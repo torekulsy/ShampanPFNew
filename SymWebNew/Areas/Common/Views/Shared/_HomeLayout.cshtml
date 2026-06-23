@@ -6,11 +6,10 @@
     <title>ShampanERP-@ViewBag.Title</title>
     <link href="~/Images/LOGO_Sym.png" rel="shortcut icon" type="image/x-icon" />
     <meta name="viewport" content="width=device-width" />
-    <script src="~/Content/AdminLte/plugins/jquery/jquery.min.js"></script>
     <script src="~/assets/javascripts/jQuery2.1.4.js"></script>
     <link rel="stylesheet" href="~/Content/AdminLte/dist/css/adminlte.min.css">
     <link href="~/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
-   
+
     <link href="~/assets/NewFolder1/dataTables/demo_table.css" rel="stylesheet" />
     <link href="@Url.Content("~/assets/css/demo_table.css")" rel="stylesheet" type="text/css" />
 
@@ -20,7 +19,7 @@
     <link href="~/assets/css/menu.css" rel="stylesheet" />
 
     <link href="~/assets/css/jquery-ui.css" rel="stylesheet" />
-    
+
     <link href="~/assets/plugins/font-awesome/css/font-awesome.css" rel="stylesheet" />
     <link href="~/assets/css/toastr.css" rel="stylesheet" />
     <link href="~/assets/stylesheets/common.css" rel="stylesheet" />
@@ -30,13 +29,13 @@
     <link href="~/assets/css/SymphonyBtn.css" rel="stylesheet" />
     <link href="~/assets/css/dataTables.colVis.css" rel="stylesheet" />
     <link href="~/assets/css/select2.css" rel="stylesheet" />
-   @* Admin Lt menu *@
+    @* Admin Lt menu *@
     <link rel="stylesheet" href="~/Content/AdminLte/plugins/fontawesome-free/css/all.min.css">
 
-   
 
 
-   
+
+    @*<script src="~/Content/AdminLte/plugins/jquery/jquery.min.js"></script>*@
 
 
     <script src="~/Content/AdminLte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
@@ -91,6 +90,7 @@
             width: 90%;
             margin: 0 auto !important;
         }
+
         .layout-left .main-header {
             height: 60px;
             background: linear-gradient(90deg, #1d3557, #457b9d);
@@ -99,7 +99,6 @@
             align-items: center;
             padding: 0 20px;
             color: white;
-            
         }
         /* Container */
         .main-container {
@@ -126,7 +125,6 @@
         /* Top Menu */
         .top-menu {
             display: none;
-            
         }
 
         /* ===== Layout Modes ===== */
@@ -536,138 +534,413 @@
         });
 
         //Animation on hide
-    document.addEventListener("DOMContentLoaded", function () {
 
-        const treeMenus = document.querySelectorAll(".nav-sidebar .has-treeview");
-        const links = document.querySelectorAll(".nav-sidebar a");
+    </script>
 
-        // 🔹 Smooth Slide Function
-        function slideUp(element, duration = 300) {
 
-            const submenu = element.querySelector(":scope > .nav-treeview");
-            if (!submenu) return;
+    @*<script type="text/javascript">
 
-            submenu.style.height = submenu.offsetHeight + "px";
-            submenu.style.transition = `all ${duration}ms ease`;
-            submenu.style.overflow = "hidden";
+            $(function () {
 
-            requestAnimationFrame(() => {
-                submenu.style.height = "0px";
-            submenu.style.opacity = "0";
-        });
+                // Hide all submenus initially
+                $(".nav-treeview").hide();
 
-            setTimeout(() => {
-                element.classList.remove("menu-open");
-            submenu.style.removeProperty("height");
-            submenu.style.removeProperty("overflow");
-            submenu.style.removeProperty("transition");
-            submenu.style.removeProperty("opacity");
-        }, duration);
-    }
+                // Restore menu state
+                var expandedMenu = localStorage.getItem("expandedMenu");
+                var expandedSubMenu = localStorage.getItem("expandedSubMenu");
 
-    function slideDown(element, duration = 300) {
+                if (expandedMenu) {
+                    var $menu = $('[data-menu-id="' + expandedMenu + '"]');
 
-        const submenu = element.querySelector(":scope > .nav-treeview");
-        if (!submenu) return;
+                    $menu.next(".nav-treeview").show();
+                    $menu.find(".fa-angle-left")
+                         .removeClass("fa-angle-left")
+                         .addClass("fa-angle-down");
+                }
 
-        element.classList.add("menu-open");
+                if (expandedSubMenu) {
+                    var $submenu = $('[data-menu-id="' + expandedSubMenu + '"]');
 
-        submenu.style.height = "0px";
-        submenu.style.opacity = "0";
-        submenu.style.overflow = "hidden";
-        submenu.style.transition = `all ${duration}ms ease`;
+                    $submenu.next(".nav-treeview").show();
+                    $submenu.find(".fa-angle-left")
+                            .removeClass("fa-angle-left")
+                            .addClass("fa-angle-down");
+                }
 
-        requestAnimationFrame(() => {
-            submenu.style.height = submenu.scrollHeight + "px";
-        submenu.style.opacity = "1";
-    });
+                // =========================
+                // Parent Menu
+                // =========================
+                $("body").delegate(".has-treeview", "click", function (e) {
+                    debugger
+                    e.preventDefault();
+                    e.stopPropagation();
 
-        setTimeout(() => {
-            submenu.style.removeProperty("height");
-        submenu.style.removeProperty("overflow");
-        submenu.style.removeProperty("transition");
-        submenu.style.removeProperty("opacity");
-    }, duration);
-    }
+                    var $this = $(this);
+                    var $target = $this.next(".nav-treeview");
 
-    // 🔹 Restore Active Link
-    const activeHref = localStorage.getItem("activeLink");
+                    if ($target.is(":animated"))
+                        return false;
 
-    if (activeHref) {
+                    $(".has-treeview").not($this).each(function () {
 
-        links.forEach(link => {
+                        var $other = $(this);
+                        var $otherMenu = $other.next(".nav-treeview");
 
-            if (link.getAttribute("href") === activeHref) {
+                        $otherMenu.stop(true, true).slideUp(200);
 
-                link.classList.add("active");
+                        $other.find(".fa-angle-down")
+                              .removeClass("fa-angle-down")
+                              .addClass("fa-angle-left");
+                    });
 
-        let parentTree = link.closest(".has-treeview");
+                    if ($target.is(":visible")) {
 
-        while (parentTree) {
+                        $target.stop(true, true).slideUp(200);
 
-            parentTree.classList.add("menu-open");
+                        $this.find(".fa-angle-down")
+                             .removeClass("fa-angle-down")
+                             .addClass("fa-angle-left");
 
-            const parentLink = parentTree.querySelector(":scope > a");
+                        localStorage.removeItem("expandedMenu");
 
-            if (parentLink) {
-                parentLink.classList.add("active");
+                    } else {
+
+                        $target.stop(true, true).slideDown(200);
+
+                        $this.find(".fa-angle-left")
+                             .removeClass("fa-angle-left")
+                             .addClass("fa-angle-down");
+
+                        localStorage.setItem(
+                            "expandedMenu",
+                            $this.attr("data-menu-id")
+                        );
+                    }
+
+                    return false;
+                });
+
+                // =========================
+                // Sub Menu
+                // =========================
+                $("body").delegate(".has-treeview-a", "click", function (e) {
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    var $this = $(this);
+                    var $target = $this.next(".nav-treeview");
+
+                    if ($target.is(":animated"))
+                        return false;
+
+                    $this.closest(".nav-treeview")
+                         .find("> li > .has-treeview-a")
+                         .not($this)
+                         .each(function () {
+
+                             var $other = $(this);
+
+                             $other.next(".nav-treeview")
+                                   .stop(true, true)
+                                   .slideUp(200);
+
+                             $other.find(".fa-angle-down")
+                                   .removeClass("fa-angle-down")
+                                   .addClass("fa-angle-left");
+                         });
+
+                    if ($target.is(":visible")) {
+
+                        $target.stop(true, true).slideUp(200);
+
+                        $this.find(".fa-angle-down")
+                             .removeClass("fa-angle-down")
+                             .addClass("fa-angle-left");
+
+                        localStorage.removeItem("expandedSubMenu");
+
+                    } else {
+
+                        $target.stop(true, true).slideDown(200);
+
+                        $this.find(".fa-angle-left")
+                             .removeClass("fa-angle-left")
+                             .addClass("fa-angle-down");
+
+                        localStorage.setItem(
+                            "expandedSubMenu",
+                            $this.attr("data-menu-id")
+                        );
+                    }
+
+                    return false;
+                });
+
+                // Active Menu Save
+                $("body").delegate(".nav-link:not(.has-treeview):not(.has-treeview-a)", "click", function () {
+
+                    localStorage.setItem(
+                        "activeMenu",
+                        $(this).attr("data-menu-id")
+                    );
+                });
+
+            });
+        </script>*@
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".nav-treeview").hide();
+
+            var expandedMenu = localStorage.getItem("expandedMenu");
+            var expandedSubMenu = localStorage.getItem("expandedSubMenu");
+            var activeMenu = localStorage.getItem("activeMenu");
+
+            function openMenu($el) {
+                $el.addClass("treeview-expanded");
+                $el.next(".nav-treeview").show();
+
+                $el.find("i.fas.fa-angle-left")
+                    .removeClass("fa-angle-left")
+                    .addClass("fa-angle-down");
             }
 
-            parentTree = parentTree.parentElement.closest(".has-treeview");
-        }
-    }
-    });
-    }
+            // =========================
+            // RESTORE MENU STATE
+            // =========================
+            if (expandedMenu) {
+                openMenu($('[data-menu-id="' + expandedMenu + '"]'));
+            }
 
-    // 🔹 Click Event
-    links.forEach(link => {
+            if (expandedSubMenu) {
+                openMenu($('[data-menu-id="' + expandedSubMenu + '"]'));
+            }
 
-        link.addEventListener("click", function () {
+            // =========================
+            // RESTORE ACTIVE STATE
+            // =========================
+            if (activeMenu) {
 
-            const href = link.getAttribute("href");
+                var $active = $('[data-menu-id="' + activeMenu + '"]');
 
-            if (!href || href === "#") return;
+                $(".nav-link").removeClass("active-menu");
+                $(".has-treeview-a").removeClass("last-parent-active");
 
-            // Save Active Link
-            localStorage.setItem("activeLink", href);
+                $active.addClass("active-menu");
 
-            // Remove all active classes
-            links.forEach(l => l.classList.remove("active"));
+                $active.parents(".nav-treeview").show();
 
-            // Smooth Close Other Menus
-            treeMenus.forEach(menu => {
+                $active.parents("li")
+                    .children(".has-treeview, .has-treeview-a")
+                    .each(function () {
 
-                if (!menu.contains(link) && menu.classList.contains("menu-open")) {
-                    slideUp(menu);
-        }
+                        $(this).addClass("treeview-expanded");
+
+                        $(this).find("i.fas.fa-angle-left")
+                            .removeClass("fa-angle-left")
+                            .addClass("fa-angle-down");
+                    });
+
+                // Last Parent Highlight
+                var $lastParent = $active
+                    .closest(".nav-treeview")
+                    .prev(".has-treeview-a");
+
+                if ($lastParent.length) {
+                    $lastParent.addClass("last-parent-active");
+                }
+            }
+
+            // =========================
+            // PARENT MENU
+            // =========================
+            $("body").on("click", ".has-treeview", function (e) {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                var $this = $(this);
+                var $target = $this.next(".nav-treeview");
+                var menuId = $this.data("menu-id");
+
+                if ($this.hasClass("treeview-expanded")) {
+
+                    $this.removeClass("treeview-expanded");
+
+                    $target.slideUp(200);
+
+                    $this.find("i.fa-angle-down")
+                        .removeClass("fa-angle-down")
+                        .addClass("fa-angle-left");
+
+                    localStorage.removeItem("expandedMenu");
+                }
+                else {
+
+                    $(".has-treeview").not($this).each(function () {
+
+                        $(this)
+                            .removeClass("treeview-expanded")
+                            .next(".nav-treeview")
+                            .slideUp(200);
+
+                        $(this).find("i.fa-angle-down")
+                            .removeClass("fa-angle-down")
+                            .addClass("fa-angle-left");
+                    });
+
+                    $this.addClass("treeview-expanded");
+
+                    $target.slideDown(200);
+
+                    $this.find("i.fa-angle-left")
+                        .removeClass("fa-angle-left")
+                        .addClass("fa-angle-down");
+
+                    localStorage.setItem("expandedMenu", menuId);
+                }
+            });
+
+            // =========================
+            // SUB MENU
+            // =========================
+            $("body").on("click", ".has-treeview-a", function (e) {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                var $this = $(this);
+                var $target = $this.next(".nav-treeview");
+                var menuId = $this.data("menu-id");
+
+                if ($this.hasClass("treeview-expanded")) {
+
+                    $this.removeClass("treeview-expanded");
+
+                    $target.slideUp(200);
+
+                    $this.find("i.fa-angle-down")
+                        .removeClass("fa-angle-down")
+                        .addClass("fa-angle-left");
+
+                    localStorage.removeItem("expandedSubMenu");
+                }
+                else {
+
+                    $this.closest(".nav-treeview")
+                        .find("> li > .has-treeview-a")
+                        .not($this)
+                        .each(function () {
+
+                            $(this)
+                                .removeClass("treeview-expanded")
+                                .next(".nav-treeview")
+                                .slideUp(200);
+
+                            $(this).find("i.fa-angle-down")
+                                .removeClass("fa-angle-down")
+                                .addClass("fa-angle-left");
+                        });
+
+                    $this.addClass("treeview-expanded");
+
+                    $target.slideDown(200);
+
+                    $this.find("i.fa-angle-left")
+                        .removeClass("fa-angle-left")
+                        .addClass("fa-angle-down");
+
+                    localStorage.setItem("expandedSubMenu", menuId);
+                }
+            });
+
+            // =========================
+            // ACTIVE MENU CLICK
+            // =========================
+            // =========================
+            // ACTIVE MENU CLICK
+            // =========================
+            $("body").on("click", ".nav-link", function () {
+
+                var menuId = $(this).data("menu-id");
+
+                if (
+                    !$(this).hasClass("has-treeview") &&
+                    !$(this).hasClass("has-treeview-a")
+                ) {
+
+                    $(".nav-link").removeClass("active-menu");
+                    $(".has-treeview-a").removeClass("last-parent-active");
+
+                    $(this).addClass("active-menu");
+
+                    // Last Parent Highlight
+                    var $lastParent = $(this)
+                        .closest(".nav-treeview")
+                        .prev(".has-treeview-a");
+
+                    if ($lastParent.length) {
+                        $lastParent.addClass("last-parent-active");
+                    }
+
+                    // =========================
+                    // CLOSE SIBLING SUBMENUS
+                    // =========================
+                    var $currentLi = $(this).closest("li");
+
+                    $currentLi.siblings("li").each(function () {
+
+                        var $submenu = $(this).children(".has-treeview-a");
+                        var $submenuTree = $(this).children(".nav-treeview");
+
+                        if ($submenu.length > 0) {
+
+                            $submenu.removeClass("treeview-expanded");
+
+                            $submenu.find("i.fa-angle-down")
+                                .removeClass("fa-angle-down")
+                                .addClass("fa-angle-left");
+
+                            $submenuTree.slideUp(200);
+                        }
+                    });
+
+                    // expanded submenu remove
+                    localStorage.removeItem("expandedSubMenu");
+
+                    localStorage.setItem("activeMenu", menuId);
+                }
+            });
+
         });
-
-    // Active Current Link
-    link.classList.add("active");
-
-    // Open Parent Menus Smoothly
-    let parentTree = link.closest(".has-treeview");
-
-    while (parentTree) {
-
-        if (!parentTree.classList.contains("menu-open")) {
-            slideDown(parentTree);
-        }
-
-        const parentLink = parentTree.querySelector(":scope > a");
-
-        if (parentLink) {
-            parentLink.classList.add("active");
-        }
-
-        parentTree = parentTree.parentElement.closest(".has-treeview");
-    }
-    });
-    });
-
-    });
-       
     </script>
+
+    <style>
+        .active-menu {
+            background: #007bff !important;
+            color: #fff !important;
+        }
+
+        .last-parent-active {
+            background: #0056b3 !important;
+            color: #fff !important;
+            font-weight: 600;
+        }
+
+        .treeview-expanded {
+            background: rgba(0,123,255,.12);
+        }
+    </style>
+
+
+
+
+
+
 </head>
 <body onload="window.scroll(0, 150)" class="layout-left hold-transition sidebar-mini">
     @{
@@ -683,34 +956,34 @@
 
 
     <div class="layout-wrapper wrapper">
-       
+
         <!-- Header -->
         <header class="main-header">
             <a class="toggleBtnMenu" data-widget="pushmenu" href="#" role="button">
                 <i class="fas fa-bars"></i>
             </a>
             @*<div class="logo">
-                <img src="~/Images/@mySettingValue" width="140" />
-            </div>*@
+                    <img src="~/Images/@mySettingValue" width="140" />
+                </div>*@
 
             @*<div class="menu-switch">
-                <button id="btnLeftMenu" class="btn btn-sm btn-primary">Left Menu</button>
-                <button id="btnTopMenu" class="btn btn-sm btn-success">Top Menu</button>
-            </div>*@
+                    <button id="btnLeftMenu" class="btn btn-sm btn-primary">Left Menu</button>
+                    <button id="btnTopMenu" class="btn btn-sm btn-success">Top Menu</button>
+                </div>*@
 
 
             @*<div class="heder-right">
-                
-                <ul class="headeRight">
-                    <li class="">
-                        <a href="#" class="sym-btn-back" title="Go Back" onclick="goBack()" role="button" aria-haspopup="true">&nbsp;Back</a>
-                    </li>
-                    <li class="">
-                        <span>Provident Fund</span>
 
-                    </li>
-                </ul>
-            </div>*@
+                    <ul class="headeRight">
+                        <li class="">
+                            <a href="#" class="sym-btn-back" title="Go Back" onclick="goBack()" role="button" aria-haspopup="true">&nbsp;Back</a>
+                        </li>
+                        <li class="">
+                            <span>Provident Fund</span>
+
+                        </li>
+                    </ul>
+                </div>*@
         </header>
 
         <!-- Top Menu -->
@@ -733,7 +1006,7 @@
 
 
             </main>
-            
+
         </div>
 
     </div>
@@ -793,7 +1066,7 @@
     <script src="~/assets/javascripts/jquery.validate.js"></script>
     <script src="~/assets/javascripts/jquery.validate.min.js"></script>
     <script src="~/assets/javascripts/jquery.validate.unobtrusive.min.js"></script>
-    
+
     <script src="~/assets/javascripts/jquery-ui-1.8.24.min.js"></script>
     <script src="~/assets/javascripts/default.js"></script>
 
@@ -805,7 +1078,7 @@
     <script src="~/assets/javascripts/select2.js"></script>
     <script src="~/assets/plugins/chartjs/moment.js"></script>
     <script src="~/assets/javascripts/chart.min.js"></script>
-    
+
     <!-- AdminLTE -->
     @*<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>*@
 
