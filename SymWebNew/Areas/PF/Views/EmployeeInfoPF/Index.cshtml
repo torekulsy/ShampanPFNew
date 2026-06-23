@@ -1,0 +1,209 @@
+﻿@{
+    ViewBag.Title = "_index";
+}
+
+<style>
+    .dataTable tbody td:nth-child(2) {
+        padding-right: 20px;
+    }
+</style>
+<div class="card">
+    <div class="card-header p-3">
+        <div class="th_thinbox_top">
+            <p>PF Employee</p>
+            <div class="breadcrumb-container">
+                <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="thinbox">
+   
+    <div class="th_thinbox">
+        <p>PF Employee List</p>
+
+    </div>
+    <div class="custom-top">
+        <div id="mainBtnAll">
+            <button type="button" title="Add New" data-url="/PF/EmployeeInfoPF/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>
+            <button type="button" title="Add Sync" data-url="/PF/EmployeeInfoPF/Create" onclick="GoTo(this)" id="" class=" sym-btn-save ">&nbsp;Sync</button>
+            <button type="button" title="" data-url="/PF/EmployeeInfoPF/Import" onclick="GoTo(this)" id="" class=" sym-btn-Excel-Export ">&nbsp;Export / Import</button>
+        </div>
+        <div class="table-search">
+            <div class="mobile-search-toggle">
+                <i class="fa fa-search"></i>
+            </div>
+            <div id="dataTables_filter"></div>
+        </div>
+
+    </div>
+    <table id="myDataTable" class="display">
+        <thead>
+            <tr>
+                <th class="center">
+                    <input type="checkbox" class="chkAll" />Select All
+                </th>
+             
+                <th>Code</th>
+                <th>Name</th>
+                <th>Department</th>             
+                <th>Date Of Birth</th>
+                <th>Join Date</th>
+            </tr>
+            <tr>   
+                <th class="center">Actions</th>    
+                <th>Code</th>
+                <th>Name</th>
+                <th>Department</th>               
+                <th>Date Of Birth</th>
+                <th>Join Date</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+       
+    </table>
+    <div class="custom-footer">
+        <div id="footer-length"></div>
+            <div id="footer-info"></div>
+        <div id="footer-pagination"></div>
+    </div>
+   
+</div>
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+
+        var oTable = $('#myDataTable').dataTable({
+            "bServerSide": true,
+            "bProcessing": true,
+            "bPaginate": true,
+            "sPaginationType": "full_numbers",
+            "iDisplayLength": 10,
+            "sAjaxSource": "/PF/EmployeeInfoPF/_index",
+            "aLengthMenu": tablelength(),
+            "bAutoWidth": false,
+
+            "bPaginate": true,
+            "sPaginationType": "full_numbers",
+            "iDisplayLength": 10,
+            "oLanguage": {
+                "oPaginate": {
+                    "sPrevious": '<i class="fa fa-angle-left"></i>',
+                    "sNext": '<i class="fa fa-angle-right"></i>'
+                },
+                "sSearch": ""
+            },
+
+            "fnDrawCallback": function () {
+                $('.dataTables_filter input')
+                    .attr('placeholder', 'Search...');
+            },
+
+            "aoColumns": [
+                {
+                    "sName": "Id",
+                    "bSearchable": false,
+                    "bSortable": false,
+                    "sWidth": "5%",
+                    "sClass": "center",
+                    "fnRender": function (oObj) {
+                        return '<input onclick="CheckAll(this)" type="checkbox" data-Id="' + oObj.aData[0] + '">' +
+                            '&nbsp;<a href="/PF/EmployeeInfoPF/Edit/' + oObj.aData[0] + '" class="sym-btn-edit-row"></a>' +
+                            '&nbsp;<a href="/PF/EmployeeInfoPF/Delete?Id=' + oObj.aData[0] + '" class="sym-btn-remove-row"></a>';
+                    }
+                },
+                { "sName": "Code" },
+                { "sName": "Name" },
+                { "sName": "Department" },
+                { "sName": "DateOfBirth" },
+                { "sName": "JoinDate" }
+            ]
+        });
+
+        oTable.columnFilter({
+            sPlaceHolder: "head:after",
+            aoColumns: [null, { type: "text" }, { type: "text" }, { type: "text" }, { type: "text" }, { type: "text" }]
+        });
+
+        $("#footer-length").append($(".dataTables_length"));
+        $("#footer-info").append($(".dataTables_info"));
+        $("#footer-pagination").append($(".dataTables_paginate"));
+        $("#dataTables_filter").append($(".dataTables_filter"));
+
+        $(document).on("click", ".mobile-search-toggle", function (e) {
+            e.stopPropagation();
+            $("#dataTables_filter").slideToggle(150);
+        });
+
+    });
+
+</script>
+
+
+@*<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        var oTable = $('#myDataTable').dataTable({
+            "bServerSide": true,
+            "bProcessing": true,
+            "bPaginate": true,
+            "sPaginationType": "full_numbers",
+            "iDisplayLength": 10,
+            "sAjaxSource": "/PF/EmployeeInfoPF/_index",
+            "aLengthMenu": tablelength(),
+            "bAutoWidth": false,
+            "oLanguage": {
+                "oPaginate": {
+                    "sPrevious": '<i class="fa fa-angle-left"></i>',
+                    "sNext": '<i class="fa fa-angle-right"></i>'
+                },
+                "sSearch": "",
+            },
+            
+
+            "aoColumns": [
+               {
+                   "sName": "Id",
+                   "bSearchable": false,
+                   "bSortable": false,
+                   "sWidth": "5%",
+                   "sClass": "center",
+                   "fnRender": function (oObj) {
+                       return ' <input onclick="CheckAll(this)" type="checkbox" data-Id="' + oObj.aData[0]
+                           + '">&nbsp; <a title="Click on for Edit" style="text-decoration:none;" href=\"/PF/EmployeeInfoPF/Edit/' + oObj.aData[0] + '\"  class=" sym-btn-edit-row"></a>'
+                           + '&nbsp; <a title="Click on for Send Mail"  href="/PF/EmployeeInfoPF/Delete?Id=' + oObj.aData[0] + '\" class="sym-btn-remove-row"></a>'
+                          
+                       ;
+                   }
+               },
+                { "sName": "Code", "sWidth": "10%" },
+                { "sName": "Name", "sWidth": "15%" },
+                { "sName": "Department", "sWidth": "15%" },             
+                { "sName": "DateOfBirth", "sWidth": "10%" },
+                { "sName": "JoinDate", "sWidth": "10%" },
+            ]
+        });
+
+        oTable.columnFilter({
+            sPlaceHolder: "head:after",
+            aoColumns: [
+                null,
+                { type: "text" },
+                { type: "text" },
+                { type: "text" },
+                { type: "text" },
+                { type: "text" },               
+            ]
+        });
+        $("#footer-length").append($(".dataTables_length"));
+        $("#footer-info").append($(".dataTables_info"));
+        $("#footer-pagination").append($(".dataTables_paginate"));
+
+        $("#dataTables_filter").append($(".dataTables_filter"));
+
+        $('.dataTables_filter input[type="text"]')
+        .attr('placeholder', 'Search...');
+       
+    });
+</script>*@

@@ -1,0 +1,234 @@
+﻿<div class="card">
+    <div class="card-header p-3">
+        <div class="th_thinbox_top">
+            <p>Profit Distribution New</p>
+            <div class="breadcrumb-container">
+                <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="thinbox">
+    <div class="th_thinbox">
+        <p>Profit Distribution List</p>
+    </div>
+    <div class="custom-top">
+        <div id="mainBtnAll">
+            @*<button type="button" title="Profit Distribution Process" data-url="/@ViewBag.TransType/ProfitDistributionNew/Process" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;Distribution Process</button>*@
+<button type="button" data-url="/@ViewBag.TransType/ProfitDistributionNew/DownloadExcel" onclick="GoTo(this)" id="" title="Click to Download the Report" class="sym-btn-Excel-Export">&nbsp;Download</button>
+<button type="button" data-url="/@ViewBag.TransType/ProfitDistributionNew/ReportView" onclick="GoTo(this)" id="" title="Click for the Report" class=" sym-btn-report ">&nbsp;Report</button>
+        </div>
+        <div class="table-search">
+            <div class="mobile-search-toggle">
+                <i class="fa fa-search"></i>
+            </div>
+            <div id="dataTables_filter"></div>
+        </div>
+
+    </div>
+    <table id="myDataTable" class="display">
+        <thead>
+            <tr>
+                <th class="center">
+                    <input type="checkbox" class="chkAll" />Select All
+                </th>
+                <th>Employee Code</th>
+                <th>Employee Name</th>
+                <th>Distribution Date</th>
+
+                <th>Employee Profit</th>
+                <th>Employer Profit</th>
+                <th>Post Status</th>
+                <th>Payment Status</th>
+
+
+
+                @*
+                    FundingDate
+                    FundingValue
+                    FundingReference
+                    Post
+                    IsDistribute
+                *@
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div class="custom-footer">
+        <div id="footer-length"></div>
+        <div id="footer-info"></div>
+        <div id="footer-pagination"></div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header p-3">
+        <div class="">
+            <button type="button" data-url="/@ViewBag.TransType/ProfitDistributionNew/DownloadExcel" onclick="GoTo(this)" id="" title="Click to Download the Report" class="sym-btn-Excel-Export">&nbsp;Download</button>
+            <button type="button" data-url="/@ViewBag.TransType/ProfitDistributionNew/ReportView" onclick="GoTo(this)" id="" title="Click for the Report" class=" sym-btn-report ">&nbsp;Report</button>
+        </div>
+    </div>
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        SelectAllForDelete();
+        $.datepicker.regional[""].dateFormat = 'dd/M/y';
+        $.datepicker.setDefaults($.datepicker.regional['']);
+        var oTable = $('#myDataTable').dataTable({
+            "bServerSide": true,
+            "sAjaxSource": "/@ViewBag.TransType/ProfitDistributionNew/_index",
+            "bProcessing": true,
+            "aLengthMenu": tablelength(),
+            "bJqueryUI": true,
+            "bAutoWidth": false,
+            "bPaginate": true,
+            "sPaginationType": "full_numbers",
+            "iDisplayLength": 10,
+            "oLanguage": {
+                "oPaginate": {
+                    "sPrevious": '<i class="fa fa-angle-left"></i>',
+                    "sNext": '<i class="fa fa-angle-right"></i>'
+                },
+                "sSearch": ""
+            },
+
+            "fnDrawCallback": function () {
+                $('.dataTables_filter input')
+                    .attr('placeholder', 'Search...');
+            },
+            "aoColumns": [
+                            {
+                                "sName": "Id",
+                                "bSearchable": false,
+                                "bSortable": false,
+                                "sWidth": "5%",
+                                "sClass": "center",
+                                "fnRender": function (oObj) {
+
+                                    return ' <input onclick="CheckAll(this)" type="checkbox" data-Id="' + oObj.aData[0] + '">'
+                                        + '&nbsp; <a id=""  title="Click on for Edit"    href=\"/@ViewBag.TransType/ProfitDistributionNew/Edit/' + oObj.aData[0] + '\" class="  sym-btn-edit-row"></a>'
+                                    //+ '&nbsp; <a title="Click on for Post"   data-url="/@ViewBag.TransType/ProfitDistributionNew/Post"   onclick=btnPostNew(this);   data-Id="' + oObj.aData[0] + '\" class="sym-btn-post-row"></a>'
+                                    //+ '&nbsp; <a title="Click on for Delete" data-url="/@ViewBag.TransType/ProfitDistributionNew/Delete" onclick=btnDeleteNew(this);   data-Id="' + oObj.aData[0] + '\" class="sym-btn-remove-row"></a>'
+                                    //+ '&nbsp; <a title="Click on for Payment" data-url="/@ViewBag.TransType/ProfitDistributionNew/Payment" onclick=btnPayment(this);   data-Id="' + oObj.aData[0] + '\" class="sym-btn-payment-row"></a>'
+                                    //+ '&nbsp; <a title="Click on for Download" target="_blank"  href=\"/@ViewBag.TransType/ProfitDistributionNew/ExcelReport/' + oObj.aData[0] + '\" class="  sym-btn-download-row"></a>'
+
+
+                                    ;
+                                }
+                            }
+                            , { "sName": "EmployeeCode", "sWidth": "10%" }
+                            , { "sName": "Name", "sWidth": "10%" }
+                            , { "sName": "DistributionDate", "sWidth": "10%" }
+                            , {
+                                "sName": "EmployeeProfit", "sWidth": "10%", "sClass": "right", "fnRender": function (oObj) {
+                                    return formatNumberWithCommas(oObj.aData[4]);
+                                }
+                            }
+                            , {
+                                "sName": "EmployerProfit", "sWidth": "10%", "sClass": "right", "fnRender": function (oObj) {
+                                    return formatNumberWithCommas(oObj.aData[5]);
+                                }
+                            }
+                            , { "sName": "Post", "sWidth": "10%" }
+                            , { "sName": "IsPaid", "sWidth": "10%" }
+
+
+
+            ]
+        });
+        $("#footer-length").append($(".dataTables_length"));
+        $("#footer-info").append($(".dataTables_info"));
+        $("#footer-pagination").append($(".dataTables_paginate"));
+        $("#dataTables_filter").append($(".dataTables_filter"));
+
+        $(document).on("click", ".mobile-search-toggle", function (e) {
+            e.stopPropagation();
+            $("#dataTables_filter").slideToggle(150);
+        });
+    });
+</script>
+
+
+<script>
+    function btnPostNew(sender) {
+
+        var Id = $(sender).attr("data-Id");
+
+        var getURL = "/@ViewBag.TransType/ProfitDistributionNew/GetProfitDistributionNew" + "?" + "id=" + Id;
+
+        $.getJSON(getURL, function (vm) {
+
+            if (vm.Post) {
+                ShowResult("Fail", "Data Already Posted!");
+                return true;
+            }
+            else {
+                var url = $(sender).attr("data-url") + "?ids=" + Id + '~';
+                var questionMSG = "Are you sure to Post Data!";
+                singleOperation(questionMSG, url);
+            }
+
+        });
+
+    }
+
+    function btnDeleteNew(sender) {
+
+        var Id = $(sender).attr("data-Id");
+
+        var getURL = "/@ViewBag.TransType/ProfitDistributionNew/GetProfitDistributionNew" + "?" + "id=" + Id;
+
+        $.getJSON(getURL, function (vm) {
+
+            if (vm.Post) {
+                ShowResult("Fail", "Data Already Posted! Can't Be Deleted!");
+                return true;
+            }
+            else {
+                var url = $(sender).attr("data-url") + "?ids=" + Id + '~';
+                var questionMSG = "Are you sure to Delete Data!";
+                singleOperation(questionMSG, url);
+            }
+
+        });
+
+    }
+
+
+    function btnPayment(sender) {
+
+        var Id = $(sender).attr("data-Id");
+
+        var getURL = "/@ViewBag.TransType/ProfitDistributionNew/GetProfitDistributionNew" + "?" + "id=" + Id;
+
+        $.getJSON(getURL, function (vm) {
+
+            if (!vm.Post) {
+                ShowResult("Fail", "Do Post before Payment!");
+                return;
+            }
+            else if (vm.IsPaid) {
+                ShowResult("Fail", "Payment Already Done!");
+                return true;
+            }
+            else {
+                var url = $(sender).attr("data-url") + "?ids=" + Id + '~';
+                var questionMSG = "Are you sure to do Payment!";
+                singleOperation(questionMSG, url);
+            }
+
+        });
+
+    }
+
+    function formatNumberWithCommas(value) {
+        if (value == null || value === '') return '';
+        value = parseFloat(value).toFixed(2);
+        var parts = value.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parts[0] + '.' + parts[1];
+    }
+</script>
+

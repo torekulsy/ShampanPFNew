@@ -1,0 +1,202 @@
+﻿@{
+    string mySettingValue = System.Configuration.ConfigurationManager.AppSettings["Company"];
+}
+
+<style>
+    .slider-box {
+        width: 100%; /* responsive */
+    }
+
+        .slider-box img {
+            width: 100%;
+            height: 381px;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+    .thumbnail-bar {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        flex: 1;
+        align-items: center;
+        max-width: 950px;
+    }
+
+    .thumb {
+        width: 100%;
+        height: 70px;
+        object-fit: cover;
+    }
+
+    .slider-box {
+        overflow: hidden;
+        border-radius: 1.5rem;
+        background: linear-gradient(135deg,#ffffff,#f0f6ff);
+        box-shadow: 0 10px 40px -15px rgba(37,99,235,.18);
+        position: relative;
+        padding: 10px;
+        max-width: 650px;
+        max-height: 415px;
+    }
+
+
+    .slider-text {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        color: #0a2540;
+    }
+
+        .slider-text h2 {
+            font-size: 32px;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .slider-text p {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+
+
+    .thumbnail-bar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 10px;
+        margin-top: 15px;
+        border-radius: 1.5rem;
+        border: 1px solid rgba(227,234,246,.6);
+        background: rgba(255,255,255,.8);
+        backdrop-filter: blur(10px);
+        padding: 1rem;
+        box-shadow: 0 10px 40px -15px rgba(37,99,235,.18);
+    }
+
+    .thumb {
+        width: 90%;
+        object-fit: cover;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+        .thumb:hover {
+            transform: scale(1.05);
+            border-color: #4facfe;
+        }
+
+        /* Active Thumbnail */
+        .thumb.active {
+            border: 2px solid #1f6fdc;
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+    .thumb-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .arrow {
+        width: 180px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        color: var(--bs-blue);
+        font-size: 16px;
+        border-radius: 50%;
+        cursor: pointer;
+        user-select: none;
+        transition: 0.3s;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.08), inset 0 3px 0 rgba(255,255,255,0.6);
+        border: 1px solid #ddd;
+    }
+
+    .thumbnail-bar {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        flex: 1;
+        align-items: center;
+    }
+        /* Hide scrollbar */
+        .thumbnail-bar::-webkit-scrollbar {
+            display: none;
+        }
+</style>
+
+<div class="slider-box">
+    <img id="mainImage" src="~/Images/symphonyLogo1.png" />
+</div>
+
+<div class="thumb-wrapper">
+
+    <!-- LEFT ARROW -->
+
+
+    <div class="thumbnail-bar" id="thumbContainer">
+        @*<div class="arrow left" onclick="scrollThumb(-1)">&#10094;</div>*@
+        <img class="thumb" src="~/Images/symphonyLogo1.png" onclick="changeImage(this)">
+        <img class="thumb" src="~/Images/payroll-12.jpg" onclick="changeImage(this)">
+        <img class="thumb" src="~/Images/sapamahrm_banner.png" onclick="changeImage(this)">
+        <img class="thumb" src="~/Images/payroll-12.jpg" onclick="changeImage(this)">
+        <img class="thumb" src="~/Images/payroll-4.jpg" onclick="changeImage(this)">
+        @*<div class="arrow right" onclick="scrollThumb(1)">&#10095;</div>*@
+    </div>
+
+    <!-- RIGHT ARROW -->
+
+
+</div>
+
+<script>
+    let currentIndex = 0;
+    const thumbs = document.querySelectorAll('.thumb');
+    const mainImage = document.getElementById('mainImage');
+
+    /* Change Image */
+    function changeImage(el) {
+        mainImage.src = el.src;
+
+        thumbs.forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+
+        currentIndex = Array.from(thumbs).indexOf(el);
+    }
+
+    /* Arrow Scroll */
+    function scrollThumb(direction) {
+        const container = document.getElementById('thumbContainer');
+        container.scrollLeft += direction * 100;
+    }
+
+    /* Auto Slide */
+    function autoSlide() {
+        currentIndex++;
+
+        if (currentIndex >= thumbs.length) {
+            currentIndex = 0;
+        }
+
+        changeImage(thumbs[currentIndex]);
+    }
+
+    /* Start Auto Slide */
+    setInterval(autoSlide1, 2000);
+</script>
+<script>
+    $(function () {
+        $('.carousel').carousel({
+            interval: false
+        })
+    })
+</script>

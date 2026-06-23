@@ -1,0 +1,1054 @@
+﻿@model SymViewModel.Common.AdminInfoDashboardVM
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PF Dashboard</title>
+    <script src="~/assets/plugins/chartjs/chart.js"></script>
+    <style>
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #eef2f7;
+        }
+
+
+
+        /* ===== CARDS ===== */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .card {
+            padding: 18px;
+            border-radius: 18px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+            .card::before {
+                content: "";
+                position: absolute;
+                width: 140px;
+                height: 140px;
+                background: rgba(255, 255, 255, 0.15);
+                border-radius: 50%;
+                top: -40px;
+                right: -40px;
+            }
+
+            .card h4 {
+                font-size: 16px;
+                color: #fff;
+                font-weight: 600;
+            }
+
+            .card p {
+                font-size: 26px;
+                font-weight: bold;
+                margin-top: 6px;
+            }
+
+        /* COLORS */
+        .green {
+            background: linear-gradient(135deg, #448aff, #448afffa);
+        }
+
+        .blue {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+        }
+
+        .orange {
+            background: linear-gradient(135deg, #3a5c9e, #3a5c9e);
+        }
+
+        .red {
+            background: linear-gradient(135deg, #2440ac, #2c439f);
+        }
+
+        /* ===== GRID ===== */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 18px;
+        }
+
+        /* TABLET + DESKTOP */
+
+        /* FULL WIDTH */
+        .full-width {
+            grid-column: span 1;
+        }
+
+
+        /* ===== CHART BOX ===== */
+        .chart-box {
+            background: #fff;
+            padding: 16px;
+            border-radius: 18px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+            height: 320px;
+        }
+
+            .chart-box h4, .table-card h4 {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+
+        /* CANVAS FIX */
+        canvas {
+            width: 100% !important;
+            height: calc(100% - 43px) !important;
+        }
+        /* ===== TABLE ===== */
+        .table-card {
+            background: #fff;
+            padding: 16px;
+            margin-top: 18px;
+            border-radius: 18px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 500px;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .chart-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+            .chart-header h4 {
+                font-size: 18px;
+                font-weight: 600;
+            }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+        }
+
+            .filters select {
+                padding: 6px 12px;
+                border-radius: 8px;
+                border: 1px solid #ddd;
+                background: #f7f9fc;
+                cursor: pointer;
+                transition: 0.3s;
+                font-size: 14px;
+            }
+
+                .filters select:hover {
+                    border-color: #007bff;
+                }
+
+                .filters select:focus {
+                    outline: none;
+                    border-color: #007bff;
+                    background: #fff;
+                }
+    </style>
+</head>
+
+<body>
+
+    <div id="mainDashbord">
+
+        <div class="dashboard">
+            <!-- CARDS -->
+            <div class="cards">
+                <div class="card green">
+                    <h4>Employees</h4>
+                    <p>120</p>
+                </div>
+                <div class="card blue">
+                    <h4>PF Balance</h4>
+                    <p>৳5.2L</p>
+                </div>
+                <div class="card orange">
+                    <h4>Last Monthly PF</h4>
+                    <p>৳45K</p>
+                </div>
+                @*<div class="card red">
+                    <h4>Pending</h4>
+                    <p>8</p>
+                </div>*@
+            </div>
+
+            <!-- CHARTS -->
+            <div class="chart-grid">
+
+                @*<div class="chart-box">
+                    <h4>Monthly Contribution</h4>
+
+                    <canvas id="barChart"></canvas>
+                </div>*@
+                <div class="chart-box">
+
+                    <div class="chart-header">
+                        <h4>Monthly Contribution</h4>
+
+                        <div class="filters">
+                            <select id="monthFiltercon">
+                                <option value="">All Months</option>
+                                <option value="0">Jan</option>
+                                <option value="1">Feb</option>
+                                <option value="2">Mar</option>
+                                <option value="3">Apr</option>
+                                <option value="4">May</option>
+                                <option value="5">Jun</option>
+                                <option value="6">Jul</option>
+                                <option value="7">Aug</option>
+                                <option value="8">Sep</option>
+                                <option value="9">Oct</option>
+                                <option value="10">Nov</option>
+                                <option value="11">Dec</option>
+                            </select>
+
+                            <select id="yearFiltercon">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <canvas id="barChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-header">
+                        <h4>Employee Growth</h4>
+
+                        <div class="filters">
+                            <select id="monthFilterGrowth">
+                                <option value="">All Months</option>
+                                <option value="0">Jan</option>
+                                <option value="1">Feb</option>
+                                <option value="2">Mar</option>
+                                <option value="3">Apr</option>
+                                <option value="4">May</option>
+                                <option value="5">Jun</option>
+                                <option value="6">Jul</option>
+                                <option value="7">Aug</option>
+                                <option value="8">Sep</option>
+                                <option value="9">Oct</option>
+                                <option value="10">Nov</option>
+                                <option value="11">Dec</option>
+                            </select>
+
+                            <select id="yearFilterGrowth">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <canvas id="lineChart"></canvas>
+                </div>
+
+                <div class="chart-box">
+                    <div class="chart-header">
+                        <h4>Contribution Split</h4>
+
+                        <div class="filters">
+                            <select id="monthFiltersplit">
+                                <option value="">All Months</option>
+                                <option value="0">Jan</option>
+                                <option value="1">Feb</option>
+                                <option value="2">Mar</option>
+                                <option value="3">Apr</option>
+                                <option value="4">May</option>
+                                <option value="5">Jun</option>
+                                <option value="6">Jul</option>
+                                <option value="7">Aug</option>
+                                <option value="8">Sep</option>
+                                <option value="9">Oct</option>
+                                <option value="10">Nov</option>
+                                <option value="11">Dec</option>
+                            </select>
+
+                            <select id="yearFiltersplit">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+                    </div>
+                   
+                    <canvas id="pieChart"></canvas>
+                </div>
+
+                <div class="chart-box">
+                    <div class="chart-header">
+                        <h4>Withdrawal vs Deposit</h4>
+
+                        <div class="filters">
+                            <select id="monthFilterWD">
+                                <option value="">All Months</option>
+                                <option value="0">Jan</option>
+                                <option value="1">Feb</option>
+                                <option value="2">Mar</option>
+                                <option value="3">Apr</option>
+                                <option value="4">May</option>
+                                <option value="5">Jun</option>
+                                <option value="6">Jul</option>
+                                <option value="7">Aug</option>
+                                <option value="8">Sep</option>
+                                <option value="9">Oct</option>
+                                <option value="10">Nov</option>
+                                <option value="11">Dec</option>
+                            </select>
+
+                            <select id="yearFilterWD">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+                    </div>
+                   
+                    <canvas id="areaChart"></canvas>
+                </div>
+
+                <div class="chart-box full-width">
+                    <div class="chart-header">
+                        <h4>Department Wise PF</h4>
+
+                        <div class="filters">
+                            <select id="monthFilterDep">
+                                <option value="">All Months</option>
+                                <option value="0">Jan</option>
+                                <option value="1">Feb</option>
+                                <option value="2">Mar</option>
+                                <option value="3">Apr</option>
+                                <option value="4">May</option>
+                                <option value="5">Jun</option>
+                                <option value="6">Jul</option>
+                                <option value="7">Aug</option>
+                                <option value="8">Sep</option>
+                                <option value="9">Oct</option>
+                                <option value="10">Nov</option>
+                                <option value="11">Dec</option>
+                            </select>
+
+                            <select id="yearFilterDep">
+                                <option value="2024">2024</option>
+                                <option value="2025" >2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    
+                    <canvas id="deptChart"></canvas>
+                </div>
+                <div class="chart-box full-width">
+
+                    <div class="flex-item-inner">
+                        <a href="#">
+                            <div class="card-front">
+                                <div class="card-top" style="background: #899d23">
+                                    <h2>Last Month PF</h2>
+                                </div>
+                                <div class="char_canva">
+                                    <canvas id="myChartPF" style="width: 420px !important; height: 200px !important;"></canvas>
+                                </div>
+                                <div class="cardMain">
+                                    <div class="card-flex">
+                                        @Html.LabelFor(model => model.PfInfoDashboardVMS.TotalPerson)
+                                        <span>
+                                            @Html.TextBoxFor(model => model.PfInfoDashboardVMS.TotalPerson, new
+                   {
+                       @placeholder =
+                           "TotalPerson",
+                       @class = "form-control"
+                   })
+                                        </span>
+                                    </div>
+                                    <div class="card-flex">
+                                        @Html.LabelFor(model => model.PfInfoDashboardVMS.PFValue)
+                                        <span>
+                                            @Html.TextBoxFor(model => model.PfInfoDashboardVMS.PFValue, new
+                   {
+                       @placeholder = "PFValue",
+                       @class = "form-control"
+                   })
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </a>
+                        <!-- /card -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-card">
+            <h4>Recent Transactions</h4>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+                <tr>
+                    <td>Akbar</td>
+                    <td>৳2000</td>
+                    <td>1 May</td>
+                </tr>
+                <tr>
+                    <td>Rahim</td>
+                    <td>৳1500</td>
+                    <td>2 May</td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const options = {
+            responsive: true,
+            maintainAspectRatio: false
+        };
+        
+
+        // ===============================
+        // 📌 ONLY: Monthly Contribution
+        // ===============================
+
+        const contributionData = [
+            { month: 0, year: 2025, value: 800 },
+            { month: 1, year: 2025, value: 600 },
+            { month: 2, year: 2025, value: 700 },
+            { month: 3, year: 2025, value: 900 },
+
+            { month: 0, year: 2026, value: 300 },
+            { month: 1, year: 2026, value: 400 },
+            { month: 2, year: 2026, value: 350 },
+            { month: 3, year: 2026, value: 500 },
+        ];
+
+        // ✅ Unique IDs (NO CONFLICT)
+        const monthFilterCon = document.getElementById("monthFiltercon");
+        const yearFilterCon = document.getElementById("yearFiltercon");
+
+        const barCanvasCon = document.getElementById("barChart");
+
+        // Months
+        const monthsCon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+        // Last year
+        const lastYearCon = Math.max(...contributionData.map(d => d.year));
+
+        // Bar Chart ONLY for Contribution
+        const barChartCon = new Chart(barCanvasCon, {
+            type: "bar",
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: "#4e73df"
+                }]
+            }
+        });
+
+        // ===============================
+        // Filter Function
+        // ===============================
+        function getContributionFiltered() {
+
+            const year = yearFilterCon.value || lastYearCon;
+            const month = monthFilterCon.value;
+
+            return contributionData.filter(d =>
+                d.year == year && (month === "" || d.month == month)
+            );
+        }
+
+        // ===============================
+        // Update Chart
+        // ===============================
+        function updateContributionChart() {
+
+            const data = getContributionFiltered();
+
+            barChartCon.data.labels = data.map(d => monthsCon[d.month]);
+            barChartCon.data.datasets[0].data = data.map(d => d.value);
+
+            barChartCon.update();
+        }
+
+        // ===============================
+        // Init
+        // ===============================
+        window.addEventListener("load", () => {
+
+            yearFilterCon.value = lastYearCon;
+        monthFilterCon.value = "";
+
+        updateContributionChart();
+        });
+
+        // ===============================
+        // Events
+        // ===============================
+        monthFilterCon.onchange = updateContributionChart;
+        yearFilterCon.onchange = updateContributionChart;
+
+        const allData = [
+    { month: 0, year: 2025, value: 500 },
+    { month: 1, year: 2025, value: 100 },
+    { month: 2, year: 2025, value: 25 },
+    { month: 3, year: 2025, value: 30 },
+
+    { month: 0, year: 2026, value: 10 },
+    { month: 1, year: 2026, value: 15 },
+    { month: 2, year: 2026, value: 12 },
+    { month: 3, year: 2026, value: 18 },
+    { month: 4, year: 2026, value: 20 },
+        ];
+
+        // ✅ Correct elements (UPDATED IDs)
+        const monthFilterGrowth = document.getElementById("monthFilterGrowth");
+        const yearFilterGrowth = document.getElementById("yearFilterGrowth");
+
+        const lineCanvas = document.getElementById("lineChart");
+
+        // Months
+        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+        // Last year auto detect
+        const lastYear = Math.max(...allData.map(d => d.year));
+
+        // Chart (ONLY LINE CHART)
+        const lineChart = new Chart(lineCanvas, {
+            type: "line",
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    borderColor: "#1cc88a",
+                    backgroundColor: "transparent",
+                    tension: 0.4
+                }]
+            }
+        });
+
+        // Filter function
+        function getFilteredData() {
+            const year = yearFilterGrowth.value || lastYear;
+            const month = monthFilterGrowth.value;
+
+            return allData.filter(d =>
+                d.year == year && (month === "" || d.month == month)
+            );
+        }
+
+        // Update chart
+        function updateLineChart() {
+            const data = getFilteredData();
+
+            lineChart.data.labels = data.map(d => months[d.month]);
+            lineChart.data.datasets[0].data = data.map(d => d.value);
+
+            lineChart.update();
+        }
+
+        // Init
+        window.addEventListener("load", () => {
+            yearFilterGrowth.value = lastYear;
+        monthFilterGrowth.value = "";
+
+        updateLineChart();
+        });
+
+        // Events
+        monthFilterGrowth.onchange = updateLineChart;
+        yearFilterGrowth.onchange = updateLineChart;
+
+
+        // PIE ==========================
+        const splitData = [
+     { month: 0, year: 2025, employee: 60, company: 40 },
+     { month: 1, year: 2025, employee: 55, company: 45 },
+     { month: 2, year: 2025, employee: 65, company: 35 },
+     { month: 3, year: 2025, employee: 70, company: 30 },
+        ];
+
+        const monthFilterSplit = document.getElementById("monthFiltersplit");
+        const yearFilterSplit = document.getElementById("yearFiltersplit");
+
+        const ctx = document.getElementById("pieChart");
+
+        const lastYearSplit = Math.max(...splitData.map(d => d.year));
+
+        const pieChart = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels: ["Employee", "Company"],
+                datasets: [{
+                    data: [60, 40],
+                    backgroundColor: ["#4e73df", "#ff5c7a"],
+                    hoverBackgroundColor: ["#2e59d9", "#ff2e63"],
+                    borderColor: "#ffffff",
+                    borderWidth: 4,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "70%",   // 🎯 donut center hole
+                plugins: {
+                    legend: {
+                        position: "top",
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: "circle"
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context){
+                                return `${context.label}: ${context.parsed}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // FILTER LOGIC
+        function updateChart(){
+            const year = yearFilterSplit.value || lastYearSplit;
+            const month = monthFilterSplit.value;
+
+            const filtered = splitData.filter(d =>
+                d.year == year && (month === "" || d.month == month)
+            );
+
+            let emp = 0, com = 0;
+
+            filtered.forEach(d=>{
+                emp += d.employee;
+            com += d.company;
+        });
+
+        pieChart.data.datasets[0].data = [emp, com];
+        pieChart.update();
+        }
+
+        window.onload = () => {
+            yearFilterSplit.value = lastYearSplit;
+        monthFilterSplit.value = "";
+        updateChart();
+        };
+
+        monthFilterSplit.onchange = updateChart;
+        yearFilterSplit.onchange = updateChart;
+
+        // AREA
+        // ===============================
+        // 📌 DATA
+        // ===============================
+        const wdData = [
+            { month: 0, year: 2025, deposit: 10, withdraw: 2 },
+            { month: 1, year: 2025, deposit: 12, withdraw: 3 },
+            { month: 2, year: 2025, deposit: 15, withdraw: 4 },
+            { month: 3, year: 2025, deposit: 17, withdraw: 3 },
+            { month: 4, year: 2025, deposit: 20, withdraw: 5 },
+
+            { month: 0, year: 2026, deposit: 8, withdraw: 1 },
+            { month: 1, year: 2026, deposit: 11, withdraw: 2 },
+            { month: 2, year: 2026, deposit: 14, withdraw: 3 },
+        ];
+
+        // ===============================
+        // ELEMENTS
+        // ===============================
+        const monthFilterWD = document.getElementById("monthFilterWD");
+        const yearFilterWD = document.getElementById("yearFilterWD");
+        const ctx1 = document.getElementById("areaChart").getContext("2d");
+
+       
+
+        const lastYearWD = Math.max(...wdData.map(d => d.year));
+
+        // ===============================
+        // GRADIENTS (IMPORTANT FIX)
+        // ===============================
+        function createGradients() {
+
+            const depositGradient = ctx1.createLinearGradient(0, 0, 0, 400);
+            depositGradient.addColorStop(0, "rgba(54,162,235,0.5)");
+            depositGradient.addColorStop(1, "rgba(54,162,235,0.0)");
+
+            const withdrawGradient = ctx1.createLinearGradient(0, 0, 0, 400);
+            withdrawGradient.addColorStop(0, "rgba(255,99,132,0.5)");
+            withdrawGradient.addColorStop(1, "rgba(255,99,132,0.0)");
+
+            return { depositGradient, withdrawGradient };
+        }
+
+        let gradients = createGradients();
+
+        // ===============================
+        // CHART
+        // ===============================
+        const areaChart = new Chart(ctx1, {
+            type: "line",
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: "Deposit",
+                        data: [],
+                        fill: true,
+                        backgroundColor: gradients.depositGradient,
+                        borderColor: "#36A2EB",
+                        tension: 0.4,
+                        pointRadius: 4
+                    },
+                    {
+                        label: "Withdrawal",
+                        data: [],
+                        fill: true,
+                        backgroundColor: gradients.withdrawGradient,
+                        borderColor: "#FF6384",
+                        tension: 0.4,
+                        pointRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: "top"
+                    },
+                    tooltip: {
+                        mode: "index",
+                        intersect: false
+                    }
+                },
+                interaction: {
+                    mode: "nearest",
+                    axis: "x",
+                    intersect: false
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: "rgba(0,0,0,0.05)"
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // ===============================
+        // FILTER
+        // ===============================
+        function getFilteredWD() {
+
+            const year = yearFilterWD.value || lastYearWD;
+            const month = monthFilterWD.value;
+
+            return wdData.filter(d =>
+                d.year == year && (month === "" || d.month == month)
+            );
+        }
+
+        // ===============================
+        // UPDATE CHART
+        // ===============================
+        function updateWDChart() {
+
+            const data = getFilteredWD();
+
+            areaChart.data.labels = data.map(d => months[d.month]);
+            areaChart.data.datasets[0].data = data.map(d => d.deposit);
+            areaChart.data.datasets[1].data = data.map(d => d.withdraw);
+
+            // regenerate gradient (important on resize/update)
+            gradients = createGradients();
+            areaChart.data.datasets[0].backgroundColor = gradients.depositGradient;
+            areaChart.data.datasets[1].backgroundColor = gradients.withdrawGradient;
+
+            areaChart.update();
+        }
+
+        // ===============================
+        // INIT
+        // ===============================
+        window.addEventListener("load", () => {
+            yearFilterWD.value = lastYearWD;
+        monthFilterWD.value = "";
+        updateWDChart();
+        });
+
+        // ===============================
+        // EVENTS
+        // ===============================
+        monthFilterWD.onchange = updateWDChart;
+        yearFilterWD.onchange = updateWDChart;
+
+        // DEPT
+        
+        // =======================
+        // 📌 DATA
+        // =======================
+        
+        // =======================
+        // 📌 DATA
+        // =======================
+        const deptData = [
+            { month: 0, year: 2025, HR: 10, IT: 20, Accounts: 5, Sales: 15 },
+            { month: 1, year: 2025, HR: 12, IT: 25, Accounts: 7, Sales: 18 },
+            { month: 2, year: 2025, HR: 15, IT: 30, Accounts: 10, Sales: 20 },
+            { month: 3, year: 2025, HR: 18, IT: 35, Accounts: 12, Sales: 22 },
+            { month: 4, year: 2025, HR: 20, IT: 38, Accounts: 14, Sales: 25 },
+            { month: 5, year: 2025, HR: 22, IT: 40, Accounts: 15, Sales: 28 },
+
+            { month: 0, year: 2026, HR: 8, IT: 18, Accounts: 4, Sales: 12 },
+            { month: 1, year: 2026, HR: 11, IT: 22, Accounts: 6, Sales: 16 },
+            { month: 2, year: 2026, HR: 13, IT: 24, Accounts: 7, Sales: 18 },
+        ];
+
+        // =======================
+        // 📌 ELEMENTS
+        // =======================
+        const monthFilterDep = document.getElementById("monthFilterDep");
+        const yearFilterDep = document.getElementById("yearFilterDep");
+
+        // =======================
+        // 📌 TIME SETUP
+        // =======================
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth();
+
+        // =======================
+        // 📌 LABELS
+        // =======================
+       
+
+        // =======================
+        // 📌 CHART INIT
+        // =======================
+        const deptChart = new Chart(document.getElementById("deptChart"), {
+            type: "bar",
+            data: {
+                labels: [],
+                datasets: [
+                    { label: "HR", data: [], backgroundColor: "#4e73df" },
+                    { label: "IT", data: [], backgroundColor: "#1cc88a" },
+                    { label: "Accounts", data: [], backgroundColor: "#36b9cc" },
+                    { label: "Sales", data: [], backgroundColor: "#f6c23e" }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "top"
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // =======================
+        // 📌 SMART FILTER LOGIC
+        // =======================
+        function getFilteredDeptData() {
+
+            const year = parseInt(yearFilterDep.value);
+            const month = monthFilterDep.value;
+
+            let data = deptData.filter(d => d.year == year);
+
+            // 👉 Single month filter
+            if (month !== "") {
+                return data.filter(d => d.month == month);
+            }
+
+            // 👉 Running year logic (current year only show till current month)
+            if (year === currentYear) {
+                return data.filter(d => d.month <= currentMonth);
+            }
+
+            // 👉 Previous year → full data
+            return data;
+        }
+
+        // =======================
+        // 📌 UPDATE CHART (PRO LOGIC)
+        // =======================
+        function updateDeptChart() {
+
+            const data = getFilteredDeptData();
+
+            let labels = [];
+            let hr = [];
+            let it = [];
+            let acc = [];
+            let sales = [];
+
+            data.forEach(d => {
+                labels.push(months[d.month]);
+            hr.push(d.HR);
+            it.push(d.IT);
+            acc.push(d.Accounts);
+            sales.push(d.Sales);
+        });
+
+        deptChart.data.labels = labels;
+        deptChart.data.datasets[0].data = hr;
+        deptChart.data.datasets[1].data = it;
+        deptChart.data.datasets[2].data = acc;
+        deptChart.data.datasets[3].data = sales;
+
+        deptChart.update();
+        }
+
+        // =======================
+        // 📌 INIT
+        // =======================
+        window.addEventListener("load", () => {
+
+            yearFilterDep.value = currentYear;
+        monthFilterDep.value = "";
+
+        updateDeptChart();
+        });
+
+        // =======================
+        // 📌 EVENTS
+        // =======================
+        monthFilterDep.onchange = updateDeptChart;
+        yearFilterDep.onchange = updateDeptChart;
+        localStorage.removeItem("activeLink");
+        localStorage.removeItem("openedMenus");
+    </script>
+    <script>
+        $(function () {
+            var backgroundColor = ["#2ecc71", "#3498db", "#95a5a6", "#e74c3c"];
+
+            setTimeout(function () { loadsPie() }, 0);
+            setTimeout(function () { loadsPiePF() }, 0);
+
+
+            function loadsPie() {
+                var labels = [];
+                var datas = [];
+                $.ajax({
+                    url: "@Url.Action("AdminInfo", "Home", new { area = "Common" })",
+                    type: 'GET',
+                    beforeSend: function () { $(".loading").show(); },
+                    complete: function () { $(".loading").fadeOut(200).hide("slow") },
+                    success: function (data) {
+
+                        var labels = ["Present", "Absent", "Late", "InMiss"];
+                        var datas = [data.Present, data.Absent, data.Late, data.InMiss];
+
+                        var ctx = document.getElementById("myChartPie").getContext('2d');
+                        var myChart = new Chart(ctx, {
+                            type: 'pie',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    backgroundColor: backgroundColor,
+                                    data: datas
+                                }],
+                            }
+                        });
+                    },
+                });
+            }
+
+            function loadsPiePF() {
+                var labels = [];
+                var datas = [];
+                $.ajax({
+                    url: "@Url.Action("PFInfo", "Home", new { area = "Common" })",
+                    type: 'GET',
+                    beforeSend: function () { $(".loading").show(); },
+                    complete: function () { $(".loading").fadeOut(200).hide("slow") },
+                    success: function (data) {
+
+                        var labels = ["TotalPerson", "PFValue"];
+                        var datas = [data.TotalPerson, data.PFValue];
+
+                        var ctx = document.getElementById("myChartPF").getContext('2d');
+                        var myChart = new Chart(ctx, {
+                            type: 'pie',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    backgroundColor: backgroundColor,
+                                    data: datas
+                                }],
+                            }
+                        });
+                    },
+                });
+            }
+
+
+        });
+
+
+
+    </script>
+</body>
+
+</html>

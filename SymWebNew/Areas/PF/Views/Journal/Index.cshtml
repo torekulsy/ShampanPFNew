@@ -1,0 +1,240 @@
+﻿@model SymViewModel.PF.GLJournalVM
+@using System.Threading;
+@using NPOI.SS.Formula.Functions
+@using UIHelper.MVC
+@using SymOrdinary
+@{
+    ShampanIdentity identity = null;
+    try
+    {
+        identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
+    }
+    catch (Exception)
+    {
+        Response.Redirect("/Home/Index");
+        return;
+    }
+}
+<div class="card">
+    <div class="card-header p-3">
+        <div class="th_thinbox_top">
+            <p>Journal Entry</p>
+            <div class="breadcrumb-container">
+                <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="thinbox">
+    <div class="th_thinbox">
+        @{
+            if (Model.JournalType == 1)
+            {
+                <p class="thinHead">Journal Voucher</p>
+
+            }
+            else if (Model.JournalType == 2)
+            {
+                <p class="thinHead">Payment Voucher</p>
+
+            }
+            else if (Model.JournalType == 3)
+            {
+                <p class="thinHead">Receipt Voucher</p>
+            }
+        }
+    </div>
+    <div class="row">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+            <div class="editor-label">
+                @Html.HiddenFor(model => model.JournalType)
+            </div>
+
+        </div>
+
+        @*<div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                <div class="editor-label">
+                    <label>&nbsp;</label>
+                </div>
+                <div class="editor-field">
+                    <button type="button" title="Click to Search" id="searchBtn" class="sym-btn-search">&nbsp;Search</button>
+                </div>
+            </div>*@
+    </div>
+    <div class="custom-top">
+        <div id="mainBtnAll">
+            <a title="Add New Journal Entry" href="/@ViewBag.TransType/Journal/Create?JournalType=@Model.JournalType" id="" class="sym-btn-add">&nbsp;New</a>
+        </div>
+        <div class="table-search">
+            <div class="mobile-search-toggle">
+                <i class="fa fa-search"></i>
+            </div>
+            <div id="dataTables_filter"></div>
+        </div>
+
+    </div>
+
+
+    <table id="myDataTable" class="display">
+        <thead>
+            <tr>
+                 
+                <th class="center">Action</th>
+                <th class="center">Voucher No</th>
+                <th class="center">Voucher Date</th>                
+                @*<th class="center">Transaction Type</th>*@
+                <th class="center">Value</th>
+                <th class="center">Post Status</th>
+                <th class="center">Approve Status</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div class="custom-footer">
+        <div id="footer-length"></div>
+        <div id="footer-info"></div>
+        <div id="footer-pagination"></div>
+    </div>
+</div>
+<div class="headrow">
+
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        SelectAllForDelete();
+        $.datepicker.regional[""].dateFormat = 'dd/M/y';
+        $.datepicker.setDefaults($.datepicker.regional['']);
+        var oTable = $('#myDataTable').dataTable({
+            "bServerSide": true,
+            "sAjaxSource": "/@ViewBag.TransType/Journal/_index?JournalType=@Model.JournalType",
+            "bProcessing": true,
+            "aLengthMenu": tablelength(),
+            "bJqueryUI": true,
+            "bAutoWidth": false,
+            "bPaginate": true,
+            "sPaginationType": "full_numbers",
+            "iDisplayLength": 10,
+            "oLanguage": {
+                "oPaginate": {
+                    "sPrevious": '<i class="fa fa-angle-left"></i>',
+                    "sNext": '<i class="fa fa-angle-right"></i>'
+                },
+                "sSearch": ""
+            },
+
+            "fnDrawCallback": function () {
+                $('.dataTables_filter input')
+                    .attr('placeholder', 'Search...');
+            },
+            "aoColumns": [
+                {
+                    "sName": "Id",
+                    "bSearchable": false,
+                    "bSortable": false,
+                    "sWidth": "5%",
+                    "sClass": "center",
+                    "fnRender": function (oObj) {
+
+                        if ('@identity.IsAdmin'.toLowerCase() == "true") {
+
+                            if (oObj.aData[4] == "Posted") {
+                                return ''
+                                    + '&nbsp; <a title="Click on for Edit" style="text-decoration:none;" Id="" class="innerListLink sym-btn-edit-row" href="/@ViewBag.TransType/Journal/Edit/' + oObj.aData[0].split('~')[0] + '"></a>'
+                                    + '&nbsp; <a title="Click on for Post" data-url="/@ViewBag.TransType/Journal/Post" onclick=btnPostNoSplit(this); data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row" style="opacity:0.45;pointer-events:none;cursor:default;"></a>'
+                                    + '&nbsp; <a title="Click on for Voucher" data-url="/@ViewBag.TransType/Journal/ReportView" onclick=reportData(this); data-Id="' + oObj.aData[0].split('~')[0] + '" class="sym-btn-report-row"></a>';
+                            } else {
+                                return ''
+                                    + '&nbsp; <a title="Click on for Edit" style="text-decoration:none;" Id="" class="innerListLink sym-btn-edit-row" href="/@ViewBag.TransType/Journal/Edit/' + oObj.aData[0].split('~')[0] + '"></a>'
+                                    // Show "Post" button only if IsAdmin is true
+                                    + ('@identity.IsAdmin'
+                                        ? '&nbsp; <a title="Click on for Post" data-url="/@ViewBag.TransType/Journal/Post" onclick=btnPostNoSplit(this); data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row"></a>'
+                                        : '') // If not Admin, don't show the "Post" button
+                                    + '&nbsp; <a title="Click on for Voucher" data-url="/@ViewBag.TransType/Journal/ReportView" onclick=reportData(this); data-Id="' + oObj.aData[0].split('~')[0] + '" class="sym-btn-report-row"></a>';
+                            }
+                        }
+                        else
+                        {
+                            if (oObj.aData[4] == "Posted") {
+                                return ''
+                                     + '&nbsp; <a title="Click on for Edit" style="text-decoration:none;" Id="" class="innerListLink sym-btn-edit-row" href="/@ViewBag.TransType/Journal/Edit/' + oObj.aData[0].split('~')[0] + '"></a>'
+                                    + '&nbsp; <a title="Click on for Post" data-url="/@ViewBag.TransType/Journal/Post" onclick=btnPostNoSplit(this); data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row" style="opacity:0.45;pointer-events:none;cursor:default;"></a>'
+                                    + '&nbsp; <a title="Click on for Voucher" data-url="/@ViewBag.TransType/Journal/ReportView" onclick=reportData(this); data-Id="' + oObj.aData[0].split('~')[0] + '" class="sym-btn-report-row"></a>';
+                                   
+                            } else {
+                                return ''                                 
+                                  + '&nbsp; <a title="Click on for Edit" style="text-decoration:none;" Id="" class="innerListLink sym-btn-edit-row" href="/@ViewBag.TransType/Journal/Edit/' + oObj.aData[0].split('~')[0] + '"></a>'
+                                  + '&nbsp; <a title="Click on for Post" data-url="/@ViewBag.TransType/Journal/Post" onclick=btnPostNoSplit(this); data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row"></a>'
+                                  + '&nbsp; <a title="Click on for Voucher" data-url="/@ViewBag.TransType/Journal/ReportView" onclick=reportData(this); data-Id="' + oObj.aData[0].split('~')[0] + '" class="sym-btn-report-row"></a>';
+                            }
+                           
+                        }
+
+
+                    }
+                }, { "sName": "Code ", "sWidth": "15%" }
+                , { "sName": "TransactionDate", "sWidth": "15%" }
+                , {
+                    "sName": "TransactionValue", "sWidth": "15%", "sClass": "right", "fnRender": function (oObj) {
+                        return formatNumberWithCommas(oObj.aData[3]);
+                    }
+                }
+                //, { "sName": "TransactionType", "sWidth": "15%" }
+                , { "sName": "Post", "sWidth": "12%" }
+                , { "sName": "Approve", "sWidth": "12%" }
+            ]
+        });
+        $('#searchBtn').click(function () {
+            var oParam = {
+                "branchId": "",
+                "tType": "",
+                "dtFrom": "",
+                "dtTo": ""
+            };
+            oParam.branchId = $(".branchId :selected").val();
+            oParam.tType = '@Model.TransactionType';
+            oParam.dtFrom = $(".dtFrom").val();
+            oParam.dtTo = $(".dtTo").val();
+
+            $.ajax({
+                url: "/Acc/JournalEntry/Index",
+                cache: false,
+                data: oParam,
+                success: function (html) {
+                    oTable.fnDraw();
+                }
+            });
+        });
+        $("#footer-length").append($(".dataTables_length"));
+        $("#footer-info").append($(".dataTables_info"));
+        $("#footer-pagination").append($(".dataTables_paginate"));
+        $("#dataTables_filter").append($(".dataTables_filter"));
+
+        $(document).on("click", ".mobile-search-toggle", function (e) {
+            e.stopPropagation();
+            $("#dataTables_filter").slideToggle(150);
+        });
+    });
+</script>
+<script>
+
+    function reportData(sender) {
+        var url = $(sender).attr('data-url');
+        var code = $(sender).attr('data-Id');
+        rptObj = new Object();
+        rptObj.id = code;
+        
+
+        var rptParam = $.param(rptObj);
+        url = url + "?" + rptParam;
+        var win = window.open(url, '_blank');
+    }
+    function formatNumberWithCommas(value) {
+        if (value == null || value === '') return '';
+        value = parseFloat(value).toFixed(2);
+        var parts = value.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parts[0] + '.' + parts[1];
+    }
+</script>
+
+              

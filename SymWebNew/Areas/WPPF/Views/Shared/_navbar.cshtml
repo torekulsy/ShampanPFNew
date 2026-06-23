@@ -1,0 +1,92 @@
+﻿@using SymOrdinary
+@using System.Threading;
+@{
+    ShampanIdentity identity = null;
+    try
+    {
+        identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
+    }
+    catch (Exception)
+    {
+        Response.Redirect("/Home/Index");
+        return;
+    }
+}
+@{
+    string CompanyName = System.Configuration.ConfigurationManager.AppSettings["CompanyName"];
+    string BranchName = Session["BranchName"] != null ? Session["BranchName"].ToString() : "No Branch Selected";
+}
+<div class="content white menuheight">
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+            <ul class="nav col-xs-4 visible-xs">
+                <li class="dropdown1" style="padding-top: 4px">
+                    <a href="#" class=" btn btn-warning">PF </a>
+                </li>
+            </ul>
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <!--/.navbar-header-->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="Transfer"><a href="/PF/Home/">Home</a></li>
+                @if ((HttpContext.Current.User.IsInRole("Master") || HttpContext.Current.User.IsInRole("Admin") || HttpContext.Current.User.IsInRole("Account")))
+                {
+                    <li class="Home dropdown">
+                   
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Module<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            @if (identity.IsAdmin)
+                            {
+                                <li><a class="btn btn-info" href="/Common/Home/">Admin</a></li>
+                            }
+                          
+                            @if (identity.IsAdmin || identity.IsPF)
+                            {
+                                <li><a class="btn btn-info" href="/PF/Home/">PF</a></li>
+                            }                        
+                            @*@if (identity.IsAdmin || identity.IsPF)
+                            {
+                                <li><a class="btn btn-info" href="/WPPF/WPPF/IndexFiscalPeriod">WPPF</a></li>
+                            }*@
+                         
+                        </ul>
+                    </li>
+                    
+                     <li class="dropdown Setup">
+                        <a style="color:green;">&nbsp;&nbsp;&nbsp;&nbsp; (@BranchName)</a>
+
+                    </li>                
+                }
+
+            </ul>
+
+            <ul class=" btn-danger nav navbar-nav navbar-right" style="border-left: 5px solid #fff">
+                <li class="dropdown1">
+                    <a href="#" class="dropdown-toggle sym-btn-back" title="Go Back" onclick="goBack()" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">&nbsp;Back</a>
+                </li>
+                <li class="dropdown1">
+                    <a href="#" class="dropdown-toggle btn btn-danger" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Provident Fund </a>
+                </li>
+            </ul>
+        </div>
+
+    </nav>
+</div>
+<style>
+    .navbar-default .navbar-nav > li.dropdown:hover > a,
+    .navbar-default .navbar-nav > li.dropdown:hover > a:hover,
+    .navbar-default .navbar-nav > li.dropdown:hover > a:focus {
+        /*background-color: rgb(231, 231, 231);*/
+        color: rgb(85, 85, 85);
+    }
+
+    li.dropdown:hover > .dropdown-menu {
+        display: block;
+    }
+</style>

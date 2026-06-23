@@ -1,0 +1,225 @@
+﻿@model SymViewModel.PF.InvestmentRenewVM
+@using UIHelper.MVC
+<div class="card">
+    <div class="card-header p-3">
+        <div class="th_thinbox_top">
+            <p>Investment Renew</p>
+            <div class="breadcrumb-container">
+                <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="thinbox">
+    <div class="th_thinbox">
+        <p>Investment Renew List</p>
+    </div>
+    <div class="custom-top">
+        <div id="mainBtnAll">
+            <button type="button" title="Add New Renew" data-url="/@ViewBag.TransType/InvestmentRenew/Create?investmentId=@Model.InvestmentId&Encash=F" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;Renew</button>
+            <button type="button" title="Add New Encash" data-url="/@ViewBag.TransType/InvestmentRenew/Create?investmentId=@Model.InvestmentId&Encash=T" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;Encash</button>
+        </div>
+        <div class="table-search">
+            <div class="mobile-search-toggle">
+                <i class="fa fa-search"></i>
+            </div>
+            <div id="dataTables_filter"></div>
+        </div>
+
+    </div>
+    <table id="myDataTable" class="display">
+        <thead>
+            <tr>
+
+                <th class="center">Action</th>
+                <th class="center">Transaction Code</th>
+                <th class="center">Investment Date</th>
+                <th class="center">Investment Value</th>
+                <th class="center">Maturity Date</th>
+                <th class="center">Interest</th>
+                <th class="center">AIT</th>
+                <th class="center">Reference Value</th>
+                <th class="center">Post</th>
+                <th class="center">Encashed</th>
+
+
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div class="custom-footer">
+        <div id="footer-length"></div>
+        <div id="footer-info"></div>
+        <div id="footer-pagination"></div>
+    </div>
+</div>
+<div class="card mt-3">
+    <div class="card-header p-3">
+        <div class="">
+            <button type="button" title="Add New InvestmentRenew" data-url="/@ViewBag.TransType/InvestmentRenew/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>
+        </div>
+    </div>
+</div>
+
+
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        SelectAllForDelete();
+        $.datepicker.regional[""].dateFormat = 'dd/M/y';
+        $.datepicker.setDefaults($.datepicker.regional['']);
+        var oTable = $('#myDataTable').dataTable({
+            "bServerSide": true,
+            "sAjaxSource": "/@ViewBag.TransType/InvestmentRenew/_index?investmentId=@Model.InvestmentId",
+            "bProcessing": true,
+            "aLengthMenu": tablelength(),
+            "bJqueryUI": true,
+            "bAutoWidth": false,
+            "bPaginate": true,
+            "sPaginationType": "full_numbers",
+            "iDisplayLength": 10,
+            "oLanguage": {
+                "oPaginate": {
+                    "sPrevious": '<i class="fa fa-angle-left"></i>',
+                    "sNext": '<i class="fa fa-angle-right"></i>'
+                },
+                "sSearch": ""
+            },
+
+            "fnDrawCallback": function () {
+                $('.dataTables_filter input')
+                    .attr('placeholder', 'Search...');
+            },
+            "aoColumns": [
+                            {
+                                "sName": "Id",
+                                "bSearchable": false,
+                                "bSortable": false,
+                                "sWidth": "5%",
+                                "sClass": "center",
+                                "fnRender": function (oObj) {
+
+                                    if (oObj.aData[4] == "Posted") {
+                                        return ''
+                                            + '&nbsp; <a id=""  title="Click on for Edit"   href=\"/@ViewBag.TransType/InvestmentRenew/Edit/' + oObj.aData[0] + '\" class=" sym-btn-edit-row"></a>'
+
+
+                                            + '&nbsp; <a title="Click on for Post" data-url="/@ViewBag.TransType/InvestmentRenew/Post"  onclick=btnPostNew(this); data-Id="' + oObj.aData[0] + '\" class="sym-btn-post-row"></a>'
+
+                                        + '&nbsp; <a title="Click on for Journal" href="/@ViewBag.TransType/InvestmentRenew/JournalEntry?TransactionId=' + oObj.aData[0] + '&Code=' + oObj.aData[1] + '" class="sym-btn-bank-row"></a>'
+                                        + '&nbsp; <a title="Click on for Journal" target="_blank"  href="/@ViewBag.TransType/InvestmentRenew/InvestmentRenew?JournalType=1' + '&TransactionForm=MaturityJournal' + '&TransactionId=' + oObj.aData[0] + '\" class="sym-btn-bank-row"></a>'
+                                    }
+                                    else
+                                    {
+                                        return ''
+                                           + '&nbsp; <a id=""  title="Click on for Edit"   href=\"/@ViewBag.TransType/InvestmentRenew/Edit/' + oObj.aData[0] + '\" class=" sym-btn-edit-row"></a>'
+
+
+                                           + '&nbsp; <a title="Click on for Post" data-url="/@ViewBag.TransType/InvestmentRenew/Post"  onclick=btnPostNew(this); data-Id="' + oObj.aData[0] + '\" class="sym-btn-post-row"></a>'
+                                      + '&nbsp; <a title="Click on for Journal" target="_blank"  href="/@ViewBag.TransType/InvestmentRenew/JournalEntry?JournalType=1' + '&TransactionForm=MaturityJournal' + '&TransactionId=' + oObj.aData[0] + '\" class="sym-btn-bank-row"></a>'
+                                    }
+                                    ;
+                                }
+                            }
+
+                            , { "sName": "TransactionCode", "sWidth": "10%" }
+                            , { "sName": "InvestmentDate", "sWidth": "10%" }
+                             , { "sName": "InvestmentValue", "sWidth": "10%" }
+                             , { "sName": "MaturityDate", "sWidth": "10%" }
+                             , { "sName": "Interest", "sWidth": "10%" }
+                             , { "sName": "AIT", "sWidth": "5%" }
+                            , { "sName": "ReferenceNo", "sWidth": "10%" }
+                            , { "sName": "Post", "sWidth": "5%" }
+                            , { "sName": "IsEncashed", "sWidth": "10%" }
+            ]
+        });
+        $("#footer-length").append($(".dataTables_length"));
+        $("#footer-info").append($(".dataTables_info"));
+        $("#footer-pagination").append($(".dataTables_paginate"));
+        $("#dataTables_filter").append($(".dataTables_filter"));
+
+        $(document).on("click", ".mobile-search-toggle", function (e) {
+            e.stopPropagation();
+            $("#dataTables_filter").slideToggle(150);
+        });
+    });
+</script>
+
+
+<script>
+    function btnPostNew(sender) {
+
+        var Id = $(sender).attr("data-Id");
+
+        var getURL = "/@ViewBag.TransType/InvestmentRenew/GetInvestment" + "?" + "id=" + Id;
+
+        $.getJSON(getURL, function (vm) {
+
+            if (vm.Post) {
+                ShowResult("Fail", "Data Already Posted!");
+                return true;
+            }
+            else {
+                var url = $(sender).attr("data-url") + "?ids=" + Id + '~';
+                var questionMSG = "Are you sure to Post Data!";
+                singleOperation(questionMSG, url);
+            }
+
+        });
+
+    }
+
+    function btnDeleteNew(sender) {
+
+        //////var Id = $(sender).attr("data-Id");
+
+        //////var getURL = "/@ViewBag.TransType/Withdraw/GetWithdraw" + "?" + "id=" + Id;
+
+        //////$.getJSON(getURL, function (vm) {
+
+        //////    if (vm.Post) {
+        //////        ShowResult("Fail", "Data Already Posted! Can't Be Deleted!");
+        //////        return true;
+        //////    }
+        //////    else {
+        //////        var url = $(sender).attr("data-url") + "?ids=" + Id + '~';
+        //////        var questionMSG = "Are you sure to Delete Data!";
+        //////        singleOperation(questionMSG, url);
+        //////    }
+
+        //////});
+
+    }
+
+</script>
+
+<script>
+    function btnROI(sender) {
+        var id = $(sender).attr("data-Id");
+
+
+        var getURL = "/@ViewBag.TransType/InvestmentRenew/GetInvestment" + "?" + "id=" + id;
+
+        $.getJSON(getURL, function (vm) {
+
+            if (!vm.Post) {
+                ShowResult("Fail", "Do Post before Return on InvestmentRenew!");
+                return;
+            }
+
+
+            $("#ReferenceId").val(id);
+            $("#TransactionType").val("ROI");
+
+            $("#frmReturnOnInvestmentGet").submit();
+
+        });
+
+
+
+    }
+
+
+</script>

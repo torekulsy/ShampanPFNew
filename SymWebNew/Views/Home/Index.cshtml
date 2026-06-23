@@ -1,0 +1,687 @@
+﻿@model SymViewModel.Common.UserLogsVM
+@using UIHelper.MVC
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login Form</title>
+
+    <style>
+    </style>
+
+</head>
+<body>
+
+
+    <style>
+        body {
+            background: linear-gradient(135deg,#eaf2ff 0%,#f4f8ff 50%,#eef4ff 100%) !important;
+        }
+
+
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e5e5;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            text-align: center;
+            flex: 1;
+            font-size: 26px;
+            color: #1f6fdc;
+            font-weight: 600;
+        }
+
+        .content-area {
+            display: flex;
+            gap: 50px;
+        }
+
+        /* LEFT */
+        .left-panel {
+            flex: 2;
+        }
+
+        /* RIGHT LOGIN */
+        .left-panel {
+            animation: fadeUp .6s ease both;
+            animation-delay: .15s;
+            position: relative;
+            width: 650px;
+        }
+
+        .right-panel {
+            flex: 1;
+            background: #f8fbff;
+            animation: fadeUp .6s ease both;
+            animation-delay: .15s;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .login-glow {
+            position: absolute;
+            inset: -4px;
+            border-radius: 1.6rem;
+            background: linear-gradient(135deg,#2563eb,#60a5fa);
+            opacity: .2;
+            filter: blur(20px);
+        }
+
+        .login-title {
+            max-width: 190px;
+            margin: 0 auto 25px auto;
+            padding: 10px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0px 3px rgba(0,0,0,0.08), inset 0 3px 0 rgba(255,255,255,0.6);
+            position: relative;
+            z-index: 1;
+        }
+
+            .login-title img {
+                max-width: 100%;
+                height: 73px;
+                object-fit: contain;
+                display: block;
+            }
+
+            .login-title::before {
+                content: "";
+                position: absolute;
+                inset: -2px;
+                border-radius: inherit;
+                opacity: 0.15;
+                filter: blur(8px);
+                z-index: -1;
+            }
+
+        .form-control {
+            margin-bottom: 15px;
+            height: 45px;
+            border-radius: 8px;
+            font-family: "Segoe UI", Verdana, Helvetica, sans-serif;
+            font-size: 15px !important;
+        }
+
+        .form-control {
+            margin-bottom: 15px;
+            height: 45px;
+            border-radius: 8px;
+            font-family: "Segoe UI", Verdana, Helvetica, sans-serif;
+            font-size: 15px !important;
+        }
+
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #888;
+        }
+
+        .login-card a {
+            font-family: "Segoe UI", Verdana, Helvetica, sans-serif;
+            font-size: 14px;
+        }
+
+        .login-card {
+            position: relative;
+            background: rgba(255,255,255,.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,.8);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-elegant);
+            height: 100%;
+            min-width: 500px;
+        }
+
+            .login-card label {
+                display: block;
+                font-size: 15px;
+                font-weight: 600;
+                margin-bottom: .5rem;
+                font-family: "Segoe UI", Verdana, Helvetica, sans-serif;
+            }
+
+        .checkbox {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            cursor: pointer;
+            font-size: .9rem;
+            font-weight: 500;
+        }
+
+        .submit-btn {
+            position: relative;
+            overflow: hidden;
+            height: 48px;
+            width: 100%;
+            border: none;
+            border-radius: .75rem;
+            background: linear-gradient(135deg,#2563eb,#60a5fa);
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 20px 60px -20px rgba(37,99,235,.35);
+            transition: transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;
+            font-family: "Segoe UI", Verdana, Helvetica, sans-serif;
+            margin-top: 25px;
+        }
+
+            .submit-btn .shimmer {
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+                transform: translateX(-100%);
+                transition: transform .7s;
+                z-index: -1;
+            }
+
+            .submit-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 0 30px rgba(96,165,250,.55);
+            }
+
+                .submit-btn:hover .shimmer {
+                    transform: translateX(100%);
+                }
+
+        .btn-login {
+            font-size: 16px;
+            text-align: center;
+            width: 100%;
+            border: 0;
+            background: transparent;
+            margin: auto;
+            height: 100%;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            color: #2563eb;
+            pointer-events: none;
+            transition: transform .25s;
+        }
+
+        .input-wrap input, .input-wrap select {
+            width: 100%;
+            height: 48px;
+            border-radius: .75rem;
+            border: 1px solid #e3eaf6;
+            background: rgba(243,247,255,.6);
+            padding: 0 1rem 0 4rem;
+            font-size: .9rem;
+            color: #0f1d3a;
+            transition: all .25s;
+            outline: none;
+            font-family: "Segoe UI", Verdana, Helvetica, Sans-Serif;
+            appearance: none;
+        }
+
+        /* WRAPPER */
+        .input-wrap {
+            position: relative;
+        }
+
+        /* SELECT DESIGN */
+        .companyDropdown select {
+            border: 1px solid rgba(200, 210, 230, 0.6);
+            background: linear-gradient(135deg, #f8fbff, #eef3ff);
+            font-family: "Segoe UI", Verdana, Helvetica, Sans-Serif !important;
+            font-size: 14px;
+            color: #0f1d3a;
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+            /* HOVER */
+            .companyDropdown select:hover {
+                border-color: #4facfe;
+            }
+
+            /* FOCUS */
+            .companyDropdown select:focus {
+                border-color: #4facfe;
+                background: #ffffff;
+                box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.2), 0 8px 20px rgba(79, 172, 254, 0.15);
+            }
+
+        /* CUSTOM ARROW */
+        .companyDropdown::after {
+            content: "";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            width: 10px;
+            height: 10px;
+            border-right: 2px solid #4facfe;
+            border-bottom: 2px solid #4facfe;
+            transform: translateY(-50%) rotate(45deg);
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        /* ROTATE ARROW WHEN ACTIVE */
+        .companyDropdown:focus-within::after {
+            transform: translateY(-50%) rotate(225deg);
+        }
+
+        /* OPTION STYLE */
+        .companyDropdown select option {
+            background: #ffffff;
+            color: #0f1d3a;
+            font-family: "Segoe UI", Verdana, Helvetica, Sans-Serif;
+        }
+
+        .password-wrap {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c7a96;
+            display: flex;
+            align-items: center;
+        }
+
+        /* input padding fix */
+        .password-wrap input {
+            padding-right: 45px;
+        }
+    </style>
+
+    @*<div class="main-wrapper">
+            <!-- MAIN CONTENT -->
+            <div class="content-area">
+
+                <!-- LEFT SLIDESHOW -->
+                <div class="left-panel">
+                    @Html.Partial("_slideshow")
+                </div>
+
+                <!-- RIGHT LOGIN -->
+                <div class="right-panel">
+
+                    <div class="login-title">
+                        Shampan PF
+                    </div>
+
+                    @using (Html.BeginForm("Login", "Home",
+                        new { ReturnUrl = ViewBag.ReturnUrl },
+                        FormMethod.Post,
+                        new { @id = "frmLogin" }))
+                    {
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        @Html.HiddenFor(m => m.ReturnUrl)
+
+                        @Html.TextBoxFor(m => m.LogID,
+                            new { @class = "form-control", placeholder = "User ID", required = "required" })
+
+                        @Html.PasswordFor(m => m.Password,
+                            new { @class = "form-control", placeholder = "Password", required = "required" })
+
+                        @Html.SimpleDropDownFor(m => m.BranchId,
+                            "/Config/DropDown/Branch",
+                            new { @class = "form-control", required = "required" })
+
+                        <button type="submit" class="btn-login">
+                            Log In →
+                        </button>
+
+                        <div style="margin-top:10px; display:flex; justify-content:space-between;">
+                            <label>
+                                <input type="checkbox" /> Remember me
+                            </label>
+
+                            <a href="/Home/ForgotPasswordView">
+                                Forgot Password?
+                            </a>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="footer">
+                Powered by Symphony Softtech Ltd. | Version 2.0
+            </div>
+
+        </div>*@
+    <div class="main-wrapper">
+        <div class="content-area">
+
+            <!-- LEFT -->
+            <div class="left-panel">
+                @Html.Partial("_slideshow")
+            </div>
+
+            <!-- RIGHT LOGIN -->
+            <div class="right-panel">
+                <div class="login-glow"></div>
+                <div class="login-card">
+                    <div class="login-title">
+                        <img src="~/Images/PF.png" alt="Alternate Text" />
+                    </div>
+
+                    @using (Html.BeginForm("Login", "Home",
+                new { ReturnUrl = ViewBag.ReturnUrl },
+                FormMethod.Post,
+                new { @id = "frmLogin" }))
+                    {
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        @Html.HiddenFor(m => m.ReturnUrl)
+                        <label for="userId">User ID</label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                            @Html.TextBoxFor(m => m.LogID,
+                    new { @class = "form-control", placeholder = "User ID", required = "required" })
+
+                        </div>
+
+                        <label for="password">Password</label>
+                        @*<div class="input-wrap">
+                                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                                    @Html.PasswordFor(m => m.Password,
+                            new { @class = "form-control", placeholder = "Password", required = "required" })
+                                </div>*@
+
+                        <div class="input-wrap password-wrap">
+
+                            <!-- LEFT ICON -->
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+
+                            @Html.PasswordFor(m => m.Password,
+        new { @class = "form-control", placeholder = "Password", required = "required", id = "passwordField" })
+
+                            <!-- RIGHT EYE ICON -->
+                            <span class="toggle-password" onclick="togglePassword()">
+
+                                <!-- Eye Open -->
+                                <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+
+                                <!-- Eye Closed -->
+                                <svg id="eyeClose" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.77 21.77 0 0 1 5.06-6.94" />
+                                    <path d="M1 1l22 22" />
+                                </svg>
+
+                            </span>
+
+                        </div>
+                        <label for="branch">Branch Name</label>
+                        <div class="input-wrap companyDropdown">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" /><path d="M9 22v-4h6v4" /><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01" /></svg>
+                            @Html.SimpleDropDownFor(m => m.BranchId,
+                    "/Config/DropDown/Branch",
+                    new { @class = "form-control", required = "required" })
+                        </div>
+
+                        <div style="margin-top:10px; display:flex; justify-content:space-between;">
+                            <label>
+                                <input type="checkbox" /> Remember me
+                            </label>
+
+                            <a href="/Home/ForgotPasswordView">Forgot Password?</a>
+                        </div>
+                        <div class="submit-btn">
+                            <div class="shimmer"></div>
+                            <button type="submit" class="btn-login">
+                                Login →
+                            </button>
+
+                        </div>
+
+
+
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    @*  <div class="content">
+            @Html.Partial("_footerView")
+        </div>*@
+    @*<span id="ip"></span>*@
+
+
+</body>
+
+<script>
+    $(document).ready(function () {
+        $("#BranchId").on("invalid", function () {
+            this.setCustomValidity("Please Select Branch Name");
+        });
+
+        $("#BranchId").on("input change", function () {
+            this.setCustomValidity("");
+        });
+    });
+</script>
+
+<script>
+    //$(function () {
+    //    setTimeout(function () {
+    //        getUserIP();
+    //    }, 3000);
+
+    //});
+
+    //$(document).keypress(function (e) {
+    //    if (e.which == 13) {
+    //        //var url = "/Home/Login";
+    //        pageSubmit('frmLogin')
+    //        //submit(url);
+    //    }
+    //});
+
+   
+
+    var realIp = "";
+    $('#shwoname').click(function () {
+        //uid
+        //alert((myurl);
+    })
+    $('.logme').click(function () {
+        var myurl = '@HttpContext.Current.Request.RawUrl';
+        //alert((myurl);
+    })
+    $(".loading").hide();
+    var localIp = "";
+
+    function realipFind() {
+        //$.get("http://ipinfo.io", function (response) {
+        //    realIp=response.ip;
+        //}, "jsonp");
+        $.ajax({
+            url: "http://ipinfo.io",
+            dataType: 'jsonp',
+            //beforeSend: function () { $(".loading").show(); },
+            complete: function () {
+                $(".loading").fadeOut(200).hide("slow")
+                getipdetail();
+            },
+            success: function (data) {
+                realIp = data.ip;
+            },
+        });
+    }
+    realipFind();
+    function getipdetail() {
+        getUserIP(function (ip) {
+            var FullIp = "";
+            var localIp = ip;
+            FullIp = realIp + "~" + localIp
+            $('.ipAdd').val(FullIp);
+        });
+    }
+    function getUserIP(onNewIP) { //  onNewIp - your listener function for new IPs
+        //compatibility for firefox and chrome
+        var myPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+        var pc = new myPeerConnection({
+            iceServers: []
+        }),
+        noop = function () { },
+        localIPs = {},
+        ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/g,
+        key;
+
+        function iterateIP(ip) {
+            if (!localIPs[ip]) onNewIP(ip);
+            localIPs[ip] = true;
+        }
+
+        //create a bogus data channel
+        pc.createDataChannel("");
+
+        // create offer and set local description
+        pc.createOffer(function (sdp) {
+            sdp.sdp.split('\n').forEach(function (line) {
+                if (line.indexOf('candidate') < 0) return;
+                line.match(ipRegex).forEach(iterateIP);
+            });
+
+            pc.setLocalDescription(sdp, noop, noop);
+        }, noop);
+
+        //listen for candidate events
+        pc.onicecandidate = function (ice) {
+            if (!ice || !ice.candidate || !ice.candidate.candidate || !ice.candidate.candidate.match(ipRegex)) return;
+            ice.candidate.candidate.match(ipRegex).forEach(iterateIP);
+        };
+    }
+    //$(':input[type="submit"]').prop('disabled', true);
+    getLocation()
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+    function showPosition(position) {
+        if (position != null) {
+            $('#Location').val(position.coords.latitude + ',' + position.coords.longitude);
+            $(':input[type="submit"]').prop('disabled', false);
+            $('.onLocation').hide();
+        }
+    }
+</script>
+<script>
+    /* ==============================================
+    PORTFOLIO ITEMS
+    =============================================== */
+
+    var $container = $('.portfolio-items');
+
+    $container.isotope({
+        //masonry: { columnWidth: $container.width() / 5 },
+        itemSelector: '.item',
+    });
+
+    var $optionSets = $('#options .option-set'),
+          $optionLinks = $optionSets.find('a');
+
+    $optionLinks.click(function () {
+        var $this = $(this);
+
+        // don't proceed if already selected
+        if ($this.hasClass('selected')) {
+            return false;
+        }
+        var $optionSet = $this.parents('.option-set');
+        $optionSet.find('.selected').removeClass('selected');
+        $this.addClass('selected');
+
+        // make option object dynamically, i.e. { filter: '.my-filter-class' }
+        var options = {},
+            key = $optionSet.attr('data-option-key'),
+            value = $this.attr('data-option-value');
+        // parse 'false' as false boolean
+        value = value === 'false' ? false : value;
+        options[key] = value;
+        if (key === 'layoutMode' && typeof changeLayoutMode === 'function') {
+            // changes in layout modes need extra logic
+            changeLayoutMode($this, options)
+        } else {
+            // otherwise, apply new options
+            $container.isotope(options);
+        }
+
+        return false;
+    });
+
+</script>
+<script>
+
+    localStorage.removeItem("activeLink");
+    localStorage.removeItem("openedMenus");
+
+
+
+    function togglePassword() {
+        const input = document.getElementById("passwordField");
+        const eyeOpen = document.getElementById("eyeOpen");
+        const eyeClose = document.getElementById("eyeClose");
+
+        if (input.type === "password") {
+            input.type = "text";
+            eyeOpen.style.display = "block";
+            eyeClose.style.display = "none";
+        } else {
+            input.type = "password";
+            eyeOpen.style.display = "none";
+            eyeClose.style.display = "block";
+        }
+    }
+
+</script>
+@*<script>
+        localStorage.removeItem("activeLink");
+        localStorage.setItem("activeLink_" + userId, href);
+        localStorage.getItem("activeLink_" + userId);
+
+
+
+
+    </script>*@

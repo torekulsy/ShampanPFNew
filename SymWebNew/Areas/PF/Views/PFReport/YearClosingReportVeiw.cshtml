@@ -1,0 +1,86 @@
+﻿@model SymViewModel.PF.PFReportVM
+@using UIHelper.MVC
+@{
+    ViewBag.Title = "YearClosingReportVeiw";
+}
+@using (Html.BeginForm("Year_Closing", "PFReport", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmYearClosing" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.JournalType)
+    @Html.HiddenFor(model => model.TransType)
+
+    <div class="card">
+        <div class="card-header p-3">
+            <div class="th_thinbox_top">
+                <p>Year Closing For Financial</p>
+                <div class="breadcrumb-container">
+                    <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="thinbox">
+        <div class="th_thinbox">
+            <p>Year Closing For Financial Report</p>
+        </div>
+        <div class="EnumEEHead card-body">
+            <div class="row">
+                <div class="col-sm-5 col-lg-4 col-xl-3 offset-sm-1 offset-md-1 offset-xl-3">
+                        <div class="editor-label">
+                            <label>Fiscal Year</label>
+                        </div>
+                        <div class="editor-field">
+                            @Html.SimpleDropDownFor(model => model.YearTo, "/Config/DropDown/DropDownYear", new { @class = " fiscalyearTo required form-control selectDropdown" })
+                        </div>
+                       
+                   
+                </div>
+                <div class="col-sm-5 col-lg-4 col-xl-3">
+
+                    <div class="editor-label">
+                        <label>&nbsp;</label>
+                    </div>
+                    <div class="editor-field">
+                        <button type="button" title="Process Data" id="" class="saveJSON sym-btn-save" style="height: 30px">&nbsp;Process</button>
+                    </div>
+
+
+
+
+                </div>
+                <label class="col-sm-2 hidden">
+                    &nbsp;<button type="button" title="Clear the Entries" id="Clear" class="sym-btn-clear">&nbsp;Clear</button>
+                    <button type="button" title="Cancel Data" class=" btncancel sym-btn-cancel">&nbsp;Cancel</button>
+
+                </label>
+                <label class="col-sm-2 hidden">
+                    <button type="button" title="Cancel Data" class=" btncancel sym-btn-cancel">&nbsp;Cancel</button>
+                </label>
+            </div>
+        </div>
+    </div>
+}
+<script>
+    $(function () {
+        InitDropDowns();
+        $("#Clear").on('click', function () {
+            $("#DateFrom").val("");
+        });
+    });
+
+    $('.saveJSON').click(function () {
+        Ask("Do you want to Process the year end?", function () {
+
+            var FiscalPeriodDetailId = $("#YearTo").val();
+            if (FiscalPeriodDetailId == "") {
+                ShowResult("Fail", "Please Select the Fiscal Period");
+                return;
+            }
+
+            var url = "/PF/PFReport/Year_Closing?fydid=" + FiscalPeriodDetailId;
+
+            submit(url);
+        });
+    });
+
+</script>

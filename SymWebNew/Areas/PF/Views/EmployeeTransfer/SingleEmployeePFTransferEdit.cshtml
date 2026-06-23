@@ -1,0 +1,310 @@
+﻿@model SymViewModel.HRM.EmployeeInfoVM
+@using UIHelper.MVC
+
+<style>
+    .pager-wrapper {
+        min-width: 45%;
+    }
+    /* Container */
+    .select2-container .select2-choice {
+        display: block;
+        height: 30px;
+        padding: 0 0 0 8px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid #0cc2fe;
+        white-space: nowrap;
+        line-height: 26px;
+        color: #444;
+        text-decoration: none;
+        border-radius: 4px;
+        background-clip: padding-box;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-color: #fff;
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(0.5, #fff));
+        background-image: -webkit-linear-gradient(center bottom, #eee 0%, #fff 50%);
+        background-image: -moz-linear-gradient(center bottom, #eee 0%, #fff 50%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ffffff', endColorstr = '#eeeeee', GradientType = 0);
+        background-image: linear-gradient(top, #fff 0%, #eee 50%);
+    }
+
+    .modern-pager {
+        display: flex !important;
+        align-items: center !important;
+        gap: 2px !important;
+        background: #f4f7fb !important;
+        padding: 10px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08) !important;
+    }
+
+        /* Override Bootstrap input-group-addon */
+        .modern-pager .input-group-addon {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+
+        /* Buttons */
+        .modern-pager .pager-btn {
+            display: flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+            background: linear-gradient(135deg, #4facfe, #00c6ff) !important;
+            color: #fff !important;
+            border: none !important;
+            padding: 8px 14px !important;
+            border-radius: 8px !important;
+            font-size: 13px !important;
+            height: 30px;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+        }
+
+            /* Hover */
+            .modern-pager .pager-btn:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 8px 18px rgba(0,0,0,0.15) !important;
+            }
+
+            /* Click */
+            .modern-pager .pager-btn:active {
+                transform: scale(0.95) !important;
+            }
+
+        /* Search Button */
+        .modern-pager .search-btn {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b) !important;
+        }
+
+        /* Dropdown Fix */
+        .modern-pager .modern-dropdown {
+            border-radius: 8px !important;
+            border: 0 !important;
+            box-shadow: none !important;
+        }
+
+            /* Dropdown hover */
+            .modern-pager .modern-dropdown:hover {
+                border-color: #4facfe !important;
+                box-shadow: 0 0 6px rgba(79,172,254,0.4) !important;
+            }
+
+        /* Remove Bootstrap focus glow */
+        .modern-pager .form-control:focus {
+            box-shadow: none !important;
+            border-color: #4facfe !important;
+        }
+
+
+    /* Select2 inner fix */
+    .select2-container .select2-choice {
+        width: 100% !important;
+    }
+        .select2-container .select2-choice > .select2-chosen {
+            white-space: normal;
+        }
+        .select2-container .select2-choice .select2-arrow {
+            border-left: 1px solid #12bffe;
+        }
+    .search-btn:hover{
+        text-decoration: none
+    }
+
+</style>
+
+<div class="card">
+    <div class="card-header p-3">
+        <div class="th_thinbox_top">
+            <p>Employee Transfer</p>
+            <div class="breadcrumb-container">
+                <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="thinbox">
+
+    <div class="custom-top">
+        <div id="mainBtnAll">
+            <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/EmployeeTransfer" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>
+        </div>
+        @*<div class="">
+
+                @if (true)
+                {
+                    <div class="input-group col-lg-8 col-md-8  col-sm-12 col-xs-12 text-color" style="">
+                        <a class="input-group-addon btn btn-primary hidden-xs" data-pager-action='first' id="first"><i class="fa fa-angle-double-left"></i>&nbsp;First</a>
+                        <a class="input-group-addon btn btn-primary" data-pager-action='previous' id="precode"><i class="fa fa-angle-left"></i>&nbsp;Previous</a>
+                        @Html.SimpleDropDownFor(model => model.Code, "/Config/DropDown/EmployeeCodeName", new { @id = "FiscalYearDetailId", @class = "form-control selectDropdown empId" })
+                        <a class="input-group-addon btn btn-primary" data-pager-action='next' id="current"><i class="fa fa-search"></i></a>
+                        <a class="input-group-addon btn btn-primary" data-pager-action='next' id="nextcode">Next <i class="fa  fa-angle-right"></i></a>
+                        <a class="input-group-addon btn btn-primary hidden-xs" data-pager-action='last' id="last">Last <i class="fa  fa-angle-double-right"></i></a>
+                    </div>
+                }
+                <div class="input-group   col-lg-6  col-md-6  col-sm-12 col-xs-12 text-color" style="">
+
+                </div>
+            </div>*@
+
+        <div class="pager-wrapper">
+
+            @if (true)
+            {
+                <div class="text-color modern-pager">
+
+                    <a class="pager-btn hidden-xs" data-pager-action='first' id="first">
+                        <i class="fa fa-angle-double-left"></i>
+                        <span>First</span>
+                    </a>
+
+                    <a class="pager-btn" data-pager-action='previous' id="precode">
+                        <i class="fa fa-angle-left"></i>
+                        <span>Previous</span>
+                    </a>
+
+                    @Html.SimpleDropDownFor(model => model.Code, "/Config/DropDown/EmployeeCodeName",
+                new { @id = "FiscalYearDetailId", @class = "selectDropdown empId modern-dropdown" })
+
+                    <a class="pager-btn search-btn" data-pager-action='next' id="current">
+                        <i class="fa fa-search"></i>
+                    </a>
+
+                    <a class="pager-btn" data-pager-action='next' id="nextcode">
+                        <span>Next</span>
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+
+                    <a class="pager-btn hidden-xs" data-pager-action='last' id="last">
+                        <span>Last</span>
+                        <i class="fa fa-angle-double-right"></i>
+                    </a>
+
+                </div>
+            }
+
+            <div class="text-color"></div>
+
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="row">
+
+            </div>
+        </div>
+
+        <div id="detailsDiv"></div>
+    </div>
+</div>
+
+<script>
+
+    $(function () {
+
+        InitDropDowns();
+        InitDropdownsCommon();
+
+    });
+    $(function () {
+
+        $('#empId').autocomplete({ source: '@Url.Action("EmployeeCodeAll", "Autocomplete", new { area = "Config" })', minLength: 2 });
+        $.get('@Url.Action("DetailCreate", "EmployeeTransfer", new { id = Model.empPFForTransferVM.Id })', function (data) {
+            $('#detailsDiv').html(data);
+
+        });
+    });
+
+    $('.eType').change(function () {
+        var btn = 'current';
+
+        Searching(btn);
+    });
+
+    $('.eType').click(function () {
+
+    });
+
+    $('#current').click(function () {
+        var empId = $('#empId').val();
+        if (empId == "") {
+            ShowResult("Fail", "Please Input Code!");
+            return;
+        }
+        var btn = 'current';
+        Searching(btn);
+    });
+
+    $('#nextcode').click(function () {
+        var btn = 'next';
+        Searching(btn);
+    });
+    $('#precode').click(function () {
+        var btn = 'previous';
+        Searching(btn);
+    });
+    $('#first').click(function () {
+        var btn = 'first';
+        Searching(btn);
+    });
+    $('#last').click(function () {
+        var btn = 'last';
+        Searching(btn);
+    });
+
+
+    function Searching(btn) {
+        var empid = $('.selectDropdown  :selected').text();
+        empid = empid.split('~')[0];
+
+        url = "/@ViewBag.TransType/EmployeeTransfer/DetailCreate?empcode=" + empid + '&btn=' + btn + '&id=' + '@Model.empPFForTransferVM.Id';
+        $.ajax({
+            url: url,
+            type: 'GET',
+            beforeSend: function () { $(".loading").show(); },
+            complete: function () { $(".loading").fadeOut(200).hide("slow") },
+            success: function (data) {
+                $('#detailsDiv').html(data);
+            },
+
+        });
+
+
+    }
+    $(document).ready(function () {
+        $('#afrmEmployeeEdit').on('click', 'input[type="text"], textarea.NumberCheck', function () {
+            $(this).select();
+        });
+    });
+
+</script>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+    $(function () {
+        InitDateTimePickers();
+    });
+</script>
+
+<style>
+    .text-color {
+        margin: auto;
+    }
+
+        .text-color a {
+            color: #ff6a00 !important;
+        }
+
+    .input-group .form-control {
+        padding-top: 0px !important;
+        margin-top: 0px !important;
+    }
+</style>

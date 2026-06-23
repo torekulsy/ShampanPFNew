@@ -1,0 +1,457 @@
+﻿@model SymViewModel.Common.CompanyVM
+
+@{
+    ViewBag.Title = "Create";
+}
+<style>
+    div > input[type="checkbox"] {
+        text-align: center;
+        margin: 0 !important;
+    }
+
+    .employee-image-card {
+        margin-top: 26px;
+        background: #f3f6fb;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        max-width: 150px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    /* Upload Area */
+
+    .image-wrapper {
+        position: relative;
+        border: 2px dashed #2e6fd8;
+        border-radius: 10px;
+        text-align: center;
+        background: #e9edf5;
+        cursor: pointer;
+        transition: 0.3s ease;
+        min-height: 100px;
+    }
+
+        .image-wrapper:hover {
+            background: #dde5f2;
+        }
+
+    .upload-content {
+        pointer-events: none;
+    }
+
+    .upload-icon {
+        font-size: 45px;
+        color: #2e6fd8;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .upload-content p {
+        margin: 0;
+        font-size: 16px;
+        color: #333;
+    }
+    /* Image Preview */
+
+    .image-wrapper img {
+        width: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+        display: none;
+    }
+    /* Hide input */
+
+    .image-wrapper input[type="file"] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+    /* File Info Section */
+
+    .file-info {
+        position: relative;
+        margin-top: 15px;
+        padding: 5px 10px;
+        background: #dce3ef;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        overflow: visible; /* must be visible for tooltip */
+    }
+
+    .file-name {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden; /* ellipsis */
+        text-overflow: ellipsis;
+        cursor: pointer;
+        position: relative;
+    }
+    /* Tooltip (shown on hover) */
+
+    .file-info:hover::after {
+        content: attr(data-fullname);
+        position: absolute;
+        top: -35px; /* adjust above text */
+        left: 0;
+        background: #222;
+        color: #fff;
+        padding: 6px 10px;
+        font-size: 13px;
+        border-radius: 6px;
+        white-space: nowrap;
+        max-width: 300px;
+        z-index: 999;
+        opacity: 1;
+    }
+
+    .file-info:hover::before {
+        content: "";
+        position: absolute;
+        top: -12px; /* arrow */
+        left: 15px;
+        border-width: 6px;
+        border-style: solid;
+        border-color: #222 transparent transparent transparent;
+        z-index: 999;
+        opacity: 1;
+    }
+    
+</style>
+@using (Html.BeginForm("Create", "Company", FormMethod.Post, new { enctype = "multipart/form-data", @id = "createCompanyForm" }))
+{
+    @Html.ValidationSummary(true)
+    <div class="card">
+        <div class="card-header p-3">
+            <div class="th_thinbox_top">
+                <button type="submit" title="Save Data" class="sym-btn-save">&nbsp;Save</button>
+                <div class="breadcrumb-container">
+                    <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="thinbox">
+        <div class="th_thinbox">
+            <p>Company Information</p>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 ">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.Code)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.Code, new { @placeholder = "Company Code", @class = "required form-control" })
+                                @Html.ValidationMessageFor(model => model.Code)
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.Name)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.Name, new { @placeholder = "Company Name", @class = "required form-control" })
+                                @Html.ValidationMessageFor(model => model.Name)
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.Address)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.Address, new { @placeholder = "Address", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Address)
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.Country)
+                            </div>
+                            <div class="editor-field">
+                                <select id="Country" name="Country" data-url="/Config/DropDown/CountryEN/" class=" country form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.Division)
+                            </div>
+                            <div class="editor-field">
+                                <select id="Division" name="Division" data-url="/Config/DropDown/Division/" class=" division form-control"></select>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.City)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.City, new { @placeholder = "City", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.City)
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.PostalCode)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.PostalCode, new { @placeholder = "Postal Code", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.PostalCode)
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.Phone)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.Phone, new { @placeholder = "Phone", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Phone)
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.Mobile)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.Mobile, new { @placeholder = "Mobile", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Mobile)
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.Fax)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.Fax, new { @placeholder = "Fax", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Fax)
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.TaxId)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.TaxId, new { @placeholder = "TAX Id", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.TaxId)
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.RegistrationNumber)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.RegistrationNumber, new { @placeholder = "Registration Number", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.RegistrationNumber)
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.NumberOfEmployees)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.NumberOfEmployees, new { @placeholder = "Number Of Employees", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.NumberOfEmployees)
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.Remarks)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextAreaFor(model => model.Email, new { @placeholder = "Email", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Email)
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.District)
+                            </div>
+                            <div class="editor-field">
+                                <select id="District" name="District" data-url="/Config/DropDown/District/" class=" district form-control"></select>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.Year)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.Year, new { @disabled = "disabled", @placeholder = "Year", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Year)
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.YearStart)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.YearStart, new { @placeholder = "Year Start", @class = "customDatePicker required form-control" })
+                                @Html.ValidationMessageFor(model => model.YearStart)
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.Email)
+                            </div>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.Email, new { @placeholder = "Email", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Email)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @*<div class="col-md-1">
+
+                    <div class="image-section">
+
+                        <div class="image-upload">
+                            <input type="file" accept=".jpg,.png,.gif,.jpeg" name="file" id="FileUpload" onchange="CheckImageSize(this);ShowpImagePreview(this);" />
+                        </div>
+                        <div class="action-buttons">
+                            <img src="@Url.Content("~/Images/default-logo.png")" id="LogoImage" alt="IMAGES" height="50" />
+
+                        </div>
+                    </div>
+
+                </div>*@
+
+
+
+                <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 ">
+
+                    <div class="employee-image-card">
+
+                        <div class="image-wrapper">
+
+                            <!-- Preview Image -->
+                            <img src="@Url.Content("~/Images/default-logo.png")"
+                                 id="LogoImage"
+                                 alt="Logo Image" />
+
+                            <!-- Upload UI -->
+                            <div class="upload-content">
+                                <i class="fa fa-cloud-upload upload-icon"></i>
+                                <p>Browse Logo to upload</p>
+                            </div>
+
+                            <!-- File Input (Same function kept) -->
+                            <input type="file"
+                                   accept=".jpg,.png,.gif,.jpeg"
+                                   name="file"
+                                   id="FileUpload"
+                                   onchange="CheckImageSize(this);ShowpImagePreview(this);" />
+
+                        </div>
+
+                    </div>
+
+                    <!-- File Info -->
+
+                    <div class="file-info" data-fullname="No selected File">
+                        <span id="fileName" class="file-name">
+                            No selected File
+                        </span>
+                        <span class="sym-btn-remove-row" onclick="removeFile()"></span>
+                    </div>
+
+
+                </div>
+
+
+
+
+
+
+                @*<input type="hidden" id="employeeId" name="employeeId" value="@Model.Id" />*@
+            </div>
+        </div>
+
+    </div>
+    
+     <div class="card">
+    <div class="card-header p-3">
+        <div class="">
+            <button type="submit" title="Save Data" class="sym-btn-save">&nbsp;Save</button>
+        </div>
+    </div>
+</div>
+
+    @*<p>
+      <input type="submit" class="btn btn-info" value="Create" />
+
+    </p>*@
+}
+@section Scripts {
+    <script>
+        $(function () {
+            Country();
+            Division();
+            District();
+        })
+
+        //function ShowpImagePreview(input) {
+        //    if (input.files && input.files[0]) {
+        //        var reader = new FileReader();
+        //        reader.onload = function (e) {
+        //            $('#LogoImage').attr('src', e.target.result);
+        //        }
+        //        reader.readAsDataURL(input.files[0]);
+        //    }
+        //}
+
+
+
+        function ShowpImagePreview(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#LogoImage').attr('src', e.target.result).show();
+                    $('.upload-content').hide();
+                };
+
+                reader.readAsDataURL(input.files[0]);
+
+                // File name show
+                var fileName = input.files[0].name;
+                $('#fileName').text(fileName);
+                $('.file-info').attr('data-fullname', fileName);
+            }
+        }
+
+
+        function removeFile() {
+
+            // Clear file input
+            const fileInput = document.getElementById("FileUpload");
+            fileInput.value = "";
+
+            // Reset image preview (default image set)
+            const img = document.getElementById("LogoImage");
+            img.src = "/Images/default-logo.png";
+
+            // Show upload content again
+            document.querySelector(".upload-content").style.display = "block";
+
+            // Reset file name text
+            document.getElementById("fileName").innerText = "No selected File";
+
+            // Reset tooltip
+            document.querySelector(".file-info").setAttribute("data-fullname", "No selected File");
+        }
+
+
+
+
+
+
+    </script>
+}

@@ -1,0 +1,96 @@
+﻿@model SymViewModel.Common.UserLogsVM
+@using UIHelper.MVC
+@using (Html.BeginForm("Edit", "User", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmUser" }))
+{
+    @Html.ValidationSummary(true)
+
+    @Html.HiddenFor(model => model.Id)
+    @Html.Hidden("UserRoles")
+    @Html.HiddenFor(model => model.EmployeeId)
+
+    <div class="thinbox">
+        <div class="th_thinbox">
+            <p>User Create</p>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.LogID)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.LogID, new { @placeholder = "User ID", @class = "required form-control", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.LogID)
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.FullName)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.FullName, new { @placeholder = "Full Name", @class = " form-control", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.FullName)
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.GroupId)
+                    </div>
+                    <div class="editor-field">
+                        @Html.SimpleDropDownFor(model => model.GroupId, "/Config/DropDown/UserGroup", new { @class = "required form-control" })
+                        @Html.ValidationMessageFor(model => model.GroupId)
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.Email)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.Email, new { @placeholder = "Email", @class = " form-control" })
+                        @Html.ValidationMessageFor(model => model.Email)
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 col-lg-1 userCheckbox">
+                    <div class="editor-label" style="text-align: center">
+                        @Html.LabelFor(model => model.IsApprove)
+                    </div>
+                    <div class="editor-field">
+                        @Html.CheckBoxFor(model => model.IsApprove, new { @class = " form-control" })
+                    </div>
+                </div>
+
+
+
+
+                @*<div class="passwordAreaB">
+                        <label>&nbsp;</label>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"><input onchange="ResetPassword(this);" type="checkbox" class="role togglecheckbox" id="resetPassword" name="resetPassword" /><label for="resetPassword"> Re-set Password</label></div>
+                    </div>*@
+            </div>
+            @Html.HiddenFor(model => model.IsAdmin, new { @class = "form-control" })
+            <br />
+            <button type="submit" title="Update Data" onclick="pageSubmit('frmUser');" class=" Save sym-btn-update">&nbsp;Update</button>
+            @*<button type="button" title="Cancel Data" onclick="CancleUser();" class=" Cancle sym-btn-cancel">&nbsp;Cancel</button>*@
+        </div>
+    </div>
+}
+<script>
+
+    $(function(){
+        $('#FullName').autocomplete({ source: '@Url.Action("EmployeeCode", "Autocomplete", new { area = "Config" })', minLength: 2 });
+        });
+
+    function CreateUser() {
+        //var passW = $(".passW");
+        //var conpassW = $(".conpassW");
+        //alert(passW + " " + conpassW);
+        //if (passW != conpassW) {
+        //    ShowResult("Fail", "Password are not matched!");
+        //    return;
+        //}
+
+        pageSubmit('frmUser');
+    }
+
+</script>

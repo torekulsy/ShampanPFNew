@@ -1,0 +1,905 @@
+﻿@using SymOrdinary
+@using System.Threading;
+@{
+    ShampanIdentity identity = null;
+    try
+    {
+        identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
+
+    }
+    catch (Exception)
+    {
+        Response.Redirect("/Home/Index");
+        return;
+    }
+}
+@{
+    string CompanyName = System.Configuration.ConfigurationManager.AppSettings["CompanyName"];
+    string BranchName = Session["BranchName"] != null ? Session["BranchName"].ToString() : "No Branch Selected";
+}
+
+<style>
+    .main-sidebar {
+        font-size: 14px;
+    }
+
+
+
+    .nav-sidebar .nav-link:hover {
+        background-color: #17A2ED !important;
+        color: white !important;
+    }
+
+    .brand-link {
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .sidebar {
+        height: calc(100vh - 118px) !important;
+        width: 247px !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    .main-sidebar .brandLogo {
+        background: #fff;
+        text-align: center;
+        padding: 3px;
+        display: block;
+        margin: 7px;
+       height: 62px;
+        border-radius: 4px;
+    }
+        .main-sidebar .brandLogo img {
+            margin: auto;
+            height: 100%;
+        }
+</style>
+<section class="">
+
+    <a href="/PF/Home/" class="brandLogo">
+
+        <img src="/Images/LOGO_Sym.png" alt="Company Logo">
+
+    </a>
+    <nav class="sidebar">
+        <ul class="nav nav-pills nav-sidebar flex-column"
+            data-widget="treeview"
+            role="menu"
+            data-accordion="false">
+
+            <!-- Home -->
+            <li class="nav-item">
+                <a href="/Common/Home/" class="nav-link homeColor">
+                    <span class="nav-icon">🏠</span>
+                    <p>Home</p>
+                </a>
+            </li>
+
+            @if (identity.IsAdmin)
+            {
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">🛠️</span>
+                        <p>
+                            Admin
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <!-- User -->
+                        <li class="nav-item">
+                            <a href="/Common/User/" class="nav-link">
+                                <span class="nav-icon">🧑‍💼</span>
+                                <p>User</p>
+                            </a>
+                        </li>
+
+                        <!-- Setup -->
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link">
+                                <span class="nav-icon">⚙️</span>
+                                <p>
+                                    Setup
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+
+                            <ul class="nav nav-treeview">
+
+                                <!-- Master Data -->
+                                <li class="nav-item has-treeview">
+                                    <a href="#" class="nav-link">
+                                        <span class="nav-icon">🗂️</span>
+                                        <p>
+                                            Master Data
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+
+                                    <ul class="nav nav-treeview">
+
+                                        <li class="nav-item">
+                                            <a href="/Common/DesignationGroup" class="nav-link">
+                                                <span class="nav-icon">🧑‍💼</span>
+                                                <p>Designation Group</p>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a href="/Common/Branch" class="nav-link">
+                                                <span class="nav-icon">🏢</span>
+                                                <p>Branch</p>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a href="/Common/Section" class="nav-link">
+                                                <span class="nav-icon">🏷️</span>
+                                                <p>@Session["SectionLabel"]</p>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a href="/Common/ExportImport" class="nav-link">
+                                                <span class="nav-icon">🏷️</span>
+                                                <p>Export / Import</p>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a href="/Common/Department" class="nav-link">
+                                                <span class="nav-icon">🏷️</span>
+                                                <p>@Session["DepartmentLabel"]</p>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a href="/Common/Designation" class="nav-link">
+                                                <span class="nav-icon">🏷️</span>
+                                                <p>Designation</p>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a href="/Common/Bank" class="nav-link">
+                                                <span class="nav-icon">🏦</span>
+                                                <p>Bank</p>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a href="/Common/Project" class="nav-link">
+                                                <span class="nav-icon">📁</span>
+                                                <p>@Session["ProjectLabel"]</p>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a href="/Common/Company" class="nav-link">
+                                                <span class="nav-icon">🏢</span>
+                                                <p>Company</p>
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                </li>
+
+                                <!-- Other Setup -->
+                                <li class="nav-item">
+                                    <a href="/Common/FiscalYear" class="nav-link">
+                                        <span class="nav-icon">📅</span>
+                                        <p>Fiscal Year</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/Common/Settings" class="nav-link">
+                                        <span class="nav-icon">🔧</span>
+                                        <p>Settings</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/Common/DBUpdate/DBUpdate" class="nav-link">
+                                        <span class="nav-icon">💾</span>
+                                        <p>DB Update</p>
+                                    </a>
+                                </li>
+
+                                <!-- User Submenu -->
+                                <li class="nav-item has-treeview">
+                                    <a href="#" class="nav-link">
+                                        <span class="nav-icon">🧑‍💼</span>
+                                        <p>
+                                            User
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+
+                                    <ul class="nav nav-treeview">
+
+                                        <li class="nav-item">
+                                            <a href="/Common/SymUserRoll" class="nav-link">
+                                                <span class="nav-icon">🛡️</span>
+                                                <p>Sym User Role</p>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a href="/Common/UserGroup" class="nav-link">
+                                                <span class="nav-icon">🧑‍🤝‍🧑</span>
+                                                <p>User Group</p>
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                </li>
+
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            }
+
+            @if (identity.IsAdmin || identity.IsPF)
+            {
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">💰</span>
+                        <p>
+                            PF
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <!-- Setup -->
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon">⚙️</i>
+                                <p>
+                                    Setup
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+
+                            <ul class="nav nav-treeview">
+
+                                <li class="nav-item">
+                                    <a href="/PF/InvestmentName" class="nav-link">
+                                        <i class="nav-icon">📊</i>
+                                        <p>Investment Register</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/PF/EnumInvestmentType" class="nav-link">
+                                        <i class="nav-icon">🏷️</i>
+                                        <p>Investment Type</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/PF/SettlementPolicy" class="nav-link">
+                                        <i class="nav-icon">⚖️</i>
+                                        <p>Settlement Policy</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/PF/AutoJournalSetup" class="nav-link">
+                                        <i class="nav-icon">🔁</i>
+                                        <p>Auto Journal Setup</p>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+
+                        <!-- Transaction -->
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon">🔄</i>
+                                <p>
+                                    Transaction
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+
+                            <ul class="nav nav-treeview">
+
+                                <li class="nav-item">
+                                    <a href="/PF/PFDetail/IndexFiscalPeriod" class="nav-link">
+                                        <i class="nav-icon">💰</i>
+                                        <p>Contribution</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/PF/Investment" class="nav-link">
+                                        <i class="nav-icon">📈</i>
+                                        <p>Investment</p>
+                                    </a>
+                                </li>
+                                <!-- Employee -->
+                                <li class="nav-item has-treeview">
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon">👨‍💼</i>
+                                        <p>
+                                            Employee
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="/PF/EmployeeInfoPF/Index" class="nav-link">
+                                                <i class="nav-icon">🪪</i>
+                                                <p>Employee Info</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/Left/Index" class="nav-link">
+                                                <i class="nav-icon">🚶</i>
+                                                <p>Employee Resign</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/EmployeeTransfer" class="nav-link">
+                                                <i class="nav-icon">🔄</i>
+                                                <p>Employee Transfer</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/EmployeePFOpeinig" class="nav-link">
+                                                <i class="nav-icon">📂</i>
+                                                <p>Opening</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/EmployeePFPayment" class="nav-link">
+                                                <i class="nav-icon">💵</i>
+                                                <p>Payment</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/EmployeeBreakMonthPF" class="nav-link">
+                                                <i class="nav-icon">⏸️</i>
+                                                <p>Break Month</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/EmployeeForfeiture" class="nav-link">
+                                                <i class="nav-icon">🚫</i>
+                                                <p>Forfeiture</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <!-- Extra Transaction Items -->
+
+                                <li class="nav-item">
+                                    <a href="/PF/PreDistributionFund" class="nav-link">
+                                        <i class="nav-icon">🥧</i>
+                                        <p>Profit Distribution</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/PF/PFSettlement" class="nav-link">
+                                        <i class="nav-icon">🤝</i>
+                                        <p>Settlement</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/PF/Loan/AllLoan" class="nav-link">
+                                        <i class="nav-icon">💸</i>
+                                        <p>Loan</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/PF/ProcessControll" class="nav-link">
+                                        <i class="nav-icon">💰</i>
+                                        <p>Loan Collection</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Reports -->
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon">📊</i>
+                                <p>
+                                    Reports
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+
+                            <ul class="nav nav-treeview">
+
+                                <li class="nav-item">
+                                    <a href="/PF/PFReport/PFContributionReportVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                        <i class="nav-icon">📄</i>
+                                        <p>Contribution</p>
+                                    </a>
+                                </li>
+
+                                <!-- Financial Reports -->
+                                @*<li class="nav-item has-treeview">
+                                        <a href="#" class="nav-link">
+                                            <i class="nav-icon">📄</i>
+                                            <p>
+                                                Financial Reports
+                                                <i class="right fas fa-angle-left"></i>
+                                            </p>
+                                        </a>
+
+                                        <ul class="nav nav-treeview">
+                                            <li class="nav-item">
+                                                <a href="/PF/PFReport/LedgerVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                                    <i class="nav-icon">📚</i>
+                                                    <p>Ledger</p>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="/PF/PFReport/IFRSReportView?ReportType=tb" id="lnkEdit1" class="nav-link">
+                                                    <i class="nav-icon">⚖️</i>
+                                                    <p>Trial Balance</p>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="/PF/PFReport/IFRSReportView?ReportType=is" id="lnkEdit1" class="nav-link">
+                                                    <i class="nav-icon">📈</i>
+                                                    <p>Income Statement (P/L)</p>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="/PF/PFReport/IFRSReportView?ReportType=bs" id="lnkEdit1" class="nav-link">
+                                                    <i class="nav-icon">🏢</i>
+                                                    <p>Balance Sheet</p>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="/PF/PFReport/IFRSReportView?ReportType=nc" id="lnkEdit1" class="nav-link">
+                                                    <i class="nav-icon">🔄</i>
+                                                    <p>Net Change</p>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>*@
+
+                                @*Voucher Reports
+                                    <li class="nav-item has-treeview">
+                                        <a href="#" class="nav-link">
+                                            <i class="nav-icon">📄</i>
+                                            <p>
+                                                Voucher
+                                                <i class="right fas fa-angle-left"></i>
+                                            </p>
+                                        </a>
+
+                                        <ul class="nav nav-treeview">
+                                            <li class="nav-item">
+                                                <a href="/PF/PFReport/Voucher_StatementReportVeiw?JournalType=1" id="lnkEdit1" class="nav-link linkReport">
+                                                    <i class="nav-icon">📘</i>
+                                                    <p>Journal Voucher</p>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="/PF/PFReport/Voucher_StatementReportVeiw?JournalType=2" id="lnkEdit1" class="nav-link linkReport">
+                                                    <i class="nav-icon">🧾</i>
+                                                    <p>Payment Voucher</p>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="/PF/PFReport/Voucher_StatementReportVeiw?JournalType=3" id="lnkEdit1" class="nav-link linkReport">
+                                                    <i class="nav-icon">🧾</i>
+                                                    <p>Receipt Voucher</p>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>*@
+
+                                <!-- Employee Reports -->
+                                <li class="nav-item has-treeview">
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon">👨‍💼</i>
+                                        <p>
+                                            Employee
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="/PF/PFReport/AllEmployeeReportVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                                <i class="nav-icon">👥</i>
+                                                <p>All Employee</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/PFReport/EmployeeReportVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                                <i class="nav-icon">🧾</i>
+                                                <p>Employee Statement</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/PFReport/EmployeeLedgerReportVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                                <i class="nav-icon">📒</i>
+                                                <p>Employee Ledger</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/PFReport/EmployeePFOpeinigReportVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                                <i class="nav-icon">➕</i>
+                                                <p>Opening</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/PFReport/EmployeePFPaymentReportVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                                <i class="nav-icon">💵</i>
+                                                <p>Payment</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/PFReport/EmployeeBreakMonthPFReportVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                                <i class="nav-icon">⏸️</i>
+                                                <p>Break Month</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/PFReport/EmployeeForfeitureReportVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                                <i class="nav-icon">🚫</i>
+                                                <p>Forfeiture</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <!-- Investment Report -->
+                                <li class="nav-item">
+                                    <a href="/PF/PFReport/PFInvestmentReportView" class="nav-link">
+                                        <i class="nav-icon">📈</i>
+                                        <p>Investment</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/PF/PFReport/EmployeePFSettlementReport" class="nav-link">
+                                        <i class="nav-icon">✅</i>
+                                        <p>Final Settlement</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/PF/PFReport/ProfitDistributionNewReportVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                        <i class="nav-icon">🔁</i>
+                                        <p>Profit Distribution</p>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            }
+
+            @* GL Menu *@
+
+            <li class="nav-item has-treeview">
+                <a href="#" class="nav-link">
+                    <span class="nav-icon">📑</span>
+                    <p>
+                        GL
+                        <i class="right fas fa-angle-left"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <!-- Setup -->
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon">⚙️</i>
+                            <p>
+                                Setup
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+
+                            <!-- Bank -->
+                            <li class="nav-item has-treeview">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon">🏦</i>
+                                    <p>
+                                        Bank
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="/PF/BankName" class="nav-link">
+                                            <i class="nav-icon">🏧</i>
+                                            <p>Bank Name</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/PF/BankBranch" class="nav-link">
+                                            <i class="nav-icon">🏢</i>
+                                            <p>Bank Branch</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <!-- COA -->
+                            <li class="nav-item has-treeview">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon">🧾</i>
+                                    <p>
+                                        COA
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="/PF/COA" class="nav-link">
+                                            <i class="nav-icon">🧾</i>
+                                            <p>COA</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/PF/COAGroup" class="nav-link">
+                                            <i class="nav-icon">🗂️</i>
+                                            <p>COA Group</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="/PF/TransactionMedia" class="nav-link">
+                                    <i class="nav-icon">💳</i>
+                                    <p>Transaction Media</p>
+                                </a>
+                            </li>
+
+
+                        </ul>
+                    </li>
+
+                    <!-- Transaction -->
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon">🔄</i>
+                            <p>
+                                Transaction
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+
+
+
+                            <!-- Voucher Entry -->
+                            <li class="nav-item has-treeview">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon">📒</i>
+                                    <p>
+                                        Voucher Entry
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="/PF/Journal?JournalType=1" class="nav-link">
+                                            <i class="nav-icon">📘</i>
+                                            <p>Journal Voucher</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/PF/Journal?JournalType=2" class="nav-link">
+                                            <i class="nav-icon">🧾</i>
+                                            <p>Payment Voucher</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/PF/Journal?JournalType=3" class="nav-link">
+                                            <i class="nav-icon">🧾</i>
+                                            <p>Receipt Voucher</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+
+                            @if (CompanyName != "EGCB")
+                            {
+                                <li class="nav-item has-treeview bank-menu">
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon">🏦</i>
+                                        <p>
+                                            Bank
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="/PF/PFBankDeposit" class="nav-link">
+                                                <i class="nav-icon">📥</i>
+                                                <p>Bank Deposit</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/Withdraw" class="nav-link">
+                                                <i class="nav-icon">📤</i>
+                                                <p>Withdraw</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/ReturnOnBankInterest" class="nav-link">
+                                                <i class="nav-icon">💹</i>
+                                                <p>Return On Bank Interest</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/BankCharge" class="nav-link">
+                                                <i class="nav-icon">⚠️</i>
+                                                <p>Bank Charge</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+
+                            <li class="nav-item has-treeview">
+                                <a href="/PF/PFReport/YearClosingReportVeiw?JournalType=1" class="nav-link">
+                                    <i class="nav-icon">📅</i>
+                                    <p>Year Closing</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- Reports -->
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon">📊</i>
+                            <p>
+                                Reports
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+                            <!-- Financial Reports -->
+                            <li class="nav-item has-treeview">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon">📄</i>
+                                    <p>
+                                        Financial Reports
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="/PF/PFReport/LedgerVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                            <i class="nav-icon">📚</i>
+                                            <p>Ledger</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/PF/PFReport/IFRSReportView?ReportType=tb" id="lnkEdit1" class="nav-link">
+                                            <i class="nav-icon">⚖️</i>
+                                            <p>Trial Balance</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/PF/PFReport/IFRSReportView?ReportType=is" id="lnkEdit1" class="nav-link">
+                                            <i class="nav-icon">📈</i>
+                                            <p>Income Statement (P/L)</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/PF/PFReport/IFRSReportView?ReportType=bs" id="lnkEdit1" class="nav-link">
+                                            <i class="nav-icon">🏢</i>
+                                            <p>Balance Sheet</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/PF/PFReport/IFRSReportView?ReportType=nc" id="lnkEdit1" class="nav-link">
+                                            <i class="nav-icon">🔄</i>
+                                            <p>Net Change</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <!-- Voucher Reports -->
+                            <li class="nav-item has-treeview">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon">📄</i>
+                                    <p>
+                                        Voucher
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="/PF/PFReport/Voucher_StatementReportVeiw?JournalType=1" id="lnkEdit1" class="nav-link linkReport">
+                                            <i class="nav-icon">📘</i>
+                                            <p>Journal Voucher</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/PF/PFReport/Voucher_StatementReportVeiw?JournalType=2" id="lnkEdit1" class="nav-link linkReport">
+                                            <i class="nav-icon">🧾</i>
+                                            <p>Payment Voucher</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/PF/PFReport/Voucher_StatementReportVeiw?JournalType=3" id="lnkEdit1" class="nav-link linkReport">
+                                            <i class="nav-icon">🧾</i>
+                                            <p>Receipt Voucher</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+
+                            @if (CompanyName != "EGCB")
+                            {
+                                <li class="nav-item has-treeview bank-reports">
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon">🏦</i>
+                                        <p>
+                                            Bank Reports
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="/PF/PFReport/PFBankDepositsReportVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                                <i class="nav-icon">📥</i>
+                                                <p>Bank Deposits</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/PFReport/WithdrawsReportVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                                <i class="nav-icon">📤</i>
+                                                <p>Withdraws</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/PFReport/BankChargeReportVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                                <i class="nav-icon">⚠️</i>
+                                                <p>Bank Charge</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/PF/PFReport/ReturnOnBankInterestsReportVeiw" id="lnkEdit1" class="nav-link linkReport">
+                                                <i class="nav-icon">💹</i>
+                                                <p>Return On Bank Interests</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+
+
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+
+
+        </ul>
+    </nav>
+</section>

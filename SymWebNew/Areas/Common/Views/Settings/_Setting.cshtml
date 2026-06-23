@@ -1,0 +1,46 @@
+﻿@model SymViewModel.Common.SettingsVM
+           <style>
+               .sym-btn-update{
+                   height: 27px
+               }
+           </style>
+@using (Html.BeginForm("Edit", "Settings", FormMethod.Post, new { @Id = "frmSettings" }))
+{
+    <div class="row my-2">
+        <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
+            @Html.HiddenFor(model => model.Id)
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.SettingGroup, new { @class = " required form-control", @readonly = "readonly" })
+                @Html.ValidationMessageFor(model => model.SettingGroup)
+            </div>
+        </div>
+        <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.SettingName, new { @class = " required form-control", @readonly = "readonly" })
+                @Html.ValidationMessageFor(model => model.SettingName)
+            </div>
+        </div>
+        <div class="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3">
+            <div class="editor-field">
+                @Html.TextAreaFor(model => model.SettingValue, new { @class = " required form-control" })
+                @Html.ValidationMessageFor(model => model.SettingValue)
+
+            </div>
+        </div>
+        <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.SettingType, new { @class = " required form-control", @readonly = "readonly" })
+                @Html.ValidationMessageFor(model => model.SettingType)
+            </div>
+        </div>
+        <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
+            <div class="editor-field">
+                @Html.TextBoxFor(model => model.Remarks, new { @class = "  form-control" })
+                @Html.ValidationMessageFor(model => model.Remarks)
+            </div>
+        </div>
+        <div class="col-1">
+            <button type="submit" onclick="pageSubmit('frmSettings');" value="Update" class="sym-btn-update">&nbsp;Update</button>
+        </div>
+    </div>
+}

@@ -1,0 +1,143 @@
+﻿
+<div class="card">
+    <div class="card-header p-3">
+        <div class="th_thinbox_top">
+            <p>Auto Journal Setup</p>
+            <div class="breadcrumb-container">
+                <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="thinbox">
+    <div class="th_thinbox">
+        <p>Auto Journal Setup</p>
+    </div>
+    <div class="custom-top">
+        <div id="mainBtnAll">
+            <button type="button" title="Add New Settlement Policy" data-url="/@ViewBag.TransType/AutoJournalSetup/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>
+            <button type="button" title="Delete Settlement Policy" data-url="/@ViewBag.TransType/AutoJournalSetup/Delete" onclick="deletedData(this, 'myDataTable');" id="" class="sym-btn-remove">&nbsp;Delete</button>
+        </div>
+        <div class="table-search">
+            <div class="mobile-search-toggle">
+                <i class="fa fa-search"></i>
+            </div>
+            <div id="dataTables_filter"></div>
+        </div>
+
+    </div>
+    <table id="myDataTable" class="display">
+        <thead>
+            <tr>
+                <th class="center">
+                    <input type="checkbox" class="chkAll" />Select All</th>
+                <th class="center">Journal For</th>
+                <th class="center">Journal Name</th>
+                <th class="center">Nature</th>
+                <th class="center">COAID</th>
+                <th class="center">Active/InActive</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div class="custom-footer">
+        <div id="footer-length"></div>
+        <div id="footer-info"></div>
+        <div id="footer-pagination"></div>
+    </div>
+</div>
+<div class="card mt-3">
+    <div class="card-header p-3">
+        <div class="">
+            <button type="button" title="Add New Auto Journal Setup" data-url="/@ViewBag.TransType/AutoJournalSetup/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>
+            <button type="button" title="Delete Auto Journal Setup" data-url="/@ViewBag.TransType/AutoJournalSetup/Delete" onclick="deletedData(this, 'myDataTable');" id="" class="sym-btn-remove">&nbsp;Delete</button>
+        </div>
+    </div>
+</div>
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        SelectAllForDelete();
+        $.datepicker.regional[""].dateFormat = 'dd/M/y';
+        $.datepicker.setDefaults($.datepicker.regional['']);
+        var oTable = $('#myDataTable').dataTable({
+            "bServerSide": true,
+            "sAjaxSource": "/@ViewBag.TransType/AutoJournalSetup/_index",
+            "bProcessing": true,
+            "aLengthMenu": tablelength(),
+            "bJqueryUI": true,
+            "bAutoWidth": false,
+            "bPaginate": true,
+            "sPaginationType": "full_numbers",
+            "iDisplayLength": 10,
+            "oLanguage": {
+                "oPaginate": {
+                    "sPrevious": '<i class="fa fa-angle-left"></i>',
+                    "sNext": '<i class="fa fa-angle-right"></i>'
+                },
+                "sSearch": ""
+            },
+
+            "fnDrawCallback": function () {
+                $('.dataTables_filter input')
+                    .attr('placeholder', 'Search...');
+            },
+            "aoColumns": [
+                            {
+                                "sName": "Id",
+                                "bSearchable": false,
+                                "bSortable": false,
+                                "sWidth": "5%",
+                                "sClass": "center",
+                                "fnRender": function (oObj) {
+                                    return ' <input onclick="CheckAll(this)" type="checkbox" data-Id="' + oObj.aData[0] + '">'
+                                        + '&nbsp; <a id="lnkEdit1"  title="Click on for Edit" style="text-decoration:none;"    href=\"/@ViewBag.TransType/AutoJournalSetup/Edit/' + oObj.aData[0] + '\" class=" innerListLink sym-btn-edit-row"></a>'
+                                        + '&nbsp; <a title="Click on for Delete" style="text-decoration:none;" data-url="/@ViewBag.TransType/AutoJournalSetup/Delete" onclick="deletedData(this, myDataTable,\'' + oObj.aData[0] + '\');"  class="sym-btn-remove-row"></a>'
+                                    ;
+                                }
+                            }
+                            , { "sName": "PolicyName", "sWidth": "10%" }
+                            , { "sName": "JobAgeInMonth", "sWidth": "10%" }
+                            , { "sName": "EmployeeContributionRatio ", "sWidth": "10%" }
+                            , { "sName": "EmployeerContributionRatio", "sWidth": "10%" }
+                            , { "sName": "Remarks", "sWidth": "10%" }
+                           
+
+                            
+
+            ]
+        });
+        $("#footer-length").append($(".dataTables_length"));
+        $("#footer-info").append($(".dataTables_info"));
+        $("#footer-pagination").append($(".dataTables_paginate"));
+        $("#dataTables_filter").append($(".dataTables_filter"));
+
+        $(document).on("click", ".mobile-search-toggle", function (e) {
+            e.stopPropagation();
+            $("#dataTables_filter").slideToggle(150);
+        });
+    });
+</script>
+<script>
+    $('#CheckDt').click(function () {
+        var table = $('#myDataTable').DataTable();
+        alert(table);
+        var data = table.$('input, select').serialize();
+        alert(data);
+        //alert(
+        //    "The following data would have been submitted to the server: \n\n" +
+        //    data.substr(0, 120) + '...'
+        //);
+        return false;
+        //$('button').click(function () {
+        //    var data = table.$('input, select').serialize();
+        //    alert(
+        //        "The following data would have been submitted to the server: \n\n" +
+        //        data.substr(0, 120) + '...'
+        //    );
+        //    return false;
+        //});
+    }
+    );
+</script>

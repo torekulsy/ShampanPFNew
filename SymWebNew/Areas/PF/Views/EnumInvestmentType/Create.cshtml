@@ -1,0 +1,65 @@
+﻿@model SymViewModel.PF.EnumInvestmentTypeVM
+@using UIHelper.MVC
+@{
+
+    ViewBag.Title = "Create";
+    ViewBag.Location = "Create"; 
+}
+
+@using (Html.BeginForm("CreateEdit", "EnumInvestmentType", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmEnumInvestmentType" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.Operation)
+
+    <div class="">
+        <div class="EnumInvestmentType">
+            <div class="row mt-2">
+                <label class="col-sm-3">
+                    @Html.LabelFor(model => model.Name)
+                </label>
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(model => model.Name, new { @placeholder = "Investment Type Name", @class = "required form-control" })
+                </div>
+            </div>
+
+            @if (Model.Operation != "add")
+{
+    <div class="row mt-2">
+        <label class="col-sm-3">
+            @Html.LabelFor(model => model.IsActive)
+        </label>
+        <div class="col-sm-9">
+            @Html.CheckBoxFor(model => model.IsActive, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.IsActive)
+        </div>
+    </div>
+}
+            <div class="row mt-2">
+                <label class="col-sm-3">
+                    @Html.LabelFor(model => model.Remarks)
+                </label>
+                <div class="col-sm-9">
+                    @Html.TextAreaFor(model => model.Remarks, new { @placeholder = "Remarks", @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Remarks)
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-sm-12">
+                    <div class="reportModalbtn">
+                        <button type="button" title="Save Data" onclick="pageSubmit('frmEnumInvestmentType');" class="sym-btn-save">&nbsp;Save</button>
+
+                        <button type="button" title="Cancel Data" class=" btncancel sym-btn-cancel">&nbsp;Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script>
+    $(function () {
+        InitDropDowns();
+        valiDation("frmEnumInvestmentType");
+    });
+
+</script>

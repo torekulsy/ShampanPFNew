@@ -1,0 +1,173 @@
+﻿@model SymViewModel.WPPF.PFBankDepositVM
+@using UIHelper.MVC
+
+<div class="headrow">
+    <button type="button" title="Add New WPPF" data-url="/WPPF/WPPF/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>
+    <button type="button" data-url="/WPPF/WPPF/AllWPPFReport" title="Click to see the Report" id="" class=" sendRpt sym-btn-report">&nbsp;Report</button>
+    <button type="button" data-url="/WPPF/WPPF/DownloadAllWPPFReport" id="" title="Click to Download the Report" class=" sendRpt sym-btn-Excel-Export">&nbsp;Download</button>
+    <label class="pull-right">Profit Value</label>
+</div>
+<div class="thinbox">
+    <div class="th_thinbox">
+        <p class="thinHead">Profit Value</p>
+    </div>
+    <p>
+    </p>
+    <table id="myDataTable" class="display">
+        <thead>
+            <tr>
+
+                <th class="center">Action</th>
+                <th class="center">Code</th>
+                <th class="center">Project</th>
+                <th class="center">Fiscal Period</th>
+                <th class="center">Total Profit</th>
+                <th class="center">Distributed Value</th>
+                <th class="center">WPPF Value</th>
+                <th class="center">WWF Value</th>
+                <th class="center">BWWF Value</th>
+                <th class="center">Post</th>
+
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <br />
+</div>
+<div class="headrow">
+    <button type="button" title="Add New WPPF" data-url="/WPPF/WPPF/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>
+    <button type="button" data-url="/WPPF/WPPF/AllWPPFReport" title="Click to see the Report" id="" class=" sendRpt sym-btn-report">&nbsp;Report</button>
+    <button type="button" data-url="/WPPF/WPPF/DownloadAllWPPFReport" id="" title="Click to Download the Report" class=" sendRpt sym-btn-Excel-Export">&nbsp;Download</button>
+</div>
+
+
+@using (Html.BeginForm("Create", "PFBankDeposit", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmPFBankDepositGet" }))
+{
+    @Html.HiddenFor(model => model.TransactionType)
+    @Html.HiddenFor(model => model.FiscalYearDetailId)
+
+}
+
+
+<script language="javascript" type="text/javascript">
+    $(function () {
+        InitDateTimePickers();
+        $.datepicker.regional[""].dateFormat = 'dd/M/y';
+        $.datepicker.setDefaults($.datepicker.regional['']);
+        var oTable = $('#myDataTable').dataTable({
+            "bServerSide": true,
+            "sAjaxSource": "/WPPF/WPPF/_indexFiscalPeriod?EmployeeId=@ViewBag.EmployeeId&fydid=@ViewBag.fydid",
+            "bProcessing": true,
+            "aLengthMenu": tablelength(),
+            "bJqueryUI": true,
+            "bAutoWidth": false,
+            "aoColumns": [
+                            {
+                                "sName": "Id",
+                                "bSearchable": false,
+                                "bSortable": false,
+                                "sWidth": "16%",
+                                "sClass": "center",
+                                "fnRender": function (oObj) {
+                                    return ''
+
+                                        @*+ '<a title="Click on for Details" style="text-decoration:none;"    href=\"/@ViewBag.TransType/ProfitDistribution?code=' + oObj.aData[0] + '\"  class="sym-btn-detail-row"></a>'*@
+                                         @*+ '<a title="Click on for Details" style="text-decoration:none;" href="/@ViewBag.TransType/WPPF/ProfitDistribution" data-Id="' + oObj.aData[0] +'\" class="sym-btn-detail-row"></a>'*@
+                                        + '<a title="Click on for Details" style="text-decoration:none;" href="/WPPF/WPPF/ProfitDistribution?code=' + oObj.aData[1] + '" class="sym-btn-detail-row"></a>'
+
+
+                                        + '<a title="Click on for Post" data-url="/WPPF/WPPF/Post"  onclick=btnPostNew(this);  data-Id="' + oObj.aData[0] + "~" + oObj.aData[7] + '\" class="sym-btn-post-row"></a>'
+                                    ;
+                                }
+                            }
+                            , { "sName": "Code", "sWidth": "10%" }
+                            , { "sName": "ProjectName", "sWidth": "10%" }
+                            , { "sName": "FiscalPeriod", "sWidth": "10%" }
+                             , {
+                                 "sName": "Profit",
+                                 "sWidth": "10%", "sClass": "right",
+                                 "fnRender": function (oObj) {
+                                     return formatNumberWithCommas(oObj.aData[4]);
+                                 }
+                             }
+                           , {
+                               "sName": "DistributedValue",
+                               "sWidth": "10%", "sClass": "right",
+                               "fnRender": function (oObj) {
+                                   return formatNumberWithCommas(oObj.aData[5]);
+                               }
+                           }
+                            , {
+                                "sName": "EmployeePFValue",
+                                "sWidth": "10%", "sClass": "right",
+                                "fnRender": function (oObj) {
+                                    return formatNumberWithCommas(oObj.aData[6]);
+                                }
+                            }
+                            , {
+                                "sName": "EmployeerPFValue",
+                                "sWidth": "10%", "sClass": "right",
+                                "fnRender": function (oObj) {
+                                    return formatNumberWithCommas(oObj.aData[7]);
+                                }
+                            }
+                          , {
+                              "sName": "TotalEmployeeValue",
+                              "sWidth": "10%", "sClass": "right",
+                              "fnRender": function (oObj) {
+                                  return formatNumberWithCommas(oObj.aData[8]);
+                              }
+                          }                         
+                            , { "sName": "Post", "sWidth": "12%" }
+            ]
+        });
+
+    });
+
+    function formatNumberWithCommas(value) {
+        if (value == null || value === '') return '';
+        value = parseFloat(value).toFixed(2); 
+        var parts = value.split('.'); 
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parts[0] + '.' + parts[1];
+    }
+
+</script>
+
+<script>
+
+    function btnPostNew(sender) {
+
+        var Id = $(sender).attr("data-Id").split('~')[0];
+        var post = $(sender).attr("data-Id").split('~')[1];
+        if (post == "Posted") {
+            ShowResult("Fail", "Data Already Posted!");
+            return true;
+        }
+        var getURL = "/WPPF/WPPF/Post" + "?" + "ids=" + Id;
+
+        $.getJSON(getURL, function (vm) {
+
+            if (vm.Post) {
+                ShowResult("Fail", "Data Already Posted!");
+                return true;
+            }
+            else {
+                var url = $(sender).attr("data-url") + "?ids=" + Id + '~';
+                var questionMSG = "Are you sure to Post Data!";
+                singleOperation(questionMSG, url);
+            }
+
+        });
+
+    }
+
+
+    $('.sendRpt').click(function () {
+        debugger;
+
+        var url = $(this).attr("data-url");
+        window.open(url, '_blank');
+    });
+   
+</script>

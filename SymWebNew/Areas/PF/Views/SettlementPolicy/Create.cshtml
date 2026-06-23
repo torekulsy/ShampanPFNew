@@ -1,0 +1,147 @@
+﻿@*
+    PolicyName
+    JobAgeInMonth
+    EmployeeContributionRatio
+    EmployeerContributionRatio
+    Remarks
+*@
+
+@model SymViewModel.PF.SettlementPolicyVM
+@using UIHelper.MVC
+@using (Html.BeginForm("CreateEdit", "SettlementPolicy", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmSettlementPolicy" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.Operation)
+    <div class="card">
+        <div class="card-header p-3">
+            <div class="th_thinbox_top">
+                <div>
+                    @if (Model.Operation == "add")
+                    {
+                        <button type="button" name="btnName" value="Save" title="Save Data" onclick="pageSubmit('frmSettlementPolicy')" class="sym-btn-save">&nbsp;Save</button>
+
+                    }
+                    else
+                    {
+                        <button type="button" name="btnName" value="Update" title="Update Data" onclick="pageSubmit('frmSettlementPolicy')" class="sym-btn-update">&nbsp;Update</button>
+
+                    }
+                    <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/SettlementPolicy" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>
+                    @*<button type="button" title="Add New Settlement Policy" data-url="/@ViewBag.TransType/SettlementPolicy/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>*@
+
+
+                </div>
+                <div class="breadcrumb-container">
+                    <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="headrow">
+
+    </div>
+    <div class="thinbox">
+        <div class="th_thinbox">
+            <p>Settlement Policy</p>
+        </div>
+        <div class="SettlementPolicy card-body">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.PolicyName)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.PolicyName, new { @placeholder = "Policy Name", @class = " required form-control" })
+                        @Html.ValidationMessageFor(model => model.PolicyName)
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.JobAgeInMonth)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.JobAgeInMonth, new { @placeholder = "Job Age In Month", @class = "required  form-control", type = "number" })
+                        @Html.ValidationMessageFor(model => model.JobAgeInMonth)
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.EmployeeContributionRatio)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.EmployeeContributionRatio, new { @placeholder = "Employee Contribution Ratio", @class = "required   form-control", type = "number" })
+                        @Html.ValidationMessageFor(model => model.EmployeeContributionRatio)
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.EmployerContributionRatio)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.EmployerContributionRatio, new { @placeholder = "Employeer Contribution Ratio", @class = " required  form-control", type = "number" })
+                        @Html.ValidationMessageFor(model => model.EmployerContributionRatio)
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.EmployeeProfitRatio)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.EmployeeProfitRatio, new { @placeholder = "Employee Profit Ratio", @class = "required   form-control", type = "number" })
+                        @Html.ValidationMessageFor(model => model.EmployeeProfitRatio)
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.EmployerProfitRatio)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.EmployerProfitRatio, new { @placeholder = "Employer Profit Ratio", @class = " required  form-control", type = "number" })
+                        @Html.ValidationMessageFor(model => model.EmployerProfitRatio)
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-4">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.Remarks)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextAreaFor(model => model.Remarks, new { @placeholder = " Remarks", @class = "  form-control" })
+                        @Html.ValidationMessageFor(model => model.Remarks)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="headrow">
+
+
+    </div>
+    <div class="card">
+        <div class="card-header p-3">
+            @if (Model.Operation == "add")
+            {
+                <button type="button" name="btnName" value="Save" title="Save Data" onclick="pageSubmit('frmSettlementPolicy')" class="sym-btn-save">&nbsp;Save</button>
+            }
+            else
+            {
+                <button type="button" name="btnName" value="Update" title="Update Data" onclick="pageSubmit('frmSettlementPolicy')" class="sym-btn-update">&nbsp;Update</button>
+            }
+            <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/SettlementPolicy" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>
+            @*<button type="button" title="Add New Settlement Policy" data-url="/@ViewBag.TransType/SettlementPolicy/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>*@
+        </div>
+    </div>
+}
+<script>
+    $(function () {
+        valiDation("frmSettlementPolicy");
+    });
+
+    $(document).ready(function () {
+        $('#frmSettlementPolicy').on('click', 'input[type="text"], textarea.NumberCheck', function () {
+            $(this).select();
+        });
+    });
+</script>

@@ -1,0 +1,195 @@
+﻿@using SymOrdinary
+@using System.Threading;
+@{
+    ShampanIdentity identity = null;
+    try
+    {
+        identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
+    }
+    catch (Exception)
+    {
+        Response.Redirect("/Home/Index");
+        return;
+    }
+}
+<div class="card">
+    <div class="card-header p-3">
+        <div class="th_thinbox_top">
+            <p>PF Settlement</p>
+            <div class="breadcrumb-container">
+                <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="thinbox">
+    <div class="th_thinbox">
+        <p>PF Settlement List</p>
+    </div>
+    <div class="custom-top">
+        <div id="mainBtnAll">
+            <button type="button" title="New Employee Settlement" data-url="/@ViewBag.TransType/PFSettlement/IndexResignEmployee" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>
+        </div>
+        <div class="table-search">
+            <div class="mobile-search-toggle">
+                <i class="fa fa-search"></i>
+            </div>
+            <div id="dataTables_filter"></div>
+        </div>
+
+    </div>
+
+    <table id="myDataTable" class="display">
+        <thead>
+            <tr>
+                <th class="center">Action</th>
+                <th class="center">Code</th>
+                <th class="center">Name</th>
+                <th class="center">Designation</th>
+                <th class="center">Department</th>
+                <th class="center">Total Payable Amount</th>
+                <th class="center">Already Paid Amount</th>
+                <th class="center">Net Pay Amount</th>
+                <th class="center">Post Status</th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div class="custom-footer">
+        <div id="footer-length"></div>
+        <div id="footer-info"></div>
+        <div id="footer-pagination"></div>
+    </div>
+</div>
+<div class="headrow">
+    <button type="button" title="New Employee Settlement" data-url="/@ViewBag.TransType/PFSettlement/IndexResignEmployee" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>
+</div>
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        SelectAllForDelete();
+        $.datepicker.regional[""].dateFormat = 'dd/M/y';
+        $.datepicker.setDefaults($.datepicker.regional['']);
+        var oTable = $('#myDataTable').dataTable({
+            "bServerSide": true,
+            "sAjaxSource": "/@ViewBag.TransType/PFSettlement/_index",
+            "bProcessing": true,
+            "aLengthMenu": tablelength(),
+            "bJqueryUI": true,
+            "bAutoWidth": false,
+            "bPaginate": true,
+            "sPaginationType": "full_numbers",
+            "iDisplayLength": 10,
+            "oLanguage": {
+                "oPaginate": {
+                    "sPrevious": '<i class="fa fa-angle-left"></i>',
+                    "sNext": '<i class="fa fa-angle-right"></i>'
+                },
+                "sSearch": ""
+            },
+
+            "fnDrawCallback": function () {
+                $('.dataTables_filter input')
+                    .attr('placeholder', 'Search...');
+            },
+            "aoColumns": [
+                            {
+                                "sName": "Id",
+                                "bSearchable": false,
+                                "bSortable": false,
+                                "sWidth": "5%",
+                                "sClass": "center",
+                            fnRender: function (oObj) {
+    var Code = encodeURIComponent(oObj.aData[1]);
+
+    // Admin check
+    if ('@identity.IsAdmin'.toLowerCase() == "true") {
+        if (oObj.aData[8] == "Posted") {
+            // If "Posted", show disabled Post button
+            return ''
+                + '<a title="Click on for Post" data-url="/@ViewBag.TransType/PFSettlement/Post" onclick="btnPostNew(this);" data-Post="' + oObj.aData[7] + '" data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row" style="opacity:0.45;pointer-events:none;cursor:default;"></a>'
+            + ' <a title="Journal" class="sym-btn-bank-row" href="/@ViewBag.TransType/PFSettlement/JournalEntry/?Code=' + Code + '&Id=' + oObj.aData[0] + '"></a>';
+        } else {
+            // If not posted, show enabled Post button
+            return ''
+                + '<a title="Click on for Post" data-url="/@ViewBag.TransType/PFSettlement/Post" onclick="btnPostNew(this);" data-Post="' + oObj.aData[7] + '" data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row"></a>';
+        }
+    }
+
+    // Always render the following buttons for all users (admin or non-admin)
+    return ''
+        + ' <input onclick="CheckAll(this)" type="checkbox" data-Id="' + oObj.aData[0] + '">'
+        + '<a title="Click on for Report" target="_blank" href="/@ViewBag.TransType/PFSettlement/ReportView?Id=' + oObj.aData[0] + '" class="sym-btn-report-row"></a>'
+       
+}
+
+                            }
+                            , { "sName": "Code", "sWidth": "10%" }
+                            , { "sName": "EmpName", "sWidth": "10%" }
+                            , { "sName": "Designation", "sWidth": "10%" }
+                            , { "sName": "Department", "sWidth": "10%" }
+                            , {
+                                "sName": "TotalPayableAmount", "sWidth": "10%", "sClass": "right", "fnRender": function (oObj) {
+                                    return formatNumberWithCommas(oObj.aData[5]);
+                                }
+                            }
+                            , {
+                                "sName": "AlreadyPaidAmount", "sWidth": "10%", "sClass": "right", "fnRender": function (oObj) {
+                                    return formatNumberWithCommas(oObj.aData[6]);
+                                }
+                            }
+                            , {
+                                "sName": "NetPayAmount", "sWidth": "10%", "sClass": "right", "fnRender": function (oObj) {
+                                    return formatNumberWithCommas(oObj.aData[7]);
+                                }
+                            }
+                            , { "sName": "Post", "sWidth": "10%" }
+
+            ]
+        });
+        $("#footer-length").append($(".dataTables_length"));
+        $("#footer-info").append($(".dataTables_info"));
+        $("#footer-pagination").append($(".dataTables_paginate"));
+        $("#dataTables_filter").append($(".dataTables_filter"));
+
+        $(document).on("click", ".mobile-search-toggle", function (e) {
+            e.stopPropagation();
+            $("#dataTables_filter").slideToggle(150);
+        });
+    });
+</script>
+
+<script>
+    function btnPostNew(sender) {
+
+        var Id = $(sender).attr("data-Id");
+
+        var getURL = "/@ViewBag.TransType/PFSettlement/GetPFSettlement" + "?" + "id=" + Id;
+
+        $.getJSON(getURL, function (vm) {
+
+            if (vm.Post) {
+                ShowResult("Fail", "Data Already Posted!");
+                return true;
+            }
+            else {
+                var url = $(sender).attr("data-url") + "?ids=" + Id + '~';
+                var questionMSG = "Are you sure to Post Data!";
+                singleOperation(questionMSG, url);
+            }
+
+        });
+
+    }
+
+    function formatNumberWithCommas(value) {
+        if (value == null || value === '') return '';
+        value = parseFloat(value).toFixed(2);
+        var parts = value.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parts[0] + '.' + parts[1];
+    }
+</script>

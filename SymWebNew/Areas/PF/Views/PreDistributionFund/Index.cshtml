@@ -1,0 +1,161 @@
+﻿@using SymOrdinary
+@using System.Threading;
+@{
+    ShampanIdentity identity = null;
+    try
+    {
+        identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
+    }
+    catch (Exception)
+    {
+        Response.Redirect("/Home/Index");
+        return;
+    }
+}
+<div class="card">
+    <div class="card-header p-3">
+        <div class="th_thinbox_top">
+            <p>Pre Distribution Fund</p>
+            <div class="breadcrumb-container">
+                <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="thinbox">
+    <div class="th_thinbox">
+        <p>Pre Distribution Fund List</p>
+    </div>
+    <div class="custom-top">
+        <div id="mainBtnAll">
+            <button type="button" title="Add Fund (Return On Investment)" data-url="/@ViewBag.TransType/PreDistributionFund/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>
+        </div>
+        <div class="table-search">
+            <div class="mobile-search-toggle">
+                <i class="fa fa-search"></i>
+            </div>
+            <div id="dataTables_filter"></div>
+        </div>
+
+    </div>
+    <table id="myDataTable" class="display">
+        <thead>
+            <tr>
+                <th class="center">
+                   Action
+                </th>
+                <th class="left">Code </th>
+                <th class="left">Transaction Date</th>
+                <th class="left">Total Value</th>
+                <th class="left">Remarks</th>
+                <th class="left">Post Status</th>
+                <th class="left">Approve Status</th>
+    
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div class="custom-footer">
+        <div id="footer-length"></div>
+        <div id="footer-info"></div>
+        <div id="footer-pagination"></div>
+    </div>
+</div>
+<div class="card mt-3">
+    <div class="card-header p-3">
+        <div class="">
+            <button type="button" title="Add Fund (Return On Investment)" data-url="/@ViewBag.TransType/PreDistributionFund/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>
+        </div>
+    </div>
+</div>
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $.datepicker.regional[""].dateFormat = 'dd/M/y';
+        $.datepicker.setDefaults($.datepicker.regional['']);
+        var oTable = $('#myDataTable').dataTable({
+            "bServerSide": true,
+            "sAjaxSource": "/@ViewBag.TransType/PreDistributionFund/_index",
+            "bProcessing": true,
+            "aLengthMenu": tablelength(),
+            "bJqueryUI": true,
+            "bAutoWidth": false,
+            "bPaginate": true,
+            "sPaginationType": "full_numbers",
+            "iDisplayLength": 10,
+            "oLanguage": {
+                "oPaginate": {
+                    "sPrevious": '<i class="fa fa-angle-left"></i>',
+                    "sNext": '<i class="fa fa-angle-right"></i>'
+                },
+                "sSearch": ""
+            },
+
+            "fnDrawCallback": function () {
+                $('.dataTables_filter input')
+                    .attr('placeholder', 'Search...');
+            },
+            "aoColumns": [
+                {
+                    "sName": "Id",
+                    "bSearchable": false,
+                    "bSortable": false,
+                    "sWidth": "5%",
+                    "sMargin": "10px",
+                    "sClass": "center",
+                   fnRender: function (oObj) {
+                    var Code = encodeURIComponent(oObj.aData[1]);
+
+                    // Always display these buttons
+                    var result = '<a id="lnkEdit1" title="Click on for Edit" style="text-decoration:none;" href="/@ViewBag.TransType/PreDistributionFund/Edit/' + oObj.aData[0] + '" class="innerListLink sym-btn-edit-row"></a>'
+                        + '<a id="lnkEdit1" title="Click on for Report" style="text-decoration:none;" href="/@ViewBag.TransType/PreDistributionFund/reportVeiw/' + oObj.aData[0] + '" class="linkReport sym-btn-report-row"></a>'
+                        + '<a id="lnkEdit1" title="Click on for Distribution" style="text-decoration:none;" target="_blank" href="/@ViewBag.TransType/ProfitDistributionNew/Process?PreDistributionFundId=' + oObj.aData[0] + '" class="innerListLink sym-btn-add-row"></a>'
+                        + '<a title="Journal" class="sym-btn-bank-row" href="/@ViewBag.TransType/PreDistributionFund/JournalEntry/?Code=' + Code + '&Id=' + oObj.aData[0] + '"></a>';
+
+                    // Now check if admin and the post condition
+                    if ('@identity.IsAdmin'.toLowerCase() == "true") {
+                        if (oObj.aData[5] == "Posted") {
+                            // If posted, show post button with disabled style
+                            result += ' <a title="Click on for Post" data-url="/@ViewBag.TransType/PreDistributionFund/Post" onclick=btnPostNoSplit(this); data-Post="' + oObj.aData[4] + '" data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row" style="opacity:0.45;pointer-events:none;cursor:default;"></a>';
+                        } else {
+                            // If not posted, show enabled post button
+                            result += ' <a title="Click on for Post" data-url="/@ViewBag.TransType/PreDistributionFund/Post" onclick=btnPostNoSplit(this); data-Post="' + oObj.aData[4] + '" data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row"></a>';
+                        }
+                    }
+
+                    return result;
+                }
+
+
+                },
+                { "sName": "Code", "sWidth": "10%" },
+                { "sName": "TransactionDate", "sWidth": "10%" },
+                {
+                    "sName": "TotalValue", "sWidth": "10%", "sClass": "right", "fnRender": function (oObj) {
+                        return formatNumberWithCommas(oObj.aData[3]);
+                    }
+                },
+                { "sName": "Remarks", "sWidth": "10%" },
+                { "sName": "Post", "sWidth": "10%" },
+                { "sName": "Approve", "sWidth": "10%" }
+            ]
+        });
+        $("#footer-length").append($(".dataTables_length"));
+        $("#footer-info").append($(".dataTables_info"));
+        $("#footer-pagination").append($(".dataTables_paginate"));
+        $("#dataTables_filter").append($(".dataTables_filter"));
+
+        $(document).on("click", ".mobile-search-toggle", function (e) {
+            e.stopPropagation();
+            $("#dataTables_filter").slideToggle(150);
+        });
+    });
+    function formatNumberWithCommas(value) {
+        if (value == null || value === '') return '';
+        value = parseFloat(value).toFixed(2);
+        var parts = value.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parts[0] + '.' + parts[1];
+    }
+</script>
+

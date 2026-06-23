@@ -1,0 +1,130 @@
+﻿@using UIHelper.MVC
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="card">
+    <div class="card-header p-3">
+        <div class="th_thinbox_top">
+            <p>PF Employee</p>
+            <div class="breadcrumb-container">
+                <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="thinbox">
+    <div class="th_thinbox">
+        <p>PF Employee List</p>
+        
+    </div>
+    <div class="custom-top">
+        <div id="mainBtnAll">
+            <button type="button" title="Add New Employee PF Opeinig" data-url="/@ViewBag.TransType/EmployeeTransfer/SingleEmployeePFTransferEdit" onclick="GoTo(this)" id="" class="sym-btn-add ">&nbsp;New</button>
+        </div>
+        <div class="table-search">
+            <div class="mobile-search-toggle">
+                <i class="fa fa-search"></i>
+            </div>
+            <div id="dataTables_filter"></div>
+        </div>
+
+    </div>
+    <div id="container">
+        <table id="myDataTable" class="display">
+            <thead>
+                <tr>
+                    <th class="center" style="display:none;"></th>
+                    <th class="center">Employee Code</th>
+                    <th class="center">Employee Name</th>
+                    <th class="center">From Branch</th>
+                    <th class="center">To Branch</th>
+                    <th class="center">Date</th>
+                </tr>
+
+            </thead>
+            <tbody></tbody>
+        </table>
+        
+    </div>
+    <div class="custom-footer">
+        <div id="footer-length"></div>
+        <div id="footer-info"></div>
+        <div id="footer-pagination"></div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header p-3">
+        <div class="">
+            <button type="button" title="Add New Employee PF Opeinig" data-url="/@ViewBag.TransType/EmployeeTransfer/SingleEmployeePFTransferEdit" onclick="GoTo(this)" id="" class="sym-btn-add ">&nbsp;New</button>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+
+        SelectAllForDelete();
+        var oTable = $('#myDataTable').dataTable({
+            "bServerSide": true,
+            "sAjaxSource": "/@ViewBag.TransType/EmployeeTransfer/_index",
+            "bProcessing": true,
+            "aLengthMenu": tablelength(),
+            "bJqueryUI": true,
+            "bAutoWidth": false,
+            "bPaginate": true,
+            "sPaginationType": "full_numbers",
+            "iDisplayLength": 10,
+            "oLanguage": {
+                "oPaginate": {
+                    "sPrevious": '<i class="fa fa-angle-left"></i>',
+                    "sNext": '<i class="fa fa-angle-right"></i>'
+                },
+                "sSearch": ""
+            },
+
+            "fnDrawCallback": function () {
+                $('.dataTables_filter input')
+                    .attr('placeholder', 'Search...');
+            },
+            "aoColumns": [
+                 //{
+                 //    "sName": "Id",
+                 //    "bSearchable": false,
+                 //    "bSortable": false,
+                 //    "sWidth": "10%",
+                 //    "sClass": "center",
+                 //    "fnRender": function (oObj) {
+                 //        return '  &nbsp;  <a title="Click on for Edit" id="lnkEdit1" style="text-decoration:none;" Onclick="otherearningEdit(this);"  class="hidden  sym-btn-edit-row"  data-Id="' + oObj.aData[0] + '"></a>'
+                 //        ;
+                 //    }
+                 //},
+                            { "sName": "Id", "bVisible": false },
+                            { "sName": "Code", "sWidth": "15%", "sClass": "center" },
+                            { "sName": "EmpName", "sWidth": "25%" },
+                            { "sName": "FromBranch", "sWidth": "20%", "sClass": "center" },
+                            { "sName": "ToBranch", "sWidth": "20%", "sClass": "center" },
+                            { "sName": "TransferDate", "sWidth": "20%", "sClass": "center" }
+
+
+            ]
+        });
+        $("#footer-length").append($(".dataTables_length"));
+        $("#footer-info").append($(".dataTables_info"));
+        $("#footer-pagination").append($(".dataTables_paginate"));
+        $("#dataTables_filter").append($(".dataTables_filter"));
+
+        $(document).on("click", ".mobile-search-toggle", function (e) {
+            e.stopPropagation();
+            $("#dataTables_filter").slideToggle(150);
+        });
+
+    });
+    function otherearningEdit(sender) {
+        window.location = "/@ViewBag.TransType/EmployeeTransfer/SingleEmployeePFTransferEdit?PFOpeinigId=" + $(sender).attr('data-Id');
+    }
+</script>
+
+
