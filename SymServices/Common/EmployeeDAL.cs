@@ -49,6 +49,7 @@ namespace SymServices.Common
                     SELECT Id
                           ,Name    
                       FROM Branch
+                      Where IsActive = 1
                     ";
 
                 SqlCommand _objComm = new SqlCommand();

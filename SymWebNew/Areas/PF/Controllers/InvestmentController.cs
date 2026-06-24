@@ -678,14 +678,58 @@ namespace SymWebUI.Areas.PF.Controllers
             }
         }
 
-        /// <summary>
-        /// Created: 13 Apr 2025  
-        /// Created By: Md Torekul Islam  
-        /// Generates and returns a PDF Crystal Report for Investment based on filtering criteria and report type.  
-        /// This method handles two types of reports: Header and Detailed. The report content varies based on the `ReportType` parameter.
-        /// </summary>
-        /// <param name="vm">An instance of PFReportVM containing filtering criteria like Code, Id, DateFrom, DateTo, and ReportType.</param>
-        /// <returns>A PDF file as an ActionResult containing the Investment Report.</returns>
+        public ActionResult InvestmentReportNew(int investmentId = 0)
+        {
+            try
+            {
+                string ReportHead = "";
+                string rptLocation = "";
+             
+                PFReport report = new PFReport();
+                PFReportVM vm = new PFReportVM();
+                vm.Id = investmentId;
+                vm.TransType = "PF";
+
+                ReportDocument doc = new ReportDocument();
+                DataTable dt = new DataTable();
+                DataTable dt1 = new DataTable();
+                DataSet ds = new DataSet();
+
+                dt = new PFReportRepo().InvestmentDetailsReport(vm, null, null);
+
+                dt1 = new PFReportRepo().InvestmentNameDetailsReport(dt.Rows[0]["InvestmentNameId"].ToString());
+
+                ds.Tables.Add(dt);
+                ds.Tables.Add(dt1);
+                dt.TableName = "dtInvestmentDetails";
+                dt1.TableName = "dtInvestmentNameDetails";
+                rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptInvestmentDetails.rpt";
+
+
+                doc.Load(rptLocation);
+                doc.SetDataSource(ds);
+                string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
+                FormulaFieldDefinitions ffds = doc.DataDefinition.FormulaFields;
+                CompanyRepo _CompanyRepo = new CompanyRepo();
+                CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
+
+                doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text = "'" + companyLogo + "'";
+                doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + ReportHead + "'";
+                doc.DataDefinition.FormulaFields["TransType"].Text = "'" + AreaTypePFVM.TransType + "'";
+                doc.DataDefinition.FormulaFields["Address"].Text = "'" + cvm.Address + "'";
+                doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
+                doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
+                //doc.DataDefinition.FormulaFields["frmGroupBy"].Text = "'" + groupBy + "'";
+                var rpt = RenderReportAsPDF(doc);
+                doc.Close();
+                return rpt;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
          [HttpPost]
         public ActionResult InvestmentReport(PFReportVM vm)
         {
@@ -712,7 +756,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 }
                 else
                 {
-                    vm.Id = vm.Id;
+                     vm.Id = vm.Id;
                     dt = new PFReportRepo().InvestmentDetailsReport(vm, null,null);
                   
                     dt1 = new PFReportRepo().InvestmentNameDetailsReport(dt.Rows[0]["InvestmentNameId"].ToString());

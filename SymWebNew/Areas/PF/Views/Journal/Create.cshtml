@@ -450,7 +450,7 @@ else
         $(sender).parents("div.row:first").remove();
         calculation();
         ShowHide();
-        ShowBalance();
+        //ShowBalance();
     }
 
     function RemoveProduct(sender) {
@@ -568,9 +568,9 @@ else
 
         });
     }
-    $(function () {
-        $('.accName').change(ShowBalance);
-    });
+    //$(function () {
+    //    $('.accName').change(ShowBalance);
+    //});
     //function ShowBalance() {
     //    var acctId = $('.accName  :selected').val().replace("Select", "");
     //    Obj = new Object();
