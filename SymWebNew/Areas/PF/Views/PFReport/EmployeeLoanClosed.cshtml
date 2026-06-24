@@ -5,14 +5,23 @@
 
 @using (Html.BeginForm("EmployeeLoanClosed", "PFReport", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmEmployeeLoanClosed", @target = "_blank" }))
 {
+    <div class="card">
+        <div class="card-header p-3">
+            <div class="th_thinbox_top" style="justify-content:flex-end">
+                <div class="breadcrumb-container">
+                    <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="thinbox">
         <div class="th_thinbox">
             <p>Employee PF Statement</p>
         </div>
-        <div class="Withdraw">
+        <div class="Withdraw card-body">
             <div class="row">
 
-                <div class="col-md-3">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
                     <div class="editor-label">
                         <label>From Date</label>
                     </div>
@@ -21,7 +30,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
                     <div class="editor-label">
                         <label>To Date</label>
                     </div>
@@ -32,12 +41,13 @@
 
 
             </div>
+            <div class="headrow mt-4">
+                <button type="button" title="Click to View Report Summary" class="sym-btn-report btnSummary">&nbsp;Report</button>
+            </div>
         </div>
     </div>
 
-    <div class="headrow">
-        <button type="button" title="Click to View Report Summary" class="sym-btn-report btnSummary">&nbsp;Report</button>
-    </div>
+   
 }
 
 <script>

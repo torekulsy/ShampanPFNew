@@ -11,7 +11,34 @@
 * {
     font-family: "Source Sans Pro",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
 }
+@view-transition {
+    navigation: auto;
+}
+::view-transition-old(root) {
+    animation: old-page .8s ease forwards;
+}
 
+::view-transition-new(root) {
+    animation: new-page .8s ease forwards;
+}
+
+@keyframes old-page {
+    to {
+        opacity: 0;
+       
+    }
+}
+
+@keyframes new-page {
+    from {
+        opacity: 0;
+        
+    }
+    to {
+        opacity: 1;
+        
+    }
+}
 body {
     background: #fff !important;
 }
