@@ -34,25 +34,24 @@
     font-weight: normal !important;
     line-height: 1.5 !important;
 }
+
 .sym-btn-add:hover, .sym-btn-add:focus, .sym-btn-add:active, .sym-btn-add.active, .open > .dropdown-toggle.sym-btn-add {
-    background-color: #106cba;
-    
+    background-color: transparent;
+    border-color: #106cba;
+    color: #106cba!important;
 }
- .sym-btn-save:hover,
-    .sym-btn-save:focus,
-    .sym-btn-save:active,
-    .sym-btn-save-row.active,
-    .open > .dropdown-toggle .sym-btn-save {
-        background-color: #059fdf;
-    }
+.sym-btn-save:hover, .sym-btn-save:focus, .sym-btn-save:active, .sym-btn-save-row.active, .open > .dropdown-toggle .sym-btn-save{
+    background-color: transparent;
+    border-color: #059fdf;
+    color: #059fdf!important;
+}
  
-    .sym-btn-Excel-Export:hover,
-    .sym-btn-Excel-Export:focus,
-    .sym-btn-Excel-Export:active,
-    .sym-btn-Excel-Export.active,
-    .open > .dropdown-toggle.sym-btn-Excel-Export {
-        background-color: #059fdf;
-    }
+ 
+    .sym-btn-Excel-Export:hover, .sym-btn-Excel-Export:focus, .sym-btn-Excel-Export:active, .sym-btn-Excel-Export.active, .open > .dropdown-toggle.sym-btn-Excel-Export {
+    background-color: transparent;
+    border: 1px solid #059fdf;
+    color: #059fdf!important;
+}
     .sym-btn-back {
     font-family: FontAwesome;
     padding: 6px 12px;
@@ -88,7 +87,7 @@
 , .sym-btn-investment-row
 , .sym-btn-payment-row
 , .sym-btn-bank-row
-, .sym-btn-post, .sym-btn-post-row, .sym-btn-detail, .sym-btn-detail-row, .sym-btn-remove, .sym-btn-remove-row, .sym-btn-remove-row-minus, .sym-btn-edit, .sym-btn-edit-row, .sym-btn-audit, .sym-btn-audit-row, .sym-btn-password, .sym-btn-password-row, .sym-btn-save, .sym-btn-save-row, .sym-btn-cancel, .sym-btn-cancel-row, .sym-btn-update, .sym-btn-update-row, .sym-btn-back, .sym-btn-add-upload, .sym-btn-report, .sym-btn-report-row, .sym-btn-approve, .sym-btn-approve-row, .sym-btn-reject, .sym-btn-reject-row, .sym-btn-search, .sym-btn-mail, .sym-btn-mail-row, .sym-btn-Excel-import, .sym-btn-Excel-Export, .sym-btn-ExportImport, .sym-btn-ExportImport-row, .sym-btn-print, .sym-btn-clear, .sym-btn-duplicate, .sym-btn-duplicate-row, .sym-btn-file-upload, .sym-btn-search, .sym-btn-refresh {
+, .sym-btn-post, .sym-btn-post-row, .sym-btn-detail, .sym-btn-detail-row, .sym-btn-remove, .sym-btn-remove-row, .sym-btn-remove-row-minus, .sym-btn-edit, .sym-btn-edit-row, .sym-btn-audit, .sym-btn-audit-row, .sym-btn-password, .sym-btn-password-row, .sym-btn-save, .sym-btn-save-row, .sym-btn-cancel, .sym-btn-cancel-row, .sym-btn-update, .sym-btn-update-row, .sym-btn-back, .sym-btn-add-upload, .sym-btn-report, .sym-btn-report-row, .sym-btn-approve, .sym-btn-approve-row, .sym-btn-reject, .sym-btn-reject-row, .sym-btn-search, .sym-btn-mail, .sym-btn-mail-row, .sym-btn-Excel-import, .sym-btn-Excel-Export, .sym-btn-ExportImport, .sym-btn-ExportImport-row, .sym-btn-print, .sym-btn-clear, .sym-btn-duplicate, .sym-btn-duplicate-row, .sym-btn-file-upload, .sym-btn-search, .sym-btn-refresh, .sym-btn-journal-row {
     font-family: FontAwesome !important;
     margin-bottom: 0;
     font-weight: normal;
@@ -233,16 +232,12 @@ tbody tr td #lnkEdit1 {
         content: "\f014";
     }
 
-    .sym-btn-remove:hover,
-    .sym-btn-remove:focus,
-    .sym-btn-remove:active,
-    .sym-btn-remove.active,
-    .open > .dropdown-toggle.sym-btn-remove {
-        background-color: #c9302c;
-        border-color: #ac2925;
-        color: black !important;
-        text-decoration: none !important;
-    }
+    .sym-btn-remove:hover, .sym-btn-remove:focus, .sym-btn-remove:active, .sym-btn-remove.active, .open > .dropdown-toggle.sym-btn-remove {
+    background-color: transparent;
+    border-color: #d9534f;
+    color: #d9534f!important;
+    text-decoration: none !important;
+}
 
 
     .sym-btn-remove-row:before {
@@ -269,16 +264,12 @@ tbody tr td #lnkEdit1 {
         content: "\f00c";
     }
 
-    .sym-btn-post:hover,
-    .sym-btn-post:focus,
-    .sym-btn-post:active,
-    .sym-btn-post.active,
-    .open > .dropdown-toggle.sym-btn-post {
-        background-color: #246c21bf;
-      
-        text-decoration: none !important;
-    }
-
+   .sym-btn-post:hover, .sym-btn-post:focus, .sym-btn-post:active, .sym-btn-post.active, .open > .dropdown-toggle.sym-btn-post {
+    background-color: transparent;
+    text-decoration: none !important;
+    border-color: #246c21bf;
+    color: #246c21bf!important;
+}
 
 .sym-btn-download-row {
     font-family: FontAwesome !important;
@@ -421,16 +412,12 @@ tbody tr td #lnkEdit1 {
         content: "\f0ca";
     }
 
-    .sym-btn-detail:hover,
-    .sym-btn-detail:focus,
-    .sym-btn-detail:active,
-    .sym-btn-detail.active,
-    .open > .dropdown-toggle.sym-btn-detail {
-        background-color: #5bc0de;
-        border-color: #4bc0de;
-        color: black !important;
-        text-decoration: none !important;
-    }
+  .sym-btn-detail:hover, .sym-btn-detail:focus, .sym-btn-detail:active, .sym-btn-detail.active, .open > .dropdown-toggle.sym-btn-detail {
+    background-color: transparent;
+    border-color: #4bc0de;
+    color: #4bc0de!important;
+    text-decoration: none !important;
+}
 
 .sym-btn-detail-row {
     font-family: FontAwesome !important;
@@ -623,16 +610,12 @@ tbody tr td #lnkEdit1 {
         content: "\f00d";
     }
 
-    .sym-btn-cancel:hover,
-    .sym-btn-cancel:focus,
-    .sym-btn-cancel:active,
-    .sym-btn-cancel.active,
-    .open > .dropdown-toggle.sym-btn-cancel {
-        background-color:#f15353;
-        border-color: #d58512;
-        color: black !important;
-        text-decoration: none !important;
-    }
+   .sym-btn-cancel:hover, .sym-btn-cancel:focus, .sym-btn-cancel:active, .sym-btn-cancel.active, .open > .dropdown-toggle.sym-btn-cancel {
+    background-color: transparent;
+    border-color: #db1717;
+    color: #db1717!important;
+    text-decoration: none !important;
+}
 
 .sym-btn-update {
     font-family: FontAwesome;
@@ -748,9 +731,9 @@ tbody tr td #lnkEdit1 {
     }
 
     .sym-btn-report:hover, .sym-btn-report:focus, .sym-btn-report:active, .sym-btn-report.active, .open > .dropdown-toggle.sym-btn-report {
-    background-color: #6c9ba8 !important;
+    background-color: transparent!important;
     border-color: #4bc0de !important;
-    color: #ffffff !important;
+    color: #4bc0de !important;
     text-decoration: none !important;
 }
 
@@ -762,7 +745,11 @@ tbody tr td #lnkEdit1 {
     background-color: #5bc0de;
     border-color: #4bc0de;
 }
-
+.sym-btn-journal-row {
+    background: #97b246;
+    color: #fff!important;
+   
+}
     .sym-btn-report-row:before {
         content: "\f15c";
     }
@@ -984,16 +971,12 @@ tbody tr td #lnkEdit1 {
         content: "\f021";
     }
 
-    .sym-btn-clear:hover,
-    .sym-btn-clear:focus,
-    .sym-btn-clear:active,
-    .sym-btn-clear.active,
-    .open > .dropdown-toggle.sym-btn-clear {
-        background-color: #65463b;
-        border-color: #65463b;
-        color: black !important;
-        text-decoration: none !important;
-    }
+    .sym-btn-clear:hover, .sym-btn-clear:focus, .sym-btn-clear:active, .sym-btn-clear.active, .open > .dropdown-toggle.sym-btn-clear {
+    background-color: transparent;
+    color: #65463b!important;
+    text-decoration: none !important;
+    border: 1px solid #65463b;
+}
 
 .sym-btn-duplicate {
     font-family: FontAwesome;
@@ -1027,7 +1010,10 @@ tbody tr td #lnkEdit1 {
     font-weight: 600;
 }
 
-
+    .sym-btn-report, .sym-btn-clear, .sym-btn-cancel, .sym-btn-Excel-Export {
+   font-size: 14px!important;
+    height: 35px!important;
+}
 .sym-btn-duplicate-row {
     font-family: FontAwesome !important;
     padding: 2px 7px !important;
@@ -1109,17 +1095,12 @@ tbody tr td #lnkEdit1 {
         content: "\f0ec";
     }
 
-    .sym-btn-ExportImport:hover,
-    .sym-btn-ExportImport:focus,
-    .sym-btn-ExportImport:active,
-    .sym-btn-ExportImport.active,
-    .sym-btn-ExportImpor .open > .dropdown-toggle.sym-btn-edit {
-        background-color: #78a83f;
-        border-color: #78a83f;
-        color: black !important;
-        text-decoration: none !important;
-    }
-
+    .sym-btn-ExportImport:hover, .sym-btn-ExportImport:focus, .sym-btn-ExportImport:active, .sym-btn-ExportImport.active, .sym-btn-ExportImpor .open > .dropdown-toggle.sym-btn-edit {
+    background-color: transparent;
+    border-color: #78a83f;
+    color: #78a83f!important;
+    text-decoration: none !important;
+}
 
 .sym-btn-ExportImport-row {
     font-family: FontAwesome !important;

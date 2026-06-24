@@ -15,6 +15,20 @@
 body {
     background: #fff !important;
 }
+a:focus {
+    outline: none;
+    outline: none;
+    outline-offset: 0;
+}
+.btn:focus, .btn:active:focus, .btn.active:focus {
+    outline: 0!important;
+    outline: none!important;
+    outline-offset: 0!important;
+}
+.ui-dialog .ui-dialog-title {
+    
+    font-size: 16px;
+}
 .main-sidebar .brandLogo {
     background: #fff;
     text-align: center;
@@ -52,6 +66,18 @@ body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .content-w
 }
 
 }*/
+
+
+.main-container .sidebar a.nav-link.has-treeview-a.treeview-expanded.last-parent-active {
+   
+    background: #bcefff !important;
+    color: #000000 !important;
+    box-shadow: none!important;
+    animation: none;
+    border-radius: 4px;
+    transform: translate(0);
+
+}
 @media(max-width: 1200px){
     .left-panel {
     animation: fadeUp .6s ease both;
@@ -188,8 +214,8 @@ body.layout-top .content-area {
     height: 100vh !important;
 }
 .layout-wrapper.wrapper .content-wrapper {
-    margin-top: calc(78px + 1px);
- background: #f4f6f9!important
+    margin-top: calc(43px + 15px);
+    background: #f4f6f9!important;
 }
 /* Parent UL relative */
 .nav-sidebar .nav-treeview {
@@ -198,45 +224,6 @@ body.layout-top .content-area {
 }
 
 /* Vertical main line */
-.nav-sidebar .nav-treeview::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 6px;
-    width: 2px;
-    height: calc(100% - 17px);
-    background: #fff;
-}
-
-/*.nav-sidebar .nav-treeview::after {
-    content: "";
-    position: absolute;
-    bottom: 17px;
-    left: 6px;
-    width: 42px;
-    height: 2px;
-    background: #fff;
-    z-index: -1
-}*/
-.nav-sidebar .nav-treeview .has-treeview >.nav-treeview::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 26px;
-    width: 2px;
-    height: calc(100% - 17px);
-    background: #fff;
-}
-.nav-sidebar .nav-treeview .has-treeview >.nav-treeview .has-treeview >.nav-treeview::before {
-    content: "";
-    position: inherit;
-    top: 0;
-    left: 26px;
-    width:0;
-    height: 100%;
-   
-   
-}
 
 /* Each child item connector */
 .nav-sidebar .nav-treeview > .nav-item {
@@ -274,10 +261,14 @@ body.layout-top .content-area {
     
 }
 
-
-
-
-
+.nav-treeview .nav-treeview .nav-treeview .nav-item::before,
+.nav-treeview .nav-treeview .nav-treeview .nav-item::after {
+    content: none !important;
+    display: none !important;
+}
+.nav-treeview .nav-treeview .nav-treeview{
+    padding-left: 0!important
+}
 .branchNamecls {
     margin-right: 110px
 }
@@ -378,14 +369,14 @@ body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .content-w
     }
 [class*=sidebar-dark-] .nav-sidebar > .nav-item > .nav-treeview > li > a, [class*=sidebar-dark-] .nav-sidebar > .nav-item > .nav-treeview > li > .nav-treeview > li > a {
     background-color: rgb(74 114 199 / 63%);
-    margin-left: 20px!important;
+    /*margin-left: 20px!important;*/
     width: calc(100% - 10px);
     color: #fff!important;
     display: block;
 }
 [class*=sidebar-dark-] .nav-sidebar > .nav-item > .nav-treeview > li > .nav-treeview > li > a {
     background-color: #42a0d287;
-    margin-left: 40px!important;
+    /*margin-left: 40px!important;*/
     width: calc(100% - 17px);
     color: #fff!important;
     display: block;
@@ -398,6 +389,8 @@ body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .content-w
 [class*=sidebar-dark-] .nav-sidebar>.nav-item.menu-open>.nav-link, [class*=sidebar-dark-] .nav-sidebar>.nav-item:hover>.nav-link, [class*=sidebar-dark-] .nav-sidebar>.nav-item>.nav-link:focus {
     background-color: #448aff!important ;
     color: #fff!important;
+    outline: none!important;
+    border: none
 }
 /*[class*=sidebar-dark-] .sidebar .nav-treeview>.nav-item> .nav-treeview>.nav-item>.nav-link.active {
     background: linear-gradient(86deg, #0299e1 56%, #9ff8ff 100%)!important;
@@ -529,12 +522,7 @@ position: relative;
     box-shadow: 3px 3px 5px #fff;
 }*/
 /* Active Nested Menu Style */
-[class*=sidebar-dark-] 
-.sidebar 
-.nav-treeview > .nav-item 
-> .nav-treeview > .nav-item 
-> .nav-treeview > .nav-item 
-> .nav-link.active {
+a.nav-link.active-menu {
     position: relative;
     overflow: hidden;
     background: linear-gradient(90deg, #0f0cff 0%, #02c4f0 100%) !important;
@@ -551,12 +539,7 @@ position: relative;
 }
 
 /* Left Active Indicator */
-[class*=sidebar-dark-] 
-.sidebar 
-.nav-treeview > .nav-item 
-> .nav-treeview > .nav-item 
-> .nav-treeview > .nav-item 
-> .nav-link.active::before {
+a.nav-link.active-menu::before {
     content: "";
     position: absolute;
     left: 0;
@@ -569,12 +552,7 @@ position: relative;
 }
 
 /* Shine Effect */
-[class*=sidebar-dark-] 
-.sidebar 
-.nav-treeview > .nav-item 
-> .nav-treeview > .nav-item 
-> .nav-treeview > .nav-item 
-> .nav-link.active::after{
+a.nav-link.active-menu::after{
 
     content: "";
     position: absolute;
@@ -663,9 +641,9 @@ position: relative;
     background: #2c439f;
 }*/
 ul.nav-sidebar .nav-treeview .nav-treeview .nav.nav-treeview {
-    margin-left: 50px !important;
+    margin-left: 8px !important;
     background: #2c439f;
-    width: calc(100% - 50px);
+    /*width: calc(100% - 50px);*/
     margin-bottom: 3px;
 }
 .has-treeview-a.treeview-expanded {
@@ -687,9 +665,11 @@ ul.nav-sidebar .nav-treeview .nav-treeview .nav.nav-treeview {
     a{
         cursor: pointer!important
     }
-    .nav-sidebar li a{
-        padding: 0.5rem 1rem
-    }
+    .nav-sidebar li a {
+    position: relative;
+    display: block;
+    padding: 0.5rem 1rem;
+}
     .nav-sidebar>.nav-item .nav-icon {
     font-size: 17px!important;
     font-style: normal;
