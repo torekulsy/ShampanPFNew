@@ -23,14 +23,14 @@ namespace SymViewModel.PF
         [Display(Name = "Maturity Date")]
         public string MaturityDate { get; set; }
         [Display(Name = "Investable/Encashable Value")]
-        public decimal InvestmentValue { get; set; }
+        public decimal? InvestmentValue { get; set; }
         [Display(Name = "Bank charge & Excise Duty.")]
-        public decimal BankCharge { get; set; }
+        public decimal? BankCharge { get; set; }
         [Display(Name = "Excise Duty")]
         public decimal BankExciseDuty { get; set; }
 
         [Display(Name = "New Interest Rate")]
-        public decimal InterestRate { get; set; }
+        public decimal? InterestRate { get; set; }
         [Display(Name = "Investment Month")]
         public string InvestmentMonth { get; set; }
         [Display(Name = "Source Tax Deduct")]
@@ -39,7 +39,7 @@ namespace SymViewModel.PF
         public decimal OtherCharge { get; set; }
 
         [Display(Name = "New Interest")]
-        public decimal Interest { get; set; }
+        public decimal? Interest { get; set; }
         public bool Post { get; set; }
         [StringLength(450, ErrorMessage = "Remarks cannot be longer than 450 characters.")]
         public string Remarks { get; set; }
@@ -58,11 +58,11 @@ namespace SymViewModel.PF
 
         public bool IsEncashed { get; set; }
         public string TransType { get; set; }
-        public decimal AIT { get; set; }
+        public decimal? AIT { get; set; }
          [Display(Name = "Adition Amount")]
-        public decimal AditionAmount { get; set; }
+        public decimal? AditionAmount { get; set; }
         [Display(Name = "Deduction Amount")]
-        public decimal EncashAmount { get; set; }
+        public decimal? EncashAmount { get; set; }
         public decimal InvestableAmount { get; set; }
     }
 }

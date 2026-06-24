@@ -20,6 +20,7 @@ using SymServices.Common;
 
 namespace SymWebUI.Areas.PF.Controllers
 {
+   
     public class JournalController : Controller
     {
         public JournalController()
@@ -42,33 +43,33 @@ namespace SymWebUI.Areas.PF.Controllers
             };
             vm.TransType = AreaTypePFVM.TransType;
 
-            return View("~/Areas/PF/Views/Journal/Index.cshtml",vm);
+            return View("~/Areas/PF/Views/Journal/Index.cshtml", vm);
 
         }
-       
 
-        public ActionResult Create(string JournalType, string TransactionForm,string TransactionId)
+
+        public ActionResult Create(string JournalType, string TransactionForm, string TransactionId)
         {
-             int  TransactionType =0;
+            int TransactionType = 0;
             EnumJournalTypeRepo _JournalTypeRepo = new EnumJournalTypeRepo();
 
             SettingDAL _settingDal = new SettingDAL();
             string CashCOAId = _settingDal.settingValue("PF", "CashCOAId").Trim();
-            
-             
+
+
             var getAllData = _JournalTypeRepo.SelectAllJournalTransactionType(0, new[] { "NameTrim", "TransType" }, new[] { TransactionForm, AreaTypePFVM.TransType });
-            if (getAllData.Count>0 )
-            { 
-               TransactionType = getAllData.FirstOrDefault().Id;
+            if (getAllData.Count > 0)
+            {
+                TransactionType = getAllData.FirstOrDefault().Id;
             }
 
-          
+
             GLJournalVM vm = new GLJournalVM
             {
                 Operation = "add",
                 JournalType = Convert.ToInt32(JournalType),
                 TransactionType = TransactionType,
-                TransType=AreaTypePFVM.TransType, 
+                TransType = AreaTypePFVM.TransType,
                 CashCOAId = CashCOAId
             };
 
@@ -82,7 +83,7 @@ namespace SymWebUI.Areas.PF.Controllers
         /// Retrieves all Investment Name information.
         /// </summary>      
         /// <returns>View containing PF Journal</returns>
-        public ActionResult _index(JQueryDataTableParamModel param, int JournalType =1)
+        public ActionResult _index(JQueryDataTableParamModel param, int JournalType = 1)
         {
 
             string branchId = Session["BranchId"].ToString();
@@ -96,7 +97,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 filteredData = getAllData.Where(c =>
                     c.Code.ToLower().Contains(param.sSearch.ToLower()) ||
                     c.TransactionDate.ToLower().Contains(param.sSearch.ToLower()) ||
-                    //c.TransactionTypeName.ToLower().Contains(param.sSearch.ToLower()) ||
+                        //c.TransactionTypeName.ToLower().Contains(param.sSearch.ToLower()) ||
                     c.TransactionValue.ToString().ToLower().Contains(param.sSearch.ToLower()) ||
                     (c.Post ? "Yes" : "No").ToLower().Contains(param.sSearch.ToLower()) ||
                     (c.IsApprove ? "Approve" : "Not Approve").ToLower().Contains(param.sSearch.ToLower())
@@ -232,9 +233,9 @@ namespace SymWebUI.Areas.PF.Controllers
                 FileLogger.Log(result[0].ToString() + Environment.NewLine + result[2].ToString() + Environment.NewLine + result[5].ToString(), this.GetType().Name, result[4].ToString() + Environment.NewLine + result[3].ToString());
 
                 return View("~/Areas/PF/Views/Journal/Create.cshtml", new GLJournalVM());
-                 
+
             }
-        }  
+        }
 
         public ActionResult BlankItem(GLJournalDetailVM vm)
         {
@@ -245,8 +246,8 @@ namespace SymWebUI.Areas.PF.Controllers
 
                 vm.TransType = AreaTypePFVM.TransType;
                 return PartialView("~/Areas/PF/Views/Journal/_details.cshtml", vm);
-                
-               
+
+
             }
             catch (Exception)
             {
@@ -291,7 +292,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 ReportHead = "There are no data to Preview for Journal Voucher";
                 if (table.Rows.Count > 0)
                 {
-                    if (table.Rows[0]["JournalType"].ToString()=="1")
+                    if (table.Rows[0]["JournalType"].ToString() == "1")
                     {
                         ReportHead = "Journal Voucher";
                     }
@@ -303,7 +304,7 @@ namespace SymWebUI.Areas.PF.Controllers
                     {
                         ReportHead = "Receive Voucher";
                     }
-                   
+
                 }
                 ds.Tables.Add(table);
                 ds.Tables[0].TableName = "dtGLTransaction";

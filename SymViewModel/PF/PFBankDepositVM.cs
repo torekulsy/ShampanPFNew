@@ -19,7 +19,7 @@ namespace SymViewModel.PF
         [Display(Name = "Total Employeer PF Value")]
         public decimal TotalEmployeerPFValue { get; set; }
         [Display(Name = "Deposit Amount")]
-        public decimal DepositAmount { get; set; }
+        public decimal? DepositAmount { get; set; }
         [Display(Name = "Deposit Date")]
         public string DepositDate { get; set; }
         [Display(Name = "Bank Branch")]

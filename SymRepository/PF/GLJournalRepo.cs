@@ -18,7 +18,7 @@ namespace SymRepository.PF
 
                 return glJournalDal.Insert(vm);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -115,7 +115,7 @@ namespace SymRepository.PF
         {
             try
             {
-                return  glJournalDal.Report(vm, conditionFields, conditionValues);
+                return glJournalDal.Report(vm, conditionFields, conditionValues);
             }
             catch (Exception ex)
             {

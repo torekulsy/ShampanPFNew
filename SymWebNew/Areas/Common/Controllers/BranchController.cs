@@ -135,7 +135,7 @@ namespace SymWebUI.Areas.Common.Controllers
                 , c.Code 
                 , c.Name
                 , c.City
-                , c.Mobile
+                , c.Address
             };
             return Json(new
             {

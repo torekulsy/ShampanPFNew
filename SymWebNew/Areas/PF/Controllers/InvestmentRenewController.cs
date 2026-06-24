@@ -114,7 +114,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 ,c.AIT.ToString()
                 , c.ReferenceNo         
                 , c.Post ? "Posted" : "Not Posted"               
-                , c.IsEncashed ? "True" : "False"        
+                , c.IsEncashed ? "Yes" : "No"        
             };
             return Json(new
             {
@@ -168,7 +168,8 @@ namespace SymWebUI.Areas.PF.Controllers
                     Session["result"] = result[0] + "~" + result[1];
                     if (result[0].ToLower() == "success")
                     {
-                        return RedirectToAction("Edit", new { id = result[2] });
+                        //return RedirectToAction("Edit", new { id = result[2] });
+                        return RedirectToAction("Index", new { id = "0" });
                     }
                     else
                     {
