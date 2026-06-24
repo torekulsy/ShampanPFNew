@@ -15,6 +15,20 @@
 body {
     background: #fff !important;
 }
+a:focus {
+    outline: none;
+    outline: none;
+    outline-offset: 0;
+}
+.btn:focus, .btn:active:focus, .btn.active:focus {
+    outline: 0!important;
+    outline: none!important;
+    outline-offset: 0!important;
+}
+.ui-dialog .ui-dialog-title {
+    
+    font-size: 16px;
+}
 .main-sidebar .brandLogo {
     background: #fff;
     text-align: center;
@@ -200,8 +214,8 @@ body.layout-top .content-area {
     height: 100vh !important;
 }
 .layout-wrapper.wrapper .content-wrapper {
-    margin-top: calc(78px + 1px);
- background: #f4f6f9!important
+    margin-top: calc(43px + 15px);
+    background: #f4f6f9!important;
 }
 /* Parent UL relative */
 .nav-sidebar .nav-treeview {
