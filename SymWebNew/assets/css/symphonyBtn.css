@@ -478,16 +478,12 @@ tbody tr td #lnkEdit1 {
         content: "\f044";
     }
 
-    .sym-btn-edit:hover,
-    .sym-btn-edit:focus,
-    .sym-btn-edit:active,
-    .sym-btn-edit-row.active,
-    .open > .dropdown-toggle.sym-btn-edit {
-        background-color: #ed8d3b;
-        border-color: #e47c3f;
-        color: black !important;
-        text-decoration: none !important;
-    }
+   .sym-btn-edit:hover, .sym-btn-edit:focus, .sym-btn-edit:active, .sym-btn-edit-row.active, .open > .dropdown-toggle.sym-btn-edit {
+    background-color: transparent;
+    border-color: #e47c3f;
+    color: #ed8d3b!important;
+    text-decoration: none !important;
+}
 
 
 .sym-btn-audit-row {
@@ -630,16 +626,12 @@ tbody tr td #lnkEdit1 {
         margin-right: 5px
     }
 
-    .sym-btn-update:hover,
-    .sym-btn-update:focus,
-    .sym-btn-update:active,
-    .sym-btn-update.active,
-    .open > .dropdown-toggle.sym-btn-update {
-        background-color: #ec971f;
-        border-color: #d58512;
-        color: black !important;
-        text-decoration: none !important;
-    }
+    .sym-btn-update:hover, .sym-btn-update:focus, .sym-btn-update:active, .sym-btn-update.active, .open > .dropdown-toggle.sym-btn-update {
+    background-color: transparent;
+    border-color: #f0ad4e;
+    color: #f0ad4e !important;
+    text-decoration: none !important;
+}
 
 
     .sym-btn-back:before {
@@ -1010,7 +1002,7 @@ tbody tr td #lnkEdit1 {
     font-weight: 600;
 }
 
-    .sym-btn-report, .sym-btn-clear, .sym-btn-cancel, .sym-btn-Excel-Export {
+    .sym-btn-report, .sym-btn-clear, .sym-btn-cancel, .sym-btn-Excel-Export, .sym-btn-save, .sym-btn-edit {
    font-size: 14px!important;
     height: 35px!important;
 }
@@ -1054,10 +1046,10 @@ tbody tr td #lnkEdit1 {
     }
 
     .sym-btn-file-upload:hover, .sym-btn-file-upload:focus, .sym-btn-file-upload:active, .sym-btn-file-upload.active, .open > .dropdown-toggle.sym-btn-file-upload {
-    background-color: #0a21a1;
-   
-    color: #ffffff !important;
+    background-color: transparent;
+    color: #3E50B4!important;
     text-decoration: none !important;
+    border-color: #3E50B4;
 }
 
 .sym-btn-search {
