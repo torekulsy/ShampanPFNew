@@ -420,13 +420,11 @@
                 <div class="card-waves" aria-hidden="true"></div>
                 <div class="dashbordCard">
                     <div class="card-icon"><i class="fa fa-users"></i></div>
-                    <button class="card-menu" aria-label="Menu"><i class="fa fa-ellipsis-vertical"></i></button>
                 </div>
                 <div class="card-body">
                     <p class="card-label">Employees</p>
                     <div class="card-value-row">
                         <span class="card-value">120</span>
-                        <span class="trend-badge trend-up">↑ 8%</span>
                     </div>
                 </div>
                 <div class="dashbordCard-div">
@@ -439,13 +437,11 @@
                 <div class="card-waves" aria-hidden="true"></div>
                 <div class="dashbordCard">
                     <div class="card-icon"><i class="fa fa-wallet"></i></div>
-                    <button class="card-menu" aria-label="Menu"><i class="fa fa-ellipsis-vertical"></i></button>
                 </div>
                 <div class="card-body">
                     <p class="card-label">PF Balance</p>
                     <div class="card-value-row">
                         <span class="card-value">৳5.2L</span>
-                        <span class="trend-badge trend-up">↑ 12%</span>
                     </div>
                 </div>
                 <div class="dashbordCard-div">
@@ -458,13 +454,11 @@
                 <div class="card-waves" aria-hidden="true"></div>
                 <div class="dashbordCard">
                     <div class="card-icon"><i class="fa fa-chart-line"></i></div>
-                    <button class="card-menu" aria-label="Menu"><i class="fa fa-ellipsis-vertical"></i></button>
                 </div>
                 <div class="card-body">
                     <p class="card-label">Last Monthly PF (Contribution)</p>
                     <div class="card-value-row">
                         <span class="card-value">৳45K</span>
-                        <span class="trend-badge trend-orange">↑ 5%</span>
                     </div>
                 </div>
                 <div class="dashbordCard-div">
@@ -477,13 +471,11 @@
                 <div class="card-waves" aria-hidden="true"></div>
                 <div class="dashbordCard">
                     <div class="card-icon"><i class="fa fa-building-columns"></i></div>
-                    <button class="card-menu" aria-label="Menu"><i class="fa fa-ellipsis-vertical"></i></button>
                 </div>
                 <div class="card-body">
                     <p class="card-label">Last Month Loan Collection</p>
                     <div class="card-value-row">
                         <span class="card-value">৳1.25L</span>
-                        <span class="trend-badge trend-up">↑ 9%</span>
                     </div>
                 </div>
                 <div class="dashbordCard-div">
@@ -496,13 +488,11 @@
                 <div class="card-waves" aria-hidden="true"></div>
                 <div class="dashbordCard">
                     <div class="card-icon"><i class="fa fa-chart-pie"></i></div>
-                    <button class="card-menu" aria-label="Menu"><i class="fa fa-ellipsis-vertical"></i></button>
                 </div>
                 <div class="card-body">
                     <p class="card-label">Total Investment</p>
                     <div class="card-value-row">
                         <span class="card-value">৳15.8L</span>
-                        <span class="trend-badge trend-up">↑ 14%</span>
                     </div>
                 </div>
                 <div class="dashbordCard-div">
@@ -515,13 +505,11 @@
                 <div class="card-waves" aria-hidden="true"></div>
                 <div class="dashbordCard">
                     <div class="card-icon"><i class="fa fa-building-columns"></i></div>
-                    <button class="card-menu" aria-label="Menu"><i class="fa fa-ellipsis-vertical"></i></button>
                 </div>
                 <div class="card-body">
                     <p class="card-label">Cash at Bank</p>
                     <div class="card-value-row">
                         <span class="card-value">৳8.4L</span>
-                        <span class="trend-badge trend-down">↓ 3%</span>
                     </div>
                 </div>
                 <div class="dashbordCard-div">
@@ -1460,7 +1448,9 @@
 
         });
 
-
+    localStorage.removeItem("expandedMenu");
+    localStorage.removeItem("expandedSubMenu");
+    localStorage.removeItem("activeMenu");
 
 </script>
 

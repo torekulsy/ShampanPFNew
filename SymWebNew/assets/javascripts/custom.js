@@ -51,49 +51,147 @@ $(function () {
         changeYear: true
     });
 });
-
+$(window).load(function () {
+    $('html, body').scrollTop(0);
+});
 $(document).ready(function () {
 
+    // =========================
+    // Save Breadcrumb On Menu Click
+    // =========================
+    $(document).on("click", ".nav-sidebar a.nav-link", function () {
 
+        var currentHref = $(this).attr("href");
 
-    var breadcrumb = $('#dynamicBreadcrumb');
+        if (!currentHref || currentHref === "#") {
+            return;
+        }
+
+        var breadcrumbItems = [];
+
+        // Parent Menus
+        $(this).parents("li.nav-item").each(function () {
+
+            var parentLink = $(this).children("a.nav-link").first();
+
+            if (!parentLink.length) return;
+
+            var text = $.trim(
+                parentLink.find("p")
+                    .clone()
+                    .children()
+                    .remove()
+                    .end()
+                    .text()
+            );
+
+            var href = parentLink.attr("href");
+
+            if (text) {
+
+                breadcrumbItems.unshift({
+                    text: text,
+                    href: href
+                });
+
+            }
+
+        });
+
+        // Current Menu
+        var currentText = $.trim(
+            $(this).find("p")
+                .clone()
+                .children()
+                .remove()
+                .end()
+                .text()
+        );
+
+        breadcrumbItems.push({
+            text: currentText,
+            href: currentHref
+        });
+
+        localStorage.setItem(
+            "breadcrumbData",
+            JSON.stringify(breadcrumbItems)
+        );
+
+    });
+
+    // =========================
+    // Render Breadcrumb
+    // =========================
+    var breadcrumb = $("#dynamicBreadcrumb");
+
+    if (!breadcrumb.length) {
+        return;
+    }
+
     breadcrumb.empty();
 
-    // Home link
-    breadcrumb.append('<li><a href="/Common/Home/">Home</a></li>');
+    breadcrumb.append(
+        '<li><a href="/Common/Home/">Home</a></li>'
+    );
 
-    // Active menu item hierarchy
-    var activeItems = $('.top-navbar li.active');
-    if (activeItems.length > 0) {
-        activeItems.last().parents('li').addBack().each(function () {
-            var link = $(this).children('a').first();
-            var text = $.trim(link.clone().children().remove().end().text());
-            var href = link.attr('href');
+    var savedData = localStorage.getItem("breadcrumbData");
 
-            if (!text || text === 'Home') return;
+    if (!savedData) {
+        return;
+    }
+
+    var items = JSON.parse(savedData);
+
+    // =========================
+    // Remove Consecutive Duplicate
+    // =========================
+    var uniqueItems = [];
+
+    $.each(items, function (i, item) {
+
+        if (
+            uniqueItems.length === 0 ||
+            uniqueItems[uniqueItems.length - 1].text !== item.text
+        ) {
+            uniqueItems.push(item);
+        }
+
+    });
+
+    // =========================
+    // Render Items
+    // =========================
+    $.each(uniqueItems, function (index, item) {
+
+        var isLast =
+            index === uniqueItems.length - 1;
+
+        var cssClass =
+            isLast ? "active" : "";
+
+        if (item.href && item.href !== "#") {
 
             breadcrumb.append(
-                '<li>' +
-                (href && href !== '#' ? '<a href="' + href + '">' + text + '</a>' : text) +
+                '<li class="' + cssClass + '">' +
+                '<a href="' + item.href + '">' +
+                item.text +
+                '</a>' +
                 '</li>'
             );
-        });
-    } else {
-        // Fallback: use URL path if active menu not found (like Create page)
-        var pathParts = window.location.pathname.split('/').filter(Boolean); // removes empty
-        // Example: /PF/Employee/Create → ["PF", "Employee", "Create"]
-        // skip first part if needed (PF)
-        for (var i = 1; i < pathParts.length; i++) {
-            var name = pathParts[i];
-            var url = '/' + pathParts.slice(0, i + 1).join('/') + '/';
-            // last item active
-            if (i === pathParts.length - 1) {
-                breadcrumb.append('<li>' + name + '</li>');
-            } else {
-                breadcrumb.append('<li><a href="' + url + '">' + name + '</a></li>');
-            }
+
+        } else {
+
+            breadcrumb.append(
+                '<li class="' + cssClass + '">' +
+                item.text +
+                '</li>'
+            );
+
         }
-    }
+
+    });
+
 });
 
 
