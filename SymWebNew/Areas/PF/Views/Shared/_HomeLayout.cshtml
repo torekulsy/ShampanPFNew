@@ -917,6 +917,45 @@
             });
 
         });
+        $(document).ready(function () {
+            $(".customDatePicker").datepicker({
+                dateFormat: "dd-M-yy",
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "1900:2500"
+            });
+            $(".noFutureDate").datepicker("option", {
+                maxDate: 0,
+                yearRange: "1900:+0"
+            });
+
+            $(".FromDate").on("change", function () {
+
+                var fromDate = $(this).datepicker("getDate");
+
+                if (fromDate) {
+
+                    $(".ToDate").datepicker("option", "minDate", fromDate);
+                    var toDate = $(".ToDate").datepicker("getDate");
+                    if (toDate && toDate < fromDate) {
+                        $(".ToDate").val('');
+                    }
+                }
+            });
+
+        });
+
+        $(document).ready(function () {
+            $('.isPositiveNumeric').on('keypress', function (e) {
+                var charCode = e.which;
+                if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                    e.preventDefault();
+                }
+            });
+            $('.isPositiveNumeric').on('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
     </script>
 
     <style>

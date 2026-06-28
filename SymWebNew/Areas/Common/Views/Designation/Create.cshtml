@@ -596,7 +596,13 @@
 
 <script>
     $(function () {
-        valiDation("frmDesignation");
+        $("#frmDesignation").validate({
+            ignore: [],
+            errorClass: "text-danger",
+            submitHandler: function (form) {
+                form.submit();
+            }
+        });
     });
 </script>
 

@@ -59,7 +59,7 @@ namespace SymWebUI.Areas.PF.Controllers
             var FromBranchFilter = Convert.ToString(Request["sSearch_3"]);
             var ToBranchFilter = Convert.ToString(Request["sSearch_4"]);
             var TransferDateFilter = Convert.ToString(Request["sSearch_5"]);
-        
+
             #endregion
             //ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
 
@@ -73,13 +73,13 @@ namespace SymWebUI.Areas.PF.Controllers
                 var isSearchable2 = Convert.ToBoolean(Request["bSearchable_2"]);
                 var isSearchable3 = Convert.ToBoolean(Request["bSearchable_3"]);
                 var isSearchable4 = Convert.ToBoolean(Request["bSearchable_4"]);
-                var isSearchable5 = Convert.ToBoolean(Request["bSearchable_5"]);             
+                var isSearchable5 = Convert.ToBoolean(Request["bSearchable_5"]);
                 filteredData = getAllData.Where(c =>
                        isSearchable1 && c.Code.ToLower().Contains(param.sSearch.ToLower())
                     || isSearchable2 && c.EmpName.ToString().ToLower().Contains(param.sSearch.ToLower())
                     || isSearchable3 && c.FromBranch.ToString().ToLower().Contains(param.sSearch.ToLower())
                     || isSearchable4 && c.ToBranch.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable5 && c.TransferDate.ToString().ToLower().Contains(param.sSearch.ToLower())                  
+                    || isSearchable5 && c.TransferDate.ToString().ToLower().Contains(param.sSearch.ToLower())
                 );
             }
             else
@@ -94,7 +94,7 @@ namespace SymWebUI.Areas.PF.Controllers
                     && (EmpName == "" || c.EmpName.ToLower().Contains(EmpName.ToLower()))
                     && (FromBranchFilter == "" || c.FromBranch.ToString().Contains(FromBranchFilter.ToLower()))
                     && (ToBranchFilter == "" || c.ToBranch.ToString().Contains(ToBranchFilter.ToLower()))
-                    && (TransferDateFilter == "" || c.TransferDate.ToString().Contains(TransferDateFilter.ToLower()))                 
+                    && (TransferDateFilter == "" || c.TransferDate.ToString().Contains(TransferDateFilter.ToLower()))
                     );
             }
             #endregion Column Filtering
@@ -228,10 +228,11 @@ namespace SymWebUI.Areas.PF.Controllers
                 vm.CreatedBy = identity.Name;
                 vm.CreatedFrom = identity.WorkStationIP;
                 vm.Code = empVM.Code;
+                vm.FromBranch = empVM.empPFForTransferVM.FromBranch;
 
                 result = _eaRepo.Insert(vm);
 
-                return Json(result[0] + "~" + result[1] + "~" + result[2], JsonRequestBehavior.AllowGet);            
+                return Json(result[0] + "~" + result[1] + "~" + result[2], JsonRequestBehavior.AllowGet);
 
             }
             catch (Exception)
@@ -255,7 +256,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 //vm.FiscalYearDetailId = empVM.FiscalYearDetailId;
 
                 result = _eaRepo.Update(vm);
-            
+
                 return Json(result[0] + "~" + result[1], JsonRequestBehavior.AllowGet);
             }
             catch (Exception)

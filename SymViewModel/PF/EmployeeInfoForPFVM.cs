@@ -26,9 +26,9 @@ namespace SymViewModel.PF
           [Display(Name = "Resign Reason")]
         public string ResignReason { get; set; }
           [Display(Name = "Basic Salary")]
-        public decimal BasicSalary { get; set; }
+        public decimal? BasicSalary { get; set; }
           [Display(Name = "Gross Salary")]
-        public decimal GrossSalary { get; set; }
+        public decimal? GrossSalary { get; set; }
           [Display(Name = "Is Active")]
         public bool IsActive { get; set; }
           [Display(Name = "Is Profit")]

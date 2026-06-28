@@ -21,7 +21,8 @@
     string CompanyName = System.Configuration.ConfigurationManager.AppSettings["CompanyName"];
 }
 
-@using (Html.BeginForm("CreateEdit", "Journal", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmJournalEntry" }))
+@using (Html.BeginForm("CreateEdit", "Journal", FormMethod.Post,
+    new { enctype = "multipart/form-data", id = "frmJournalEntry" }))
 {
     @Html.ValidationSummary(true)
     @Html.HiddenFor(model => model.Id)
@@ -598,35 +599,82 @@ else
         var win = window.open(url, '_blank');
     }
 
+    //function SaveData() {
+    //    var drTotal = $(".drTotal").val();
+    //    var crTotal = $(".crTotal").val();
+
+    //    if (drTotal != crTotal) {
+    //        ShowResult("Fail", "Debit and Credit Total Must Be Same!");
+    //        return;
+    //    }
+    //    pageSubmit('frmJournalEntry');
+    //}
+
     function SaveData() {
-        var drTotal = $(".drTotal").val();
-        var crTotal = $(".crTotal").val();
+
+        // Check if any detail row exists
+        if ($(".row.details").length == 0) {
+            ShowResult("Fail", "Please add Detail");
+            return;
+        }
+
+        var drTotal = getnum($(".drTotal").val().replace(/,/g, ""));
+        var crTotal = getnum($(".crTotal").val().replace(/,/g, ""));
 
         if (drTotal != crTotal) {
             ShowResult("Fail", "Debit and Credit Total Must Be Same!");
             return;
         }
-        pageSubmit('frmJournalEntry');
+
+        //pageSubmit('frmJournalEntry');
+        document.getElementById("frmJournalEntry").submit();
+       
     }
 
 
+    //function UpdateData() {
+
+    //    var drTotal = $(".drTotal").val();
+    //    var crTotal = $(".crTotal").val();
+
+    //    if (drTotal != crTotal) {
+    //        ShowResult("Fail", "Debit and Credit Total Must Be Same!");
+    //        return;
+    //    }
+    //    var Post = $("#Post").val();
+    //    if (Post == 'True') {
+    //        ShowResult("Fail", "Data Already Posted! Can't Update!");
+    //        return;
+    //    }
+    //    pageSubmit('frmJournalEntry');
+    //}
+
     function UpdateData() {
 
-        var drTotal = $(".drTotal").val();
-        var crTotal = $(".crTotal").val();
+        // Check if any detail row exists
+        if ($(".row.details").length == 0) {
+            ShowResult("Fail", "Please add Detail");
+            return;
+        }
+
+        var drTotal = getnum($(".drTotal").val().replace(/,/g, ""));
+        var crTotal = getnum($(".crTotal").val().replace(/,/g, ""));
 
         if (drTotal != crTotal) {
             ShowResult("Fail", "Debit and Credit Total Must Be Same!");
             return;
         }
+
         var Post = $("#Post").val();
         if (Post == 'True') {
             ShowResult("Fail", "Data Already Posted! Can't Update!");
             return;
         }
-        pageSubmit('frmJournalEntry');
-    }
 
+        //pageSubmit('frmJournalEntry');
+        document.getElementById("frmJournalEntry").submit();
+       
+    }
 
 </script>
 <link rel="stylesheet" href="~/Content/AdminLte/dist/css/adminlte.min.css">

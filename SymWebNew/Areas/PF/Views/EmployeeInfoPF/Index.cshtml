@@ -28,7 +28,7 @@
     <div class="custom-top">
         <div id="mainBtnAll">
             <button type="button" title="Add New" data-url="/PF/EmployeeInfoPF/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>
-            <button type="button" title="Add Sync" data-url="/PF/EmployeeInfoPF/Create" onclick="GoTo(this)" id="" class=" sym-btn-save ">&nbsp;Sync</button>
+            <button type="button" title="Add Sync" data-url="" onclick="GoTo(this)" id="" class=" sym-btn-save ">&nbsp;Sync</button>
             <button type="button" title="" data-url="/PF/EmployeeInfoPF/Import" onclick="GoTo(this)" id="" class=" sym-btn-Excel-Export ">&nbsp;Export / Import</button>
         </div>
         <div class="table-search">
@@ -43,7 +43,7 @@
         <thead>
             <tr>
                 <th class="center">
-                    <input type="checkbox" class="chkAll" />Select All
+                    <input type="checkbox" class="chkAll hidden" />
                 </th>
              
                 <th>Code</th>
@@ -109,9 +109,11 @@
                     "sWidth": "5%",
                     "sClass": "center",
                     "fnRender": function (oObj) {
-                        return '<input onclick="CheckAll(this)" type="checkbox" data-Id="' + oObj.aData[0] + '">' +
-                            '&nbsp;<a href="/PF/EmployeeInfoPF/Edit/' + oObj.aData[0] + '" class="sym-btn-edit-row"></a>' +
-                            '&nbsp;<a href="/PF/EmployeeInfoPF/Delete?Id=' + oObj.aData[0] + '" class="sym-btn-remove-row"></a>';
+                        var id = oObj.aData[0];
+
+                        return ' &nbsp;<a title="Click on for Edit" style="text-decoration:none;" href="/PF/EmployeeInfoPF/Edit/' + id + '" class="sym-btn-edit-row"></a>'
+                        //+ ' &nbsp;<a title="Click on for Delete" href="/PF/EmployeeInfoPF/Delete?Id=' + id + '" class="sym-btn-remove-row"></a>';
+                        + '&nbsp; <a title="Click on for Delete" style="text-decoration:none;" data-url=\"/PF/EmployeeInfoPF/Delete/' + id + '" onclick="deletedData(this, myDataTable,\'' + oObj.aData[0] + '\');" class="sym-btn-remove-row"></a>'
                     }
                 },
                 { "sName": "Code" },

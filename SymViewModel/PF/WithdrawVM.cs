@@ -18,7 +18,7 @@ namespace SymViewModel.PF
         [Display(Name = "Withdraw Date")]
         public string WithdrawDate { get; set; }
         [Display(Name = "Withdraw Amount")]
-        public decimal WithdrawAmount { get; set; }
+        public decimal? WithdrawAmount { get; set; }
         [Display(Name = "Bank Branch")]
         public int BankBranchId { get; set; }
         [Display(Name = "Bank Branch Name")]

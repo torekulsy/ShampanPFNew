@@ -381,34 +381,95 @@ namespace SymWebUI.Areas.PF.Controllers
         /// - If the provided filter results in data, the report is generated using a Crystal Reports template located in the project directory.
         /// - The report header includes details like the company logo, company name, and address from the `CompanyRepo`.
         /// </remarks>
-        [HttpPost]
-        public ActionResult PFBankDepositReport(PFReportVM vm)
+        //[HttpPost]
+        //public ActionResult PFBankDepositReport(PFReportVM vm)
+        //{
+        //    try
+        //    {
+        //        string ReportHead = "";
+        //        string rptLocation = "";
+        //        ReportDocument doc = new ReportDocument();
+        //        DataTable dt = new DataTable();
+
+        //        //PFBankDepositVM vm = new PFBankDepositVM();
+        //        string[] cFields = { "pfbd.Code", "pfbd.Id", "pfbd.DepositDate>", "pfbd.DepositDate<", "pfbd.TransType" };
+        //        string[] cValues = { vm.Code, vm.Id.ToString() == "0" ? "" : vm.Id.ToString(), Ordinary.DateToString(vm.DateFrom), Ordinary.DateToString(vm.DateTo), AreaTypePFVM.TransType };
+        //        var Result = _repo.SelectAll(Session["BranchId"].ToString(), 0, cFields, cValues);
+
+        //        dt = JsonConvert.DeserializeObject<DataTable>(JsonConvert.SerializeObject(Result));
+
+
+        //        ReportHead = "There are no data to Preview for GL Transaction for Bank Deposit";
+        //        if (dt.Rows.Count > 0)
+        //        {
+        //            ReportHead = "Bank Deposit GL Transactions";
+        //        }
+        //        dt.TableName = "dtPFBankDeposits";
+        //        rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptBankDeposit.rpt";
+
+        //        doc.Load(rptLocation);
+        //        doc.SetDataSource(dt);
+        //        string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
+        //        FormulaFieldDefinitions ffds = doc.DataDefinition.FormulaFields;
+        //        CompanyRepo _CompanyRepo = new CompanyRepo();
+        //        CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
+
+        //        doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text = "'" + companyLogo + "'";
+        //        doc.DataDefinition.FormulaFields["TransType"].Text = "'" + AreaTypePFVM.TransType + "'";
+        //        doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + ReportHead + "'";
+        //        doc.DataDefinition.FormulaFields["Address"].Text = "'" + cvm.Address + "'";
+        //        doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
+        //        doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
+        //        //doc.DataDefinition.FormulaFields["frmGroupBy"].Text = "'" + groupBy + "'";
+        //        var rpt = RenderReportAsPDF(doc);
+        //        doc.Close();
+        //        return rpt;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+        public ActionResult PFBankDepositReport(int depositId = 0)
         {
             try
             {
                 string ReportHead = "";
                 string rptLocation = "";
+
+                PFReport report = new PFReport();
+                PFReportVM vm = new PFReportVM();
+                vm.Id = depositId;
+                vm.TransType = "PF";
+
                 ReportDocument doc = new ReportDocument();
                 DataTable dt = new DataTable();
-                
-                //PFBankDepositVM vm = new PFBankDepositVM();
+                DataTable dt1 = new DataTable();
+                DataSet ds = new DataSet();
+
+                // Build the query variables matching the single integer ID pattern
+                string depositIdStr = depositId == 0 ? "" : depositId.ToString();
+
                 string[] cFields = { "pfbd.Code", "pfbd.Id", "pfbd.DepositDate>", "pfbd.DepositDate<", "pfbd.TransType" };
-                string[] cValues = { vm.Code, vm.Id.ToString() == "0" ? "" : vm.Id.ToString(), Ordinary.DateToString(vm.DateFrom), Ordinary.DateToString(vm.DateTo), AreaTypePFVM.TransType };
+                string[] cValues = { "", depositIdStr, "", "", AreaTypePFVM.TransType };
+
                 var Result = _repo.SelectAll(Session["BranchId"].ToString(), 0, cFields, cValues);
+                dt = JsonConvert.DeserializeObject<DataTable>(JsonConvert.SerializeObject(Result));
 
-               dt = JsonConvert.DeserializeObject<DataTable>(JsonConvert.SerializeObject(Result));
-
-                
                 ReportHead = "There are no data to Preview for GL Transaction for Bank Deposit";
                 if (dt.Rows.Count > 0)
                 {
                     ReportHead = "Bank Deposit GL Transactions";
                 }
-                dt.TableName = "dtPFBankDeposits";
+
+                ds.Tables.Add(dt);
+                dt.TableName = "dtWithdraw";
                 rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptBankDeposit.rpt";
 
                 doc.Load(rptLocation);
-                doc.SetDataSource(dt);
+                doc.SetDataSource(ds);
+
                 string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
                 FormulaFieldDefinitions ffds = doc.DataDefinition.FormulaFields;
                 CompanyRepo _CompanyRepo = new CompanyRepo();
@@ -421,6 +482,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
                 doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
                 //doc.DataDefinition.FormulaFields["frmGroupBy"].Text = "'" + groupBy + "'";
+
                 var rpt = RenderReportAsPDF(doc);
                 doc.Close();
                 return rpt;

@@ -184,7 +184,7 @@
                                 @Html.LabelFor(model => model.Designation)
                             </div>
                             <div class="editor-field">
-                                @Html.SimpleDropDownFor(model => model.Designation, "/Config/DropDown/Designation", new { @class = "form-control " })
+                                @Html.SimpleDropDownFor(model => model.Designation, "/Config/DropDown/Designation", new { @class = "required form-control " })
                                 @Html.ValidationMessageFor(model => model.Designation)
                             </div>
                         </div>

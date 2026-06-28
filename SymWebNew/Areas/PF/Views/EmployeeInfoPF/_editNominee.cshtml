@@ -44,7 +44,9 @@
                     @Html.LabelFor(model => model.nomineeVM.DateofBirth)
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.nomineeVM.DateofBirth, new { @onchange = "DateOfBirth(this)", @placeholder = "Date of Birth", @class = "required customDatePicker form-control" })
+                    @*@Html.TextBoxFor(model => model.nomineeVM.DateofBirth, new { @onchange = "DateOfBirth(this)", @placeholder = "Date of Birth", @class = "customDatePicker required  form-control" }*@   
+                    
+                    @Html.TextBoxFor(model => model.nomineeVM.DateofBirth, new { @placeholder = "Date Of Birth", @class = " customDatePicker noFutureDate required  form-control" })
                 </div>
             </div>
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
@@ -69,7 +71,7 @@
                     @Html.LabelFor(model => model.nomineeVM.PostalCode)
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.nomineeVM.PostalCode, new { @placeholder = "Postal Code", @class = "form-control" })
+                    @Html.TextBoxFor(model => model.nomineeVM.PostalCode, new { @placeholder = "Postal Code", @class = "form-control isPositiveNumeric" })
                 </div>
             </div>
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
@@ -119,7 +121,7 @@
                     @Html.LabelFor(model => model.nomineeVM.NID)
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.nomineeVM.NID, new { @placeholder = "NID No.", @class = "form-control" })
+                    @Html.TextBoxFor(model => model.nomineeVM.NID, new { @placeholder = "NID No.", @class = "form-control isPositiveNumeric" })
                 </div>
             </div>
 
@@ -129,7 +131,7 @@
                     @Html.LabelFor(model => model.nomineeVM.Mobile)
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.nomineeVM.Mobile, new { @placeholder = "Mobile", @class = "required form-control" })
+                    @Html.TextBoxFor(model => model.nomineeVM.Mobile, new { @placeholder = "Mobile", @class = "required form-control isPositiveNumeric" })
                 </div>
             </div>
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
@@ -137,7 +139,7 @@
                     @Html.LabelFor(model => model.nomineeVM.Phone)
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.nomineeVM.Phone, new { @placeholder = "Phone", @class = " form-control" })
+                    @Html.TextBoxFor(model => model.nomineeVM.Phone, new { @placeholder = "Phone", @class = " form-control isPositiveNumeric" })
                 </div>
             </div>
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
@@ -205,14 +207,14 @@
         $(".showHideNM").hide();//index page new btn
         valiDation('frmNominee');
     });
-    function DateOfBirth(sender) {
-        var selectedDate = ParseDate($(sender).val());
-        var today = new Date();
-        if (selectedDate > today) {
-            $(sender).val("");
-            ShowResult("Fail", "Date of birth can't be prior to today!");
-        }
-    }
+    //function DateOfBirth(sender) {
+    //    var selectedDate = ParseDate($(sender).val());
+    //    var today = new Date();
+    //    if (selectedDate > today) {
+    //        $(sender).val("");
+    //        ShowResult("Fail", "Date of birth can't be prior to today!");
+    //    }
+    //}
     var isChange = false;
     $('.form-control').change(function () {
         isChange = true;
@@ -241,6 +243,47 @@
             $(".showHideNM").show();
         }
     }
+</script>
+<script>
+    $(document).ready(function () {
+        $(".customDatePicker").datepicker({
+            dateFormat: "dd-M-yy",
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "1900:2500"
+        });
+        $(".noFutureDate").datepicker("option", {
+            maxDate: 0,
+            yearRange: "1900:+0"
+        });
+
+        $(".FromDate").on("change", function () {
+
+            var fromDate = $(this).datepicker("getDate");
+
+            if (fromDate) {
+
+                $(".ToDate").datepicker("option", "minDate", fromDate);
+                var toDate = $(".ToDate").datepicker("getDate");
+                if (toDate && toDate < fromDate) {
+                    $(".ToDate").val('');
+                }
+            }
+        });
+
+    });
+
+    $(document).ready(function () {
+        $('.isPositiveNumeric').on('keypress', function (e) {
+            var charCode = e.which;
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                e.preventDefault();
+            }
+        });
+        $('.isPositiveNumeric').on('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    });
 </script>
 
 

@@ -25,10 +25,15 @@ namespace SymWebUI.Areas.PF.Controllers
 {
     public class EmployeeInfoPFController : Controller
     {
+
+        public EmployeeInfoPFController()
+        {
+            ViewBag.TransType = AreaTypePFVM.TransType;
+        }
         //
         // GET: /PF/EmployeeInfoPF/
         ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
-               
+
         public ActionResult Index()
         {
             return View();
@@ -51,7 +56,7 @@ namespace SymWebUI.Areas.PF.Controllers
             var Id = Convert.ToString(Request["sSearch_0"]);
             var Code = Convert.ToString(Request["sSearch_1"]);
             var Name = Convert.ToString(Request["sSearch_2"]);
-            var Department = Convert.ToString(Request["sSearch_3"]);        
+            var Department = Convert.ToString(Request["sSearch_3"]);
             var DateOfBirth = Convert.ToString(Request["sSearch_4"]);
             var JoinDate = Convert.ToString(Request["sSearch_5"]);
             #endregion Column Search
@@ -72,12 +77,12 @@ namespace SymWebUI.Areas.PF.Controllers
                 var isSearchable3 = Convert.ToBoolean(Request["bSearchable_3"]);
                 var isSearchable4 = Convert.ToBoolean(Request["bSearchable_4"]);
                 var isSearchable5 = Convert.ToBoolean(Request["bSearchable_5"]);
-          
+
                 filteredData = getAllData.Where(c =>
                         isSearchable0 && c.Id.ToString().Contains(param.sSearch.ToLower())
                      || isSearchable1 && c.Code.ToLower().Contains(param.sSearch.ToLower())
                      || isSearchable2 && c.Name.ToLower().Contains(param.sSearch.ToLower())
-                     || isSearchable3 && c.Department.ToLower().Contains(param.sSearch.ToLower())                  
+                     || isSearchable3 && c.Department.ToLower().Contains(param.sSearch.ToLower())
                      || isSearchable4 && c.DateOfBirth.ToString().ToLower().Contains(param.sSearch.ToLower())
                      || isSearchable5 && c.JoinDate.ToString().ToLower().Contains(param.sSearch.ToLower())
                     );
@@ -95,7 +100,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 filteredData = filteredData
                                 .Where(c => (Code == "" || c.Code.ToLower().Contains(Code.ToLower()))
                                             && (Name == "" || c.Name.ToLower().Contains(Name.ToLower()))
-                                            && (Department == "" || c.Department.ToLower().Contains(Department.ToLower()))                                          
+                                            && (Department == "" || c.Department.ToLower().Contains(Department.ToLower()))
                                             && (DateOfBirth == "" || c.DateOfBirth.ToString().ToLower().Contains(DateOfBirth.ToLower()))
                                             && (JoinDate == "" || c.JoinDate.ToString().ToLower().Contains(JoinDate.ToLower()))
                                         );
@@ -107,13 +112,13 @@ namespace SymWebUI.Areas.PF.Controllers
             var isSortable_2 = Convert.ToBoolean(Request["bSortable_2"]);
             var isSortable_3 = Convert.ToBoolean(Request["bSortable_3"]);
             var isSortable_4 = Convert.ToBoolean(Request["bSortable_4"]);
-            var isSortable_5 = Convert.ToBoolean(Request["bSortable_5"]);           
+            var isSortable_5 = Convert.ToBoolean(Request["bSortable_5"]);
             var sortColumnIndex = Convert.ToInt32(Request["iSortCol_0"]);
             Func<EmployeeInfoForPFVM, string> orderingFunction = (c =>
                 sortColumnIndex == 0 && isSortable_0 ? c.Id.ToString() :
                 sortColumnIndex == 1 && isSortable_1 ? c.Code :
                 sortColumnIndex == 2 && isSortable_2 ? c.Name :
-                sortColumnIndex == 3 && isSortable_3 ? c.Department :               
+                sortColumnIndex == 3 && isSortable_3 ? c.Department :
                 sortColumnIndex == 4 && isSortable_4 ? c.DateOfBirth.ToString() :
                 sortColumnIndex == 5 && isSortable_5 ? c.JoinDate.ToString() :
                 "");
@@ -244,7 +249,7 @@ namespace SymWebUI.Areas.PF.Controllers
             },
             JsonRequestBehavior.AllowGet);
         }
-                
+
         public ActionResult Create(EmployeeInfoForPFVM vm)
         {
             return View("Create", vm);
@@ -258,7 +263,7 @@ namespace SymWebUI.Areas.PF.Controllers
         /// </summary>
         /// <param name="vm">The EmployeeInfoForPFVM object containing the form data</param>
         /// <returns>Redirects to Index on success, otherwise returns the same view with the provided model</returns>
-        
+
         /// <summary>
         /// Created: 13 Apr 2025  
         /// Created By: Md Torekul Islam  
@@ -279,7 +284,7 @@ namespace SymWebUI.Areas.PF.Controllers
         public ActionResult ReActive(string Id)
         {
             string[] result = new string[6];
-         
+
             try
             {
 
@@ -407,15 +412,41 @@ namespace SymWebUI.Areas.PF.Controllers
         /// </summary>
         /// <param name="Id">The ID of the employee PF record to be deleted</param>
         /// <returns>Returns the Index view with a session message indicating success or failure</returns>
-        public ActionResult Delete(int Id)
-        {
-            string[] result = new string[6];
-            EmployeeInfoForPFRepo _Repo = new EmployeeInfoForPFRepo();
-            EmployeeInfoForPFVM vm = new EmployeeInfoForPFVM();
+        /// 
 
-            result = _Repo.DeleteEmployeeInfoForPF(Id);
-            Session["result"] = result[0] + "~" + result[1];
-            return View("Index");
+        //public ActionResult Delete(int Id)
+        //{
+        //    string[] result = new string[6];
+        //    EmployeeInfoForPFRepo _Repo = new EmployeeInfoForPFRepo();
+        //    EmployeeInfoForPFVM vm = new EmployeeInfoForPFVM();
+
+        //    result = _Repo.DeleteEmployeeInfoForPF(Id);
+        //    Session["result"] = result[0] + "~" + result[1];
+        //    return View("Index");
+        //}
+
+        public JsonResult Delete(string ids)
+        {
+            // Assuming _repoSUR and identity are properly initialized somewhere in your controller
+
+
+
+            // Create ViewModel (adjust accordingly if different from your use case)
+            EmployeeInfoForPFVM vm = new EmployeeInfoForPFVM();
+            EmployeeInfoForPFRepo _Repo = new EmployeeInfoForPFRepo();
+            vm.LastUpdateAt = DateTime.Now.ToString("yyyyMMddHHmmss");
+            vm.LastUpdateBy = identity.Name;
+            vm.LastUpdateFrom = identity.WorkStationIP;
+
+            // Split the 'ids' string by '~' to handle multiple IDs (bulk delete scenario)
+            string[] a = ids.Split('~');
+
+            // Call the Delete method in your repository
+            string[] result = new string[6];
+            result = _Repo.DeleteEmployeeInfoForPF(vm, a);  // Assuming your repo method accepts the vm and array of ids
+
+            // Return the result as JSON (using result[1] for status message, adjust based on your return structure)
+            return Json(result[1], JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -603,7 +634,7 @@ namespace SymWebUI.Areas.PF.Controllers
             var mgs = result[0] + "~" + result[1];
 
             Session["mgs"] = "mgs";
-            return RedirectToAction("Index", new { Id = non.EmployeeId, mgs = mgs });
+            return RedirectToAction("Edit", new { Id = non.EmployeeId, mgs = mgs });
         }
 
         [Authorize(Roles = "Master,Admin,Account")]

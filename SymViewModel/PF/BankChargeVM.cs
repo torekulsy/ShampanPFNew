@@ -17,7 +17,7 @@ namespace SymViewModel.PF
         [Display(Name = "ROBI Date")]
         public string TransactionDate { get; set; }
         [Display(Name = "Net Interest")]
-        public decimal TotalValue { get; set; }
+        public decimal? TotalValue { get; set; }
         public bool Post { get; set; }
 
         [StringLength(450, ErrorMessage = "Remarks cannot be longer than 450 characters.")]

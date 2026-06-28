@@ -32,7 +32,13 @@
                 </div>
                 <div class="">
                     <label>&nbsp;</label>
-                    <button type="button" onclick="pageSubmit('frmUploadExcel');" title="Bonus Import" class="sym-btn-file-upload" value="Upload">&nbsp;Upload</button>
+                    @*<button type="button" onclick="pageSubmit('frmUploadExcel');" title="Bonus Import" class="sym-btn-file-upload" value="Upload">&nbsp;Upload</button>*@
+                    <button type="button"
+                            onclick="return validateUpload('frmUploadExcel');"
+                            title="Bonus Import"
+                            class="sym-btn-file-upload">
+                        &nbsp;Upload
+                    </button>
                     
                 </div>
                 <div class="">
@@ -50,5 +56,20 @@
         Ask(questionMSG, function () {
             window.location.href = '/EmployeeInfoPF/ExportExcell'; // Ensure correct controller name
         });
+    }
+
+    function validateUpload(formId) {
+
+        var fileInput = $("#FileUpload");
+
+        // check empty
+        if (fileInput.val() === "" || fileInput.val() === null) {
+            ShowResult("Fail","Please choose a file");
+            return false;
+        }
+
+        // submit form
+        pageSubmit(formId);
+        return true;
     }
 </script>

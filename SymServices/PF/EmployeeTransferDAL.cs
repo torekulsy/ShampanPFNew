@@ -62,7 +62,7 @@ namespace SymServices.PF
                 #endregion
 
                 #region sql statement
-             
+
                 sqlText = @"
                SELECT et.Id
                        ,[EmployeeCode]
@@ -74,12 +74,12 @@ namespace SymServices.PF
                   Left Join ViewEmployeeInformation ve on ve.Code=et.EmployeeCode
                   Left Join Branch b on b.Id=et.FromBranch  
                   Left Join Branch b2 on b2.Id=et.ToBranch
-                ";             
-             
+                ";
+
                 #endregion
 
                 #region SqlExecution
-                SqlCommand objComm = new SqlCommand(sqlText, currConn, transaction);                
+                SqlCommand objComm = new SqlCommand(sqlText, currConn, transaction);
                 SqlDataReader dr;
                 dr = objComm.ExecuteReader();
                 while (dr.Read())
@@ -91,7 +91,7 @@ namespace SymServices.PF
                     vm.FromBranch = dr["FromBranch"].ToString();
                     vm.ToBranch = dr["ToBranch"].ToString();
                     vm.TransferDate = Ordinary.StringToDate(dr["TransferDate"].ToString());
-                   
+
                     vms.Add(vm);
                 }
                 dr.Close();
@@ -317,11 +317,11 @@ From EmployeeForfeiture pfo
                 dr = objComm.ExecuteReader();
                 while (dr.Read())
                 {
-                    vm = new EmployeeTransferVM();                  
+                    vm = new EmployeeTransferVM();
                     vm.Code = dr["Code"].ToString();
                     vm.EmpName = dr["EmpName"].ToString();
                     vm.FromBranch = dr["FromBranch"].ToString();
-               
+
                 }
                 dr.Close();
                 #endregion

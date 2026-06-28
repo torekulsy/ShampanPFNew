@@ -1,8 +1,8 @@
 ﻿using SymServices.Common;
 using SymServices.PF;
 using SymViewModel.Common;
-using SymViewModel.PF;
 using SymViewModel.Enum;
+using SymViewModel.PF;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -47,7 +47,7 @@ namespace SymRepository.PF
                 throw ex;
             }
         }
-        
+
         public EmployeeInfoForPFVM SelectById(int id)
         {
             try
@@ -62,14 +62,28 @@ namespace SymRepository.PF
 
 
 
-        public string[] DeleteEmployeeInfoForPF(int Id)
+        //public string[] DeleteEmployeeInfoForPF(int Id)
+        //{
+        //    try
+        //    {
+        //        return new EmployeeInfoForPFDAL().DeleteEmployeeInfoForPF(Id, null, null);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+        //}
+
+        public string[] DeleteEmployeeInfoForPF(EmployeeInfoForPFVM vm, string[] ids)
         {
             try
             {
-                return new EmployeeInfoForPFDAL().DeleteEmployeeInfoForPF(Id, null, null);
+                // Assuming your DAL method now needs the ViewModel and array of ids to delete
+                return new EmployeeInfoForPFDAL().DeleteEmployeeInfoForPF(vm, ids);
             }
             catch (Exception ex)
             {
+                // You can log the exception or handle it in a way that fits your needs
                 throw ex;
             }
         }
@@ -125,8 +139,6 @@ namespace SymRepository.PF
                 throw ex;
             }
         }
-
-
 
         public List<EnumDivisionVM> DivisionDropDown(string country)
         {

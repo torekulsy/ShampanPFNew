@@ -110,7 +110,7 @@
                         @Html.LabelFor(model => model.ContactNo)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.ContactNo, new { @placeholder = "Personal Contact No", @class = "required form-control" })
+                        @Html.TextBoxFor(model => model.ContactNo, new { @placeholder = "Personal Contact No", @class = "required form-control isPositiveNumeric" })
                         @Html.ValidationMessageFor(model => model.ContactNo)
                     </div>
                 </div>
@@ -119,7 +119,7 @@
                         @Html.LabelFor(model => model.OfficialContactNo)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.OfficialContactNo, new { @placeholder = "Official Contact No", @class = "required form-control" })
+                        @Html.TextBoxFor(model => model.OfficialContactNo, new { @placeholder = "Official Contact No", @class = "required form-control isPositiveNumeric" })
                         @Html.ValidationMessageFor(model => model.OfficialContactNo)
                     </div>
                 </div>
@@ -129,7 +129,7 @@
                         @Html.LabelFor(model => model.DateOfBirth)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.DateOfBirth, new { @placeholder = "Date Of Birth", @class = " customDatePicker  required  form-control" })
+                        @Html.TextBoxFor(model => model.DateOfBirth, new { @placeholder = "Date Of Birth", @class = " customDatePicker noFutureDate required  form-control" })
                         @Html.ValidationMessageFor(model => model.DateOfBirth)
                     </div>
                 </div>
@@ -140,7 +140,7 @@
                         @Html.LabelFor(model => model.JoinDate)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.JoinDate, new { @placeholder = "Join Date", @class = " customDatePicker  required  form-control" })
+                        @Html.TextBoxFor(model => model.JoinDate, new { @placeholder = "Join Date", @class = " customDatePicker noFutureDate required  form-control" })
                         @Html.ValidationMessageFor(model => model.JoinDate)
                     </div>
                 </div>
@@ -160,6 +160,7 @@
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.BasicSalary, new { @class = "required NumberCheck form-control", @required = "" })
+                        @Html.ValidationMessageFor(model => model.BasicSalary)
                     </div>
                 </div>
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
@@ -168,6 +169,7 @@
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.GrossSalary, new { @class = "required NumberCheck form-control", @required = "" })
+                        @Html.ValidationMessageFor(model => model.GrossSalary)
                     </div>
                 </div>
 
@@ -176,7 +178,7 @@
                         @Html.LabelFor(model => model.EmployeeNID)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.EmployeeNID, new { @placeholder = "NID  ", @class = "form-control" })
+                        @Html.TextBoxFor(model => model.EmployeeNID, new { @placeholder = "NID  ", @class = "form-control isPositiveNumeric" })
                     </div>
                 </div>
 
@@ -186,7 +188,7 @@
                         @Html.LabelFor(model => model.EmployeeTIN)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.EmployeeTIN, new { @placeholder = "TIN", @class = "form-control" })
+                        @Html.TextBoxFor(model => model.EmployeeTIN, new { @placeholder = "TIN", @class = "form-control isPositiveNumeric" })
                     </div>
                 </div>
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
@@ -228,7 +230,7 @@
                         @Html.LabelFor(model => model.EmployeeBankAccountNumber)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.EmployeeBankAccountNumber, new { @placeholder = "Bank Account Number", @class = "form-control" })
+                        @Html.TextBoxFor(model => model.EmployeeBankAccountNumber, new { @placeholder = "Bank Account Number", @class = "form-control isPositiveNumeric" })
                     </div>
                 </div>
 

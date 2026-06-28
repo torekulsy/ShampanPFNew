@@ -79,7 +79,8 @@
                         <div class="col-md-6 col-lg-6 col-xl-3">
                             <div class="editor-label">@Html.LabelFor(model => model.empPFForTransferVM.FromBranch)</div>
                             <div class="editor-field">
-                                @Html.SimpleDropDownFor(model => model.empPFForTransferVM.FromBranch, "/Config/DropDown/Branch", new { @placeholder = "From Branch", @class = " form-control ", @disabled = "disabled" })
+                                @Html.HiddenFor(model => model.empPFForTransferVM.FromBranch)
+                                @Html.SimpleDropDownFor(model => model.empPFForTransferVM.FromBranch, "/Config/DropDown/Branch", new { @placeholder = "From Branch", @class = " form-control", @disabled = "disabled" })
 
                             </div>
                         </div>
