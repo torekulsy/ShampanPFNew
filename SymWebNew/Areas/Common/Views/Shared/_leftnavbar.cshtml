@@ -1,4 +1,5 @@
-﻿@using SymOrdinary
+﻿
+@using SymOrdinary
 @using System.Threading;
 @{
     ShampanIdentity identity = null;
@@ -60,7 +61,7 @@
 
     /* Child Menu Indentation */
     .nav-treeview {
-        padding-left: 20px !important;
+        padding-left: 16px !important;
     }
 
     .has-treeview-a.treeview-expanded.nav-treeview {
@@ -75,9 +76,9 @@
         .nav-treeview > .nav-item::before {
             content: "" !important;
             position: absolute !important;
-            left: -12px !important;
+            left: -8px !important;
             top: 20px !important;
-            width: 12px !important;
+            width: 8px !important;
             border-top: 1px solid #fff !important;
         }
 
@@ -85,7 +86,7 @@
         .nav-treeview > .nav-item::after {
             content: "" !important;
             position: absolute !important;
-            left: -12px !important;
+            left: -8px !important;
             top: 0 !important;
             height: 100% !important;
             border-left: 1px solid #fff !important;
@@ -244,7 +245,8 @@
 
                                         <li class="nav-item">
                                             <a class="nav-link"
-                                               href="/Common/Project">
+                                               href="/Common/Project"
+                                               data-menu-id="12">
                                                 <span class="nav-icon">📁</span>
                                                 <p>@Session["ProjectLabel"]</p>
                                             </a>
@@ -255,6 +257,7 @@
                                                href="/Common/Company"
                                                data-menu-id="13">
                                                 <span class="nav-icon">🏢</span>
+                                                <p>Company</p>
                                             </a>
                                         </li>
 
@@ -808,7 +811,7 @@
                                             <li class="nav-item">
                                                 <a class="nav-link"
                                                    id="lnkEdit1"
-                                                   href="/PF/PFReport/EmployeeLoanClosedView" data-menu-id="337">
+                                                   href="/PF/PFReport/EmployeeLoanClosedView" data-menu-id="338">
 
                                                     <i class="nav-icon">🔒</i>
                                                     <p>Loan Closed</p>

@@ -1,94 +1,107 @@
 ﻿@{
     ViewBag.Title = "ScheduleofLoanMember";
 }
+<style>
+    .btn.sym-btn-report {
+        gap: 8px;
+    }
+</style>
 @using UIHelper.MVC
+<div class="card">
+    <div class="card-header p-3">
+        <div class="th_thinbox_top" style="justify-content:flex-end">
+            <div class="breadcrumb-container">
+                <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="thinbox">
     <div class="th_thinbox">
         <p>Schedule Of Loan Member</p>
     </div>
+    <div class="card-body">
+        <div class="row">
 
-    <div class="row">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+                <div class="editor-label">
+                    <label>@Session["DepartmentLabel"]</label>
+                </div>
+                <div class="editor-field">
+                    @Html.SimpleDropDown("DepartmentId", "/Config/DropDown/Department", new { @class = " form-control" })
+                </div>
 
-        <div class="col-md-3">
-            <div class="editor-label">
-                <label>@Session["DepartmentLabel"]</label>
             </div>
-            <div class="editor-field">
-                @Html.SimpleDropDown("DepartmentId", "/Config/DropDown/Department", new { @class = " form-control" })
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+                <div class="editor-label">
+                    <label>@Session["SectionLabel"]</label>
+                </div>
+                <div class="editor-field">
+                    @Html.SimpleDropDown("SectionId", "/Config/DropDown/Section", new { @class = " form-control" })
+                </div>
             </div>
 
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+                <div class="editor-label">
+                    <label>@Session["ProjectLabel"]</label>
+                </div>
+                <div class="editor-field">
+                    @Html.SimpleDropDown("ProjectId", "/Config/DropDown/Project", new { @class = " form-control" })
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+                <div class="editor-label">
+                    <label>Designation</label>
+                </div>
+                <div class="editor-field">
+                    @Html.SimpleDropDown("DesignationId", "/Config/DropDown/Designation", new { @class = " form-control" })
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+                <div class="editor-label">
+                    <label>Employee Code(From)</label>
+                </div>
+                <div class="editor-field">
+                    @Html.SimpleDropDown("CodeF", "/Config/DropDown/EmployeeCodeName", new { @class = "codeFCom form-control selectDropdown" })
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+                <div class="editor-label">
+                    <label>Employee Code(To)</label>
+                </div>
+                <div class="editor-field">
+                    @Html.SimpleDropDown("CodeT", "/Config/DropDown/EmployeeCodeName", new { @class = "codeTCom form-control selectDropdown" })
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+                <div class="editor-label">
+                    <label>From Date</label>
+                </div>
+                <div class="editor-field">
+                    @Html.TextBox("FromDate", "", new { @placeholder = "From Date", @class = "customDatePicker fiscalyearCom form-control" })
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+                <div class="editor-label">
+                    <label>To Date</label>
+                </div>
+                <div class="editor-field">
+                    @Html.TextBox("Todate", "", new { @placeholder = "To Date", @class = "customDatePicker fiscalyearCom form-control" })
+
+                </div>
+            </div>
         </div>
-        <div class="col-md-3">
-            <div class="editor-label">
-                <label>@Session["SectionLabel"]</label>
-            </div>
-            <div class="editor-field">
-                @Html.SimpleDropDown("SectionId", "/Config/DropDown/Section", new { @class = " form-control" })
-            </div>
-        </div>
 
-        <div class="col-md-3">
-            <div class="editor-label">
-                <label>@Session["ProjectLabel"]</label>
-            </div>
-            <div class="editor-field">
-                @Html.SimpleDropDown("ProjectId", "/Config/DropDown/Project", new { @class = " form-control" })
-            </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
         </div>
-        <div class="col-md-3">
-            <div class="editor-label">
-                <label>Designation</label>
-            </div>
-            <div class="editor-field">
-                @Html.SimpleDropDown("DesignationId", "/Config/DropDown/Designation", new { @class = " form-control" })
-            </div>
+        <div class=" headrow mt-4">
+            @Html.ActionLink(" Report", "ScheduleofLoanMember", null, new { target = "_blank", id = "sendRpt", @class = "btn sym-btn-report" })
         </div>
-        <div class="col-md-3">
-            <div class="editor-label">
-                <label>Employee Code(From)</label>
-            </div>
-            <div class="editor-field">
-                @Html.SimpleDropDown("CodeF", "/Config/DropDown/EmployeeCodeName", new { @class = "codeFCom form-control selectDropdown" })
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="editor-label">
-                <label>Employee Code(To)</label>
-            </div>
-            <div class="editor-field">
-                @Html.SimpleDropDown("CodeT", "/Config/DropDown/EmployeeCodeName", new { @class = "codeTCom form-control selectDropdown" })
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="editor-label">
-                <label>From Date</label>
-            </div>
-            <div class="editor-field">
-                @Html.TextBox("FromDate", "", new { @placeholder = "From Date", @class = "customDatePicker fiscalyearCom form-control" }) 
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="editor-label">
-                <label>To Date</label>
-            </div>
-            <div class="editor-field">
-                @Html.TextBox("Todate", "", new { @placeholder = "To Date", @class = "customDatePicker fiscalyearCom form-control" })
-                
-            </div>
-        </div>
-    </div>
-
-
-
-
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
     </div>
 </div>
 
-<div class=" headrow">
-    @Html.ActionLink(" Report", "ScheduleofLoanMember", null, new { target = "_blank", id = "sendRpt", @class = "btn sym-btn-report" })
-</div>
+
 
 
 @section Scripts {

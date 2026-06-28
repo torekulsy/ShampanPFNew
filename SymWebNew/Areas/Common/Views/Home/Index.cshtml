@@ -1,219 +1,534 @@
-﻿@model SymViewModel.Common.AdminInfoDashboardVM
+﻿
+@model SymViewModel.Common.AdminInfoDashboardVM
 
-<!DOCTYPE html>
-<html lang="en">
+<script src="~/assets/plugins/chartjs/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+    /* ===== RESET ===== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-<head>
-    <meta charset="UTF-8">
-    <title>PF Dashboard</title>
-    <script src="~/assets/plugins/chartjs/chart.js"></script>
-    <style>
-        /* ===== RESET ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: #eef2f7;
+    }
+
+
+    /* Grid */
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 14px;
+    }
+
+    /* Card */
+    .stat-card {
+        position: relative;
+        border-radius: 10px;
+        padding: 14px 15px 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 148px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 3px 12px rgba(0, 0, 0, 0.04);
+    }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            z-index: 2;
         }
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #eef2f7;
+    /* Wavy contour lines per theme */
+    .card-waves {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 55%;
+        height: 70%;
+        pointer-events: none;
+        background-repeat: no-repeat;
+        background-position: top right;
+        background-size: 100% 100%;
+    }
+
+    .stat-card[data-theme="blue"] .card-waves {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 140' fill='none'%3E%3Cpath d='M0 110 C40 95 80 105 120 90 C160 75 180 85 200 70' stroke='%230066ff' stroke-width='0.7' opacity='0.09'/%3E%3Cpath d='M0 95 C40 80 80 90 120 75 C160 60 180 70 200 55' stroke='%230066ff' stroke-width='0.7' opacity='0.11'/%3E%3Cpath d='M0 80 C40 65 80 75 120 60 C160 45 180 55 200 40' stroke='%230066ff' stroke-width='0.7' opacity='0.13'/%3E%3Cpath d='M0 65 C40 50 80 60 120 45 C160 30 180 40 200 25' stroke='%230066ff' stroke-width='0.7' opacity='0.15'/%3E%3Cpath d='M0 50 C40 35 80 45 120 30 C160 15 180 25 200 10' stroke='%230066ff' stroke-width='0.7' opacity='0.12'/%3E%3C/svg%3E");
+    }
+
+    .stat-card[data-theme="green"] .card-waves {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 140' fill='none'%3E%3Cpath d='M0 110 C40 95 80 105 120 90 C160 75 180 85 200 70' stroke='%2328a745' stroke-width='0.7' opacity='0.09'/%3E%3Cpath d='M0 95 C40 80 80 90 120 75 C160 60 180 70 200 55' stroke='%2328a745' stroke-width='0.7' opacity='0.11'/%3E%3Cpath d='M0 80 C40 65 80 75 120 60 C160 45 180 55 200 40' stroke='%2328a745' stroke-width='0.7' opacity='0.13'/%3E%3Cpath d='M0 65 C40 50 80 60 120 45 C160 30 180 40 200 25' stroke='%2328a745' stroke-width='0.7' opacity='0.15'/%3E%3Cpath d='M0 50 C40 35 80 45 120 30 C160 15 180 25 200 10' stroke='%2328a745' stroke-width='0.7' opacity='0.12'/%3E%3C/svg%3E");
+    }
+
+    .stat-card[data-theme="orange"] .card-waves {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 140' fill='none'%3E%3Cpath d='M0 110 C40 95 80 105 120 90 C160 75 180 85 200 70' stroke='%23fd7e14' stroke-width='0.7' opacity='0.09'/%3E%3Cpath d='M0 95 C40 80 80 90 120 75 C160 60 180 70 200 55' stroke='%23fd7e14' stroke-width='0.7' opacity='0.11'/%3E%3Cpath d='M0 80 C40 65 80 75 120 60 C160 45 180 55 200 40' stroke='%23fd7e14' stroke-width='0.7' opacity='0.13'/%3E%3Cpath d='M0 65 C40 50 80 60 120 45 C160 30 180 40 200 25' stroke='%23fd7e14' stroke-width='0.7' opacity='0.15'/%3E%3Cpath d='M0 50 C40 35 80 45 120 30 C160 15 180 25 200 10' stroke='%23fd7e14' stroke-width='0.7' opacity='0.12'/%3E%3C/svg%3E");
+    }
+
+    .stat-card[data-theme="purple"] .card-waves {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 140' fill='none'%3E%3Cpath d='M0 110 C40 95 80 105 120 90 C160 75 180 85 200 70' stroke='%236f42c1' stroke-width='0.7' opacity='0.09'/%3E%3Cpath d='M0 95 C40 80 80 90 120 75 C160 60 180 70 200 55' stroke='%236f42c1' stroke-width='0.7' opacity='0.11'/%3E%3Cpath d='M0 80 C40 65 80 75 120 60 C160 45 180 55 200 40' stroke='%236f42c1' stroke-width='0.7' opacity='0.13'/%3E%3Cpath d='M0 65 C40 50 80 60 120 45 C160 30 180 40 200 25' stroke='%236f42c1' stroke-width='0.7' opacity='0.15'/%3E%3Cpath d='M0 50 C40 35 80 45 120 30 C160 15 180 25 200 10' stroke='%236f42c1' stroke-width='0.7' opacity='0.12'/%3E%3C/svg%3E");
+    }
+
+    .stat-card[data-theme="teal"] .card-waves {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 140' fill='none'%3E%3Cpath d='M0 110 C40 95 80 105 120 90 C160 75 180 85 200 70' stroke='%2317a2b8' stroke-width='0.7' opacity='0.09'/%3E%3Cpath d='M0 95 C40 80 80 90 120 75 C160 60 180 70 200 55' stroke='%2317a2b8' stroke-width='0.7' opacity='0.11'/%3E%3Cpath d='M0 80 C40 65 80 75 120 60 C160 45 180 55 200 40' stroke='%2317a2b8' stroke-width='0.7' opacity='0.13'/%3E%3Cpath d='M0 65 C40 50 80 60 120 45 C160 30 180 40 200 25' stroke='%2317a2b8' stroke-width='0.7' opacity='0.15'/%3E%3Cpath d='M0 50 C40 35 80 45 120 30 C160 15 180 25 200 10' stroke='%2317a2b8' stroke-width='0.7' opacity='0.12'/%3E%3C/svg%3E");
+    }
+
+    .stat-card[data-theme="pink"] .card-waves {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 140' fill='none'%3E%3Cpath d='M0 110 C40 95 80 105 120 90 C160 75 180 85 200 70' stroke='%23e83e8c' stroke-width='0.7' opacity='0.09'/%3E%3Cpath d='M0 95 C40 80 80 90 120 75 C160 60 180 70 200 55' stroke='%23e83e8c' stroke-width='0.7' opacity='0.11'/%3E%3Cpath d='M0 80 C40 65 80 75 120 60 C160 45 180 55 200 40' stroke='%23e83e8c' stroke-width='0.7' opacity='0.13'/%3E%3Cpath d='M0 65 C40 50 80 60 120 45 C160 30 180 40 200 25' stroke='%23e83e8c' stroke-width='0.7' opacity='0.15'/%3E%3Cpath d='M0 50 C40 35 80 45 120 30 C160 15 180 25 200 10' stroke='%23e83e8c' stroke-width='0.7' opacity='0.12'/%3E%3C/svg%3E");
+    }
+
+    /* Top */
+    .dashbordCard {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        z-index: 1;
+        margin-bottom: 8px;
+    }
+
+    .card-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .card-icon i {
+            font-size: 16px;
         }
 
+    .card-menu {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #c8d0da;
+        font-size: 13px;
+        padding: 0 2px;
+        line-height: 1;
+    }
 
+    /* Body */
+    .card-body {
+        position: relative;
+        z-index: 1;
+        flex: 1;
+    }
 
-        /* ===== CARDS ===== */
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-            margin-bottom: 18px;
-        }
+    .card-label {
+        font-size: 16px;
+        font-weight: 500;
+        color: #64748b;
+        margin-bottom: 1px;
+        line-height: 1.35;
+    }
 
-        .card {
-            padding: 18px;
-            border-radius: 18px;
-            color: white;
-            position: relative;
+    .card-value-row {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .card-value {
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+    }
+
+    .trend-badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 1px 6px;
+        border-radius: 8px;
+        line-height: 1.6;
+    }
+
+    .trend-up {
+        color: #22c55e;
+        background: #dcfce7;
+    }
+
+    .trend-orange {
+        color: #f97316;
+        background: #ffedd5;
+    }
+
+    .trend-down {
+        color: #ef4444;
+        background: #fee2e2;
+    }
+
+    /* div */
+    .dashbordCard-div {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 6px;
+        margin-top: 10px;
+        padding: 8px 0 10px;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        font-size: 14px;
+        color: #94a3b8;
+    }
+
+        .dashbordCard-div span:first-child {
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-            .card::before {
-                content: "";
-                position: absolute;
-                width: 140px;
-                height: 140px;
-                background: rgba(255, 255, 255, 0.15);
-                border-radius: 50%;
-                top: -40px;
-                right: -40px;
+        .dashbordCard-div span:last-child {
+            flex-shrink: 0;
+        }
+
+    /* ── Blue ── */
+    .stat-card[data-theme="blue"] {
+        background: linear-gradient(155deg, #edf4ff 0%, #fff 50%);
+    }
+
+        .stat-card[data-theme="blue"]::after {
+            background: #0066ff;
+        }
+
+        .stat-card[data-theme="blue"] .card-icon {
+            background: #dbeafe;
+            color: #0066ff;
+            box-shadow: 0 2px 6px rgba(0, 102, 255, 0.14);
+        }
+
+        .stat-card[data-theme="blue"] .card-value {
+            color: #0066ff;
+        }
+
+    /* ── Green ── */
+    .stat-card[data-theme="green"] {
+        background: linear-gradient(155deg, #ecfdf3 0%, #fff 50%);
+    }
+
+        .stat-card[data-theme="green"]::after {
+            background: #28a745;
+        }
+
+        .stat-card[data-theme="green"] .card-icon {
+            background: #d1fae5;
+            color: #28a745;
+            box-shadow: 0 2px 6px rgba(40, 167, 69, 0.14);
+        }
+
+        .stat-card[data-theme="green"] .card-value {
+            color: #28a745;
+        }
+
+    /* ── Orange ── */
+    .stat-card[data-theme="orange"] {
+        background: linear-gradient(155deg, #fff7ed 0%, #fff 50%);
+    }
+
+        .stat-card[data-theme="orange"]::after {
+            background: #fd7e14;
+        }
+
+        .stat-card[data-theme="orange"] .card-icon {
+            background: #ffedd5;
+            color: #fd7e14;
+            box-shadow: 0 2px 6px rgba(253, 126, 20, 0.14);
+        }
+
+        .stat-card[data-theme="orange"] .card-value {
+            color: #fd7e14;
+        }
+
+    /* ── Purple ── */
+    .stat-card[data-theme="purple"] {
+        background: linear-gradient(155deg, #f5f0ff 0%, #fff 50%);
+    }
+
+        .stat-card[data-theme="purple"]::after {
+            background: #6f42c1;
+        }
+
+        .stat-card[data-theme="purple"] .card-icon {
+            background: #ede9fe;
+            color: #6f42c1;
+            box-shadow: 0 2px 6px rgba(111, 66, 193, 0.14);
+        }
+
+        .stat-card[data-theme="purple"] .card-value {
+            color: #6f42c1;
+        }
+
+    /* ── Teal ── */
+    .stat-card[data-theme="teal"] {
+        background: linear-gradient(155deg, #ecfeff 0%, #fff 50%);
+    }
+
+        .stat-card[data-theme="teal"]::after {
+            background: #17a2b8;
+        }
+
+        .stat-card[data-theme="teal"] .card-icon {
+            background: #cffafe;
+            color: #17a2b8;
+            box-shadow: 0 2px 6px rgba(23, 162, 184, 0.14);
+        }
+
+        .stat-card[data-theme="teal"] .card-value {
+            color: #17a2b8;
+        }
+
+    /* ── Pink ── */
+    .stat-card[data-theme="pink"] {
+        background: linear-gradient(155deg, #fdf2f8 0%, #fff 50%);
+    }
+
+        .stat-card[data-theme="pink"]::after {
+            background: #e83e8c;
+        }
+
+        .stat-card[data-theme="pink"] .card-icon {
+            background: #fce7f3;
+            color: #e83e8c;
+            box-shadow: 0 2px 6px rgba(232, 62, 140, 0.14);
+        }
+
+        .stat-card[data-theme="pink"] .card-value {
+            color: #e83e8c;
+        }
+
+
+    /* ===== GRID ===== */
+    .chart-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 18px;
+    }
+
+    /* TABLET + DESKTOP */
+
+    /* FULL WIDTH */
+    .full-width {
+        grid-column: span 1;
+    }
+
+
+    /* ===== CHART BOX ===== */
+    .chart-box {
+        background: #fff;
+        padding: 16px;
+        border-radius: 18px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        height: 430px;
+    }
+
+        .chart-box h4, .table-card h4 {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+    /* CANVAS FIX */
+    canvas {
+        width: 100% !important;
+        height: calc(100% - 43px) !important;
+    }
+    /* ===== TABLE ===== */
+    .table-card {
+        background: #fff;
+        padding: 16px;
+        margin-top: 18px;
+        border-radius: 18px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        min-width: 500px;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .chart-box {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+        .chart-header h4 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+    .filters {
+        display: flex;
+        gap: 10px;
+    }
+
+        .filters select {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: #f7f9fc;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+            .filters select:hover {
+                border-color: #007bff;
             }
 
-            .card h4 {
-                font-size: 16px;
-                color: #fff;
-                font-weight: 600;
+            .filters select:focus {
+                outline: none;
+                border-color: #007bff;
+                background: #fff;
             }
+</style>
 
-            .card p {
-                font-size: 26px;
-                font-weight: bold;
-                margin-top: 6px;
-            }
+<div id="mainDashbord">
 
-        /* COLORS */
-        .green {
-            background: linear-gradient(135deg, #448aff, #448afffa);
-        }
+    <div class="dashboard">
+        <!-- CARDS -->
+        <section class="cards-grid my-4">
 
-        .blue {
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
-        }
-
-        .orange {
-            background: linear-gradient(135deg, #3a5c9e, #3a5c9e);
-        }
-
-        .red {
-            background: linear-gradient(135deg, #2440ac, #2c439f);
-        }
-
-        /* ===== GRID ===== */
-        .chart-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 18px;
-        }
-
-        /* TABLET + DESKTOP */
-
-        /* FULL WIDTH */
-        .full-width {
-            grid-column: span 1;
-        }
-
-
-        /* ===== CHART BOX ===== */
-        .chart-box {
-            background: #fff;
-            padding: 16px;
-            border-radius: 18px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-            height: 320px;
-        }
-
-            .chart-box h4, .table-card h4 {
-                font-size: 14px;
-                margin-bottom: 10px;
-            }
-
-        /* CANVAS FIX */
-        canvas {
-            width: 100% !important;
-            height: calc(100% - 43px) !important;
-        }
-        /* ===== TABLE ===== */
-        .table-card {
-            background: #fff;
-            padding: 16px;
-            margin-top: 18px;
-            border-radius: 18px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            min-width: 500px;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        .chart-box {
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-            .chart-header h4 {
-                font-size: 18px;
-                font-weight: 600;
-            }
-
-        .filters {
-            display: flex;
-            gap: 10px;
-        }
-
-            .filters select {
-                padding: 6px 12px;
-                border-radius: 8px;
-                border: 1px solid #ddd;
-                background: #f7f9fc;
-                cursor: pointer;
-                transition: 0.3s;
-                font-size: 14px;
-            }
-
-                .filters select:hover {
-                    border-color: #007bff;
-                }
-
-                .filters select:focus {
-                    outline: none;
-                    border-color: #007bff;
-                    background: #fff;
-                }
-    </style>
-</head>
-
-<body>
-
-    <div id="mainDashbord">
-
-        <div class="dashboard">
-            <!-- CARDS -->
-            <div class="cards">
-                <div class="card green">
-                    <h4>Employees</h4>
-                    <p>120</p>
+            <div class="stat-card" data-theme="blue">
+                <div class="card-waves" aria-hidden="true"></div>
+                <div class="dashbordCard">
+                    <div class="card-icon"><i class="fa fa-users"></i></div>
                 </div>
-                <div class="card blue">
-                    <h4>PF Balance</h4>
-                    <p>৳5.2L</p>
+                <div class="card-body">
+                    <p class="card-label">Employees</p>
+                    <div class="card-value-row">
+                        <span class="card-value">120</span>
+                    </div>
                 </div>
-                <div class="card orange">
-                    <h4>Last Monthly PF</h4>
-                    <p>৳45K</p>
+                <div class="dashbordCard-div">
+                    <span>Total Active Employees</span>
+
                 </div>
-                @*<div class="card red">
-                    <h4>Pending</h4>
-                    <p>8</p>
-                </div>*@
             </div>
 
-            <!-- CHARTS -->
-            <div class="chart-grid">
+            <div class="stat-card" data-theme="green">
+                <div class="card-waves" aria-hidden="true"></div>
+                <div class="dashbordCard">
+                    <div class="card-icon"><i class="fa fa-wallet"></i></div>
+                </div>
+                <div class="card-body">
+                    <p class="card-label">PF Balance</p>
+                    <div class="card-value-row">
+                        <span class="card-value">৳5.2L</span>
+                    </div>
+                </div>
+                <div class="dashbordCard-div">
+                    <span>Total Provident Fund Balance</span>
 
-                @*<div class="chart-box">
+                </div>
+            </div>
+
+            <div class="stat-card" data-theme="orange">
+                <div class="card-waves" aria-hidden="true"></div>
+                <div class="dashbordCard">
+                    <div class="card-icon"><i class="fa fa-chart-line"></i></div>
+                </div>
+                <div class="card-body">
+                    <p class="card-label">Last Monthly PF (Contribution)</p>
+                    <div class="card-value-row">
+                        <span class="card-value">৳45K</span>
+                    </div>
+                </div>
+                <div class="dashbordCard-div">
+                    <span>Employee Contribution</span>
+
+                </div>
+            </div>
+
+            <div class="stat-card" data-theme="purple">
+                <div class="card-waves" aria-hidden="true"></div>
+                <div class="dashbordCard">
+                    <div class="card-icon"><i class="fa fa-building-columns"></i></div>
+                </div>
+                <div class="card-body">
+                    <p class="card-label">Last Month Loan Collection</p>
+                    <div class="card-value-row">
+                        <span class="card-value">৳1.25L</span>
+                    </div>
+                </div>
+                <div class="dashbordCard-div">
+                    <span>Total Loan Collection</span>
+
+                </div>
+            </div>
+
+            <div class="stat-card" data-theme="teal">
+                <div class="card-waves" aria-hidden="true"></div>
+                <div class="dashbordCard">
+                    <div class="card-icon"><i class="fa fa-chart-pie"></i></div>
+                </div>
+                <div class="card-body">
+                    <p class="card-label">Total Investment</p>
+                    <div class="card-value-row">
+                        <span class="card-value">৳15.8L</span>
+                    </div>
+                </div>
+                <div class="dashbordCard-div">
+                    <span>Total Investment</span>
+
+                </div>
+            </div>
+
+            <div class="stat-card" data-theme="pink">
+                <div class="card-waves" aria-hidden="true"></div>
+                <div class="dashbordCard">
+                    <div class="card-icon"><i class="fa fa-building-columns"></i></div>
+                </div>
+                <div class="card-body">
+                    <p class="card-label">Cash at Bank</p>
+                    <div class="card-value-row">
+                        <span class="card-value">৳8.4L</span>
+                    </div>
+                </div>
+                <div class="dashbordCard-div">
+                    <span>Available Cash in Bank</span>
+
+                </div>
+            </div>
+
+        </section>
+
+        <!-- CHARTS -->
+        <div class="chart-grid">
+
+            @*<div class="chart-box">
                     <h4>Monthly Contribution</h4>
 
                     <canvas id="barChart"></canvas>
                 </div>*@
-                <div class="chart-box">
+            @*<div class="chart-box">
 
                     <div class="chart-header">
                         <h4>Monthly Contribution</h4>
@@ -244,8 +559,8 @@
                     </div>
 
                     <canvas id="barChart"></canvas>
-                </div>
-                <div class="chart-box">
+                </div>*@
+            @*<div class="chart-box">
                     <div class="chart-header">
                         <h4>Employee Growth</h4>
 
@@ -273,11 +588,11 @@
                             </select>
                         </div>
                     </div>
-                    
-                    <canvas id="lineChart"></canvas>
-                </div>
 
-                <div class="chart-box">
+                    <canvas id="lineChart"></canvas>
+                </div>*@
+
+            @*<div class="chart-box">
                     <div class="chart-header">
                         <h4>Contribution Split</h4>
 
@@ -305,11 +620,11 @@
                             </select>
                         </div>
                     </div>
-                   
-                    <canvas id="pieChart"></canvas>
-                </div>
 
-                <div class="chart-box">
+                    <canvas id="pieChart"></canvas>
+                </div>*@
+
+            @*<div class="chart-box">
                     <div class="chart-header">
                         <h4>Withdrawal vs Deposit</h4>
 
@@ -337,117 +652,94 @@
                             </select>
                         </div>
                     </div>
-                   
+
                     <canvas id="areaChart"></canvas>
-                </div>
+                </div>*@
 
-                <div class="chart-box full-width">
-                    <div class="chart-header">
-                        <h4>Department Wise PF</h4>
+            <div class="chart-box full-width">
+                <div class="chart-header">
+                    <h4>Department Wise PF</h4>
 
-                        <div class="filters">
-                            <select id="monthFilterDep">
-                                <option value="">All Months</option>
-                                <option value="0">Jan</option>
-                                <option value="1">Feb</option>
-                                <option value="2">Mar</option>
-                                <option value="3">Apr</option>
-                                <option value="4">May</option>
-                                <option value="5">Jun</option>
-                                <option value="6">Jul</option>
-                                <option value="7">Aug</option>
-                                <option value="8">Sep</option>
-                                <option value="9">Oct</option>
-                                <option value="10">Nov</option>
-                                <option value="11">Dec</option>
-                            </select>
+                    <div class="filters">
+                        <select id="monthFilterDep">
+                            <option value="">All Months</option>
+                            <option value="0">Jan</option>
+                            <option value="1">Feb</option>
+                            <option value="2">Mar</option>
+                            <option value="3">Apr</option>
+                            <option value="4">May</option>
+                            <option value="5">Jun</option>
+                            <option value="6">Jul</option>
+                            <option value="7">Aug</option>
+                            <option value="8">Sep</option>
+                            <option value="9">Oct</option>
+                            <option value="10">Nov</option>
+                            <option value="11">Dec</option>
+                        </select>
 
-                            <select id="yearFilterDep">
-                                <option value="2024">2024</option>
-                                <option value="2025" >2025</option>
-                                <option value="2026">2026</option>
-                            </select>
-                        </div>
+                        <select id="yearFilterDep">
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                        </select>
                     </div>
-
-                    
-                    <canvas id="deptChart"></canvas>
                 </div>
-                <div class="chart-box full-width">
 
-                    <div class="flex-item-inner">
-                        <a href="#">
-                            <div class="card-front">
-                                <div class="card-top" style="background: #899d23">
-                                    <h2>Last Month PF</h2>
-                                </div>
-                                <div class="char_canva">
-                                    <canvas id="myChartPF" style="width: 420px !important; height: 200px !important;"></canvas>
-                                </div>
-                                <div class="cardMain">
-                                    <div class="card-flex">
-                                        @Html.LabelFor(model => model.PfInfoDashboardVMS.TotalPerson)
-                                        <span>
-                                            @Html.TextBoxFor(model => model.PfInfoDashboardVMS.TotalPerson, new
+
+                <canvas id="deptChart"></canvas>
+            </div>
+            <div class="chart-box full-width">
+
+                <div class="flex-item-inner">
+                    <a href="#">
+                        <div class="card-front">
+                            <div class="dashbordCard" style="background: #899d23">
+                                <h2>Last Month PF</h2>
+                            </div>
+                            <div class="char_canva">
+                                <canvas id="myChartPF" style="width: 420px !important; height: 200px !important;"></canvas>
+                            </div>
+                            <div class="cardMain">
+                                <div class="card-flex">
+                                    @Html.LabelFor(model => model.PfInfoDashboardVMS.TotalPerson)
+                                    <span>
+                                        @Html.TextBoxFor(model => model.PfInfoDashboardVMS.TotalPerson, new
                    {
                        @placeholder =
                            "TotalPerson",
                        @class = "form-control"
                    })
-                                        </span>
-                                    </div>
-                                    <div class="card-flex">
-                                        @Html.LabelFor(model => model.PfInfoDashboardVMS.PFValue)
-                                        <span>
-                                            @Html.TextBoxFor(model => model.PfInfoDashboardVMS.PFValue, new
+                                    </span>
+                                </div>
+                                <div class="card-flex">
+                                    @Html.LabelFor(model => model.PfInfoDashboardVMS.PFValue)
+                                    <span>
+                                        @Html.TextBoxFor(model => model.PfInfoDashboardVMS.PFValue, new
                    {
                        @placeholder = "PFValue",
                        @class = "form-control"
                    })
-                                        </span>
-                                    </div>
+                                    </span>
                                 </div>
                             </div>
+                        </div>
 
-                        </a>
-                        <!-- /card -->
-                    </div>
+                    </a>
+                    <!-- /card -->
                 </div>
             </div>
         </div>
-
-        <!-- TABLE -->
-        <div class="table-card">
-            <h4>Recent Transactions</h4>
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Amount</th>
-                    <th>Date</th>
-                </tr>
-                <tr>
-                    <td>Akbar</td>
-                    <td>৳2000</td>
-                    <td>1 May</td>
-                </tr>
-                <tr>
-                    <td>Rahim</td>
-                    <td>৳1500</td>
-                    <td>2 May</td>
-                </tr>
-            </table>
-        </div>
-
     </div>
+</div>
 
 
-    <script>
+@*<script>
 
         const options = {
             responsive: true,
             maintainAspectRatio: false
         };
-        
+
 
         // ===============================
         // 📌 ONLY: Monthly Contribution
@@ -707,7 +999,7 @@
         const yearFilterWD = document.getElementById("yearFilterWD");
         const ctx1 = document.getElementById("areaChart").getContext("2d");
 
-       
+
 
         const lastYearWD = Math.max(...wdData.map(d => d.year));
 
@@ -837,11 +1129,11 @@
         yearFilterWD.onchange = updateWDChart;
 
         // DEPT
-        
+
         // =======================
         // 📌 DATA
         // =======================
-        
+
         // =======================
         // 📌 DATA
         // =======================
@@ -874,7 +1166,7 @@
         // =======================
         // 📌 LABELS
         // =======================
-       
+
 
         // =======================
         // 📌 CHART INIT
@@ -979,8 +1271,117 @@
         localStorage.removeItem("expandedMenu");
         localStorage.removeItem("expandedSubMenu");
         localStorage.removeItem("activeMenu");
-    </script>
-    <script>
+    </script>*@
+<script>
+
+
+    const months = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+    ];
+
+    const deptData = [
+        { month: 0, year: 2025, HR: 10, IT: 20, Accounts: 5, Sales: 15 },
+        { month: 1, year: 2025, HR: 12, IT: 25, Accounts: 7, Sales: 18 },
+        { month: 2, year: 2025, HR: 15, IT: 30, Accounts: 10, Sales: 20 },
+        { month: 3, year: 2025, HR: 18, IT: 35, Accounts: 12, Sales: 22 },
+        { month: 4, year: 2025, HR: 20, IT: 38, Accounts: 14, Sales: 25 },
+
+        { month: 0, year: 2026, HR: 8, IT: 18, Accounts: 4, Sales: 12 },
+        { month: 1, year: 2026, HR: 11, IT: 22, Accounts: 6, Sales: 16 },
+        { month: 2, year: 2026, HR: 13, IT: 24, Accounts: 7, Sales: 18 }
+    ];
+
+    const monthFilterDep = document.getElementById("monthFilterDep");
+    const yearFilterDep = document.getElementById("yearFilterDep");
+
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+
+    const deptChart = new Chart(document.getElementById("deptChart"), {
+        type: "bar",
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: "HR",
+                    data: [],
+                    backgroundColor: "#4e73df"
+                },
+                {
+                    label: "IT",
+                    data: [],
+                    backgroundColor: "#1cc88a"
+                },
+                {
+                    label: "Accounts",
+                    data: [],
+                    backgroundColor: "#36b9cc"
+                },
+                {
+                    label: "Sales",
+                    data: [],
+                    backgroundColor: "#f6c23e"
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    function getFilteredDeptData() {
+
+        const year = parseInt(yearFilterDep.value);
+        const month = monthFilterDep.value;
+
+        let data = deptData.filter(x => x.year == year);
+
+        if (month !== "") {
+            data = data.filter(x => x.month == month);
+        }
+        else if (year === currentYear) {
+            data = data.filter(x => x.month <= currentMonth);
+        }
+
+        return data;
+    }
+
+    function updateDeptChart() {
+
+        const data = getFilteredDeptData();
+
+        deptChart.data.labels = data.map(x => months[x.month]);
+
+        deptChart.data.datasets[0].data = data.map(x => x.HR);
+        deptChart.data.datasets[1].data = data.map(x => x.IT);
+        deptChart.data.datasets[2].data = data.map(x => x.Accounts);
+        deptChart.data.datasets[3].data = data.map(x => x.Sales);
+
+        deptChart.update();
+    }
+
+    window.addEventListener("load", function () {
+
+        yearFilterDep.value = currentYear;
+        monthFilterDep.value = "";
+
+        updateDeptChart();
+    });
+
+    monthFilterDep.addEventListener("change", updateDeptChart);
+    yearFilterDep.addEventListener("change", updateDeptChart);
+
+
+</script>
+<script>
         $(function () {
             var backgroundColor = ["#2ecc71", "#3498db", "#95a5a6", "#e74c3c"];
 
@@ -1047,9 +1448,10 @@
 
         });
 
+    localStorage.removeItem("expandedMenu");
+    localStorage.removeItem("expandedSubMenu");
+    localStorage.removeItem("activeMenu");
+
+</script>
 
 
-    </script>
-</body>
-
-</html>
