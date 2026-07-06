@@ -50,6 +50,7 @@
                 <th class="left">Remarks</th>
                 <th class="left">Post Status</th>
                 <th class="left">Approve Status</th>
+                <th class="left">Distribute Status</th>
     
             </tr>
         </thead>
@@ -103,28 +104,36 @@
                     "sWidth": "5%",
                     "sMargin": "10px",
                     "sClass": "center",
-                   fnRender: function (oObj) {
-                    var Code = encodeURIComponent(oObj.aData[1]);
+                    fnRender: function (oObj) {
+                        var Code = encodeURIComponent(oObj.aData[1]);
 
-                    // Always display these buttons
-                    var result = '<a id="lnkEdit1" title="Click on for Edit" style="text-decoration:none;" href="/@ViewBag.TransType/PreDistributionFund/Edit/' + oObj.aData[0] + '" class="innerListLink sym-btn-edit-row"></a>'
-                        + '<a id="lnkEdit1" title="Click on for Report" style="text-decoration:none;" href="/@ViewBag.TransType/PreDistributionFund/reportVeiw/' + oObj.aData[0] + '" class="linkReport sym-btn-report-row"></a>'
-                        + '<a id="lnkEdit1" title="Click on for Distribution" style="text-decoration:none;" target="_blank" href="/@ViewBag.TransType/ProfitDistributionNew/Process?PreDistributionFundId=' + oObj.aData[0] + '" class="innerListLink sym-btn-add-row"></a>'
+                        // Always display these buttons
+                        var result = '<a id="lnkEdit1" title="Click on for Edit" style="text-decoration:none;" href="/@ViewBag.TransType/PreDistributionFund/Edit/' + oObj.aData[0] + '" class="innerListLink sym-btn-edit-row"></a>'
+                            + '<a id="lnkEdit1" title="Click on for Report" style="text-decoration:none;" href="/@ViewBag.TransType/PreDistributionFund/reportVeiw/' + oObj.aData[0] + '" class="linkReport sym-btn-report-row"></a>'
+                          if (oObj.aData[7] == "Distributed") {
+                              result += '<a title="Already Distributed" style="text-decoration:none;opacity:0.45;pointer-events:none;cursor:default;" target="_blank" href="/@ViewBag.TransType/ProfitDistributionNew/Process?PreDistributionFundId=' + oObj.aData[0] + '" class="innerListLink sym-btn-add-row"></a>';
+
+                              result +='<button type="button" ' +'title="Go To Index" ' +'data-id="' + oObj.aData[0] + '" ' +'data-url="/@ViewBag.TransType/ProfitDistributionNew" ' +'onclick="GoToIndex(this)" ' +'class="sym-btn-detail-row">' +'&nbsp;</button>';
+                        }
+                        else {
+                            result += '<a title="Click on for Distribution" style="text-decoration:none;" target="_blank" href="/@ViewBag.TransType/ProfitDistributionNew/Process?PreDistributionFundId=' + oObj.aData[0] + '" class="innerListLink sym-btn-add-row"></a>';
+                        }
+
                         + '<a title="Journal" class="sym-btn-bank-row" href="/@ViewBag.TransType/PreDistributionFund/JournalEntry/?Code=' + Code + '&Id=' + oObj.aData[0] + '"></a>';
 
-                    // Now check if admin and the post condition
-                    if ('@identity.IsAdmin'.toLowerCase() == "true") {
-                        if (oObj.aData[5] == "Posted") {
-                            // If posted, show post button with disabled style
-                            result += ' <a title="Click on for Post" data-url="/@ViewBag.TransType/PreDistributionFund/Post" onclick=btnPostNoSplit(this); data-Post="' + oObj.aData[4] + '" data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row" style="opacity:0.45;pointer-events:none;cursor:default;"></a>';
-                        } else {
-                            // If not posted, show enabled post button
-                            result += ' <a title="Click on for Post" data-url="/@ViewBag.TransType/PreDistributionFund/Post" onclick=btnPostNoSplit(this); data-Post="' + oObj.aData[4] + '" data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row"></a>';
+                        // Now check if admin and the post condition
+                        if ('@identity.IsAdmin'.toLowerCase() == "true") {
+                            if (oObj.aData[5] == "Posted") {
+                                // If posted, show post button with disabled style
+                                result += ' <a title="Click on for Post" data-url="/@ViewBag.TransType/PreDistributionFund/Post" onclick=btnPostNoSplit(this); data-Post="' + oObj.aData[4] + '" data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row" style="opacity:0.45;pointer-events:none;cursor:default;"></a>';
+                            } else {
+                                // If not posted, show enabled post button
+                                result += ' <a title="Click on for Post" data-url="/@ViewBag.TransType/PreDistributionFund/Post" onclick=btnPostNoSplit(this); data-Post="' + oObj.aData[4] + '" data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row"></a>';
+                            }
                         }
-                    }
 
-                    return result;
-                }
+                        return result;
+                    }
 
 
                 },
@@ -137,7 +146,9 @@
                 },
                 { "sName": "Remarks", "sWidth": "10%" },
                 { "sName": "Post", "sWidth": "10%" },
-                { "sName": "Approve", "sWidth": "10%" }
+                { "sName": "Approve", "sWidth": "10%" },
+                { "sName": "Distributed", "sWidth": "10%" }
+
             ]
         });
         $("#footer-length").append($(".dataTables_length"));
@@ -156,6 +167,16 @@
         var parts = value.split('.');
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         return parts[0] + '.' + parts[1];
+    }
+
+    function GoToIndex(el) {
+
+        var id = $(el).data("id");
+        var baseUrl = $(el).data("url");
+
+        var finalUrl = baseUrl + "?PreDistributionFundId=" + id;
+
+        window.location.href = finalUrl;
     }
 </script>
 

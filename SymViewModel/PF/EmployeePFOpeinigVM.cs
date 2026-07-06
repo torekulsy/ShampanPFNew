@@ -50,13 +50,13 @@ namespace SymViewModel.PF
         public string ForFeitureDate { get; set; }
 
         [Display(Name = "Employee Contribution")]
-        public decimal EmployeeContribution { get; set; }
+        public decimal? EmployeeContribution { get; set; }
   [Display(Name = "Employer Contribution")]
-  public decimal EmployerContribution { get; set; }
+  public decimal? EmployerContribution { get; set; }
   [Display(Name = "Employee Profit")]
-  public decimal EmployeeProfit { get; set; }
+  public decimal? EmployeeProfit { get; set; }
   [Display(Name = "Employer Profit")]
-  public decimal EmployerProfit { get; set; }
+  public decimal? EmployerProfit { get; set; }
   public string TransType { get; set; }
 
 

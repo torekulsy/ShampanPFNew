@@ -38,7 +38,7 @@ namespace SymServices.PF
         /// [3] = Executed SQL query,  
         /// [4] = Exception message (if any)    
         /// </returns>
-        public List<EmployeeBreakMonthPFVM> SelectAll(string branchId, string empid = null)
+        public List<EmployeeBreakMonthPFVM> SelectAll(string empid = null)
         {
 
             #region Variables
@@ -59,7 +59,7 @@ namespace SymServices.PF
                 }
 
                 #endregion open connection and transaction
-                             
+
 
                 #region sql statement
 
@@ -133,7 +133,7 @@ From EmployeeBreakMonthPF pfo
                 sqlText += " left outer join ViewEmployeeInformation e on pfo.EmployeeId=e.EmployeeId";
                 sqlText += "  left outer join  ViewEmployeeInformation eOld  on pfo.EmployeeId=eold.EmployeeId";
 
-                sqlText += " Where 1=1 and  pfo.IsArchive=0 and  pfo.IsActive=1 and pfo.BranchId = @BranchId";
+                sqlText += " Where 1=1 and  pfo.IsArchive=0 and  pfo.IsActive=1";
 
                 #endregion
 
@@ -154,7 +154,7 @@ From EmployeeBreakMonthPF pfo
                 {
                     objComm.Parameters.AddWithValue("@EmployeeId", empid);
                 }
-                objComm.Parameters.AddWithValue("@BranchId", branchId);
+
                 SqlDataReader dr;
                 dr = objComm.ExecuteReader();
                 while (dr.Read())
@@ -185,7 +185,7 @@ From EmployeeBreakMonthPF pfo
                     vm.Project = dr["Project"].ToString();
                     vm.GrossSalary = Convert.ToDecimal(dr["GrossSalary"]);
                     vm.BasicSalary = Convert.ToDecimal(dr["BasicSalary"]);
-                    vm.BranchId = branchId;
+
                     vms.Add(vm);
                 }
                 dr.Close();
@@ -272,7 +272,7 @@ From EmployeeBreakMonthPF pfo
                 {
                     transaction = currConn.BeginTransaction("");
                 }
-                
+
 
                 #endregion open connection and transaction
                 #region sql statement
@@ -454,7 +454,7 @@ From EmployeeBreakMonthPF pfo
 
                 #endregion open connection and transaction
 
-                
+
 
                 #region sql statement
 
@@ -597,7 +597,7 @@ From EmployeeBreakMonthPF pfo
 
                 #endregion open connection and transaction
 
-                
+
 
                 #region sql statement
 
@@ -761,7 +761,7 @@ From EmployeeBreakMonthPF pfo
 
             try
             {
-                
+
                 #region open connection and transaction
                 #region New open connection and transaction
                 if (VcurrConn != null)
@@ -807,6 +807,7 @@ From EmployeeBreakMonthPF pfo
                 cmdExist.Transaction = transaction;
                 cmdExist.Parameters.AddWithValue("@EmployeeId", vm.EmployeeId);
                 cmdExist.Parameters.AddWithValue("@OpeningDate", Ordinary.DateToString(vm.OpeningDate));
+
                 var exeRes = cmdExist.ExecuteScalar();
 
                 int objfoundId = Convert.ToInt32(exeRes);
@@ -842,7 +843,6 @@ From EmployeeBreakMonthPF pfo
 ,CreatedBy
 ,CreatedAt
 ,CreatedFrom
-,BranchId
 ) VALUES (
   @Id
 , @EmployeeId
@@ -858,7 +858,6 @@ From EmployeeBreakMonthPF pfo
 , @CreatedBy
 , @CreatedAt
 , @CreatedFrom
-, @BranchId
 ) ";
                     SqlCommand cmdInsert = new SqlCommand(sqlText, currConn);
 
@@ -869,14 +868,14 @@ From EmployeeBreakMonthPF pfo
                     cmdInsert.Parameters.AddWithValue("@EmployeeProfit", vm.EmployeeProfit);
                     cmdInsert.Parameters.AddWithValue("@EmployerProfit", vm.EmployerProfit);
                     cmdInsert.Parameters.AddWithValue("@OpeningDate", Ordinary.DateToString(vm.OpeningDate));
-                    cmdInsert.Parameters.AddWithValue("@Post", false);                    
+                    cmdInsert.Parameters.AddWithValue("@Post", false);
                     cmdInsert.Parameters.AddWithValue("@Remarks", vm.Remarks ?? Convert.DBNull);
                     cmdInsert.Parameters.AddWithValue("@IsActive", true);
                     cmdInsert.Parameters.AddWithValue("@IsArchive", false);
                     cmdInsert.Parameters.AddWithValue("@CreatedBy", vm.CreatedBy);
                     cmdInsert.Parameters.AddWithValue("@CreatedAt", vm.CreatedAt);
                     cmdInsert.Parameters.AddWithValue("@CreatedFrom", vm.CreatedFrom);
-                    cmdInsert.Parameters.AddWithValue("@BranchId", vm.BranchId);
+
                     cmdInsert.Transaction = transaction;
                     cmdInsert.ExecuteNonQuery();
 
@@ -988,7 +987,7 @@ From EmployeeBreakMonthPF pfo
             SqlTransaction transaction = null;
 
             #endregion
-            
+
             try
             {
                 //if (!Ordinary.IsNumeric(vm.PFOpeningValue.ToString()))
@@ -1119,7 +1118,7 @@ From EmployeeBreakMonthPF pfo
                 }
                 else
                 {
-                    throw new ArgumentNullException("Could not found any item.","");
+                    throw new ArgumentNullException("Could not found any item.", "");
                 }
 
                 if (iSTransSuccess == true)
@@ -1431,7 +1430,7 @@ From EmployeeBreakMonthPF pfo
                 if (transaction == null) { transaction = currConn.BeginTransaction("PostToEmployeeBreakMonthPF"); }
 
                 #endregion open connection and transaction
-                
+
                 if (Ids.Length > 1)
                 {
                     #region Update Settings
@@ -1474,7 +1473,7 @@ From EmployeeBreakMonthPF pfo
                 }
                 else
                 {
-                    throw new ArgumentNullException("Could not found any item.","");
+                    throw new ArgumentNullException("Could not found any item.", "");
                 }
                 if (iSTransSuccess == true)
                 {
@@ -1535,11 +1534,11 @@ From EmployeeBreakMonthPF pfo
 
             try
             {
-                
+
                 #region DataRead From DB
 
 
-                
+
 
                 #region open connection and transaction
 
@@ -1666,8 +1665,8 @@ from ViewEmployeeInformation where 1=1
             {
 
                 #region DataRead From DB
-                
-                
+
+
 
                 #region open connection and transaction
 
@@ -1819,12 +1818,12 @@ SELECT
             #region try
             try
             {
-                
+
 
                 DataSet ds = new DataSet();
 
                 #region Excel Read
-                
+
                 System.Data.DataTable dt = new System.Data.DataTable();
                 FileStream stream = System.IO.File.Open(Fullpath, FileMode.Open, FileAccess.Read);
                 // We return the interface, so that
@@ -1876,7 +1875,7 @@ SELECT
                 foreach (DataRow item in dt.Rows)
                 {
                     EmployeeBreakMonthPFVM vm = new EmployeeBreakMonthPFVM();
-                    
+
                     //empVM = _dalemp.ViewSelectAllEmployee(item["EmpCode"].ToString(), null, null, null, null, null, null, currConn, transaction).FirstOrDefault();
 
                     string empCode = item["EmpCode"].ToString();
@@ -1884,7 +1883,7 @@ SELECT
                     #region Get Employee id
 
                     sqlText = "  ";
-                    
+
                     sqlText += " SELECT EmployeeId from ViewEmployeeInformation ";
                     sqlText += " WHERE Code=@Code";
 
@@ -1895,20 +1894,20 @@ SELECT
                     var getId = cmdExist.ExecuteScalar();
                     string empId = getId.ToString();
 
-                   
+
                     #endregion Exist
 
 
                     if (string.IsNullOrWhiteSpace(empId))
                     {
-                        throw new ArgumentNullException("","Employee Code " + item["EmpCode"].ToString() + " Not in System");
+                        throw new ArgumentNullException("", "Employee Code " + item["EmpCode"].ToString() + " Not in System");
                     }
                     else
                     {
 
                         if (!Ordinary.IsNumeric(item["OpeningValue"].ToString()))
                         {
-                            throw new ArgumentNullException("","Please input the Numeric Value in OpeningValue");
+                            throw new ArgumentNullException("", "Please input the Numeric Value in OpeningValue");
                         }
                         else
                         {
@@ -1924,7 +1923,7 @@ SELECT
                             cmdExist.Parameters.AddWithValue("@EmployeeId", empId);
 
                             var PFId = cmdExist.ExecuteScalar();
-                            string PFOprningId ="";
+                            string PFOprningId = "";
 
                             if (PFId != null)
                             {
@@ -1937,7 +1936,7 @@ SELECT
                             {
 
                                 #region Value assign
-                                
+
                                 vm.Id = PFOprningId;
                                 vm.EmployeeId = empId;
                                 vm.EmployeeContribution = Convert.ToDecimal(item["EmployeeContribution"]);
@@ -2005,10 +2004,10 @@ SELECT
 
                             }
 
-                        
-                            
+
+
                         }
-                       
+
                     }
                 }
 

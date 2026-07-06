@@ -28,7 +28,7 @@ namespace SymServices.PF
         /// </summary>
         /// <param name="empid">Optional employee ID to filter the provident fund records.</param>
         /// <returns>A list of EmployeePFOpeinigVM instances containing provident fund and employee information.</returns>
-        public List<EmployeePFOpeinigVM> SelectAll(string branchId, string empid = null)
+        public List<EmployeePFOpeinigVM> SelectAll(string BranchId, string empid = null)
         {
 
             #region Variables
@@ -49,7 +49,7 @@ namespace SymServices.PF
                 }
 
                 #endregion open connection and transaction
-                            
+
                 #region sql statement
 
                 #region sqlText
@@ -57,7 +57,8 @@ namespace SymServices.PF
 
                 sqlText = @"
 SELECT
- pfo.EmployeeId
+pfo.Id
+,pfo.EmployeeId
 ,e.EmpName
 ,e.Code
 ,e.Designation
@@ -82,15 +83,18 @@ From EmployeePFOpeinig pfo
 
 ";
                 sqlText += " left outer join ViewEmployeeInformation e on pfo.EmployeeId=e.EmployeeId";
-                sqlText += " Where 1=1 and  pfo.IsArchive=0 and  pfo.IsActive=1 and pfo.BranchId = @BranchId";
+                sqlText += " Where 1=1 and  pfo.IsArchive=0 and  pfo.IsActive=1";
 
                 #endregion
 
                 if (!string.IsNullOrEmpty(empid))
                 {
-                    sqlText += @" and pfo.EmployeeId=@EmployeeId ";
+                    sqlText += @" and pfo.EmployeeId=@EmployeeId";
                 }
-
+                if (!string.IsNullOrEmpty(BranchId))
+                {
+                    sqlText += @" and e.BranchId=@BranchId";
+                }
 
                 sqlText += @" ORDER BY pfo.EmployeeId";
 
@@ -103,12 +107,18 @@ From EmployeePFOpeinig pfo
                 {
                     objComm.Parameters.AddWithValue("@EmployeeId", empid);
                 }
-                objComm.Parameters.AddWithValue("@BranchId", branchId);
+                if (!string.IsNullOrEmpty(BranchId))
+                {
+
+                    objComm.Parameters.AddWithValue("@BranchId", BranchId);
+                }
+
                 SqlDataReader dr;
                 dr = objComm.ExecuteReader();
                 while (dr.Read())
                 {
                     vm = new EmployeePFOpeinigVM();
+                    vm.Id = dr["Id"].ToString();
                     vm.EmployeeId = dr["EmployeeId"].ToString();
                     vm.EmployeeContribution = Convert.ToDecimal(dr["EmployeeContribution"]);
                     vm.EmployerContribution = Convert.ToDecimal(dr["EmployerContribution"]);
@@ -133,7 +143,7 @@ From EmployeePFOpeinig pfo
                     vm.Project = dr["Project"].ToString();
                     vm.GrossSalary = Convert.ToDecimal(dr["GrossSalary"]);
                     vm.BasicSalary = Convert.ToDecimal(dr["BasicSalary"]);
-                    vm.BranchId = branchId;
+
                     vms.Add(vm);
                 }
                 dr.Close();
@@ -197,7 +207,7 @@ From EmployeePFOpeinig pfo
 
                 #endregion open connection and transaction
 
-                
+
 
                 #region sql statement
 
@@ -344,7 +354,7 @@ From EmployeeForFeiture_New pfo
 
                 #endregion open connection and transaction
 
-                
+
 
                 #region sql statement
 
@@ -496,7 +506,7 @@ From EmployeeForFeiture_New pfo
 
                 #endregion open connection and transaction
 
-                
+
 
                 #region sql statement
 
@@ -639,7 +649,7 @@ From EmployeePFOpeinig pfo
 
                 #endregion open connection and transaction
 
-                
+
 
                 #region sql statement
 
@@ -792,7 +802,7 @@ From EmployeeForFeiture_New pfo
 
                 #endregion open connection and transaction
 
-                
+
 
                 #region sql statement
 
@@ -1004,7 +1014,6 @@ From EmployeePFOpeinig pfo
                 cmdExist.Transaction = transaction;
                 cmdExist.Parameters.AddWithValue("@OpeningDate", Ordinary.DateToString(vm.OpeningDate));
                 cmdExist.Parameters.AddWithValue("@EmployeeId", vm.EmployeeId);
-                
 
                 var exeRes = cmdExist.ExecuteScalar();
 
@@ -1042,7 +1051,6 @@ From EmployeePFOpeinig pfo
 ,CreatedBy
 ,CreatedAt
 ,CreatedFrom
-,BranchId
 ) VALUES (
   @Id
 , @EmployeeId
@@ -1058,16 +1066,15 @@ From EmployeePFOpeinig pfo
 , @CreatedBy
 , @CreatedAt
 , @CreatedFrom
-, @BranchId
 ) ";
                     SqlCommand cmdInsert = new SqlCommand(sqlText, currConn);
 
                     cmdInsert.Parameters.AddWithValue("@Id", vm.Id);
                     cmdInsert.Parameters.AddWithValue("@EmployeeId", vm.EmployeeId);
-                    cmdInsert.Parameters.AddWithValue("@EmployeeContribution", vm.EmployeeContribution);
-                    cmdInsert.Parameters.AddWithValue("@EmployerContribution", vm.EmployerContribution);
-                    cmdInsert.Parameters.AddWithValue("@EmployeeProfit", vm.EmployeeProfit);
-                    cmdInsert.Parameters.AddWithValue("@EmployerProfit", vm.EmployerProfit);
+                    cmdInsert.Parameters.AddWithValue("@EmployeeContribution", vm.EmployeeContribution.HasValue ? (object)vm.EmployeeContribution.Value : DBNull.Value);
+                    cmdInsert.Parameters.AddWithValue("@EmployerContribution", vm.EmployerContribution.HasValue ? (object)vm.EmployerContribution.Value : DBNull.Value);
+                    cmdInsert.Parameters.AddWithValue("@EmployeeProfit", vm.EmployeeProfit.HasValue ? (object)vm.EmployeeProfit.Value : DBNull.Value);
+                    cmdInsert.Parameters.AddWithValue("@EmployerProfit", vm.EmployerProfit.HasValue ? (object)vm.EmployerProfit.Value : DBNull.Value);
                     cmdInsert.Parameters.AddWithValue("@OpeningDate", Ordinary.DateToString(vm.OpeningDate));
                     cmdInsert.Parameters.AddWithValue("@Post", false);
                     cmdInsert.Parameters.AddWithValue("@Remarks", vm.Remarks ?? Convert.DBNull);
@@ -1076,7 +1083,6 @@ From EmployeePFOpeinig pfo
                     cmdInsert.Parameters.AddWithValue("@CreatedBy", vm.CreatedBy);
                     cmdInsert.Parameters.AddWithValue("@CreatedAt", vm.CreatedAt);
                     cmdInsert.Parameters.AddWithValue("@CreatedFrom", vm.CreatedFrom);
-                    cmdInsert.Parameters.AddWithValue("@BranchId", vm.BranchId);
 
                     cmdInsert.Transaction = transaction;
                     cmdInsert.ExecuteNonQuery();
@@ -1271,10 +1277,10 @@ From EmployeePFOpeinig pfo
 
                     SqlCommand cmdUpdate = new SqlCommand(sqlText, currConn);
                     cmdUpdate.Parameters.AddWithValue("@Id", vm.Id);
-                    cmdUpdate.Parameters.AddWithValue("@EmployeeContribution", vm.EmployeeContribution);
-                    cmdUpdate.Parameters.AddWithValue("@EmployerContribution", vm.EmployerContribution);
-                    cmdUpdate.Parameters.AddWithValue("@EmployeeProfit", vm.EmployeeProfit);
-                    cmdUpdate.Parameters.AddWithValue("@EmployerProfit", vm.EmployerProfit);
+                    cmdUpdate.Parameters.AddWithValue("@EmployeeContribution", vm.EmployeeContribution.HasValue ? (object)vm.EmployeeContribution.Value : DBNull.Value);
+                    cmdUpdate.Parameters.AddWithValue("@EmployerContribution", vm.EmployerContribution.HasValue ? (object)vm.EmployerContribution.Value : DBNull.Value);
+                    cmdUpdate.Parameters.AddWithValue("@EmployeeProfit", vm.EmployeeProfit.HasValue ? (object)vm.EmployeeProfit.Value : DBNull.Value);
+                    cmdUpdate.Parameters.AddWithValue("@EmployerProfit", vm.EmployerProfit.HasValue ? (object)vm.EmployerProfit.Value : DBNull.Value);
                     cmdUpdate.Parameters.AddWithValue("@OpeningDate", Ordinary.DateToString(vm.OpeningDate));
                     cmdUpdate.Parameters.AddWithValue("@Remarks", vm.Remarks ?? Convert.DBNull);
                     cmdUpdate.Parameters.AddWithValue("@LastUpdateBy", vm.LastUpdateBy);
@@ -1749,7 +1755,7 @@ From EmployeePFOpeinig pfo
                 #region DataRead From DB
 
 
-                
+
 
                 #region open connection and transaction
 
@@ -1880,7 +1886,7 @@ from ViewEmployeeInformation where 1=1
 
                 #region DataRead From DB
 
-                
+
 
                 #region open connection and transaction
 
@@ -1909,7 +1915,6 @@ SELECT
 ,ISNULL(EmployeeProfit,0) EmployeeProfit
 ,ISNULL(EmployerProfit,0) EmployerProfit
 ,OpeningDate
-,pfo.Remarks
 
   FROM EmployeePFOpeinig pfo
 
@@ -2035,7 +2040,7 @@ SELECT
             #region try
             try
             {
-                
+
 
                 DataSet ds = new DataSet();
 
@@ -2057,7 +2062,7 @@ SELECT
                 ds = reader.AsDataSet();
                 dt = ds.Tables[0];
                 reader.Close();
-               // dt = ds.Tables[0].Select("empCode <>''").CopyToDataTable();
+                // dt = ds.Tables[0].Select("empCode <>''").CopyToDataTable();
 
                 #endregion
 

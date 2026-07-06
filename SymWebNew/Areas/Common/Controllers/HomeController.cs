@@ -20,40 +20,63 @@ namespace SymWebUI.Areas.Common.Controllers
         //GET: /Common/Home/    
 
 
+        //public ActionResult Index()
+        //{
+        //    AdminInfoDashboardVM vm = new AdminInfoDashboardVM();         
+        //    PfInfoDashboardVM vmPf = new PfInfoDashboardVM();  
+         
+        //    HomePageInfoDashboardRepo _Repo = new HomePageInfoDashboardRepo();
+        //    BranchRepo BranchRepo = new BranchRepo();
+        //    int BranchId = Convert.ToInt32(Session["BranchId"].ToString());
+        //    BranchVM branch = BranchRepo.SelectById(Convert.ToInt32(BranchId));
+        //    Session["BranchId"] = branch.Id;
+
+        //    vm.BranchVM = branch;
+        //    vmPf = _Repo.GetPfInfoDashboard();
+        //    vm.PfInfoDashboardVMS = vmPf;
+        //    Session["BranchName"] = vm.BranchVM.Name;
+                              
+        //    return View("Index", vm);
+        //}
+
         public ActionResult Index()
         {
-            AdminInfoDashboardVM vm = new AdminInfoDashboardVM();         
-            PfInfoDashboardVM vmPf = new PfInfoDashboardVM();  
-         
+            AdminInfoDashboardVM vm = new AdminInfoDashboardVM();
+            PfInfoDashboardVM vmPf = new PfInfoDashboardVM();
+
             HomePageInfoDashboardRepo _Repo = new HomePageInfoDashboardRepo();
             BranchRepo BranchRepo = new BranchRepo();
+
             int BranchId = Convert.ToInt32(Session["BranchId"].ToString());
-            BranchVM branch = BranchRepo.SelectById(Convert.ToInt32(BranchId));
+            BranchVM branch = BranchRepo.SelectById(BranchId);
             Session["BranchId"] = branch.Id;
 
             vm.BranchVM = branch;
-            vmPf = _Repo.GetPfInfoDashboard();
+
+            // Pass the BranchId token into your repo call here:
+            vmPf = _Repo.GetPfInfoDashboard(BranchId);
+
             vm.PfInfoDashboardVMS = vmPf;
             Session["BranchName"] = vm.BranchVM.Name;
-                              
+
             return View("Index", vm);
         }
 
-        public ActionResult PFInfo()
-        {
-            PfInfoDashboardVM vmPf = new PfInfoDashboardVM();
-            HomePageInfoDashboardRepo _Repo = new HomePageInfoDashboardRepo();
+        //public ActionResult PFInfo()
+        //{
+        //    PfInfoDashboardVM vmPf = new PfInfoDashboardVM();
+        //    HomePageInfoDashboardRepo _Repo = new HomePageInfoDashboardRepo();
 
-            vmPf = _Repo.GetPfInfoDashboard();
+        //    vmPf = _Repo.GetPfInfoDashboard();
 
-            var ch = new chartPF
-            {
-                TotalPerson = vmPf.TotalPerson,
-                PFValue = vmPf.PFValue,
-            };
+        //    var ch = new chartPF
+        //    {
+        //        TotalPerson = vmPf.TotalPerson,
+        //        PFValue = vmPf.PFValue,
+        //    };
 
-            return Json(ch, JsonRequestBehavior.AllowGet);
-        }
+        //    return Json(ch, JsonRequestBehavior.AllowGet);
+        //}
 
         public class chart
         {

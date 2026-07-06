@@ -109,6 +109,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 , c.Remarks.ToString()
                 , c.Post ? "Posted" : "Not Posted"
                 , c.IsApprove ? "Approve" : "Not Approve"
+                , c.IsDistribute ? "Distributed" : "Not Distributed"
 
             };
             return Json(new
@@ -538,7 +539,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 PFReport report = new PFReport();
 
 
-                string[] cFields = { "Code", "pdf.Id", "TransactionDate>", "TransactionDate<", "pdf.TransType"};
+                string[] cFields = { "pdf.Code", "pdf.Id", "pdf.TransactionDate>", "pdf.TransactionDate<", "pdf.TransType" };
                 string[] cValues = { vm.Code, vm.Id.ToString() == "0" ? "" : vm.Id.ToString(), Ordinary.DateToString(vm.DateFrom), Ordinary.DateToString(vm.DateTo), AreaTypePFVM.TransType };
 
                 ReportDocument doc = new ReportDocument();

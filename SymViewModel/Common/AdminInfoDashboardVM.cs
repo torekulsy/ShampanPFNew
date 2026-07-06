@@ -58,6 +58,15 @@ namespace SymViewModel.Common
         public decimal TotalPerson { get; set; }
         [Display(Name = "PF Value")]
         public decimal PFValue { get; set; }
+
+
+        //New----
+        public decimal TotalEmployee { get; set; }
+        public decimal TotalPF { get; set; }
+        public decimal LastMonthPF { get; set; }
+        public decimal LastMonthLoan { get; set; }
+        public decimal TotalInvestment { get; set; }
+        public decimal CashAtBank { get; set; }
     }
     public class GfInfoDashboardVM
     {

@@ -52,9 +52,9 @@ namespace SymWebUI.Areas.PF.Controllers
         /// <returns>View containing PF Settlement</returns>
         public ActionResult _index(JQueryDataTableParamModel param)
         {
-           
+            string BranchId = Session["BranchId"].ToString();
             #region Search and Filter Data
-            var getAllData = _repo.SelectAll();
+            var getAllData = _repo.SelectAll(BranchId);
             IEnumerable<PFSettlementVM> filteredData;
             if (!string.IsNullOrEmpty(param.sSearch))
             {
@@ -121,6 +121,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 , c.AlreadyPaidAmount.ToString()
                 , c.NetPayAmount.ToString()
                 , c.Post ? "Posted" : "Not Posted"
+                , c.IsJournal ? "Yes":"No"
      
             };
             return Json(new
@@ -154,10 +155,10 @@ namespace SymWebUI.Areas.PF.Controllers
         /// <returns>View containing Resign Employee</returns>
         public ActionResult _indexResignEmployee(JQueryDataTableParamModel param)
         {
-             #region Search and Filter Data
-           
+            #region Search and Filter Data
+
             PFSettlementRepo _repoPFSettlement = new PFSettlementRepo();
-           
+
 
             string[] conditionFields = { "ve.BranchId" };
             string[] conditionValues = { Session["BranchId"].ToString() };
@@ -211,6 +212,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 , c.Designation
                 , c.Department
                 , c.EmpResignDate
+                , c.Post ? "Posted" : "Not Posted"
      
             };
             return Json(new
@@ -227,6 +229,7 @@ namespace SymWebUI.Areas.PF.Controllers
         public ActionResult Create(PFSettlementVM vm)
         {
             Session["permission"] = _repoSUR.SymRoleSession(identity.UserId, "10003", "add").ToString();
+            vm.BranchId = Session["BranchId"].ToString();
 
             vm = _repo.PreInsert(vm);
 
@@ -266,7 +269,7 @@ namespace SymWebUI.Areas.PF.Controllers
                     Session["result"] = result[0] + "~" + result[1];
                     if (result[0].ToLower() == "success")
                     {
-                        return RedirectToAction("Edit", new { id = result[2] });
+                        return RedirectToAction("Index");
                     }
                     else
                     {
@@ -280,7 +283,7 @@ namespace SymWebUI.Areas.PF.Controllers
                     vm.LastUpdateFrom = identity.WorkStationIP;
                     result = _repo.Update(vm);
                     Session["result"] = result[0] + "~" + result[1];
-                    return RedirectToAction("Edit", new { id = result[2] });
+                    return RedirectToAction("Create", new { id = result[2] });
                 }
                 else
                 {
@@ -315,10 +318,11 @@ namespace SymWebUI.Areas.PF.Controllers
         {
             Session["permission"] = _repoSUR.SymRoleSession(identity.UserId, "10003", "edit").ToString();
             PFSettlementVM vm = new PFSettlementVM();
-            vm = _repo.SelectAll(Convert.ToInt32(id)).FirstOrDefault();
-            vm.detailVMs = _repoDetail.SelectByMasterId(Convert.ToInt32(id));
-
+            vm = _repo.SelectAll("", Convert.ToInt32(id)).FirstOrDefault();
+            // vm.detailVMs = _repoDetail.SelectByMasterId(Convert.ToInt32(id));
             vm.Operation = "update";
+
+
             return View("Create", vm);
         }
 
@@ -340,7 +344,7 @@ namespace SymWebUI.Areas.PF.Controllers
             string[] conditionFields = new string[5];
             string[] conditionValues = new string[5];
             string[] id = ids.Split('~');
-            var getAllData = _repo.SelectAll(Convert.ToInt32(id[0]), conditionFields, conditionValues);
+            var getAllData = _repo.SelectAll("", Convert.ToInt32(id[0]), conditionFields, conditionValues);
             if (getAllData != null && getAllData[0].Post == true)
             {
                 string[] resultdata = new string[6];
@@ -377,7 +381,7 @@ namespace SymWebUI.Areas.PF.Controllers
             Session["permission"] = _repoSUR.SymRoleSession(identity.UserId, "10010", "edit").ToString();
 
             PFSettlementVM vm = new PFSettlementVM();
-            vm = _repo.SelectAll(Convert.ToInt32(id)).FirstOrDefault();
+            vm = _repo.SelectAll("", Convert.ToInt32(id)).FirstOrDefault();
 
             return Json(vm, JsonRequestBehavior.AllowGet);
         }
@@ -444,7 +448,7 @@ namespace SymWebUI.Areas.PF.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        public ActionResult JournalEntry(string Code, int Id)
+        public ActionResult JournalEntry(string Code)
         {
             string[] result = new string[6];
 
@@ -464,18 +468,18 @@ namespace SymWebUI.Areas.PF.Controllers
                 BranchId = BranchId
             };
 
-            result = _repo.InsertAutoJournal("1", "4", Code, Id, BranchId, vm);
+            result = _repo.InsertAutoJournal("1", "4", Code, BranchId, vm);
 
             Session["result"] = result[0] + "~" + result[1];
 
             return View("~/Areas/PF/Views/PFSettlement/Index.cshtml");
         }
-   
+
         private FileStreamResult RenderReportAsPDF(ReportDocument rptDoc)
         {
             Stream stream = rptDoc.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
             return File(stream, "application/PDF");
         }
-    
+
     }
 }

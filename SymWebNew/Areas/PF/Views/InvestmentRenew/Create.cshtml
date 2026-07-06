@@ -105,14 +105,7 @@
                 </div>
 
 
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
-                    <div class="editor-label">
-                        @Html.LabelFor(model => model.InvestmentVm.InvestmentDate)
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.InvestmentVm.InvestmentDate, new { @placeholder = "InvestmentDate", @class = "   form-control", @autocomplete = "off", @readonly = "readonly" })
-                    </div>
-                </div>
+
 
 
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
@@ -229,7 +222,7 @@
 
     <div class="thinbox">
         <div class="th_thinbox">
-            <p> Renew/Encashment</p>
+            <p>@(Model.IsEncashed ? "Encashment" : "Renew")</p>
         </div>
         <div class="InvestmentRenew card-body">
             <div class="row">
@@ -287,15 +280,7 @@
 
 
 
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
-                    <div class="editor-label">
-                        <label>Renew/ Encashment Date</label>
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.InvestmentDate, new { @placeholder = "InvestmentDate", @class = " customDatePicker required form-control", @autocomplete = "off" })
-                        @Html.ValidationMessageFor(model => model.InvestmentDate)
-                    </div>
-                </div>
+
                 @if (Model.IsEncashed == false)
                 {
                     <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
@@ -312,7 +297,7 @@
                             @Html.LabelFor(model => model.ToDate)
                         </div>
                         <div class="editor-field">
-                            @Html.TextBoxFor(model => model.ToDate, new { @onchange = "DateChange(this);", @placeholder = "To Date", @class = "customDatePicker  required  form-control" })
+                            @Html.TextBoxFor(model => model.ToDate, new { @onchange = "DateChange(this);", @placeholder = "To Date", @class = "customDatePicker noBeforeDate required  form-control" })
                             @Html.ValidationMessageFor(model => model.ToDate)
                         </div>
                     </div>
@@ -321,7 +306,7 @@
                             @Html.LabelFor(model => model.MaturityDate)
                         </div>
                         <div class="editor-field">
-                            @Html.TextBoxFor(model => model.MaturityDate, new { @placeholder = "Maturity Date", @class = " customDatePicker  required   form-control" })
+                            @Html.TextBoxFor(model => model.MaturityDate, new { @placeholder = "Maturity Date", @class = " customDatePicker noBeforeDate required   form-control" })
                             @Html.ValidationMessageFor(model => model.MaturityDate)
                         </div>
                     </div>
@@ -334,8 +319,36 @@
                             @Html.ValidationMessageFor(model => model.InvestmentMonth)
                         </div>
                     </div>
+                    
+  
                 }
-
+                
+                @if (Model.IsEncashed == false)
+                { 
+                  <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">
+                        <label>@(Model.IsEncashed ? "Encashment Date" : "Renew Date")</label>
+                   
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.InvestmentDate, new { @placeholder = "Date", @class = " customDatePicker noBeforeDate required form-control", @autocomplete = "off" })
+                        @Html.ValidationMessageFor(model => model.InvestmentDate)
+                    </div>
+                </div>
+                }
+                else { 
+                   <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">
+                        <label>@(Model.IsEncashed ? "Encashment Date" : "Renew Date")</label>
+                   
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.InvestmentDate, new { @placeholder = "Date", @class = " customDatePicker  required form-control", @autocomplete = "off" })
+                        @Html.ValidationMessageFor(model => model.InvestmentDate)
+                    </div>
+                </div>
+                }
+               
 
                 @if (Model.IsEncashed == false)
                 {
@@ -416,7 +429,7 @@
                         @Html.LabelFor(model => model.InvestmentValue)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.InvestmentValue, new { @placeholder = "InvestmentRenew Value", @class = " cInvestmentValue  required NumberCheck form-control", @readonly = "readonly" })
+                        @Html.TextBoxFor(model => model.InvestmentValue, new { @placeholder = "Investment Value", @class = " cInvestmentValue  required NumberCheck form-control", @readonly = "readonly" })
                         @Html.ValidationMessageFor(model => model.InvestmentValue)
                     </div>
                 </div>

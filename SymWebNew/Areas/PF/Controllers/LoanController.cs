@@ -34,17 +34,17 @@ namespace SymWebUI.Areas.PF.Controllers
     {
         //
         // GET: /HRM/Loan/
-				SymUserRoleRepo _reposur = new SymUserRoleRepo();
-				ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
+        SymUserRoleRepo _reposur = new SymUserRoleRepo();
+        ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
         public ActionResult Index(string id)
         {
-               var permission= _reposur.SymRoleSession(identity.UserId, "1_51", "index").ToString();
-               Session["permission"] = permission;
-               if (permission=="False")
-               {
-                   return Redirect("/Payroll/Home");
-               }
-           
+            var permission = _reposur.SymRoleSession(identity.UserId, "1_51", "index").ToString();
+            Session["permission"] = permission;
+            if (permission == "False")
+            {
+                return Redirect("/Payroll/Home");
+            }
+
             if (!(identity.IsAdmin || identity.IsPayroll))
             {
                 id = identity.EmployeeId;
@@ -52,18 +52,18 @@ namespace SymWebUI.Areas.PF.Controllers
             EmployeeInfoRepo _infoRepo = new EmployeeInfoRepo();
             EmployeeInfoVM empVm = _infoRepo.SelectById(id);
             empVm.Id = id;
-        
+
             return View(empVm);
         }
-       
+
         public ActionResult AllLoan()
         {
-               var permission= _reposur.SymRoleSession(identity.UserId, "1_51", "index").ToString();
-               Session["permission"] = permission;
-               if (permission=="False")
-               {
-                   return Redirect("/PF/Home");
-               }
+            var permission = _reposur.SymRoleSession(identity.UserId, "1_51", "index").ToString();
+            Session["permission"] = permission;
+            if (permission == "False")
+            {
+                return Redirect("/PF/Home");
+            }
             return View();
         }
 
@@ -87,7 +87,8 @@ namespace SymWebUI.Areas.PF.Controllers
             var totalAmountFilter = Convert.ToString(Request["sSearch_6"]);
             var startDateFilter = Convert.ToString(Request["sSearch_7"]);
             var PrincipalAmountFilter = Convert.ToString(Request["sSearch_8"]);
-            var InterestAmountFilter = Convert.ToString(Request["sSearch_9"]);          
+            var InterestAmountFilter = Convert.ToString(Request["sSearch_9"]);
+            var IsApproved = Convert.ToString(Request["sSearch_10"]);
             DateTime fromDate = DateTime.MinValue;
             DateTime toDate = DateTime.MaxValue;
             if (startDateFilter.Contains('~'))
@@ -128,6 +129,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 var isSearchable7 = Convert.ToBoolean(Request["bSearchable_7"]);
                 var isSearchable8 = Convert.ToBoolean(Request["bSearchable_8"]);
                 var isSearchable9 = Convert.ToBoolean(Request["bSearchable_9"]);
+                var isSearchable10 = Convert.ToBoolean(Request["bSearchable_10"]);
                 filteredData = getAllData
                    .Where(c =>
                           isSearchable1 && c.Code.ToLower().Contains(param.sSearch.ToLower())
@@ -139,6 +141,7 @@ namespace SymWebUI.Areas.PF.Controllers
                        || isSearchable7 && c.PrincipalAmount.ToString().ToLower().Contains(param.sSearch.ToLower())
                        || isSearchable8 && c.InterestAmount.ToString().ToLower().Contains(param.sSearch.ToLower())
                        || isSearchable9 && c.TotalAmount.ToString().ToLower().Contains(param.sSearch.ToLower())
+                       || isSearchable10 && c.IsApproved.ToString().ToLower().Contains(param.sSearch.ToLower())
                     );
             }
             else
@@ -147,7 +150,7 @@ namespace SymWebUI.Areas.PF.Controllers
             }
             #endregion Search and Filter Data
             #region Column Filtering
-            if (codeFilter != "" || empNameFilter != "" || departmentFilter != "" || designationFilter != "" || loanTypeFilter != "" || (totalAmountFilter != "" && totalAmountFilter != "~") || (startDateFilter != "" && startDateFilter != "~"))
+            if (codeFilter != "" || empNameFilter != "" || departmentFilter != "" || designationFilter != "" || loanTypeFilter != "" || (totalAmountFilter != "" && totalAmountFilter != "~") || (startDateFilter != "" && startDateFilter != "~") || IsApproved != "")
             {
                 filteredData = filteredData
                                 .Where(c =>
@@ -168,6 +171,8 @@ namespace SymWebUI.Areas.PF.Controllers
                                     (amountFrom == 0 || amountFrom <= Convert.ToInt32(c.TotalAmount))
                                     &&
                                     (amountTo == 0 || amountTo >= Convert.ToInt32(c.TotalAmount))
+                                     &&
+                                    (IsApproved == "" || c.IsApproved)
                                 );
             }
             #endregion Column Filtering
@@ -180,6 +185,7 @@ namespace SymWebUI.Areas.PF.Controllers
             var isSortable_7 = Convert.ToBoolean(Request["bSortable_7"]);
             var isSortable_8 = Convert.ToBoolean(Request["bSortable_8"]);
             var isSortable_9 = Convert.ToBoolean(Request["bSortable_9"]);
+            var isSortable_10 = Convert.ToBoolean(Request["bSortable_10"]);
             var sortColumnIndex = Convert.ToInt32(Request["iSortCol_0"]);
             Func<EmployeeLoanVM, string> orderingFunction = (c =>
                 sortColumnIndex == 1 && isSortable_1 ? c.Code :
@@ -191,23 +197,29 @@ namespace SymWebUI.Areas.PF.Controllers
                 sortColumnIndex == 7 && isSortable_7 ? c.PrincipalAmount.ToString() :
                 sortColumnIndex == 8 && isSortable_8 ? c.InterestAmount.ToString() :
                 sortColumnIndex == 9 && isSortable_9 ? c.TotalAmount.ToString() :
+                sortColumnIndex == 10 && isSortable_10 ? c.IsApproved.ToString() :
                 "");
             var sortDirection = Request["sSortDir_0"]; // asc or desc
             if (sortDirection == "asc")
                 filteredData = filteredData.OrderBy(orderingFunction);
             else
                 filteredData = filteredData.OrderByDescending(orderingFunction);
-            var displayedCompanies = filteredData.Skip(param.iDisplayStart).Take(param.iDisplayLength);           
-            var result = from c in displayedCompanies select new[] { 
+            var displayedCompanies = filteredData.Skip(param.iDisplayStart).Take(param.iDisplayLength);
+            var result = from c in displayedCompanies
+                         select new[] { 
                Convert.ToString(c.Id) 
                 , c.Code //+ "~" + Convert.ToString(c.Id) 
                 , c.EmpName 
                 , c.Department 
-                , c.Designation , c.LoanType// + "~" + Convert.ToString(c.Id)
+                , c.Designation  
+                , c.LoanType// + "~" + Convert.ToString(c.Id)
                 , c.PrincipalAmount.ToString()
                 , c.InterestAmount.ToString()
                 , c.TotalAmount.ToString()
+                , c.IsEarlySellte ? "Yes" : "No"
                 , c.StartDate
+                , c.IsApproved ? "Approved" : "Not Approved"
+               
                 //, c.Remarks 
             };
             return Json(new
@@ -221,13 +233,13 @@ namespace SymWebUI.Areas.PF.Controllers
         }
         [HttpGet]
         public ActionResult Create(string employeeId)
-        {          
+        {
             var permission = _reposur.SymRoleSession(identity.UserId, "1_51", "add").ToString();
             Session["permission"] = permission;
             if (permission == "False")
             {
                 return Redirect("/Payroll/Home");
-            }              
+            }
             EmployeeLoanVM vm = new EmployeeLoanVM();
             EmployeeVM emp = new EmployeeInfoRepo().EmployeeInfo(employeeId);
             vm.EmployeeId = employeeId;
@@ -264,7 +276,7 @@ namespace SymWebUI.Areas.PF.Controllers
             {
                 SettingRepo sRepo = new SettingRepo();
                 bool FromSetting = Convert.ToBoolean(sRepo.settingValue("PFLoanRate", "FromSetting") == "Y" ? true : false);
-                int Upto12Month = Convert.ToInt32(sRepo.settingValue("PFLoanRate", "Upto12Month"));              
+                int Upto12Month = Convert.ToInt32(sRepo.settingValue("PFLoanRate", "Upto12Month"));
                 int GetterThen12Month = Convert.ToInt32(sRepo.settingValue("PFLoanRate", "GetterThen12Month"));
 
                 vm.CreatedAt = DateTime.Now.ToString("yyyyMMddHHmmss");
@@ -273,22 +285,22 @@ namespace SymWebUI.Areas.PF.Controllers
                 vm.BranchId = identity.BranchId.ToString();
                 vm.BranchId = Session["BranchId"].ToString();
                 vm.IsHold = false;
-                decimal cPAmount = vm.PrincipalAmount;
+                decimal cPAmount = vm.PrincipalAmount.Value;
                 decimal dPAmount = 0;
                 decimal dIAmount = 0;
                 decimal dTAmount = 0;
                 int iLoop = 1;
 
                 var fractionValue = "0";
-            
-                List<MonthCalculation> monthCalculations = Ordinary.MonthCalculation(Ordinary.DateToString(vm.StartDate), vm.NumberOfInstallment);
+
+                List<MonthCalculation> monthCalculations = Ordinary.MonthCalculation(Ordinary.DateToString(vm.StartDate), vm.NumberOfInstallment.Value);
                 List<EmployeeLoanDetailVM> loanDetails = new List<EmployeeLoanDetailVM>();
                 EmployeeLoanDetailVM loanDetail;
 
                 var amount = vm.PrincipalAmount / vm.NumberOfInstallment;
                 var actualValue = amount.ToString().Split('.')[0];
 
-                if (amount == Math.Round(amount))
+                if (amount == Math.Round(amount.Value))
                 {
                     fractionValue = "0";
                 }
@@ -301,7 +313,7 @@ namespace SymWebUI.Areas.PF.Controllers
 
                 #region  Reduce policy
                 double annualInterestRate = Convert.ToDouble(vm.InterestRate / 100); // Annual interest rate (10%)
-                int loanTermMonths = vm.NumberOfInstallment; // Loan term in months
+                int loanTermMonths = vm.NumberOfInstallment.Value; // Loan term in months
                 // Calculate monthly interest rate
 
                 double monthlyInterestRate = annualInterestRate / 12;
@@ -319,7 +331,7 @@ namespace SymWebUI.Areas.PF.Controllers
 
                     if (vm.InterestPolicy == "Reduce")
                     {
-                        
+
                         double NewPrincipleAmount = Math.Round(PrincipleAmount);
 
                         double InterestAmount = Math.Round(NewPrincipleAmount * annualInterestRate / 12);
@@ -343,8 +355,8 @@ namespace SymWebUI.Areas.PF.Controllers
                     }
                     else
                     {
-                        dPAmount = vm.PrincipalAmount / vm.NumberOfInstallment;
-                        dIAmount = vm.InterestAmount / vm.NumberOfInstallment;
+                        dPAmount = vm.PrincipalAmount.Value / vm.NumberOfInstallment.Value;
+                        dIAmount = vm.InterestAmount.Value / vm.NumberOfInstallment.Value;
                         dTAmount = dPAmount + dIAmount;
                     }
 
@@ -352,12 +364,12 @@ namespace SymWebUI.Areas.PF.Controllers
                     {
                         if (totalCount == i)
                         {
-                            dPAmount = vm.PrincipalAmount - (Convert.ToInt32(actualValue) * (vm.NumberOfInstallment - 1));
+                            dPAmount = vm.PrincipalAmount.Value - (Convert.ToInt32(actualValue) * (vm.NumberOfInstallment.Value - 1));
 
                             dIAmount = Convert.ToDecimal(dIAmount);
                             var val = dIAmount.ToString().Split('.')[0];
 
-                            dIAmount = Convert.ToInt32(vm.InterestAmount) - (Convert.ToInt32(val) * (vm.NumberOfInstallment - 1));
+                            dIAmount = Convert.ToInt32(vm.InterestAmount.Value) - (Convert.ToInt32(val) * (vm.NumberOfInstallment.Value - 1));
                         }
                         else
                         {
@@ -381,7 +393,7 @@ namespace SymWebUI.Areas.PF.Controllers
                     loanDetails.Add(loanDetail);
                     vm.EndDate = monthCalculations[i].StartDate;
                 }
-                
+
                 vm.employeeLoanDetails = loanDetails;
 
                 result = new EmployeeLoanRepo().EmployeeLoanInsert(vm);
@@ -584,11 +596,11 @@ namespace SymWebUI.Areas.PF.Controllers
                 vm.CreatedFrom = identity.WorkStationIP;
                 vm.BranchId = identity.BranchId;
                 vm.IsHold = false;
-                decimal cPAmount = vm.PrincipalAmount;
+                decimal cPAmount = vm.PrincipalAmount.Value;
                 decimal dPAmount = 0;
                 decimal dIAmount = 0;
                 decimal dTAmount = 0;
-                List<MonthCalculation> monthCalculations = Ordinary.MonthCalculation(Ordinary.DateToString(vm.StartDate), vm.NumberOfInstallment);
+                List<MonthCalculation> monthCalculations = Ordinary.MonthCalculation(Ordinary.DateToString(vm.StartDate), vm.NumberOfInstallment.Value);
                 List<EmployeeLoanDetailVM> loanDetails = new List<EmployeeLoanDetailVM>();
                 EmployeeLoanDetailVM loanDetail;
 
@@ -613,7 +625,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 for (int i = 0; i < monthCalculations.Count; i++)
                 {
                     if (vm.InterestPolicy == "Reduce")
-                    {                      
+                    {
                         double NewPrincipleAmount = Math.Round(PrincipleAmount);
 
                         double InterestAmount = Math.Round(NewPrincipleAmount * annualInterestRate / 12);
@@ -637,20 +649,20 @@ namespace SymWebUI.Areas.PF.Controllers
                     }
                     else
                     {
-                        dPAmount = vm.PrincipalAmount / vm.NumberOfInstallment;
-                        dIAmount = vm.InterestAmount / vm.NumberOfInstallment;
+                        dPAmount = vm.PrincipalAmount.Value / vm.NumberOfInstallment.Value;
+                        dIAmount = vm.InterestAmount.Value / vm.NumberOfInstallment.Value;
                         dTAmount = dPAmount + dIAmount;
                     }
                     if (vm.InterestPolicy != "Reduce")
                     {
                         if (totalCount == i)
                         {
-                            dPAmount = vm.PrincipalAmount - (Convert.ToInt32(actualValue) * (vm.NumberOfInstallment - 1));
+                            dPAmount = vm.PrincipalAmount.Value - (Convert.ToInt32(actualValue) * (vm.NumberOfInstallment.Value - 1));
 
                             dIAmount = Convert.ToDecimal(dIAmount);
                             var val = dIAmount.ToString().Split('.')[0];
 
-                            dIAmount = Convert.ToInt32(vm.InterestAmount) - (Convert.ToInt32(val) * (vm.NumberOfInstallment - 1));
+                            dIAmount = Convert.ToInt32(vm.InterestAmount.Value) - (Convert.ToInt32(val) * (vm.NumberOfInstallment.Value - 1));
 
                         }
                         else
@@ -891,8 +903,8 @@ namespace SymWebUI.Areas.PF.Controllers
             string[] result = new string[6];
             result = loanRepo.EmployeeLoanUpdate2(loanDetail);
             return Json(result, JsonRequestBehavior.AllowGet);
-        }      
-     
+        }
+
         [HttpGet]
         public ActionResult UpdateSettelment(string loanId, decimal TotalDuePrincipalAmount, decimal TotalDueInterestAmount, string EarlySellteDate)
         {
@@ -978,11 +990,11 @@ namespace SymWebUI.Areas.PF.Controllers
                 vm.CreatedFrom = identity.WorkStationIP;
                 vm.BranchId = identity.BranchId;
                 vm.IsHold = false;
-                decimal cPAmount = vm.PrincipalAmount;
+                decimal cPAmount = vm.PrincipalAmount.Value;
                 decimal dPAmount = 0;
                 decimal dIAmount = 0;
                 decimal dTAmount = 0;
-                List<MonthCalculation> monthCalculations = Ordinary.MonthCalculation(Ordinary.DateToString(vm.StartDate), vm.NumberOfInstallment);
+                List<MonthCalculation> monthCalculations = Ordinary.MonthCalculation(Ordinary.DateToString(vm.StartDate), vm.NumberOfInstallment.Value);
                 List<EmployeeLoanDetailVM> loanDetails = new List<EmployeeLoanDetailVM>();
                 EmployeeLoanDetailVM loanDetail;
 
@@ -1008,7 +1020,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 {
                     if (vm.InterestPolicy == "Reduce")
                     {
-                       
+
                         double NewPrincipleAmount = Math.Round(PrincipleAmount);
 
                         double InterestAmount = Math.Round(NewPrincipleAmount * annualInterestRate / 12);
@@ -1032,20 +1044,20 @@ namespace SymWebUI.Areas.PF.Controllers
                     }
                     else
                     {
-                        dPAmount = vm.PrincipalAmount / vm.NumberOfInstallment;
-                        dIAmount = vm.InterestAmount / vm.NumberOfInstallment;
+                        dPAmount = vm.PrincipalAmount.Value / vm.NumberOfInstallment.Value;
+                        dIAmount = vm.InterestAmount.Value / vm.NumberOfInstallment.Value;
                         dTAmount = dPAmount + dIAmount;
                     }
                     if (vm.InterestPolicy != "Reduce")
                     {
                         if (totalCount == i)
                         {
-                            dPAmount = vm.PrincipalAmount - (Convert.ToInt32(actualValue) * (vm.NumberOfInstallment - 1));
+                            dPAmount = vm.PrincipalAmount.Value - (Convert.ToInt32(actualValue) * (vm.NumberOfInstallment.Value - 1));
 
                             dIAmount = Convert.ToDecimal(dIAmount);
                             var val = dIAmount.ToString().Split('.')[0];
 
-                            dIAmount = Convert.ToInt32(vm.InterestAmount) - (Convert.ToInt32(val) * (vm.NumberOfInstallment - 1));
+                            dIAmount = Convert.ToInt32(vm.InterestAmount.Value) - (Convert.ToInt32(val) * (vm.NumberOfInstallment.Value - 1));
 
                         }
                         else
@@ -1103,13 +1115,13 @@ namespace SymWebUI.Areas.PF.Controllers
         /// <param name="FromDate">The start date to filter loan data.</param>
         /// <param name="ToDate">The end date to filter loan data.</param>
         /// <returns>A PDF report of the loan schedule for members.</returns>
-        public ActionResult ScheduleofLoanMember(string ProjectId, string DepartmentId, string SectionId, string DesignationId, string CodeF, string CodeT, string view,string FromDate,string ToDate)
+        public ActionResult ScheduleofLoanMember(string ProjectId, string DepartmentId, string SectionId, string DesignationId, string CodeF, string CodeT, string view, string FromDate, string ToDate)
         {
             try
             {
                 var permission = _reposur.SymRoleSession(identity.UserId, "1_55", "report").ToString();
                 Session["permission"] = permission;
-                string BranchId = Session["BranchId"].ToString(); 
+                string BranchId = Session["BranchId"].ToString();
                 if (permission == "False")
                 {
                     return Redirect("/Payroll/Home");
@@ -1172,13 +1184,13 @@ namespace SymWebUI.Areas.PF.Controllers
                     DateTime date = DateTime.ParseExact(FromDate, "dd-MMM-yyyy", System.Globalization.CultureInfo.InvariantCulture);
                     string formattedDate = date.ToString("yyyyMMdd");
                     vFromDate = formattedDate;
-                  
+
                 }
                 if (ToDate != "0_0" && ToDate != "0" && ToDate != "" && ToDate != "null" && ToDate != null)
                 {
                     DateTime date = DateTime.ParseExact(ToDate, "dd-MMM-yyyy", System.Globalization.CultureInfo.InvariantCulture);
                     string formattedDate = date.ToString("yyyyMMdd");
-                    vToDate = formattedDate;                   
+                    vToDate = formattedDate;
                 }
                 ReportDocument doc = new ReportDocument();
                 EmployeeLoanRepo _repo = new EmployeeLoanRepo();
@@ -1209,14 +1221,14 @@ namespace SymWebUI.Areas.PF.Controllers
                 ReportHead = "There are no data to Preview for Schedule Loan Member";
                 if (getAllData.Count > 0)
                 {
-                    if(FromDate!="")
+                    if (FromDate != "")
                     {
                         ReportHead = "Schedule of Loan Member (Date of " + FromDate + " to " + ToDate + ")";
                     }
                     else
                     {
                         ReportHead = "Schedule of Loan Member";
-                    }                    
+                    }
                 }
                 table = new DataTable();
                 table = Ordinary.ListToDataTable(getAllData.ToList());
@@ -1236,7 +1248,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 doc.DataDefinition.FormulaFields["desigParam"].Text = "'" + desigParam + "'";
                 doc.DataDefinition.FormulaFields["codeFParam"].Text = "'" + codeFParam + "'";
                 doc.DataDefinition.FormulaFields["codeTParam"].Text = "'" + codeTParam + "'";
-                doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
+                //doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
                 //doc = new rptLoanStatement();
                 //doc.SetDataSource(ds);
                 var rpt = RenderReportAsPDF(doc);
@@ -1264,18 +1276,18 @@ namespace SymWebUI.Areas.PF.Controllers
         {
             try
             {
-            var permission = _reposur.SymRoleSession(identity.UserId, "1_55", "report").ToString();
-            Session["permission"] = permission;
-            string BranchId = Session["BranchId"].ToString();
-            if (permission == "False")
-            {
-                return Redirect("/Payroll/Home");
-            }
+                var permission = _reposur.SymRoleSession(identity.UserId, "1_55", "report").ToString();
+                Session["permission"] = permission;
+                string BranchId = Session["BranchId"].ToString();
+                if (permission == "False")
+                {
+                    return Redirect("/Payroll/Home");
+                }
                 //ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
-            if (string.IsNullOrWhiteSpace(view) || view == "Y")
+                if (string.IsNullOrWhiteSpace(view) || view == "Y")
                 {
                     return View();
-                }               
+                }
                 string vProjectId = "0_0";
                 string vDepartmentId = "0_0";
                 string vSectionId = "0_0";
@@ -1330,7 +1342,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 CompanyRepo _CompanyRepo = new CompanyRepo();
                 CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
 
-                List<EmployeeLoanDetailVM> getAllData = new List<EmployeeLoanDetailVM>();              
+                List<EmployeeLoanDetailVM> getAllData = new List<EmployeeLoanDetailVM>();
                 string rptLocation = "";
                 string ReportHead = "";
                 getAllData = _repo.SelectAllForReport(vProjectId, vDepartmentId, vSectionId, vDesignationId, vCodeF, vCodeT, BranchId);
@@ -1447,7 +1459,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 if (CodeT != "0_0" && CodeT != "0" && CodeT != "" && CodeT != "null" && CodeT != null)
                 {
                     vCodeT = CodeT;
-                    codeTParam = vCodeT;                   
+                    codeTParam = vCodeT;
                 }
 
                 ReportDocument doc = new ReportDocument();
@@ -1457,9 +1469,19 @@ namespace SymWebUI.Areas.PF.Controllers
                 List<EmployeeLoanDetailVM> getAllData = new List<EmployeeLoanDetailVM>();
                 string companyLogo = "";
                 string BranchId = Session["BranchId"].ToString();
+                string[] result = new string[6];
 
                 CompanyRepo _CompanyRepo = new CompanyRepo();
                 CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
+
+                if (DateFrom == null || DateFrom == "")
+                {
+                    DateFrom = "1900 Jan 01";
+                }
+                if (DateTo == null || DateTo == "")
+                {
+                    DateTo = DateTime.Now.ToString();
+                }
 
                 if (Rtype == "Summary")
                 {
@@ -1467,8 +1489,8 @@ namespace SymWebUI.Areas.PF.Controllers
                     string ToDate = (Convert.ToDateTime(DateTo.ToString())).ToString("yyyyMMdd");
 
 
-                    string[] cFields = { "PaymentScheduleDate>", "PaymentScheduleDate<", "BranchId" };
-                    string[] cValues = { FromDate, ToDate, codeFParam, codeTParam, BranchId };
+                    string[] cFields = { "PaymentScheduleDate>", "PaymentScheduleDate<" };
+                    string[] cValues = { codeFParam, codeTParam };
 
                     dt = _repo.GetSummeryLoanData(cFields, cValues);
 
@@ -1482,8 +1504,17 @@ namespace SymWebUI.Areas.PF.Controllers
                             startdatte = Convert.ToDateTime(DateFrom);
                             enddatte = Convert.ToDateTime(DateTo);
                         }
-                        ReportHead = "Loan Summary Report (" + startdatte.ToString("yyyy") + "-" + enddatte.ToString("yy") + ")";                       
+                        ReportHead = "Loan Summary Report (" + startdatte.ToString("yyyy") + "-" + enddatte.ToString("yy") + ")";
                     }
+                    else
+                    {
+                        result[0] = "Fail";
+                        result[1] = "No Data Found";
+                        Session["result"] = result[0] + "~" + result[1];
+
+                        return RedirectToAction("EmployeeLoanStatementReport", "Loan", new { view = "Y", area = "PF" });
+                    }
+
                     rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\rptAllLoanSummary.rpt";
 
                     doc.Load(rptLocation);
@@ -1495,7 +1526,7 @@ namespace SymWebUI.Areas.PF.Controllers
                     doc.DataDefinition.FormulaFields["Address"].Text = "'" + cvm.Address + "'";
                     doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
                     //doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
-                    
+
                 }
                 if (Rtype == "Individual")
                 {
@@ -1504,7 +1535,7 @@ namespace SymWebUI.Areas.PF.Controllers
 
                     string[] cFields = { "PaymentScheduleDate>", "PaymentScheduleDate<", "BranchId" };
                     string[] cValues = { FromDate, ToDate, codeFParam, codeTParam, BranchId };
-                    
+
                     dt = _repo.GetIndividualLoanData(cFields, cValues);
 
                     rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\rptLoanEGCB_Individual.rpt";
@@ -1520,6 +1551,14 @@ namespace SymWebUI.Areas.PF.Controllers
                         }
                         ReportHead = "Loan Individual Report (" + startdatte.ToString("yyyy") + "-" + enddatte.ToString("yy") + ")";
                     }
+                    else
+                    {
+                        result[0] = "Fail";
+                        result[1] = "No Data Found";
+                        Session["result"] = result[0] + "~" + result[1];
+
+                        return RedirectToAction("EmployeeLoanStatementReport", "Loan", new { view = "Y", area = "PF" });
+                    }
                     doc.Load(rptLocation);
                     doc.SetDataSource(dt);
                     companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
@@ -1531,11 +1570,11 @@ namespace SymWebUI.Areas.PF.Controllers
                     doc.DataDefinition.FormulaFields["Address"].Text = "'" + cvm.Address + "'";
                     doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
                     //doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
-                                     
+
                 }
                 if (Rtype == "Statement")
                 {
-                    getAllData = _repo.SelectLoanStatementForReport(vProjectId, vDepartmentId, vSectionId, vDesignationId, vCodeF, vCodeT, BranchId);
+                    getAllData = _repo.SelectLoanStatementForReport(vProjectId, vDepartmentId, vSectionId, vDesignationId, vCodeF, vCodeT);
                     dt = Ordinary.ListToDataTable(getAllData.ToList());
 
                     rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\rptAllLoanStatement.rpt";
@@ -1543,15 +1582,22 @@ namespace SymWebUI.Areas.PF.Controllers
                     if (getAllData.Count > 0)
                     {
                         DateTime startdatte = DateTime.Now;
-                        DateTime enddatte = DateTime.Now; 
-                        if(DateFrom!="" && DateTo !="")
+                        DateTime enddatte = DateTime.Now;
+                        if (DateFrom != "" && DateTo != "")
                         {
                             startdatte = Convert.ToDateTime(DateFrom);
                             enddatte = Convert.ToDateTime(DateTo);
-                        }                       
-                        ReportHead = "Loan Statement Report ("+startdatte.ToString("yyyy")+"-"+enddatte.ToString("yy")+")";
+                        }
+                        ReportHead = "Loan Statement Report (" + startdatte.ToString("yyyy") + "-" + enddatte.ToString("yy") + ")";
                     }
+                    else
+                    {
+                        result[0] = "Fail";
+                        result[1] = "No Data Found";
+                        Session["result"] = result[0] + "~" + result[1];
 
+                        return RedirectToAction("EmployeeLoanStatementReport", "Loan", new { view = "Y", area = "PF" });
+                    }
                     ds = new DataSet();
                     ds.Tables.Add(dt);
                     ds.Tables[0].TableName = "dtEmpLoan";
@@ -1568,22 +1614,22 @@ namespace SymWebUI.Areas.PF.Controllers
                     doc.DataDefinition.FormulaFields["codeTParam"].Text = "'" + codeTParam + "'";
                     doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
                     doc.DataDefinition.FormulaFields["Address"].Text = "'" + cvm.Address + "'";
-                    doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
+                    //doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
                     //doc = new rptLoanStatement();
                     //doc.SetDataSource(ds);                 
-                           
+
                 }
 
                 var rpt = RenderReportAsPDF(doc);
                 doc.Close();
-                return rpt;    
+                return rpt;
             }
             catch (Exception)
             {
                 throw;
             }
         }
-       
+
         private FileStreamResult RenderReportAsPDF(ReportDocument rptDoc)
         {
             Stream stream = rptDoc.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
@@ -1591,7 +1637,7 @@ namespace SymWebUI.Areas.PF.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-         [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public JsonResult Delete(string ids)
         {
             Session["permission"] = _reposur.SymRoleSession(identity.UserId, "10003", "delete").ToString();
@@ -1615,50 +1661,9 @@ namespace SymWebUI.Areas.PF.Controllers
         /// <param name="ApplicationDate">The date for which the PF balance should be calculated. If null or empty, the current date is used.</param>
         /// <param name="emploanId">The unique identifier of the employee loan.</param>
         /// <returns>A JSON object containing PF balance, interest rate details, and rate settings.</returns>        [HttpGet]
-        /// 
-
-
-
-        //public JsonResult PFBalance(string ApplicationDate, string emploanId)
-        //{
-           
-        //    DataTable dt = new DataTable();
-        //    string date = ApplicationDate;
-        //    if (string.IsNullOrWhiteSpace(ApplicationDate))
-        //    {
-        //        date = DateTime.Now.ToString("dd-MMM-yyyy");
-        //    }
-
-        //    EmployeeLoanVM vm = new EmployeeLoanVM();
-        //    SettingRepo sRepo = new SettingRepo();
-        //    EmployeeLoanRepo loanRepo = new EmployeeLoanRepo();
-        //    dt = loanRepo.getBalance(date, emploanId);
-
-
-        //    bool FromSetting = Convert.ToBoolean(sRepo.settingValue("PFLoanRate", "FromSetting") == "Y" ? true : false);
-        //    int Upto12Month = Convert.ToInt32(sRepo.settingValue("PFLoanRate", "Upto12Month"));
-        //    int GetterThen12Month = Convert.ToInt32(sRepo.settingValue("PFLoanRate", "GetterThen12Month"));
-
-        //    if (dt != null && dt.Rows.Count > 0)
-        //    {
-        //        vm.PFBalance = Convert.ToDecimal(dt.Rows[0]["Balance"].ToString());
-        //    }
-        //    string AvailableRate = sRepo.settingValue("PFLoan", "AvailableRate");
-
-        //    vm.AvailableRate = Convert.ToDecimal(AvailableRate);
-
-        //    vm.FromSetting = FromSetting;
-        //    vm.InterestRate = Upto12Month;
-        //    vm.InterestRate1 = GetterThen12Month;
-
-        //    vm.PFBalance = 999999999;
-
-
-        //    return Json(vm, JsonRequestBehavior.AllowGet);
-        //}
-
         public JsonResult PFBalance(string ApplicationDate, string emploanId)
         {
+
             DataTable dt = new DataTable();
             string date = ApplicationDate;
             if (string.IsNullOrWhiteSpace(ApplicationDate))
@@ -1670,6 +1675,7 @@ namespace SymWebUI.Areas.PF.Controllers
             SettingRepo sRepo = new SettingRepo();
             EmployeeLoanRepo loanRepo = new EmployeeLoanRepo();
             dt = loanRepo.getBalance(date, emploanId);
+
             if (dt.Rows.Count > 0)
             {
                 vm.PFBalance = Convert.ToDecimal(dt.Rows[0]["Balance"].ToString());
@@ -1681,6 +1687,7 @@ namespace SymWebUI.Areas.PF.Controllers
             bool FromSetting = Convert.ToBoolean(sRepo.settingValue("PFLoanRate", "FromSetting") == "Y" ? true : false);
             int Upto12Month = Convert.ToInt32(sRepo.settingValue("PFLoanRate", "Upto12Month"));
             int GetterThen12Month = Convert.ToInt32(sRepo.settingValue("PFLoanRate", "GetterThen12Month"));
+
             if (dt != null && dt.Rows.Count > 0)
             {
                 vm.PFBalance = Convert.ToDecimal(dt.Rows[0]["Balance"].ToString());
@@ -1693,9 +1700,8 @@ namespace SymWebUI.Areas.PF.Controllers
             vm.InterestRate = Upto12Month;
             vm.InterestRate1 = GetterThen12Month;
 
-
             return Json(vm, JsonRequestBehavior.AllowGet);
-        }             
+        }
 
         /// <summary>
         /// Generates and returns a PDF report of loan transactions for the specified loan ID.
@@ -1705,34 +1711,34 @@ namespace SymWebUI.Areas.PF.Controllers
         /// <param name="id">The unique identifier of the loan transaction to be viewed in the report.</param>
         /// <returns>A PDF file rendered as a report containing loan transaction details.</returns>
 
-         [HttpGet]
-         public ActionResult ReportView(string id)
-         {
-             try
-             {            
-                 string ReportHead = "";
-                 string rptLocation = "";
+        [HttpGet]
+        public ActionResult ReportView(string id)
+        {
+            try
+            {
+                string ReportHead = "";
+                string rptLocation = "";
 
 
-                 string[] cFields = { "I.Id" };
-                 string[] cValues = { id.ToString() == "0" ? "" : id.ToString() };
+                string[] cFields = { "I.Id" };
+                string[] cValues = { id.ToString() == "0" ? "" : id.ToString() };
 
-                 ReportDocument doc = new ReportDocument();
-                 DataTable dt = new DataTable();
-                 EmployeeLoanRepo _repo = new EmployeeLoanRepo();
+                ReportDocument doc = new ReportDocument();
+                DataTable dt = new DataTable();
+                EmployeeLoanRepo _repo = new EmployeeLoanRepo();
 
 
-                 dt = _repo.GetData( cFields, cValues);
-                                
+                dt = _repo.GetData(cFields, cValues);
 
-                 ReportHead = "There are no data to Preview for Transaction Loan";
-                 if (dt.Rows.Count > 0)
-                 {
-                     ReportHead = "Loan Transactions";
-                 }
-                 dt.TableName = "dtLoan";
 
-                rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\rptLoanEGCB.rpt";               
+                ReportHead = "There are no data to Preview for Transaction Loan";
+                if (dt.Rows.Count > 0)
+                {
+                    ReportHead = "Loan Transactions";
+                }
+                dt.TableName = "dtLoan";
+
+                rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\rptLoanEGCB.rpt";
 
                 CompanyRepo _CompanyRepo = new CompanyRepo();
                 CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
@@ -1758,16 +1764,16 @@ namespace SymWebUI.Areas.PF.Controllers
             }
         }
 
-         /// <summary>
-         /// Generates and returns a PDF report containing all loan records for the current branch.
-         /// The report is selected based on predefined report configuration, and includes company details.
-         /// Access is restricted based on user permissions.
-         /// </summary>
-         /// <param name="vm">The view model containing loan filter parameters (currently unused).</param>
-         /// <returns>
-         /// A PDF file rendered as a report if access is granted and data is available; 
-         /// otherwise redirects to the Payroll Home or returns a default view on failure.
-         /// </returns>
+        /// <summary>
+        /// Generates and returns a PDF report containing all loan records for the current branch.
+        /// The report is selected based on predefined report configuration, and includes company details.
+        /// Access is restricted based on user permissions.
+        /// </summary>
+        /// <param name="vm">The view model containing loan filter parameters (currently unused).</param>
+        /// <returns>
+        /// A PDF file rendered as a report if access is granted and data is available; 
+        /// otherwise redirects to the Payroll Home or returns a default view on failure.
+        /// </returns>
 
         public ActionResult AllLoanReport(EmployeeLoanVM vm)
         {
@@ -1792,7 +1798,9 @@ namespace SymWebUI.Areas.PF.Controllers
                 DataTable dt = new DataTable();
 
                 EmployeeLoanRepo _loanRepo = new EmployeeLoanRepo();
-                var getAllData = _loanRepo.SelectAll(Convert.ToInt32(identity.BranchId), "");
+                var branchId = Convert.ToInt32(Session["BranchId"]);
+                var getAllData = _loanRepo.SelectAll(branchId, "");
+                //var getAllData = _loanRepo.SelectAll(Convert.ToInt32(identity.BranchId), "");
 
                 dt = Ordinary.ListToDataTable(getAllData.ToList());
 
@@ -1859,44 +1867,44 @@ namespace SymWebUI.Areas.PF.Controllers
         /// otherwise redirects to the SalarySheet view or Payroll Home on permission failure.
         /// </returns>
         public ActionResult DownloadAllLoanReport(EmployeeLoanVM vm)
-         {
-             string[] result = new string[6];
-             DataSet ds = new DataSet();
-             DataTable dt = new DataTable();
-             List<string> ProjectIdList = new List<string>();
-             try
-             {
-                 #region Objects and Variables
+        {
+            string[] result = new string[6];
+            DataSet ds = new DataSet();
+            DataTable dt = new DataTable();
+            List<string> ProjectIdList = new List<string>();
+            try
+            {
+                #region Objects and Variables
 
-                 ReportDocument doc = new ReportDocument();
+                ReportDocument doc = new ReportDocument();
 
-                 string CompanyName = new AppSettingsReader().GetValue("CompanyName", typeof(string)).ToString();
+                string CompanyName = new AppSettingsReader().GetValue("CompanyName", typeof(string)).ToString();
 
-                 var permission = _reposur.SymRoleSession(identity.UserId, "1_42", "add").ToString();
-                 Session["permission"] = permission;
-                 if (permission == "False")
-                 {
-                     return Redirect("/Payroll/Home");
-                 }
+                var permission = _reposur.SymRoleSession(identity.UserId, "1_42", "add").ToString();
+                Session["permission"] = permission;
+                if (permission == "False")
+                {
+                    return Redirect("/Payroll/Home");
+                }
 
-                 string FileName = "Download.xls";
-                 string fullPath = AppDomain.CurrentDomain.BaseDirectory + "Files\\Export\\";
-                 //string fullPath = @"C:\";
-                 if (System.IO.File.Exists(fullPath + FileName))
-                 {
-                     System.IO.File.Delete(fullPath + FileName);
-                 }
-                 #endregion
+                string FileName = "Download.xls";
+                string fullPath = AppDomain.CurrentDomain.BaseDirectory + "Files\\Export\\";
+                //string fullPath = @"C:\";
+                if (System.IO.File.Exists(fullPath + FileName))
+                {
+                    System.IO.File.Delete(fullPath + FileName);
+                }
+                #endregion
 
-              
-                 #region Pull Data
 
-                 EmployeeLoanRepo _loanRepo = new EmployeeLoanRepo();
-                 var getAllData = _loanRepo.SelectAll(Convert.ToInt32(identity.BranchId), "");
+                #region Pull Data
 
-                 dt = Ordinary.ListToDataTable(getAllData.ToList());
+                EmployeeLoanRepo _loanRepo = new EmployeeLoanRepo();
+                var getAllData = _loanRepo.SelectAll(Convert.ToInt32(identity.BranchId), "");
 
-                 var toRemove = new string[] {  "Operation","PFBalance","AvailableRate","Id","LoanType_E","EmployeeId","NumberOfInstallment"
+                dt = Ordinary.ListToDataTable(getAllData.ToList());
+
+                var toRemove = new string[] {  "Operation","PFBalance","AvailableRate","Id","LoanType_E","EmployeeId","NumberOfInstallment"
                                                 ,"PeriodName","ApplicationDate","ApprovedDate","IsApproved","EndDate","IsHold","Remarks"
                                                 ,"IsActive","IsArchive","CreatedBy","CreatedAt","CreatedFrom","LastUpdateBy","LastUpdateAt","LastUpdateFrom","Project"
                                                 ,"Section","employeeLoanDetails","InterestPolicy","IsFixed","InterestRate","InterestRate1","BranchId","Employee"
@@ -2076,6 +2084,20 @@ namespace SymWebUI.Areas.PF.Controllers
             workSheet.Cells[GrandTotalRow, 1].LoadFromText("Grand Total");
 
             #endregion
-        }   
+        }
+
+        public ActionResult Approved(string loanId)
+        {
+            Session["permission"] = _reposur.SymRoleSession(identity.UserId, "10003", "delete").ToString();
+            EmployeeLoanVM vm = new EmployeeLoanVM();
+            EmployeeLoanRepo _repo = new EmployeeLoanRepo();
+            string[] result = new string[6];
+            vm.LastUpdateAt = DateTime.Now.ToString("yyyyMMddHHmmss");
+            vm.LastUpdateBy = identity.Name;
+            vm.LastUpdateFrom = identity.WorkStationIP;
+            result = _repo.Approved(vm, loanId);
+            Session["result"] = result[0] + "~" + result[1];
+            return Redirect("/PF/Loan/AllLoan");
+        }
     }
 }

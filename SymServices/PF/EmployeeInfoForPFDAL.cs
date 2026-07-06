@@ -776,8 +776,9 @@ namespace SymServices.PF
                     EmployeeInfoForPFVM.DateOfBirth = dr["DateOfBirth"].ToString();
                     EmployeeInfoForPFVM.JoinDate = dr["JoinDate"].ToString();
                     EmployeeInfoForPFVM.ResignDate = dr["ResignDate"].ToString();
-                    EmployeeInfoForPFVM.BasicSalary = Convert.ToDecimal(dr["BasicSalary"]);
-                    EmployeeInfoForPFVM.GrossSalary = Convert.ToDecimal(dr["GrossSalary"]);
+                    // Safe conversion for nullable decimal properties
+                    EmployeeInfoForPFVM.BasicSalary = dr["BasicSalary"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(dr["BasicSalary"]);
+                    EmployeeInfoForPFVM.GrossSalary = dr["GrossSalary"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(dr["GrossSalary"]);
                     EmployeeInfoForPFVM.NomineeName = dr["NomineeName"].ToString();
                     EmployeeInfoForPFVM.NomineeDateofBirth = dr["NomineeDateofBirth"].ToString();
                     EmployeeInfoForPFVM.NomineeRelation = dr["NomineeRelation"].ToString();

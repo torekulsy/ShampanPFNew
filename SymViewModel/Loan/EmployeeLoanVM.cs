@@ -21,7 +21,7 @@ namespace SymViewModel.Loan
         public string EmployeeId { get; set; }
 
         [Display(Name = "Installment")]
-        public int NumberOfInstallment { get; set; }
+        public int? NumberOfInstallment { get; set; }
         [Display(Name = "Period Name")]
         public string PeriodName { get; set; }
         [Display(Name = "Application Date")]
@@ -57,7 +57,7 @@ namespace SymViewModel.Loan
         public string LoanType { get; set; } 
        [Required]
         [Display(Name = "Principal Amount")]
-        public decimal PrincipalAmount { get; set; }
+        public decimal? PrincipalAmount { get; set; }
         [Display(Name = "Start Date")]
         public string StartDate { get; set; }
         [Display(Name = "Settelment Date")]
@@ -77,11 +77,11 @@ namespace SymViewModel.Loan
         [Display(Name = "Fixed / Rate")]
         public bool IsFixed { get; set; }
         [Display(Name = "Rate (%)")]
-        public decimal InterestRate { get; set; }
+        public decimal? InterestRate { get; set; }
         [Display(Name = "Rate1 (%)")]
         public decimal InterestRate1 { get; set; }
         [Display(Name = "Interest Amount")]
-        public decimal InterestAmount { get; set; }
+        public decimal? InterestAmount { get; set; }
       
         [Display(Name = "Total Amount")]
         public decimal TotalAmount { get; set; }

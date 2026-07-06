@@ -17,10 +17,21 @@
         <p>Investment Renew List</p>
     </div>
     <div class="custom-top">
-        <div id="mainBtnAll">
-            <button type="button" title="Add New Renew" data-url="/@ViewBag.TransType/InvestmentRenew/Create?investmentId=@Model.InvestmentId&Encash=F" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;Renew</button>
-            <button type="button" title="Add New Encash" data-url="/@ViewBag.TransType/InvestmentRenew/Create?investmentId=@Model.InvestmentId&Encash=T" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;Encash</button>
-        </div>
+        @{
+            bool hasEncashed = ViewBag.HasEncashed != null && Convert.ToBoolean(ViewBag.HasEncashed);
+        }
+
+        @if (!hasEncashed)
+        {
+            <div id="mainBtnAll">
+                <button type="button" title="Add New Renew" data-url="/@ViewBag.TransType/InvestmentRenew/Create?investmentId=@Model.InvestmentId&Encash=F" onclick="GoTo(this)" 
+                        class="sym-btn-add"> &nbsp;Renew
+                </button>
+                <button type="button" title="Add New Encash" data-url="/@ViewBag.TransType/InvestmentRenew/Create?investmentId=@Model.InvestmentId&Encash=T" onclick="GoTo(this)"
+                        class="sym-btn-add">&nbsp;Encash
+                </button>
+            </div>
+        }
         <div class="table-search">
             <div class="mobile-search-toggle">
                 <i class="fa fa-search"></i>

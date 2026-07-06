@@ -12,7 +12,7 @@ namespace SymViewModel.PF
         public int Id { get; set; }
         [Display(Name = "Investment")] public int InvestmentId { get; set; }
         [Display(Name = "Funding Date")] public string FundingDate { get; set; }
-        [Display(Name = "Funding Value")] public decimal FundingValue { get; set; }
+        [Display(Name = "Funding Value")] public string FundingValue { get; set; }
         public bool Post { get; set; }
         [Display(Name = "Distribute")] public bool IsDistribute { get; set; }
 
@@ -21,6 +21,7 @@ namespace SymViewModel.PF
         [Display(Name = "Active")]
         public bool IsActive { get; set; }
         public bool IsArchive { get; set; }
+        public bool IsJournal { get; set; }
         public string CreatedBy { get; set; }
         public string CreatedAt { get; set; }
         public string CreatedFrom { get; set; }

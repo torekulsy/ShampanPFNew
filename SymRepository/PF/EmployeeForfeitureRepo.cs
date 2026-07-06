@@ -25,16 +25,9 @@ namespace SymRepository.PF
             }
         }
 
-        public List<EmployeePFForfeitureVM> SelectAllList(string empid = null, string[] conditionFields = null, string[] conditionValues = null)
+        public List<EmployeePFForfeitureVM> SelectAllList(string empid = null,string[] conditionFields = null,string[] conditionValues = null)
         {
-            try
-            {
-                return new EmployeeForfeitureDAL().SelectAllList(empid, conditionFields, conditionValues);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            return new EmployeeForfeitureDAL().SelectAllList(empid, conditionFields, conditionValues);
         }
 
 

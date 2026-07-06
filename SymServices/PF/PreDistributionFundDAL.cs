@@ -73,10 +73,12 @@ namespace SymServices.PF
                 sqlText = @"
 SELECT
  pdf.Id
-,Code
-,Format(cast(TransactionDate as datetime),'dd-MMM-yyyy')TransactionDate
-,TotalValue
-,Remarks
+,pdf.Code
+,Format(cast(pdf.TransactionDate as datetime),'dd-MMM-yyyy')TransactionDate
+,Format(cast(pdf.TransactionDate as datetime),'dd-MMM-yyyy')FundingDate
+,pdf.TotalValue
+,pdf.TotalValue FundingValue
+,pdf.Remarks
 ,pdf.Post
 ,pdf.IsDistribute
 ,pdf.Remarks
@@ -89,8 +91,11 @@ SELECT
 ,pdf.LastUpdateAt
 ,pdf.LastUpdateFrom
 ,pdf.IsApprove
+,pdf.TransType
+,case when ISNULL(gl.Source,0)='0' then 0 else 1 end AS IsJournal
 FROM PreDistributionFunds pdf
-WHERE  1=1 AND IsArchive = 0
+Left Join GLJournals gl on gl.Source = pdf.code
+WHERE  1=1 AND pdf.IsArchive = 0
 ";
                 //TotalFundingValue
                 //FundingValue
@@ -143,14 +148,16 @@ WHERE  1=1 AND IsArchive = 0
                 while (dr.Read())
                 {
                     vm = new PreDistributionFundVM();
-                    vm.Id = Convert.ToInt32(dr["Id"]);
+                  
 
                     vm.Id = Convert.ToInt32(dr["Id"]);
                     vm.Code = Convert.ToString(dr["Code"]);
                     vm.TransactionDate = Convert.ToString(dr["TransactionDate"]);
+                    vm.FundingDate = Convert.ToString(dr["FundingDate"]);
                     vm.TotalValue = Convert.ToString(dr["TotalValue"]);
+                    vm.FundingValue = Convert.ToString(dr["FundingValue"]);
                     vm.Remarks = Convert.ToString(dr["Remarks"]);
-
+                    vm.TransactionType = Convert.ToString(dr["TransType"]);
                     vm.Post = Convert.ToBoolean(dr["Post"]);
                     vm.IsDistribute = Convert.ToBoolean(dr["IsDistribute"]);
                     vm.Remarks = dr["Remarks"].ToString();
@@ -162,7 +169,7 @@ WHERE  1=1 AND IsArchive = 0
                     vm.LastUpdateBy = dr["LastUpdateBy"].ToString();
                     vm.LastUpdateFrom = dr["LastUpdateFrom"].ToString();
                     vm.IsApprove = dr["IsApprove"] == DBNull.Value ? false : Convert.ToBoolean(dr["IsApprove"]);
-
+                    vm.IsJournal = Convert.ToBoolean(dr["IsJournal"]);
 
                     VMs.Add(vm);
                 }

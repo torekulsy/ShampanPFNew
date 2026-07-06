@@ -13,11 +13,11 @@ namespace SymRepository.PF
     public class EmployeeBreakMonthPFRepo
     {
 
-        public List<EmployeeBreakMonthPFVM> SelectAll(string branchId, string empid = null)
+        public List<EmployeeBreakMonthPFVM> SelectAll(string empid = null)
         {
             try
             {
-                return new EmployeeBreakMonthPFDAL().SelectAll(branchId, empid);
+                return new EmployeeBreakMonthPFDAL().SelectAll(empid);
             }
             catch (Exception ex)
             {
@@ -25,7 +25,7 @@ namespace SymRepository.PF
             }
         }
 
-        public EmployeeBreakMonthPFVM SelectById(string Id, string empId="")
+        public EmployeeBreakMonthPFVM SelectById(string Id, string empId = "")
         {
             try
             {

@@ -13,19 +13,19 @@ namespace SymRepository.PF
     public class EmployeePFOpeinigRepo
     {
 
-        public List<EmployeePFOpeinigVM> SelectAll(string branchId, string empid = null)
+        public List<EmployeePFOpeinigVM> SelectAll(string BranchId, string empid = null)
         {
             try
             {
-                return new EmployeePFOpeinigDAL().SelectAll(branchId, empid);
+                return new EmployeePFOpeinigDAL().SelectAll(BranchId, empid);
             }
             catch (Exception ex)
             {
                 throw ex;
             }
         }
-    
-        public EmployeePFOpeinigVM SelectById(string Id, string empId="")
+
+        public EmployeePFOpeinigVM SelectById(string Id, string empId = "")
         {
             try
             {
@@ -36,8 +36,8 @@ namespace SymRepository.PF
                 throw ex;
             }
         }
-      
-        
+
+
         public EmployeePFOpeinigVM SelectByIdAll(string Id, string empId = "")
         {
             try
@@ -62,9 +62,9 @@ namespace SymRepository.PF
                 throw ex;
             }
         }
-       
 
-        
+
+
         public string[] Update(EmployeePFOpeinigVM vm)
         {
             try

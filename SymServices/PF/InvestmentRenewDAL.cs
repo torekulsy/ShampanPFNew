@@ -408,9 +408,9 @@ WHERE  1=1 AND inv.IsArchive = 0
                     cmdInsert.Parameters.AddWithValue("@SourceTaxDeduct", vm.SourceTaxDeduct);
                     cmdInsert.Parameters.AddWithValue("@IsEncashed", vm.IsEncashed);
                     cmdInsert.Parameters.AddWithValue("@OtherCharge", vm.OtherCharge);
-                    cmdInsert.Parameters.AddWithValue("@AditionAmount", vm.AditionAmount);
-                    cmdInsert.Parameters.AddWithValue("@EncashAmount", vm.EncashAmount);
-                    cmdInsert.Parameters.AddWithValue("@InterestRate", vm.InterestRate);
+                    cmdInsert.Parameters.AddWithValue("@AditionAmount", vm.AditionAmount ?? Convert.DBNull);
+                    cmdInsert.Parameters.AddWithValue("@EncashAmount", vm.EncashAmount ?? Convert.DBNull);
+                    cmdInsert.Parameters.AddWithValue("@InterestRate", vm.InterestRate ?? Convert.DBNull);
                     cmdInsert.Parameters.AddWithValue("@AIT", vm.AIT);
 
 

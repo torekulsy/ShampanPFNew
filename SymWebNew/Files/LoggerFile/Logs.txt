@@ -136,3 +136,48 @@ Could not find a part of the path 'D:\PF_Single\PF_Single\ShampanPF\SymWebNew\Fi
 InsertEmployeeInfoForPF , Method : EmployeeInfoPFController
 Could not find a part of the path 'D:\PF_Single\PF_Single\ShampanPF\SymWebNew\Files\EmployeeInfo\PON-121MAZ\0021\1225.jpg'.
 
+
+2026-07-02 15:13:00 +06:00
+ Source : LoanReport , Method : LoanController
+DataSet does not support System.Nullable<>.
+   at System.Data.DataColumn..ctor(String columnName, Type dataType, String expr, MappingType type)
+   at System.Data.DataColumnCollection.Add(String columnName, Type type)
+   at SymOrdinary.Ordinary.ListToDataTable[T](List`1 items) in d:\ShampanPFNew\SymOrdinary\Ordinary.cs:line 2865
+   at SymWebUI.Areas.PF.Controllers.LoanController.AllLoanReport(EmployeeLoanVM vm) in d:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\LoanController.cs:line 1803
+
+2026-07-02 15:40:57 +06:00
+ Source : LoanReport , Method : LoanController
+DataSet does not support System.Nullable<>.
+   at System.Data.DataColumn..ctor(String columnName, Type dataType, String expr, MappingType type)
+   at System.Data.DataColumnCollection.Add(String columnName, Type type)
+   at SymOrdinary.Ordinary.ListToDataTable[T](List`1 items) in d:\ShampanPFNew\SymOrdinary\Ordinary.cs:line 2865
+   at SymWebUI.Areas.PF.Controllers.LoanController.AllLoanReport(EmployeeLoanVM vm) in d:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\LoanController.cs:line 1803
+
+2026-07-02 15:44:25 +06:00
+ Source : LoanReport , Method : LoanController
+DataSet does not support System.Nullable<>.
+   at System.Data.DataColumn..ctor(String columnName, Type dataType, String expr, MappingType type)
+   at System.Data.DataColumnCollection.Add(String columnName, Type type)
+   at SymOrdinary.Ordinary.ListToDataTable[T](List`1 items) in d:\ShampanPFNew\SymOrdinary\Ordinary.cs:line 2865
+   at SymWebUI.Areas.PF.Controllers.LoanController.AllLoanReport(EmployeeLoanVM vm) in d:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\LoanController.cs:line 1803
+
+2026-07-02 15:54:16 +06:00
+ Source : LoanReport , Method : LoanController
+DataSet does not support System.Nullable<>.
+   at System.Data.DataColumn..ctor(String columnName, Type dataType, String expr, MappingType type)
+   at System.Data.DataColumnCollection.Add(String columnName, Type type)
+   at SymOrdinary.Ordinary.ListToDataTable[T](List`1 items) in d:\ShampanPFNew\SymOrdinary\Ordinary.cs:line 2865
+   at SymWebUI.Areas.PF.Controllers.LoanController.AllLoanReport(EmployeeLoanVM vm) in d:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\LoanController.cs:line 1805
+
+2026-07-02 16:28:23 +06:00
+ Source : LoanReport , Method : LoanController
+Object reference not set to an instance of an object.
+   at SymWebUI.Areas.PF.Controllers.LoanController.AllLoanReport(EmployeeLoanVM vm) in d:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\LoanController.cs:line 1818
+
+2026-07-02 17:06:46 +06:00
+ Source : Success
+0
+InsertEmployeeInfoForPF , Method : EmployeeInfoPFController
+SQL:SELECT * FROM EmployeeInfo EF               
+                WHERE 1=1 and EF.Id=@IdObject cannot be cast from DBNull to other types.
+

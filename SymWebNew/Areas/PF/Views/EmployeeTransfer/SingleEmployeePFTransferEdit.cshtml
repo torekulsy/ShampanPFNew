@@ -170,7 +170,8 @@
                     </a>
 
                     @Html.SimpleDropDownFor(model => model.Code, "/Config/DropDown/EmployeeCodeName",
-                new { @id = "FiscalYearDetailId", @class = "selectDropdown empId modern-dropdown" })
+                new { @id = "FiscalYearDetailId", @class = "selectDropdown empId modern-dropdown"})
+
 
                     <a class="pager-btn search-btn" data-pager-action='next' id="current">
                         <i class="fa fa-search"></i>
@@ -282,7 +283,7 @@
             $(this).select();
         });
     });
-
+   
 </script>
 
 <script>

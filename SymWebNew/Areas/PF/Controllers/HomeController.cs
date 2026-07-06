@@ -25,7 +25,7 @@ namespace SymWebUI.Areas.PF.Controllers
             Session["BranchId"] = branch.Id;
 
             vm.BranchVM = branch;
-            vmPf = _Repo.GetPfInfoDashboard();
+            vmPf = _Repo.GetPfInfoDashboard(BranchId);
             vm.PfInfoDashboardVMS = vmPf;
             Session["BranchName"] = vm.BranchVM.Name;
                               

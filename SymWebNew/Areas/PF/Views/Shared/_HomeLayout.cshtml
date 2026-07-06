@@ -930,6 +930,11 @@
                 yearRange: "1900:+0"
             });
 
+            $(".noBeforeDate").datepicker("option", {
+                minDate: 0,
+                yearRange: "1900:+0"
+            });
+
             $(".FromDate").on("change", function () {
 
                 var fromDate = $(this).datepicker("getDate");

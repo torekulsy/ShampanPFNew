@@ -341,145 +341,319 @@ From EmployeePFPayment pfo
         /// An EmployeePFPaymentVM object containing the payment and employee details corresponding to the provided identifiers.
         /// Returns an empty EmployeePFPaymentVM if no matching record is found.
         /// </returns>
+        /// 
+//        public EmployeePFPaymentVM SelectByIdAll(string Id, string empId)
+//        {
+
+//            #region Variables
+
+//            SqlConnection currConn = null;
+//            string sqlText = "";
+//            EmployeePFPaymentVM vm = new EmployeePFPaymentVM();
+
+//            #endregion
+//            try
+//            {
+//                #region open connection and transaction
+
+//                currConn = _dbsqlConnection.GetConnection();
+//                if (currConn.State != ConnectionState.Open)
+//                {
+//                    currConn.Open();
+//                }
+
+//                #endregion open connection and transaction
+
+//                int paymentId = 0;
+//                int employeeId = 0;
+
+//                bool hasPaymentId = IsValidIntId(Id, out paymentId);
+//                bool hasEmployeeId = IsValidIntId(empId, out employeeId);
+
+//                #region sql statement
+
+//                sqlText = @"
+//SELECT
+//pfo.Id
+//,pfo.EmployeeId
+//,e.EmpName
+//,e.Code
+//,e.Designation
+//,e.Department, e.JoinDate, e.Section, e.Project, e.GrossSalary, e.BasicSalary
+//,isnull(pfo.EmployeeContribution,0)EmployeeContribution
+//,isnull(pfo.EmployerContribution,0)EmployerContribution
+//,isnull(pfo.EmployeeProfit      ,0)EmployeeProfit
+//,isnull(pfo.EmployerProfit      ,0)EmployerProfit
+//,pfo.PaymentDate
+//,pfo.Post
+//,pfo.Remarks
+//,pfo.IsActive
+//,pfo.IsArchive
+//,pfo.CreatedBy
+//,pfo.CreatedAt
+//,pfo.CreatedFrom
+//,pfo.LastUpdateBy
+//,pfo.LastUpdateAt
+//,pfo.LastUpdateFrom
+//From EmployeePFPayment pfo
+//";
+//                sqlText += " left outer join ViewEmployeeInformation e on pfo.EmployeeId=e.EmployeeId";
+//                sqlText += " Where 1=1";
+
+//                if (!string.IsNullOrEmpty(Id))
+//                {
+//                    sqlText += @" and pfo.Id=@Id ";
+//                }
+//                if (!string.IsNullOrWhiteSpace(empId))
+//                {
+//                    sqlText += @" and pfo.EmployeeId=@EmployeeId ";
+//                }
+
+//                SqlCommand cmd = new SqlCommand();
+//                cmd.Connection = currConn;
+//                cmd.CommandText = sqlText;
+//                cmd.CommandType = CommandType.Text;
+
+//                if (!string.IsNullOrEmpty(Id))
+//                {
+//                    cmd.Parameters.AddWithValue("@Id", Id);
+//                }
+//                if (!string.IsNullOrWhiteSpace(empId))
+//                {
+//                    cmd.Parameters.AddWithValue("@EmployeeId", empId);
+//                }
+
+
+//                SqlDataReader dr;
+//                dr = cmd.ExecuteReader();
+
+//                while (dr.Read())
+//                {
+//                    vm = new EmployeePFPaymentVM();
+//                    vm.Id = dr["Id"].ToString();
+//                    vm.EmployeeId = dr["EmployeeId"].ToString();
+//                    vm.EmployeeContribution = Convert.ToDecimal(dr["EmployeeContribution"]);
+//                    vm.EmployerContribution = Convert.ToDecimal(dr["EmployerContribution"]);
+//                    vm.EmployeeProfit = Convert.ToDecimal(dr["EmployeeProfit"]);
+//                    vm.EmployerProfit = Convert.ToDecimal(dr["EmployerProfit"]);
+//                    vm.PaymentDate = Ordinary.StringToDate(dr["PaymentDate"].ToString());
+//                    vm.Remarks = dr["Remarks"].ToString();
+//                    vm.Post = Convert.ToBoolean(dr["Post"]);
+//                    vm.IsActive = Convert.ToBoolean(dr["IsActive"]);
+//                    vm.CreatedAt = Ordinary.StringToDate(dr["CreatedAt"].ToString());
+//                    vm.CreatedBy = dr["CreatedBy"].ToString();
+//                    vm.CreatedFrom = dr["CreatedFrom"].ToString();
+//                    vm.LastUpdateAt = Ordinary.StringToDate(dr["LastUpdateAt"].ToString());
+//                    vm.LastUpdateBy = dr["LastUpdateBy"].ToString();
+//                    vm.LastUpdateFrom = dr["LastUpdateFrom"].ToString();
+//                    vm.EmpName = dr["EmpName"].ToString();
+//                    vm.Code = dr["Code"].ToString();
+//                    vm.Designation = dr["Designation"].ToString();
+//                    vm.Department = dr["Department"].ToString();
+//                    vm.JoinDate = Ordinary.StringToDate(dr["JoinDate"].ToString());
+//                    vm.Section = dr["Section"].ToString();
+//                    vm.Project = dr["Project"].ToString();
+//                    vm.GrossSalary = Convert.ToDecimal(dr["GrossSalary"]);
+//                    vm.BasicSalary = Convert.ToDecimal(dr["BasicSalary"]);
+//                }
+//                dr.Close();
+
+
+//                #endregion
+//            }
+
+//            #region catch
+
+//            catch (Exception ex)
+//            {
+//                throw new ArgumentNullException("", "SQL:" + sqlText + FieldDelimeter + ex.Message.ToString());
+//            }
+
+//            #endregion
+
+//            #region finally
+
+//            finally
+//            {
+//                if (currConn != null)
+//                {
+//                    if (currConn.State == ConnectionState.Open)
+//                    {
+//                        currConn.Close();
+//                    }
+//                }
+//            }
+
+//            #endregion
+
+//            return vm;
+//        }
+
         public EmployeePFPaymentVM SelectByIdAll(string Id, string empId)
         {
-
-            #region Variables
-
             SqlConnection currConn = null;
             string sqlText = "";
             EmployeePFPaymentVM vm = new EmployeePFPaymentVM();
 
-            #endregion
             try
             {
-                #region open connection and transaction
-
                 currConn = _dbsqlConnection.GetConnection();
+
                 if (currConn.State != ConnectionState.Open)
                 {
                     currConn.Open();
                 }
 
-                #endregion open connection and transaction
+                int paymentId = 0;
+                int employeeId = 0;
 
-                
-
-                #region sql statement
+                bool hasPaymentId = IsValidIntId(Id, out paymentId);
+                bool hasEmployeeId = IsValidIntId(empId, out employeeId);
 
                 sqlText = @"
 SELECT
-pfo.EmployeeId
-,e.EmpName
-,e.Code
-,e.Designation
-,e.Department, e.JoinDate, e.Section, e.Project, e.GrossSalary, e.BasicSalary
-,isnull(pfo.EmployeeContribution,0)EmployeeContribution
-,isnull(pfo.EmployerContribution,0)EmployerContribution
-,isnull(pfo.EmployeeProfit      ,0)EmployeeProfit
-,isnull(pfo.EmployerProfit      ,0)EmployerProfit
-,pfo.PaymentDate
-,pfo.Post
-,pfo.Remarks
-,pfo.IsActive
-,pfo.IsArchive
-,pfo.CreatedBy
-,pfo.CreatedAt
-,pfo.CreatedFrom
-,pfo.LastUpdateBy
-,pfo.LastUpdateAt
-,pfo.LastUpdateFrom
-From EmployeePFPayment pfo
+     pfo.Id
+    ,pfo.EmployeeId
+    ,ISNULL(e.EmpName,'') AS EmpName
+    ,ISNULL(e.Code,'') AS Code
+    ,ISNULL(e.Designation,'') AS Designation
+    ,ISNULL(e.Department,'') AS Department
+    ,e.JoinDate
+    ,ISNULL(e.Section,'') AS Section
+    ,ISNULL(e.Project,'') AS Project
+    ,ISNULL(e.GrossSalary,0) AS GrossSalary
+    ,ISNULL(e.BasicSalary,0) AS BasicSalary
+    ,ISNULL(pfo.EmployeeContribution,0) AS EmployeeContribution
+    ,ISNULL(pfo.EmployerContribution,0) AS EmployerContribution
+    ,ISNULL(pfo.EmployeeProfit,0) AS EmployeeProfit
+    ,ISNULL(pfo.EmployerProfit,0) AS EmployerProfit
+    ,pfo.PaymentDate
+    ,ISNULL(pfo.Post,0) AS Post
+    ,ISNULL(pfo.Remarks,'') AS Remarks
+    ,ISNULL(pfo.IsActive,0) AS IsActive
+    ,ISNULL(pfo.IsArchive,0) AS IsArchive
+    ,ISNULL(pfo.CreatedBy,'') AS CreatedBy
+    ,pfo.CreatedAt
+    ,ISNULL(pfo.CreatedFrom,'') AS CreatedFrom
+    ,ISNULL(pfo.LastUpdateBy,'') AS LastUpdateBy
+    ,pfo.LastUpdateAt
+    ,ISNULL(pfo.LastUpdateFrom,'') AS LastUpdateFrom
+FROM EmployeePFPayment pfo
+LEFT OUTER JOIN ViewEmployeeInformation e 
+    ON pfo.EmployeeId = e.EmployeeId
+WHERE 1 = 1
 ";
-                sqlText += " left outer join ViewEmployeeInformation e on pfo.EmployeeId=e.EmployeeId";
-                sqlText += " Where 1=1";
 
-                if (!string.IsNullOrEmpty(Id))
+                if (hasPaymentId)
                 {
-                    sqlText += @" and pfo.Id=@Id ";
-                }
-                if (!string.IsNullOrWhiteSpace(empId))
-                {
-                    sqlText += @" and pfo.EmployeeId=@EmployeeId ";
+                    sqlText += " AND pfo.Id = @Id ";
                 }
 
-                SqlCommand cmd = new SqlCommand();
-                cmd.Connection = currConn;
-                cmd.CommandText = sqlText;
-                cmd.CommandType = CommandType.Text;
-
-                if (!string.IsNullOrEmpty(Id))
+                if (hasEmployeeId)
                 {
-                    cmd.Parameters.AddWithValue("@Id", Id);
-                }
-                if (!string.IsNullOrWhiteSpace(empId))
-                {
-                    cmd.Parameters.AddWithValue("@EmployeeId", empId);
+                    sqlText += " AND pfo.EmployeeId = @EmployeeId ";
                 }
 
-
-                SqlDataReader dr;
-                dr = cmd.ExecuteReader();
-
-                while (dr.Read())
+                using (SqlCommand cmd = new SqlCommand(sqlText, currConn))
                 {
-                    vm = new EmployeePFPaymentVM();
-                    vm.EmployeeId = dr["EmployeeId"].ToString();
-                    vm.EmployeeContribution = Convert.ToDecimal(dr["EmployeeContribution"]);
-                    vm.EmployerContribution = Convert.ToDecimal(dr["EmployerContribution"]);
-                    vm.EmployeeProfit = Convert.ToDecimal(dr["EmployeeProfit"]);
-                    vm.EmployerProfit = Convert.ToDecimal(dr["EmployerProfit"]);
-                    vm.PaymentDate = Ordinary.StringToDate(dr["PaymentDate"].ToString());
-                    vm.Remarks = dr["Remarks"].ToString();
-                    vm.Post = Convert.ToBoolean(dr["Post"]);
-                    vm.IsActive = Convert.ToBoolean(dr["IsActive"]);
-                    vm.CreatedAt = Ordinary.StringToDate(dr["CreatedAt"].ToString());
-                    vm.CreatedBy = dr["CreatedBy"].ToString();
-                    vm.CreatedFrom = dr["CreatedFrom"].ToString();
-                    vm.LastUpdateAt = Ordinary.StringToDate(dr["LastUpdateAt"].ToString());
-                    vm.LastUpdateBy = dr["LastUpdateBy"].ToString();
-                    vm.LastUpdateFrom = dr["LastUpdateFrom"].ToString();
-                    vm.EmpName = dr["EmpName"].ToString();
-                    vm.Code = dr["Code"].ToString();
-                    vm.Designation = dr["Designation"].ToString();
-                    vm.Department = dr["Department"].ToString();
-                    vm.JoinDate = Ordinary.StringToDate(dr["JoinDate"].ToString());
-                    vm.Section = dr["Section"].ToString();
-                    vm.Project = dr["Project"].ToString();
-                    vm.GrossSalary = Convert.ToDecimal(dr["GrossSalary"]);
-                    vm.BasicSalary = Convert.ToDecimal(dr["BasicSalary"]);
-                }
-                dr.Close();
+                    cmd.CommandType = CommandType.Text;
 
-
-                #endregion
-            }
-
-            #region catch
-
-            catch (Exception ex)
-            {
-                throw new ArgumentNullException("", "SQL:" + sqlText + FieldDelimeter + ex.Message.ToString());
-            }
-
-            #endregion
-
-            #region finally
-
-            finally
-            {
-                if (currConn != null)
-                {
-                    if (currConn.State == ConnectionState.Open)
+                    if (hasPaymentId)
                     {
-                        currConn.Close();
+                        cmd.Parameters.Add("@Id", SqlDbType.Int).Value = paymentId;
+                    }
+
+                    if (hasEmployeeId)
+                    {
+                        cmd.Parameters.Add("@EmployeeId", SqlDbType.Int).Value = employeeId;
+                    }
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            vm = new EmployeePFPaymentVM();
+
+                            vm.Id = dr["Id"].ToString();
+                            vm.EmployeeId = dr["EmployeeId"].ToString();
+
+                            vm.EmployeeContribution = Convert.ToDecimal(dr["EmployeeContribution"]);
+                            vm.EmployerContribution = Convert.ToDecimal(dr["EmployerContribution"]);
+                            vm.EmployeeProfit = Convert.ToDecimal(dr["EmployeeProfit"]);
+                            vm.EmployerProfit = Convert.ToDecimal(dr["EmployerProfit"]);
+
+                            vm.PaymentDate = dr["PaymentDate"] == DBNull.Value
+                                ? ""
+                                : Ordinary.StringToDate(dr["PaymentDate"].ToString());
+
+                            vm.Remarks = dr["Remarks"].ToString();
+
+                            vm.Post = dr["Post"] != DBNull.Value && Convert.ToBoolean(dr["Post"]);
+                            vm.IsActive = dr["IsActive"] != DBNull.Value && Convert.ToBoolean(dr["IsActive"]);
+
+                            vm.CreatedAt = dr["CreatedAt"] == DBNull.Value
+                                ? ""
+                                : Ordinary.StringToDate(dr["CreatedAt"].ToString());
+
+                            vm.CreatedBy = dr["CreatedBy"].ToString();
+                            vm.CreatedFrom = dr["CreatedFrom"].ToString();
+
+                            vm.LastUpdateAt = dr["LastUpdateAt"] == DBNull.Value
+                                ? ""
+                                : Ordinary.StringToDate(dr["LastUpdateAt"].ToString());
+
+                            vm.LastUpdateBy = dr["LastUpdateBy"].ToString();
+                            vm.LastUpdateFrom = dr["LastUpdateFrom"].ToString();
+
+                            vm.EmpName = dr["EmpName"].ToString();
+                            vm.Code = dr["Code"].ToString();
+                            vm.Designation = dr["Designation"].ToString();
+                            vm.Department = dr["Department"].ToString();
+
+                            vm.JoinDate = dr["JoinDate"] == DBNull.Value
+                                ? ""
+                                : Ordinary.StringToDate(dr["JoinDate"].ToString());
+
+                            vm.Section = dr["Section"].ToString();
+                            vm.Project = dr["Project"].ToString();
+
+                            vm.GrossSalary = Convert.ToDecimal(dr["GrossSalary"]);
+                            vm.BasicSalary = Convert.ToDecimal(dr["BasicSalary"]);
+                        }
                     }
                 }
             }
-
-            #endregion
+            catch (Exception ex)
+            {
+                throw new Exception("SQL:" + sqlText + FieldDelimeter + ex.Message, ex);
+            }
+            finally
+            {
+                if (currConn != null && currConn.State == ConnectionState.Open)
+                {
+                    currConn.Close();
+                }
+            }
 
             return vm;
+        }
+
+        private bool IsValidIntId(string value, out int result)
+        {
+            result = 0;
+
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+
+            value = value.Trim();
+
+            if (value.Equals("null", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            if (value == "0")
+                return false;
+
+            return int.TryParse(value, out result);
         }
 
         //==================Insert =================

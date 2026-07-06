@@ -247,152 +247,230 @@ From EmployeeForfeiture pfo
         /// [3] = Executed SQL query,  
         /// [4] = Exception message (if any)    
         /// </returns>
-        public List<EmployeePFForfeitureVM> SelectAllList(string empid = null, string[] conditionFields = null, string[] conditionValues = null, SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
+        public List<EmployeePFForfeitureVM> SelectAllList(string empid = null,string[] conditionFields = null,string[] conditionValues = null,SqlConnection VcurrConn = null,SqlTransaction Vtransaction = null)
         {
-
             #region Variables
+
             SqlConnection currConn = null;
             SqlTransaction transaction = null;
             string sqlText = "";
             List<EmployeePFForfeitureVM> VMs = new List<EmployeePFForfeitureVM>();
             EmployeePFForfeitureVM vm;
+
             #endregion
+
             try
             {
-                #region open connection and transaction
-                #region New open connection and transaction
+                #region Open Connection and Transaction
+
                 if (VcurrConn != null)
                 {
                     currConn = VcurrConn;
                 }
+
                 if (Vtransaction != null)
                 {
                     transaction = Vtransaction;
                 }
-                #endregion New open connection and transaction
+
                 if (currConn == null)
                 {
                     currConn = _dbsqlConnection.GetConnection();
+
                     if (currConn.State != ConnectionState.Open)
                     {
                         currConn.Open();
                     }
                 }
+
                 if (transaction == null)
                 {
                     transaction = currConn.BeginTransaction("");
                 }
-                
-
-                #endregion open connection and transaction
-                #region sql statement
-                #region SqlText
-
-                sqlText = @"
-SELECT
- pfo.Id
-,pfo.EmployeeId
-,e.EmpName
-,e.Code
-,e.Designation
-,e.Department, e.JoinDate, e.Section, e.Project, e.GrossSalary, e.BasicSalary
-,isnull(pfo.EmployeeContribution,0)       EmployeeContribution
-,isnull(pfo.EmployerContribution,0)       EmployerContribution
-,isnull(pfo.EmployeeProfit      ,0)       EmployeeProfit
-,isnull(pfo.EmployerProfit      ,0)       EmployerProfit
-
-,pfo.OpeningDate
-,pfo.Post
-,pfo.Remarks
-,pfo.IsActive
-,pfo.IsArchive
-,pfo.CreatedBy
-,pfo.CreatedAt
-,pfo.CreatedFrom
-,pfo.LastUpdateBy
-,pfo.LastUpdateAt
-,pfo.LastUpdateFrom
-From EmployeeForfeiture pfo
-
-";
-                sqlText += " left outer join ViewEmployeeInformation e on e.EmployeeId=pfo.Id";
-                sqlText += " Where 1=1 and  pfo.IsArchive=0 and  pfo.IsActive=1  AND e.Code=@Code AND pfo.Id=@Id AND TRY_CONVERT(date, e.JoinDate, 106)>=@DateFrom AND TRY_CONVERT(date, e.JoinDate, 106)<=@DateTo";
 
                 #endregion
 
+                #region SQL Statement
+
+                sqlText = @"
+SELECT
+     pfo.Id
+    ,pfo.EmployeeId
+    ,e.EmpName
+    ,e.Code
+    ,e.Designation
+    ,e.Department
+    ,e.JoinDate
+    ,e.Section
+    ,e.Project
+    ,ISNULL(e.GrossSalary, 0) GrossSalary
+    ,ISNULL(e.BasicSalary, 0) BasicSalary
+    ,ISNULL(pfo.EmployeeContribution, 0) EmployeeContribution
+    ,ISNULL(pfo.EmployerContribution, 0) EmployerContribution
+    ,ISNULL(pfo.EmployeeProfit, 0) EmployeeProfit
+    ,ISNULL(pfo.EmployerProfit, 0) EmployerProfit
+    ,pfo.OpeningDate
+    ,pfo.Post
+    ,pfo.Remarks
+    ,pfo.IsActive
+    ,pfo.IsArchive
+    ,pfo.CreatedBy
+    ,pfo.CreatedAt
+    ,pfo.CreatedFrom
+    ,pfo.LastUpdateBy
+    ,pfo.LastUpdateAt
+    ,pfo.LastUpdateFrom
+FROM EmployeeForfeiture pfo
+LEFT OUTER JOIN ViewEmployeeInformation e 
+    ON e.EmployeeId = pfo.EmployeeId
+WHERE 1 = 1
+AND pfo.IsArchive = 0
+AND pfo.IsActive = 1
+";
 
                 if (!string.IsNullOrEmpty(empid))
                 {
-                    sqlText += @" and pfo.EmployeeId=@EmployeeId ";
+                    sqlText += " AND pfo.EmployeeId = @EmployeeId ";
                 }
-              
-                sqlText += @" ORDER BY pfo.EmployeeId";
 
-                #endregion SqlText
-                #region SqlExecution
+                if (conditionFields != null && conditionValues != null && conditionFields.Length == conditionValues.Length)
+                {
+                    for (int i = 0; i < conditionFields.Length; i++)
+                    {
+                        if (string.IsNullOrWhiteSpace(conditionFields[i]) || string.IsNullOrWhiteSpace(conditionValues[i]))
+                        {
+                            continue;
+                        }
+
+                        string field = conditionFields[i].Trim();
+                        string op = "=";
+
+                        if (field.EndsWith(">="))
+                        {
+                            op = ">=";
+                            field = field.Substring(0, field.Length - 2).Trim();
+                        }
+                        else if (field.EndsWith("<="))
+                        {
+                            op = "<=";
+                            field = field.Substring(0, field.Length - 2).Trim();
+                        }
+                        else if (field.EndsWith("!="))
+                        {
+                            op = "!=";
+                            field = field.Substring(0, field.Length - 2).Trim();
+                        }
+                        else if (field.EndsWith(">"))
+                        {
+                            op = ">";
+                            field = field.Substring(0, field.Length - 1).Trim();
+                        }
+                        else if (field.EndsWith("<"))
+                        {
+                            op = "<";
+                            field = field.Substring(0, field.Length - 1).Trim();
+                        }
+
+                        sqlText += " AND " + field + " " + op + " @p" + i;
+                    }
+                }
+
+                sqlText += " ORDER BY pfo.EmployeeId ";
+
+                #endregion
+
+                #region SQL Execution
 
                 SqlCommand objComm = new SqlCommand(sqlText, currConn, transaction);
-                objComm.Parameters.AddWithValue("@Code", conditionValues[0]);
-                objComm.Parameters.AddWithValue("@Id", conditionValues[1]);
-                objComm.Parameters.AddWithValue("@DateFrom", conditionValues[2]);
-                objComm.Parameters.AddWithValue("@DateTo", conditionValues[3]);
+
                 if (!string.IsNullOrEmpty(empid))
                 {
                     objComm.Parameters.AddWithValue("@EmployeeId", empid);
                 }
 
-                SqlDataReader dr;
-                dr = objComm.ExecuteReader();
+                if (conditionFields != null && conditionValues != null && conditionFields.Length == conditionValues.Length)
+                {
+                    for (int i = 0; i < conditionFields.Length; i++)
+                    {
+                        if (string.IsNullOrWhiteSpace(conditionFields[i]) || string.IsNullOrWhiteSpace(conditionValues[i]))
+                        {
+                            continue;
+                        }
+
+                        objComm.Parameters.AddWithValue("@p" + i, conditionValues[i]);
+                    }
+                }
+
+                SqlDataReader dr = objComm.ExecuteReader();
+
                 while (dr.Read())
                 {
                     vm = new EmployeePFForfeitureVM();
-                    vm.Id = (dr["Id"]).ToString();
-                    vm.EmployeeId = dr["EmployeeId"].ToString();
-                    vm.EmployeeContribution = Convert.ToDecimal(dr["EmployeeContribution"]);
-                    vm.EmployerContribution = Convert.ToDecimal(dr["EmployerContribution"]);
-                    vm.EmployeeProfit = Convert.ToDecimal(dr["EmployeeProfit"]);
-                    vm.EmployerProfit = Convert.ToDecimal(dr["EmployerProfit"]);
-                    vm.OpeningDate = Ordinary.StringToDate(dr["OpeningDate"].ToString());
-                    vm.Post = Convert.ToBoolean(dr["Post"]);
-                    vm.IsActive = Convert.ToBoolean(dr["IsActive"]);
-                    vm.Remarks = dr["Remarks"].ToString();
-                    vm.CreatedAt = Ordinary.StringToDate(dr["CreatedAt"].ToString());
-                    vm.CreatedBy = dr["CreatedBy"].ToString();
-                    vm.CreatedFrom = dr["CreatedFrom"].ToString();
-                    vm.LastUpdateAt = Ordinary.StringToDate(dr["LastUpdateAt"].ToString());
-                    vm.LastUpdateBy = dr["LastUpdateBy"].ToString();
-                    vm.LastUpdateFrom = dr["LastUpdateFrom"].ToString();
-                    vm.EmpName = dr["EmpName"].ToString();
-                    vm.Code = dr["Code"].ToString();
-                    vm.Designation = dr["Designation"].ToString();
-                    vm.Department = dr["Department"].ToString();
-                    vm.JoinDate = Ordinary.StringToDate(dr["JoinDate"].ToString());
-                    vm.Section = dr["Section"].ToString();
-                    vm.Project = dr["Project"].ToString();
-                    vm.GrossSalary = Convert.ToDecimal(dr["GrossSalary"]);
-                    vm.BasicSalary = Convert.ToDecimal(dr["BasicSalary"]);
+
+                    vm.Id = dr["Id"] == DBNull.Value ? "" : dr["Id"].ToString();
+                    vm.EmployeeId = dr["EmployeeId"] == DBNull.Value ? "" : dr["EmployeeId"].ToString();
+
+                    vm.EmployeeContribution = dr["EmployeeContribution"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["EmployeeContribution"]);
+                    vm.EmployerContribution = dr["EmployerContribution"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["EmployerContribution"]);
+                    vm.EmployeeProfit = dr["EmployeeProfit"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["EmployeeProfit"]);
+                    vm.EmployerProfit = dr["EmployerProfit"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["EmployerProfit"]);
+
+                    vm.OpeningDate = dr["OpeningDate"] == DBNull.Value ? "" : Ordinary.StringToDate(dr["OpeningDate"].ToString());
+
+                    vm.Post = dr["Post"] != DBNull.Value && Convert.ToBoolean(dr["Post"]);
+                    vm.IsActive = dr["IsActive"] != DBNull.Value && Convert.ToBoolean(dr["IsActive"]);
+
+                    vm.Remarks = dr["Remarks"] == DBNull.Value ? "" : dr["Remarks"].ToString();
+
+                    vm.CreatedAt = dr["CreatedAt"] == DBNull.Value ? "" : Ordinary.StringToDate(dr["CreatedAt"].ToString());
+                    vm.CreatedBy = dr["CreatedBy"] == DBNull.Value ? "" : dr["CreatedBy"].ToString();
+                    vm.CreatedFrom = dr["CreatedFrom"] == DBNull.Value ? "" : dr["CreatedFrom"].ToString();
+
+                    vm.LastUpdateAt = dr["LastUpdateAt"] == DBNull.Value ? "" : Ordinary.StringToDate(dr["LastUpdateAt"].ToString());
+                    vm.LastUpdateBy = dr["LastUpdateBy"] == DBNull.Value ? "" : dr["LastUpdateBy"].ToString();
+                    vm.LastUpdateFrom = dr["LastUpdateFrom"] == DBNull.Value ? "" : dr["LastUpdateFrom"].ToString();
+
+                    vm.EmpName = dr["EmpName"] == DBNull.Value ? "" : dr["EmpName"].ToString();
+                    vm.Code = dr["Code"] == DBNull.Value ? "" : dr["Code"].ToString();
+                    vm.Designation = dr["Designation"] == DBNull.Value ? "" : dr["Designation"].ToString();
+                    vm.Department = dr["Department"] == DBNull.Value ? "" : dr["Department"].ToString();
+                    vm.JoinDate = dr["JoinDate"] == DBNull.Value ? "" : Ordinary.StringToDate(dr["JoinDate"].ToString());
+                    vm.Section = dr["Section"] == DBNull.Value ? "" : dr["Section"].ToString();
+                    vm.Project = dr["Project"] == DBNull.Value ? "" : dr["Project"].ToString();
+
+                    vm.GrossSalary = dr["GrossSalary"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["GrossSalary"]);
+                    vm.BasicSalary = dr["BasicSalary"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["BasicSalary"]);
 
                     VMs.Add(vm);
                 }
+
                 dr.Close();
-                #endregion SqlExecution
+
+                #endregion
 
                 if (Vtransaction == null && transaction != null)
                 {
                     transaction.Commit();
                 }
             }
-            #region catch
             catch (SqlException sqlex)
             {
-                throw new ArgumentNullException("", "SQL:" + sqlText + FieldDelimeter + sqlex.Message.ToString());
+                if (Vtransaction == null && transaction != null)
+                {
+                    transaction.Rollback();
+                }
+
+                throw new ArgumentNullException("", "SQL:" + sqlText + FieldDelimeter + sqlex.Message);
             }
             catch (Exception ex)
             {
-                throw new ArgumentNullException("", "SQL:" + sqlText + FieldDelimeter + ex.Message.ToString());
+                if (Vtransaction == null && transaction != null)
+                {
+                    transaction.Rollback();
+                }
+
+                throw new ArgumentNullException("", "SQL:" + sqlText + FieldDelimeter + ex.Message);
             }
-            #endregion
-            #region finally
             finally
             {
                 if (VcurrConn == null && currConn != null && currConn.State == ConnectionState.Open)
@@ -400,7 +478,7 @@ From EmployeeForfeiture pfo
                     currConn.Close();
                 }
             }
-            #endregion
+
             return VMs;
         }
 

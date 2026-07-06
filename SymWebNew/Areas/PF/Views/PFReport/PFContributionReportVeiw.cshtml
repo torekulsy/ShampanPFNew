@@ -21,7 +21,8 @@
                 </label>
                 <div class="col-sm-9">
                     @*@Html.TextBoxFor(model => model.Code, new { @placeholder = "Code", @class = " form-control" })*@
-                    @Html.SimpleDropDownFor(model => model.EmployeeId, "/Config/DropDown/EmployeeCodeNameId", new { @class = "codeFCom form-control selectDropdown" })
+                    @Html.SimpleDropDownFor(model => model.EmployeeId, "/Config/DropDown/EmployeeCodeNameId", new { @class = "required codeFCom form-control selectDropdown" })
+                    @Html.ValidationMessageFor(model => model.EmployeeId)
                 </div>
             </div>
             
@@ -83,28 +84,30 @@
         $(".selectDropdown").select2();
         $(".selectDropdown").removeClass('form-control');
         InitDropDowns();
-        //InitDropdownsCommon();
-
         InitDateTimePickers();
-
-        $("#Clear").on('click', function () {
-            // Clear all input, select, and textarea fields within the form
-            $("#frmStatement").find("input[type=text], select, textarea").val("");
-            $("#frmStatement").find("select").val(null).trigger('change'); // Reset select2 dropdowns
+        $(".selectDropdown").on("change", function () {
+            $(this).valid();
         });
 
-        //$("#Clear").on('click', function () {
-        //    //$("#Code").val("");
-        //    $("#Id").val("");
-        //    $("#PFHeaderId").val("");
-        //    $("#DateFrom").val("");
-        //    $("#DateTo").val("");
-
-        //});
+        $("#Clear").on('click', function () {
+            $("#frmStatement").find("input[type=text], select, textarea").val("");
+            $("#frmStatement").find("select").val(null).trigger('change');
+        });
     });
 
     function reportData(sender) {
-        $("#frmStatement").submit();
-    }
 
+        var isValid = $("#frmStatement").valid();
+
+
+        // valiDation("frmStatement");
+        // var isValid = $("#frmStatement").validate().form();
+
+        if (isValid) {
+            $("#frmStatement").submit();
+        } else {
+            console.log("Form validation failed. Prevention active.");
+        }
+    }
 </script>
+

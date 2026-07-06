@@ -27,11 +27,11 @@ namespace SymRepository.PF
         }
 
 
-        public List<PFSettlementVM> SelectAll(int Id = 0, string[] conditionFields = null, string[] conditionValues = null)
+        public List<PFSettlementVM> SelectAll(string BranchId = "", int Id = 0, string[] conditionFields = null, string[] conditionValues = null)
         {
             try
             {
-                return new PFSettlementDAL().SelectAll(Id, conditionFields, conditionValues);
+                return new PFSettlementDAL().SelectAll(BranchId, Id, conditionFields, conditionValues);
             }
             catch (Exception ex)
             {
@@ -97,11 +97,11 @@ namespace SymRepository.PF
                 throw ex;
             }
         }
-        public string[] InsertAutoJournal(string JournalType, string TransactionForm, string TransactionCode, int Id, string BranchId, ShampanIdentityVM vm)
+        public string[] InsertAutoJournal(string JournalType, string TransactionForm, string TransactionCode, string BranchId, ShampanIdentityVM vm)
         {
             try
             {
-                return new PFSettlementDAL().AutoJournalSave(JournalType, TransactionForm, TransactionCode, Id, BranchId, null, null, vm);
+                return new PFSettlementDAL().AutoJournalSave(JournalType, TransactionForm, TransactionCode, BranchId, null, null, vm);
             }
             catch (Exception ex)
             {

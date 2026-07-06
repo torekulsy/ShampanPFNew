@@ -60,11 +60,13 @@ ve.EmpName,ve.Department ,ve.Designation
 ,l.Remarks
 ,t.Name
 ,t.Name LoanType
- ,l.Id
+,l.Id
+,l.IsApproved
+,IsNull(l.IsEarlySellte,0) IsEarlySellte
  from EmployeeLoan l
 left outer join ViewEmployeeInformation ve on l.EmployeeId=ve.EmployeeId
 left outer join EnumLoanType t on t.Id=l.LoanType_E
-WHERE l.IsArchive=0  and l.BranchId=@BranchId and l.IsEarlySellte IS NULL 
+WHERE  l.BranchId=@BranchId
 ";
                 if (!string.IsNullOrWhiteSpace(employeeId))
                 {
@@ -102,6 +104,8 @@ WHERE l.IsArchive=0  and l.BranchId=@BranchId and l.IsEarlySellte IS NULL
                     vm.Code = dr["Code"].ToString();
                     vm.Designation = dr["Designation"].ToString();
                     vm.Department = dr["Department"].ToString();
+                    vm.IsApproved = Convert.ToBoolean(dr["IsApproved"]);
+                    vm.IsEarlySellte = Convert.ToBoolean(dr["IsEarlySellte"]);
                     VMs.Add(vm);
                 }
                 #endregion
@@ -400,7 +404,7 @@ WHERE l.IsArchive=0 and l.Id=@loanID
                     vm.Designation = dr["Designation"].ToString();
                     vm.Department = dr["Department"].ToString();
                     vm.Section = dr["Section"].ToString();
-                    vm.TotalDueInterestAmount =  Convert.ToDecimal(dr["EarlySellteInterestAmount"].ToString());
+                    vm.TotalDueInterestAmount = Convert.ToDecimal(dr["EarlySellteInterestAmount"].ToString());
                     //vm.Employee = dr["Salutation_E"].ToString() + " " + dr["MiddleName"].ToString() +" " +dr["LastName"].ToString();
                 }
                 dr.Close();
@@ -1431,7 +1435,7 @@ where id=@id
                 {
                     transaction = currConn.BeginTransaction("");
                 }
-              
+
                 #endregion open connection and transaction
                 #region Save
                 //if ishold false then it must be duplicate or hold
@@ -2176,7 +2180,7 @@ select
             #endregion
             return VMs;
         }
-        public List<EmployeeLoanDetailVM> SelectLoanStatementForReport(string ProjectId, string DepartmentId, string SectionId, string DesignationId, string CodeF, string CodeT,string BranchId)
+        public List<EmployeeLoanDetailVM> SelectLoanStatementForReport(string ProjectId, string DepartmentId, string SectionId, string DesignationId, string CodeF, string CodeT)
         {
             #region Variables
             SqlConnection currConn = null;
@@ -2207,7 +2211,7 @@ SELECT
       ,SUM(ROUND(PrincipalAmountPaid, 0)) PrincipalAmountPaid
       ,SUM(ROUND(InterestAmountPaid, 0)) InterestAmountPaid
   FROM View_LoanDetails
-     where 1=1 
+     where 1=1 and EmpName Is Not null
 ";
                 //if (fid != null && fid != 0)
                 //{
@@ -2222,13 +2226,13 @@ SELECT
                 if (DesignationId != "0_0")
                     sqlText += " and emp.DesignationId=@DesignationId ";
                 if (CodeF != "0_0")
-                    sqlText += " and emp.Code>= @CodeF";
+                    sqlText += " and Code>= @CodeF";
                 if (CodeT != "0_0")
-                    sqlText += " and emp.Code<= @CodeT";
-                if (BranchId != "")
-                {
-                    sqlText += " and BranchId=@BranchId";
-                }
+                    sqlText += " and Code<= @CodeT";
+                //if (BranchId != "")
+                //{
+                //    sqlText += " and BranchId=@BranchId";
+                //}
                 sqlText += " group by EmpName,Code,Designation,EmployeeLoanId,NumberOfInstallment,ApprovedDate,LoanNo Order by Code ";
                 SqlCommand objComm = new SqlCommand();
                 objComm.Connection = currConn;
@@ -2246,8 +2250,8 @@ SELECT
                     objComm.Parameters.AddWithValue("@CodeF", CodeF);
                 if (CodeT != "0_0")
                     objComm.Parameters.AddWithValue("@CodeT", CodeT);
-                if (BranchId != "")
-                    objComm.Parameters.AddWithValue("@BranchId", BranchId);
+                //if (BranchId != "")
+                //    objComm.Parameters.AddWithValue("@BranchId", BranchId);
                 SqlDataReader dr;
                 dr = objComm.ExecuteReader();
                 while (dr.Read())
@@ -2255,16 +2259,16 @@ SELECT
                     vm = new EmployeeLoanDetailVM();
 
                     vm.Code = dr["Code"].ToString();
-                    vm.EmpName = dr["EmpName"].ToString();                   
+                    vm.EmpName = dr["EmpName"].ToString();
                     vm.Designation = dr["Designation"].ToString();
-                    vm.NumberOfInstallment =Convert.ToInt32(dr["NumberOfInstallment"].ToString());
+                    vm.NumberOfInstallment = Convert.ToInt32(dr["NumberOfInstallment"].ToString());
                     vm.InstallmentAmount = Convert.ToDecimal(dr["InstallmentAmount"].ToString());
                     vm.InterestAmount = Convert.ToDecimal(dr["InterestAmount"].ToString());
                     vm.PrincipalAmountPaid = Convert.ToDecimal(dr["PrincipalAmountPaid"].ToString());
                     vm.InterestAmountPaid = Convert.ToDecimal(dr["InterestAmountPaid"].ToString());
                     vm.ApprovedDate = dr["ApprovedDate"].ToString();
-                    vm.LoanNo = dr["LoanNo"].ToString();                  
-                
+                    vm.LoanNo = dr["LoanNo"].ToString();
+
                     VMs.Add(vm);
                 }
                 #endregion
@@ -2353,7 +2357,7 @@ emp.Code
                 sqlText += @" ) Select Code,EmpName,Designation, SUM(distinct PrincipalAmount) as PrincipalAmount,SUM(distinct InterestAmount) as InterestAmount,
                 SUM(InstallmentPrincipalAmount) as InstallmentPrincipalAmount, SUM(InstallmentInterestAmount) as InstallmentInterestAmount
                 from cat ";
-                  if (FromDate != "")
+                if (FromDate != "")
                     sqlText += " where PaymentScheduleDate between @FromDate and @ToDate";
                 sqlText += @" group by Code,EmpName,Designation,EmployeeLoanId  ORDER BY Code";
                 SqlCommand objComm = new SqlCommand();
@@ -2484,7 +2488,7 @@ emp.Code
                             throw new ArgumentNullException(retResults[1], "");
                         }
                     }
-                        #endregion Check Already Used
+                    #endregion Check Already Used
                     #region Delete Settings
                     for (int i = 0; i < ids.Length - 1; i++)
                     {
@@ -2560,7 +2564,7 @@ emp.Code
             #endregion
             return retResults;
         }
-      
+
         public DataTable getBalance(string date, string emploanId, SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
         {
 
@@ -2595,32 +2599,32 @@ emp.Code
 
                 sqlText = @"SELECT JoinDate From ViewEmployeeInformation
                       where  EmployeeId=@emploanId";
-              
-                SqlCommand cmd = new SqlCommand(sqlText, currConn,transaction);
+
+                SqlCommand cmd = new SqlCommand(sqlText, currConn, transaction);
                 cmd.Parameters.AddWithValue("@emploanId", emploanId);
                 string JoinDate = cmd.ExecuteScalar().ToString();
 
                 DateTime doj = Convert.ToDateTime(Ordinary.StringToDate(JoinDate));
-                double JobDay = ((Convert.ToDateTime(date) - doj).TotalDays)/365;// Ordinary.CalculateDayBetween(doj, Convert.ToDateTime(date));
+                double JobDay = ((Convert.ToDateTime(date) - doj).TotalDays) / 365;// Ordinary.CalculateDayBetween(doj, Convert.ToDateTime(date));
                 JobDay = Math.Round(JobDay, MidpointRounding.AwayFromZero);
 
-             sqlText = @"
+                sqlText = @"
 ----declare @EmployeeId varchar(100) = '1_1'
 ----declare @ToDate varchar(14) = 20200318
 ";
-             if (JobDay >= bothContributionJobAge)
-             {
-                 sqlText += @" select EmployeeId, ((EmployeeContribution)-LoanAmount+PaymentAmount) Balance";
+                if (JobDay >= bothContributionJobAge)
+                {
+                    sqlText += @" select EmployeeId, ((EmployeeContribution)-LoanAmount+PaymentAmount) Balance";
 
-             }
-             else
-             {
-                 sqlText += @" select EmployeeId, (EmployeeContribution-LoanAmount+PaymentAmount) Balance";
+                }
+                else
+                {
+                    sqlText += @" select EmployeeId, (EmployeeContribution-LoanAmount+PaymentAmount) Balance";
 
-             }
+                }
 
 
-  sqlText += @" 
+                sqlText += @" 
 
 from
 (
@@ -2643,7 +2647,7 @@ select StartDate, EmployeeId, 0 EmployeeContribution
 ,TotalAmount LoanAmount, 0 PaymentAmount, 'Loan' TransactionType 
 from EmployeeLoan loan
 left outer join EnumLoanType elt on elt.id=loan.LoanType_E
-where 1=1 and loan.EmployeeId= @EmployeeId and loan.IsApproved=1
+where 1=1 and loan.EmployeeId=@EmployeeId and loan.IsApproved=1
 and elt.Name = 'PF Loan' and loan.StartDate <= @ToDate
 
 ) as a
@@ -2730,7 +2734,7 @@ group by EmployeeId
                     transaction = currConn.BeginTransaction("");
                 }
                 #endregion open connection and transaction
-            
+
                 #region sql statement
 
                 #region SqlText
@@ -2896,7 +2900,7 @@ where ELD.IsArchive=0
                     transaction = currConn.BeginTransaction("");
                 }
                 #endregion open connection and transaction
-              
+
                 #region sql statement
 
                 #region SqlText
@@ -3008,16 +3012,16 @@ WHERE
     AND ELD.PaymentScheduleDate >= @StartDate 
     AND ELD.PaymentScheduleDate <= @EndDate
     and I.BranchId= @BranchId
- ";              
+ ";
                 #endregion SqlText
 
                 #region SqlExecution
 
                 if (conditionValues[2].ToString() != "[All]")
                     sqlText += " and Code>= @CodeF";
-                if (conditionValues[3].ToString()!="[All]")
+                if (conditionValues[3].ToString() != "[All]")
                     sqlText += " and Code<= @CodeT";
-               
+
 
                 using (SqlCommand cmd = new SqlCommand(sqlText, currConn, transaction))
                 {
@@ -3034,7 +3038,7 @@ WHERE
                     if (conditionValues[4].ToString() != "")
                     {
                         cmd.Parameters.AddWithValue("@BranchId", conditionValues[4]);
-                    }       
+                    }
 
                     using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                     {
@@ -3109,7 +3113,7 @@ WHERE
                     transaction = currConn.BeginTransaction("");
                 }
                 #endregion open connection and transaction
-              
+
                 #region sql statement
 
                 #region SqlText
@@ -3263,7 +3267,7 @@ SET @query = '
     ORDER BY LoanNo, BranchId, LoanType_E, EmployeeId'
  
 -- Execute the dynamic SQL
-EXEC sp_executesql @query, N'@StartDate DATE, @EndDate DATE, @BranchId INT', @StartDate, @EndDate,@BranchId;
+EXEC sp_executesql @query, N'@StartDate DATE, @EndDate DATE @BranchId INT', @StartDate, @EndDate,@BranchId;
 
  ";
                 #endregion SqlText
@@ -3383,15 +3387,16 @@ EXEC sp_executesql @query, N'@StartDate DATE, @EndDate DATE, @BranchId INT', @St
                 if (loanId.Length >= 1)
                 {
                     sqlText = " ";
-                    sqlText += "Update EmployeeLoan set EarlySelltePrincipleAmount=@EarlySelltePrincipleAmount,EarlySellteInterestAmount=@EarlySellteInterestAmount,EarlySellteDate=@EarlySellteDate, IsEarlySellte = 1";
+                    sqlText += "Update EmployeeLoan set EarlySelltePrincipleAmount=@EarlySelltePrincipleAmount,EarlySellteInterestAmount=@EarlySellteInterestAmount,EarlySellteDate=@EarlySellteDate, IsEarlySellte=@IsEarlySellte";
                     sqlText += " WHERE Id=@Id";
                     SqlCommand cmdDelete = new SqlCommand(sqlText, currConn, transaction);
                     cmdDelete.Parameters.AddWithValue("@Id", loanId);
                     cmdDelete.Parameters.AddWithValue("@EarlySelltePrincipleAmount", TotalDuePrincipalAmount);
                     cmdDelete.Parameters.AddWithValue("@EarlySellteInterestAmount", TotalDueInterestAmount);
                     cmdDelete.Parameters.AddWithValue("@EarlySellteDate", EarlySellteDate);
+                    cmdDelete.Parameters.AddWithValue("@IsEarlySellte", true);
                     var exeRes = cmdDelete.ExecuteNonQuery();
-                    transResult = Convert.ToInt32(exeRes);                  
+                    transResult = Convert.ToInt32(exeRes);
                     if (transResult <= 0)
                     {
                         retResults[3] = sqlText;
@@ -3434,7 +3439,7 @@ EXEC sp_executesql @query, N'@StartDate DATE, @EndDate DATE, @BranchId INT', @St
             return retResults;
         }
 
-        public string[] ApprovedSettelment(string loanId,string EarlySellteDate, SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
+        public string[] ApprovedSettelment(string loanId, string EarlySellteDate, SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
         {
             #region Variables
             string[] retResults = new string[6];
@@ -3498,13 +3503,13 @@ EXEC sp_executesql @query, N'@StartDate DATE, @EndDate DATE, @BranchId INT', @St
                     sqlText += " WHERE EmployeeLoanId=@Id and IsPaid=0";
                     SqlCommand cmdupdate = new SqlCommand(sqlText, currConn, transaction);
                     cmdupdate.Parameters.AddWithValue("@Id", loanId);
-                    cmdupdate.Parameters.AddWithValue("@IsPaid", true);               
+                    cmdupdate.Parameters.AddWithValue("@IsPaid", true);
                     cmdupdate.Parameters.AddWithValue("@PaymentDate", EarlySellteDate);
                     var exeRed = cmdupdate.ExecuteNonQuery();
 
                     transResult = Convert.ToInt32(exeRed);
                     if (transResult <= 0)
-                    {                       
+                    {
                         throw new ArgumentNullException("Unexpected error to update Paid EmployeeLoan.", "");
                     }
                 }
@@ -3517,6 +3522,125 @@ EXEC sp_executesql @query, N'@StartDate DATE, @EndDate DATE, @BranchId INT', @St
                     transaction.Commit();
                     retResults[0] = "Success";
                     retResults[1] = "Loan settelment approved successfully.";
+                }
+            }
+            #region catch
+            catch (Exception ex)
+            {
+                retResults[0] = "Fail";//Success or Fail
+                retResults[4] = ex.Message; //catch ex
+                if (Vtransaction == null) { transaction.Rollback(); }
+                return retResults;
+            }
+            finally
+            {
+                if (VcurrConn == null)
+                {
+                    if (currConn != null)
+                    {
+                        if (currConn.State == ConnectionState.Open)
+                        {
+                            currConn.Close();
+                        }
+                    }
+                }
+            }
+            #endregion
+            return retResults;
+        }
+
+        public string[] Approved(EmployeeLoanVM vm, string ids, SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
+        {
+            #region Variables
+            string[] retResults = new string[6];
+            retResults[0] = "Fail";//Success or Fail
+            retResults[1] = "Fail";// Success or Fail Message
+            retResults[2] = "0";// Return Id
+            retResults[3] = "sqlText"; //  SQL Query
+            retResults[4] = "ex"; //catch ex
+            retResults[5] = "Approved Employee Loan"; //Method Name
+            int transResult = 0;
+            string sqlText = "";
+            string retVal = "";
+            SqlConnection currConn = null;
+            SqlTransaction transaction = null;
+            #endregion
+            try
+            {
+                #region open connection and transaction
+                #region New open connection and transaction
+                if (VcurrConn != null)
+                {
+                    currConn = VcurrConn;
+                }
+                if (Vtransaction != null)
+                {
+                    transaction = Vtransaction;
+                }
+                #endregion New open connection and transaction
+                if (currConn == null)
+                {
+                    currConn = _dbsqlConnection.GetConnection();
+                    if (currConn.State != ConnectionState.Open)
+                    {
+                        currConn.Open();
+                    }
+                }
+                if (transaction == null) { transaction = currConn.BeginTransaction("DeleteToEmployeeLoan"); }
+                #endregion open connection and transaction
+
+                if (ids.Length >= 1)
+                {
+                    sqlText = "";
+                    sqlText += " ";
+                    sqlText += "Update EmployeeLoan set IsApproved = Case when IsApproved=1 then 0 else 1 end ";
+                    sqlText += " WHERE Id=@Id";
+                    SqlCommand cmdDelete = new SqlCommand(sqlText, currConn, transaction);
+                    cmdDelete.Parameters.AddWithValue("@Id", ids);
+                    var exeRes = cmdDelete.ExecuteNonQuery();
+                    transResult = Convert.ToInt32(exeRes);
+                    if (transResult <= 0)
+                    {
+                        retResults[3] = sqlText;
+                        throw new ArgumentNullException("Unexpected error to update EmployeeLoan.", "");
+                    }
+
+                    // Retrieve the updated status of the Post column
+                    sqlText = "SELECT IsApproved FROM EmployeeLoan WHERE Id=@Id";
+                    SqlCommand cmdCheckPost = new SqlCommand(sqlText, currConn);
+                    cmdCheckPost.Parameters.AddWithValue("@Id", ids);
+                    cmdCheckPost.Transaction = transaction;
+                    var postStatus = cmdCheckPost.ExecuteScalar();
+
+                    // Check if Post is 1 or 0 and set the message accordingly
+                    //if (Convert.ToInt32(postStatus) == 1)
+                    //{
+                    retResults[0] = "Success";
+                    retResults[1] = "Data Approved Successfully.";
+                    //}
+                    //else
+                    //{
+                    //    retResults[0] = "Success";
+                    //    retResults[1] = "Data Not Approved Successfully.";
+                    //}
+
+                    retResults[2] = "";// Return Id
+                    retResults[3] = sqlText; //  SQL Query
+                    #region Commit
+                    if (transResult <= 0)
+                    {
+                        throw new ArgumentNullException("EmployeeLoan Delete", vm.Id + " could not Delete.");
+                    }
+                    #endregion Commit
+
+                }
+                else
+                {
+                    throw new ArgumentNullException("EmployeeLoan Information Delete", "Could not found any item.");
+                }
+                if (Vtransaction == null && transaction != null)
+                {
+                    transaction.Commit();
                 }
             }
             #region catch

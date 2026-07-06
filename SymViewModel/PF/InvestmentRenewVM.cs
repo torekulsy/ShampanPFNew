@@ -22,7 +22,7 @@ namespace SymViewModel.PF
         public string ToDate { get; set; }
         [Display(Name = "Maturity Date")]
         public string MaturityDate { get; set; }
-        [Display(Name = "Investable/Encashable Value")]
+        [Display(Name = "Investable Value")]
         public decimal? InvestmentValue { get; set; }
         [Display(Name = "Bank charge & Excise Duty.")]
         public decimal? BankCharge { get; set; }

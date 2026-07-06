@@ -55,7 +55,7 @@
                     <thead>
                         <tr>
                             <th class="center">
-                                <input type="checkbox" class="chkAll" />Select All1
+                                <input type="checkbox" class="chkAll" />Select All
                             </th>
                             <th>Code</th>
                             <th>Name</th>
@@ -64,7 +64,8 @@
                             <th>Loan Type</th>
                             <th style="text-align:left!important">Principal Amount</th>
                             <th style="text-align:left!important">Interest Amount</th>
-                            <th style="text-align:left!important">Total Amount</th>                       
+                            <th style="text-align:left!important">Total Amount</th> 
+                            <th>Early Sellte</th>                       
                         </tr>
                         <tr>
                             <th class="center">Actions</th>
@@ -75,7 +76,8 @@
                             <th>Loan Type</th>
                             <th style="text-align:left!important">Principal Amount</th>
                             <th style="text-align:left!important">Interest Amount</th>
-                            <th style="text-align:left!important">Total Amount</th>                        
+                            <th style="text-align:left!important">Total Amount</th>  
+                            <th>Early Sellte</th>                       
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -134,81 +136,93 @@
                 $('.dataTables_filter input')
                     .attr('placeholder', 'Search...');
             },
-            "aoColumns": [
-                            {
-                                "sName": "Id",
-                                "bSearchable": false,
-                                "bSortable": false,
-                                "sWidth": "5%",
-                                "sClass": "center",
-                                "fnRender": function (oObj) {
-                                    var loanId = oObj.aData[0];
-                                    var isApproved = oObj.aData[10]; // adjust index if needed
+             "aoColumns": [
+                 {
+                     "sName": "Id",
+                     "bSearchable": false,
+                     "bSortable": false,
+                     "sWidth": "12%",
+                     "sClass": "center",
+                     "fnRender": function (oObj) {
+                         var loanId = oObj.aData[0];
+                         var isApproved = oObj.aData[10]; // adjust index if needed
 
-                                    var checkbox = '<input onclick="CheckAll(this)" type="checkbox" data-Id="' + loanId + '">';
-                                    var editBtn = '<a title="Edit" class="sym-btn-edit-row" href="/PF/Loan/Edit?loanId=' + loanId + '"></a>';
-                                    var reportBtn = '<a title="Report" data-url="/PF/Loan/ReportView" onclick="reportData(this);" data-Id="' + loanId + '" class="sym-btn-report-row"></a>';
-                                    var deleteBtn = '<a title="Delete" data-url="/PF/Loan/Delete" onclick="deletedData(this, myDataTable, \'' + loanId + '\');" class="sym-btn-remove-row"></a>';
-                                    var settlementBtn = '<a title="Settlement" class="sym-btn-add-row" href="/PF/Loan/Settlement?loanId=' + loanId + '"></a>';
-                                    var approveBtn = '';
+                         var checkbox = '<input onclick="CheckAll(this)" type="checkbox" data-Id="' + loanId + '">';
+                         if (oObj.aData[9] == "Yes" || oObj.aData[9] == true) {
+                             var editBtn = '<a title="Edit" class="sym-btn-edit-row" style="opacity:0.45;pointer-events:none;cursor:default;" href="/PF/Loan/Edit?loanId=' + loanId + '"></a>';
+                         }
+                         else {
+                             var editBtn = '<a title="Edit" class="sym-btn-edit-row" href="/PF/Loan/Edit?loanId=' + loanId + '"></a>';
+                         }
 
-                                    if ('@identity.IsAdmin'.toLowerCase() == "true") {
-                                        if (isApproved == "Approved") {
-                                            approveBtn = '<a title="Click for Not Approve" class="sym-btn-post-row" href="/PF/Loan/Approved?loanId=' + loanId + '"></a>';
-                                        }
-                                        else {
-                                            approveBtn = '<a title="Click for Approve" class="sym-btn-reject-row" href="/PF/Loan/Approved?loanId=' + loanId + '"></a>';
-                                        }
-                                    }
+                         var reportBtn = '<a title="Report" data-url="/PF/Loan/ReportView" onclick="reportData(this);" data-Id="' + loanId + '" class="sym-btn-report-row"></a>';
+                         var deleteBtn = '<a title="Delete" data-url="/PF/Loan/Delete" onclick="deletedData(this, myDataTable, \'' + loanId + '\');" class="sym-btn-remove-row"></a>';
+                         var settlementBtn = '<a title="Settlement" class="sym-btn-add-row" href="/PF/Loan/Settlement?loanId=' + loanId + '"></a>';
+                         var approveBtn = '';
 
-                                    // Apply condition for enabling/disabling renewOrEncashBtn
-                                    if (isApproved == "Not Approved") {
-                                        settlementBtn = '<a title="settlement" target="_blank" href="#" class="sym-btn-add-row" style="pointer-events: none; opacity: 0.5;"></a>';  // Disabled state
-                                        reportBtn = '<a title="settlement" target="_blank" href="#" class="sym-btn-report-row" style="pointer-events: none; opacity: 0.5;"></a>';  // Disabled state
-                                        editBtn = '<a title="settlement" target="_blank" href="#" class="sym-btn-edit-row" style="pointer-events: none; opacity: 0.5;"></a>';  // Disabled state
-                                    } else {
-                                        settlementBtn = '<a title="settlement" target="_blank" href="/PF/Loan/Settlement?loanId=' + loanId + '" class="sym-btn-add-row"></a>';  // Enabled state
-                                        editBtn = '<a title="Edit" class="sym-btn-edit-row" href="/PF/Loan/Edit?loanId=' + loanId + '"></a>';
-                                        reportBtn = '<a title="Report" data-url="/PF/Loan/ReportView" onclick="reportData(this);" data-Id="' + loanId + '" class="sym-btn-report-row"></a>';
-                                    }
-                                        if ('@identity.IsAdmin'.toLowerCase() == "true") {
-                                        return checkbox  + editBtn  + approveBtn  + deleteBtn  + reportBtn  + settlementBtn;
-                                        }
-                                        else
-                                        {
-                                            return checkbox + editBtn  + approveBtn  + reportBtn +  settlementBtn;
-                                        }
-                                }
+                         if ('@identity.IsAdmin'.toLowerCase() == "true") {
+                             if (isApproved == "Approved" || isApproved === true) {
+                                 approveBtn = '<a title="Click for Not Approve" class=" sym-btn-post-row" style="opacity:0.45;pointer-events:none;cursor:default;" href="/PF/Loan/Approved?loanId=' + loanId + '"></a>';
+                             }
+                             else {
+                                 approveBtn = '<a title="Click for Approve" class="sym-btn-post-row" href="/PF/Loan/Approved?loanId=' + loanId + '"></a>';
+                             }
+                         }
 
-                            }
-                                , { "sName": "Code", "sWidth": "5%" }
-                                , { "sName": "EmpName", "sWidth": "12%" }
-                                , { "sName": "Department", "sWidth": "10%" }
-                                , { "sName": "Designation", "sWidth": "10%" }
-                                , { "sName": "LoanType", "sWidth": "10%" }
-                                   , {
-                                       "sName": "PrincipalAmount",
-                                    "sWidth": "8%", "sClass": "right",
-                                    "fnRender": function (oObj) {
-                                        return formatNumberWithCommas(oObj.aData[6]);
-                                    }
-                                   }
-                                    , {
-                                        "sName": "InterestAmount",
-                                        "sWidth": "8%", "sClass": "right",
-                                        "fnRender": function (oObj) {
-                                            return formatNumberWithCommas(oObj.aData[7]);
-                                        }
-                                    }
-                               , {
-                                   "sName": "TotalAmount",
-                                   "sWidth": "8%", "sClass": "right",
-                                   "fnRender": function (oObj) {
-                                       return formatNumberWithCommas(oObj.aData[8]);
-                                   }
-                               }
-                          
-            ]
+                         // Apply condition for enabling/disabling renewOrEncashBtn
+                         if (isApproved == "Not Approved") {
+                             settlementBtn = '<a title="settlement" target="_blank" href="#" class="sym-btn-add-row" style="pointer-events: none; opacity: 0.5;"></a>';  // Disabled state
+                             reportBtn = '<a title="settlement" target="_blank" href="#" class="sym-btn-report-row" style="pointer-events: none; opacity: 0.5;"></a>';  // Disabled state
+                             editBtn = '<a title="settlement" target="_blank" href="#" class="sym-btn-edit-row" style="pointer-events: none; opacity: 0.5;"></a>';  // Disabled state
+                         } else {
+                             settlementBtn = '<a title="settlement" target="_blank" href="/PF/Loan/Settlement?loanId=' + loanId + '" class="sym-btn-add-row"></a>';  // Enabled state
+                             if (oObj.aData[9] == "Yes" || oObj.aData[9] == true) {
+                                 editBtn = '<a title="Edit" class="sym-btn-edit-row" style="opacity:0.45;pointer-events:none;cursor:default;" href="/PF/Loan/Edit?loanId=' + loanId + '"></a>';
+                             }
+                             else {
+                                 editBtn = '<a title="Edit" class="sym-btn-edit-row" href="/PF/Loan/Edit?loanId=' + loanId + '"></a>';
+                             }
+                             reportBtn = '<a title="Report" data-url="/PF/Loan/ReportView" onclick="reportData(this);" data-Id="' + loanId + '" class="sym-btn-report-row"></a>';
+                         }
+                             if ('@identity.IsAdmin'.toLowerCase() == "true") {
+                             return checkbox + '&nbsp;' + editBtn + '&nbsp;' + approveBtn + '&nbsp;' + deleteBtn + '&nbsp;' + reportBtn + '&nbsp;' + settlementBtn;
+                             }
+                             else
+                             {
+                                 return checkbox + '&nbsp;' + editBtn + '&nbsp;' + approveBtn + '&nbsp;' +'&nbsp;' + reportBtn + '&nbsp;' + settlementBtn;
+                             }
+                     }
+
+                 }
+                     , { "sName": "Code", "sWidth": "10%" }
+                     , { "sName": "EmpName", "sWidth": "12%" }
+                     , { "sName": "Department", "sWidth": "10%" }
+                     , { "sName": "Designation", "sWidth": "10%" }
+                     , { "sName": "LoanType", "sWidth": "10%" }
+                        , {
+                            "sName": "PrincipalAmount",
+                         "sWidth": "8%", "sClass": "right",
+                         "fnRender": function (oObj) {
+                             return formatNumberWithCommas(oObj.aData[6]);
+                         }
+                        }
+                         , {
+                             "sName": "InterestAmount",
+                             "sWidth": "8%", "sClass": "right",
+                             "fnRender": function (oObj) {
+                                 return formatNumberWithCommas(oObj.aData[7]);
+                             }
+                         }
+                    , {
+                        "sName": "TotalAmount",
+                        "sWidth": "8%", "sClass": "right",
+                        "fnRender": function (oObj) {
+                            return formatNumberWithCommas(oObj.aData[8]);
+                        }
+                    }
+                     , { "sName": "IsEarlySellte", "sWidth": "10%" }
+
+ ]
         });
         oTable.columnFilter({
             sPlaceHolder: "head:after",
@@ -221,7 +235,6 @@
                        , { type: "text" }
                        , { type: "text" }
                        , { type: "text" }
-                       , { type: "date-range" }
                        , { type: "text" }
 
             ]

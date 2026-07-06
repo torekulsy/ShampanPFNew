@@ -623,56 +623,135 @@ namespace SymWebUI.Areas.PF.Controllers
             }
         }
 
-        [HttpPost]
-        public ActionResult EmployeeForfeitureReport(PFReportVM vm)
-        {
-            try
-            {
-                string ReportHead = "";
-                string rptLocation = "";
-                vm.TransType = AreaTypePFVM.TransType;
-                ReportDocument doc = new ReportDocument();
-                DataTable dt = new DataTable();
+        //[HttpPost]
+        //public ActionResult EmployeeForfeitureReport(PFReportVM vm)
+        //{
+        //    try
+        //    {
+        //        string ReportHead = "";
+        //        string rptLocation = "";
+        //        vm.TransType = AreaTypePFVM.TransType;
+        //        ReportDocument doc = new ReportDocument();
+        //        DataTable dt = new DataTable();
 
-                string[] cFields = { "e.Code", "pfo.Id", "TRY_CONVERT(date, e.JoinDate, 106)>", "TRY_CONVERT(date, e.JoinDate, 106)<" };
-                string[] cValues = { vm.Code, vm.Id.ToString() == "0" ? "" : vm.Id.ToString(), Ordinary.DateToString(vm.DateFrom), Ordinary.DateToString(vm.DateTo) };
-                var Result = _eaRepo.SelectAllList(null, cFields, cValues);
+        //        string[] cFields = { "e.Code", "pfo.Id", "TRY_CONVERT(date, e.JoinDate, 106)>", "TRY_CONVERT(date, e.JoinDate, 106)<" };
+        //        string[] cValues = { vm.Code, vm.Id.ToString() == "0" ? "" : vm.Id.ToString(), Ordinary.DateToString(vm.DateFrom), Ordinary.DateToString(vm.DateTo) };
+        //        var Result = _eaRepo.SelectAllList(null, cFields, cValues);
 
-                dt = JsonConvert.DeserializeObject<DataTable>(JsonConvert.SerializeObject(Result));
+        //        dt = JsonConvert.DeserializeObject<DataTable>(JsonConvert.SerializeObject(Result));
 
                 
-                ReportHead = "There are no data to Preview for GL Transaction for Bank Deposit";
-                if (dt.Rows.Count > 0)
+        //        ReportHead = "There are no data to Preview for GL Transaction for Bank Deposit";
+        //        if (dt.Rows.Count > 0)
+        //        {
+        //            ReportHead = "Employee Forfeiture Transactions";
+        //        }
+        //        else
+        //        {
+        //            ReportHead = "There are no data to Preview for GL Transaction for Bank Deposit";
+        //        }
+        //        dt.TableName = "dtEmployeeForfeiture";
+        //        rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptPFEmployeeForfeiture.rpt";
+
+        //        doc.Load(rptLocation);
+        //        doc.SetDataSource(dt);
+        //        string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
+        //        FormulaFieldDefinitions ffds = doc.DataDefinition.FormulaFields;
+        //        CompanyRepo _CompanyRepo = new CompanyRepo();
+        //        CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
+
+        //        doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text = "'" + companyLogo + "'";
+        //        doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + ReportHead + "'";
+        //        doc.DataDefinition.FormulaFields["TransType"].Text = "'" + AreaTypePFVM.TransType + "'";
+        //        doc.DataDefinition.FormulaFields["Address"].Text = "'" + cvm.Address + "'";
+        //        doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
+        //        //doc.DataDefinition.FormulaFields["frmGroupBy"].Text = "'" + groupBy + "'";
+        //        var rpt = RenderReportAsPDF(doc);
+        //        doc.Close();
+        //        return rpt;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("There are no data to Preview for GL Transaction for Bank Deposit.", ex);
+        //    }
+        //}
+
+        [HttpGet]
+        public ActionResult EmployeeForfeitureReport(int forfeitureId = 0)
+        {
+            ReportDocument doc = new ReportDocument();
+
+            try
+            {
+                if (forfeitureId <= 0)
                 {
-                    ReportHead = "Employee Forfeiture Transactions";
+                    throw new Exception("Invalid forfeiture id.");
                 }
-                else
+
+                string ReportHead = "";
+                string rptLocation = "";
+
+                string[] cFields =
+        {
+            "pfo.Id"
+        };
+
+                string[] cValues =
+        {
+            forfeitureId.ToString()
+        };
+
+                var Result = _eaRepo.SelectAllList(null, cFields, cValues);
+
+                DataTable dt = JsonConvert.DeserializeObject<DataTable>(
+                    JsonConvert.SerializeObject(Result)
+                );
+
+                if (dt == null || dt.Rows.Count == 0)
                 {
-                    ReportHead = "There are no data to Preview for GL Transaction for Bank Deposit";
+                    throw new Exception("No Data Found for Employee Forfeiture Transactions.");
                 }
+
+                ReportHead = "Employee Forfeiture Transactions";
                 dt.TableName = "dtEmployeeForfeiture";
-                rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptPFEmployeeForfeiture.rpt";
+
+                rptLocation = AppDomain.CurrentDomain.BaseDirectory
+                              + @"Files\ReportFiles\PF\rptPFEmployeeForfeiture.rpt";
 
                 doc.Load(rptLocation);
                 doc.SetDataSource(dt);
-                string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
-                FormulaFieldDefinitions ffds = doc.DataDefinition.FormulaFields;
+
+                string companyLogo = AppDomain.CurrentDomain.BaseDirectory + @"Images\COMPANYLOGO.png";
+
                 CompanyRepo _CompanyRepo = new CompanyRepo();
                 CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
 
                 doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text = "'" + companyLogo + "'";
                 doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + ReportHead + "'";
                 doc.DataDefinition.FormulaFields["TransType"].Text = "'" + AreaTypePFVM.TransType + "'";
-                doc.DataDefinition.FormulaFields["Address"].Text = "'" + cvm.Address + "'";
-                doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
-                //doc.DataDefinition.FormulaFields["frmGroupBy"].Text = "'" + groupBy + "'";
+
+                if (cvm != null)
+                {
+                    doc.DataDefinition.FormulaFields["Address"].Text = "'" + cvm.Address + "'";
+                    doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
+                }
+                else
+                {
+                    doc.DataDefinition.FormulaFields["Address"].Text = "''";
+                    doc.DataDefinition.FormulaFields["CompanyName"].Text = "''";
+                }
+
                 var rpt = RenderReportAsPDF(doc);
-                doc.Close();
                 return rpt;
             }
             catch (Exception ex)
             {
-                throw new Exception("There are no data to Preview for GL Transaction for Bank Deposit.", ex);
+                throw new Exception("Employee Forfeiture Report Error: " + ex.Message, ex);
+            }
+            finally
+            {
+                doc.Close();
+                doc.Dispose();
             }
         }
 

@@ -138,7 +138,7 @@
                         <label>No. of Installment</label>
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.NumberOfInstallment, new { @onchange = "LoanSchudele()", @placeholder = "Number Of Installment", @class = " right  required NumberCheck form-control" })
+                        @Html.TextBoxFor(model => model.NumberOfInstallment, new { @onchange = "LoanSchudele()", @placeholder = "Number Of Installment", @class = " right required  NumberCheck form-control" })
                         @Html.ValidationMessageFor(model => model.NumberOfInstallment)
                     </div>
                 </div>
@@ -167,7 +167,7 @@
                         @Html.LabelFor(model => model.ApprovedDate)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.ApprovedDate, new { @onchange = "LoanSchudele(); LoanDate(this);", @placeholder = "Approved Date", @class = "customDatePicker  form-control" })
+                        @Html.TextBoxFor(model => model.ApprovedDate, new { @onchange = "LoanSchudele(); LoanDate(this);", @placeholder = "Approved Date", @class = "required customDatePicker  form-control" })
                         @Html.ValidationMessageFor(model => model.ApprovedDate)
                     </div>
                 </div>

@@ -414,7 +414,8 @@
 
     <div class="dashboard">
         <!-- CARDS -->
-        <section class="cards-grid my-4">
+
+        @*<section class="cards-grid my-4">
 
             <div class="stat-card" data-theme="blue">
                 <div class="card-waves" aria-hidden="true"></div>
@@ -515,6 +516,115 @@
                 <div class="dashbordCard-div">
                     <span>Available Cash in Bank</span>
 
+                </div>
+            </div>
+
+        </section>*@
+
+
+     
+
+        <section class="cards-grid my-4">
+
+            <!-- Card 1: Employees -->
+            <div class="stat-card" data-theme="blue">
+                <div class="card-waves" aria-hidden="true"></div>
+                <div class="dashbordCard">
+                    <div class="card-icon"><i class="fa fa-users"></i></div>
+                </div>
+                <div class="card-body">
+                    <p class="card-label">Employees</p>
+                    <div class="card-value-row">
+                        <span class="card-value">@Model.PfInfoDashboardVMS.TotalEmployee.ToString("N0")</span>
+                    </div>
+                </div>
+                <div class="dashbordCard-div">
+                    <span>Total Active Employees</span>
+                </div>
+            </div>
+
+            <!-- Card 2: PF Balance -->
+            <div class="stat-card" data-theme="green">
+                <div class="card-waves" aria-hidden="true"></div>
+                <div class="dashbordCard">
+                    <div class="card-icon"><i class="fa fa-wallet"></i></div>
+                </div>
+                <div class="card-body">
+                    <p class="card-label">PF Balance</p>
+                    <div class="card-value-row">
+                        <span class="card-value">৳ @Model.PfInfoDashboardVMS.TotalPF.ToString("N2")</span>
+                    </div>
+                </div>
+                <div class="dashbordCard-div">
+                    <span>Total Provident Fund Balance</span>
+                </div>
+            </div>
+
+            <!-- Card 3: Last Monthly PF -->
+            <div class="stat-card" data-theme="orange">
+                <div class="card-waves" aria-hidden="true"></div>
+                <div class="dashbordCard">
+                    <div class="card-icon"><i class="fa fa-chart-line"></i></div>
+                </div>
+                <div class="card-body">
+                    <p class="card-label">Last Monthly PF (Contribution)</p>
+                    <div class="card-value-row">
+                        <span class="card-value">৳ @Model.PfInfoDashboardVMS.LastMonthPF.ToString("N2")</span>
+                    </div>
+                </div>
+                <div class="dashbordCard-div">
+                    <span>Employee & Employer Contribution</span>
+                </div>
+            </div>
+
+            <!-- Card 4: Last Month Loan Collection -->
+            <div class="stat-card" data-theme="purple">
+                <div class="card-waves" aria-hidden="true"></div>
+                <div class="dashbordCard">
+                    <div class="card-icon"><i class="fa fa-building-columns"></i></div>
+                </div>
+                <div class="card-body">
+                    <p class="card-label">Last Month Loan Collection</p>
+                    <div class="card-value-row">
+                        <span class="card-value">৳ @Model.PfInfoDashboardVMS.LastMonthLoan.ToString("N2")</span>
+                    </div>
+                </div>
+                <div class="dashbordCard-div">
+                    <span>Total Loan Collection</span>
+                </div>
+            </div>
+
+            <!-- Card 5: Total Investment -->
+            <div class="stat-card" data-theme="teal">
+                <div class="card-waves" aria-hidden="true"></div>
+                <div class="dashbordCard">
+                    <div class="card-icon"><i class="fa fa-chart-pie"></i></div>
+                </div>
+                <div class="card-body">
+                    <p class="card-label">Total Investment</p>
+                    <div class="card-value-row">
+                        <span class="card-value">৳ @Model.PfInfoDashboardVMS.TotalInvestment.ToString("N2")</span>
+                    </div>
+                </div>
+                <div class="dashbordCard-div">
+                    <span>Total Investment</span>
+                </div>
+            </div>
+
+            <!-- Card 6: Cash at Bank -->
+            <div class="stat-card" data-theme="pink">
+                <div class="card-waves" aria-hidden="true"></div>
+                <div class="dashbordCard">
+                    <div class="card-icon"><i class="fa fa-building-columns"></i></div>
+                </div>
+                <div class="card-body">
+                    <p class="card-label">Cash at Bank</p>
+                    <div class="card-value-row">
+                        <span class="card-value">৳ @Model.PfInfoDashboardVMS.CashAtBank.ToString("N2")</span>
+                    </div>
+                </div>
+                <div class="dashbordCard-div">
+                    <span>Available Cash in Bank</span>
                 </div>
             </div>
 

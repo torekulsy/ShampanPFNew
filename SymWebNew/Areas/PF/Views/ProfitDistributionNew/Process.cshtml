@@ -5,7 +5,7 @@
 }
 @using (Html.BeginForm("ProcessDistribution", "ProfitDistributionNew", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmProfitDistribution" }))
 {
-    
+
     @Html.ValidationSummary(true)
     @Html.HiddenFor(model => model.Id)
     @Html.HiddenFor(model => model.Operation)
@@ -20,8 +20,12 @@
         <div class="card-header p-3">
             <div class="th_thinbox_top">
                 <div class="headrow">
+
                     <button type="button" name="btnName" value="Save" title="Process Data" onclick="pageSubmit('frmProfitDistribution')" class="sym-btn-save">&nbsp;Process</button>
-                    <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/ProfitDistributionNew?PreDistributionFundId=@Model.PreDistributionFundId" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>
+
+                   
+                    
+                    @*<button type="button" title="Go To Index" data-url="/@ViewBag.TransType/ProfitDistributionNew?PreDistributionFundId=@Model.PreDistributionFundId" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>*@
                 </div>
                 <div class="breadcrumb-container">
                     <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
@@ -29,7 +33,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="row">
         <div class="col-sm-9">
             <div class="thinbox">
@@ -64,17 +68,17 @@
                             </div>
                         </div>
                         @if (CompanyName != "Dekko")
-{
+                        {
 
-}
-else
-{
-    <div class="col-sm-6 col-md-4 col-lg-4 col-xl-3">
-        <div class="editor-label">
-            @Html.LabelFor(model => model.PreDistributionFund.DistributionType)
-        </div>
-        <div class="editor-field">
-            @Html.DropDownListFor(model => model.PreDistributionFund.DistributionType,
+                        }
+                        else
+                        {
+                            <div class="col-sm-6 col-md-4 col-lg-4 col-xl-3">
+                                <div class="editor-label">
+                                    @Html.LabelFor(model => model.PreDistributionFund.DistributionType)
+                                </div>
+                                <div class="editor-field">
+                                    @Html.DropDownListFor(model => model.PreDistributionFund.DistributionType,
                                 new List<SelectListItem>
                                 {
                                     new SelectListItem { Text = "Profit", Value = "Profit" },
@@ -84,9 +88,9 @@ else
                                 "--- Select ---",
                                 new { @class = "form-control" }
                             )
-        </div>
-    </div>
-}
+                                </div>
+                            </div>
+                        }
 
                     </div>
                 </div>
@@ -107,7 +111,7 @@ else
                             <div class="editor-field">
                                 @Html.TextBoxFor(model => model.DistributionDate, new { @placeholder = "Distribution Date ", @class = " required customDatePicker   form-control", @readonly = "readonly" })
 
-
+                                @Html.ValidationMessageFor(model => model.DistributionDate)
 
                             </div>
                         </div>
@@ -118,15 +122,16 @@ else
             </div>
         </div>
     </div>
-    
 
-    
 
-     <div class="card mt-3">
+
+
+    <div class="card mt-3">
         <div class="card-header p-3">
             <div class="">
+ 
                 <button type="button" name="btnName" value="Save" title="Process Data" onclick="pageSubmit('frmProfitDistribution')" class="sym-btn-save">&nbsp;Process</button>
-                <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/ProfitDistributionNew" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>
+                @*<button type="button" title="Go To Index" data-url="/@ViewBag.TransType/ProfitDistributionNew" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>*@
             </div>
         </div>
     </div>
@@ -135,7 +140,7 @@ else
 
 <script>
     $(function () {
-        //  valiDation("frmProfitDistribution");
+         //valiDation("frmProfitDistribution");
 
 
         //SubTotal();
@@ -166,6 +171,10 @@ else
 </script>
 
 <script>
+
+    $(function () {
+        valiDation("frmProfitDistribution");
+    });
 
     function UpdateData() {
         var Post = $("#Post").val();

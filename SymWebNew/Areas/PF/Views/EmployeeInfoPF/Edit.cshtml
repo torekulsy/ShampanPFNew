@@ -242,6 +242,7 @@
                             </div>
                             <div class="editor-field">
                                 @Html.TextBoxFor(model => model.BasicSalary, new { @class = "required NumberCheck form-control", @required = "" })
+                                @Html.ValidationMessageFor(model => model.BasicSalary)
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
@@ -250,6 +251,7 @@
                             </div>
                             <div class="editor-field">
                                 @Html.TextBoxFor(model => model.GrossSalary, new { @class = "required NumberCheck form-control", @required = "" })
+                                @Html.ValidationMessageFor(model => model.GrossSalary)
                             </div>
                         </div>
 

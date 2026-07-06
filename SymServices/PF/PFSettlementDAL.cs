@@ -32,6 +32,8 @@ namespace SymServices.PF
         /// <param name="VcurrConn">An optional SQL connection. If not provided, a new connection is established.</param>
         /// <param name="Vtransaction">An optional SQL transaction. If not provided, a new transaction is created and committed.</param>
         /// <returns>A list of <see cref="BankBranchVM"/> representing the Resigne Employee matching the criteria.</returns>
+        /// 
+
         public List<PFSettlementVM> SelectAll_ResignEmployee(string[] conditionFields = null, string[] conditionValues = null, SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
         {
             #region Variables
@@ -67,7 +69,7 @@ namespace SymServices.PF
                     transaction = currConn.BeginTransaction("");
                 }
                 #endregion open connection and transaction
-                
+
 
                 #region sql statement
                 #region SqlText
@@ -82,16 +84,11 @@ SELECT DISTINCT
 ,ve.Project
 ,ve.ResignDate
 ";
-                sqlText += " FROM [dbo].ViewEmployeeInformation ve";
-                sqlText += @" WHERE  1=1 AND ve.IsActive = 0 
-";
-                sqlText += @" 
-AND ve.EmployeeId NOT IN (
-SELECT EmployeeId FROM PFSettlements WHERE 1=1 AND Post = 1
-UNION ALL
-SELECT EmployeeId FROM ForfeitureAccounts WHERE 1=1 AND Post = 1
-)
-";
+
+
+                sqlText += " FROM ViewEmployeeInformation ve";
+                sqlText += @" left join EmployeeLeftInformation b on ve.EmployeeId = b.EmployeeId";
+                sqlText += @" WHERE  1=1 AND b.IsActive = 1";
 
                 //////LeftDate BETWEEN 20180101 AND 20991231
                 string cField = "";
@@ -174,6 +171,134 @@ SELECT EmployeeId FROM ForfeitureAccounts WHERE 1=1 AND Post = 1
             #endregion
             return VMs;
         }
+
+
+
+        //        public List<PFSettlementVM> SelectAll_ResignEmployee(string[] conditionFields = null, string[] conditionValues = null, SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
+        //        {
+        //            #region Variables
+        //            SqlConnection currConn = null;
+        //            SqlTransaction transaction = null;
+        //            string sqlText = "";
+        //            List<PFSettlementVM> VMs = new List<PFSettlementVM>();
+        //            PFSettlementVM vm;
+        //            #endregion
+        //            try
+        //            {
+        //                #region open connection and transaction
+        //                #region New open connection and transaction
+        //                if (VcurrConn != null)
+        //                {
+        //                    currConn = VcurrConn;
+        //                }
+        //                if (Vtransaction != null)
+        //                {
+        //                    transaction = Vtransaction;
+        //                }
+        //                #endregion New open connection and transaction
+        //                if (currConn == null)
+        //                {
+        //                    currConn = _dbsqlConnection.GetConnection();
+        //                    if (currConn.State != ConnectionState.Open)
+        //                    {
+        //                        currConn.Open();
+        //                    }
+        //                }
+        //                if (transaction == null)
+        //                {
+        //                    transaction = currConn.BeginTransaction("");
+        //                }
+        //                #endregion open connection and transaction
+
+
+        //                #region sql statement
+        //                #region SqlText
+        //                sqlText = @"
+        //
+        //SELECT ve.Code, ve.EmpName , ve.Designation, ve.Department,ve.ResignDate
+        //From ViewEmployeeInformation ve
+        //LEFT OUTER JOIN  EmployeeLeftInformation el ON ve.EmployeeId = el.EmployeeId
+        //Where 1=1 and ve.IsArchive=1 
+        //";
+        //                //////LeftDate BETWEEN 20180101 AND 20991231
+        //                string cField = "";
+        //                if (conditionFields != null && conditionValues != null && conditionFields.Length == conditionValues.Length)
+        //                {
+        //                    for (int i = 0; i < conditionFields.Length; i++)
+        //                    {
+        //                        if (string.IsNullOrWhiteSpace(conditionFields[i]) || string.IsNullOrWhiteSpace(conditionValues[i]))
+        //                        {
+        //                            continue;
+        //                        }
+        //                        cField = conditionFields[i].ToString();
+        //                        cField = Ordinary.StringReplacing(cField);
+        //                        sqlText += " AND " + conditionFields[i] + "=@" + cField;
+        //                    }
+        //                }
+        //                sqlText += @" ORDER BY ve.Code";
+
+        //                #endregion SqlText
+        //                #region SqlExecution
+
+        //                SqlCommand objComm = new SqlCommand(sqlText, currConn, transaction);
+        //                if (conditionFields != null && conditionValues != null && conditionFields.Length == conditionValues.Length)
+        //                {
+        //                    for (int j = 0; j < conditionFields.Length; j++)
+        //                    {
+        //                        if (string.IsNullOrWhiteSpace(conditionFields[j]) || string.IsNullOrWhiteSpace(conditionValues[j]))
+        //                        {
+        //                            continue;
+        //                        }
+        //                        cField = conditionFields[j].ToString();
+        //                        cField = Ordinary.StringReplacing(cField);
+        //                        objComm.Parameters.AddWithValue("@" + cField, conditionValues[j]);
+        //                    }
+        //                }
+        //               // objComm.Parameters.AddWithValue("@BranchId", vm.BranchId);
+        //                SqlDataReader dr;
+        //                dr = objComm.ExecuteReader();
+        //                while (dr.Read())
+        //                {
+        //                    vm = new PFSettlementVM();
+        //                    vm.EmpName = dr["EmpName"].ToString();
+        //                    vm.Code = dr["Code"].ToString();
+        //                    vm.Designation = dr["Designation"].ToString();
+        //                    vm.Department = dr["Department"].ToString();
+        //                    vm.EmpResignDate = Ordinary.StringToDate(dr["ResignDate"].ToString());
+        //                    VMs.Add(vm);
+        //                }
+        //                dr.Close();
+        //                #endregion SqlExecution
+
+        //                if (Vtransaction == null && transaction != null)
+        //                {
+        //                    transaction.Commit();
+        //                }
+        //                #endregion
+        //            }
+        //            #region catch
+        //            catch (SqlException sqlex)
+        //            {
+        //                throw new ArgumentNullException("", "SQL:" + sqlText + FieldDelimeter + sqlex.Message.ToString());
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                throw new ArgumentNullException("", "SQL:" + sqlText + FieldDelimeter + ex.Message.ToString());
+        //            }
+        //            #endregion
+        //            #region finally
+        //            finally
+        //            {
+        //                if (VcurrConn == null && currConn != null && currConn.State == ConnectionState.Open)
+        //                {
+        //                    currConn.Close();
+        //                }
+        //            }
+        //            #endregion
+        //            return VMs;
+        //        }
+
+
         /// <summary>
         /// Retrieves a list of Profit Distribution Detail from the database, optionally filtered by ID or additional conditions.
         /// Supports external SQL connection and transaction handling for reuse within larger operations.
@@ -218,7 +343,7 @@ SELECT EmployeeId FROM ForfeitureAccounts WHERE 1=1 AND Post = 1
                     transaction = currConn.BeginTransaction("");
                 }
                 #endregion open connection and transaction
-                
+
                 #region sql statement
                 #region SqlText
 
@@ -319,7 +444,7 @@ GROUP BY
         /// <param name="VcurrConn">An optional SQL connection. If not provided, a new connection is established.</param>
         /// <param name="Vtransaction">An optional SQL transaction. If not provided, a new transaction is created and committed.</param>
         /// <returns>A list of <see cref="BankBranchVM"/> representing the PF Settlement matching the criteria.</returns>
-        public List<PFSettlementVM> SelectAll(int Id = 0, string[] conditionFields = null, string[] conditionValues = null, SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
+        public List<PFSettlementVM> SelectAll(string BranchId, int Id = 0, string[] conditionFields = null, string[] conditionValues = null, SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
         {
             #region Variables
             SqlConnection currConn = null;
@@ -354,7 +479,7 @@ GROUP BY
                     transaction = currConn.BeginTransaction("");
                 }
                 #endregion open connection and transaction
-                
+
                 #region sql statement
                 #region SqlText
 
@@ -417,17 +542,24 @@ SELECT
 
 ,pfs.Post
 
-,pfs.Remarks,pfs.IsActive,pfs.IsArchive,pfs.CreatedBy,pfs.CreatedAt,pfs.CreatedFrom,pfs.LastUpdateBy,pfs.LastUpdateAt,pfs.LastUpdateFrom
+,pfs.Remarks,pfs.IsActive,pfs.IsArchive,pfs.CreatedBy,pfs.CreatedAt,pfs.CreatedFrom,pfs.LastUpdateBy,pfs.LastUpdateAt,pfs.LastUpdateFrom,pfs.Loan
+
+,case when ISNULL(gl.Source,0)='0' then 0 else 1 end AS IsJournal
 FROM  PFSettlements  pfs
 
 ";
                 sqlText += " LEFT OUTER JOIN [dbo].ViewEmployeeInformation ve ON pfs.EmployeeId=ve.EmployeeId";
-                sqlText += " WHERE  1=1 ";
+                sqlText += " Left Join GLJournals gl on gl.Source = pfs.TransactionCode";
+                sqlText += " WHERE  1=1  ";
 
 
                 if (Id > 0)
                 {
                     sqlText += @" and pfs.Id=@Id";
+                }
+                if (BranchId != "0")
+                {
+                    sqlText += @" and ve.BranchId=@BranchId";
                 }
 
                 string cField = "";
@@ -467,6 +599,10 @@ FROM  PFSettlements  pfs
                 if (Id > 0)
                 {
                     objComm.Parameters.AddWithValue("@Id", Id);
+                }
+                if (BranchId != "0")
+                {
+                    objComm.Parameters.AddWithValue("@BranchId", BranchId);
                 }
 
                 SqlDataReader dr;
@@ -522,6 +658,8 @@ FROM  PFSettlements  pfs
                     vm.EmployeeProfitRatio = Convert.ToDecimal(dr["EmployeeProfitRatio"]);
                     vm.EmployerProfitRatio = Convert.ToDecimal(dr["EmployerProfitRatio"]);
 
+                    vm.Loan = dr["Loan"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["Loan"]);
+
 
                     vm.EmpName = dr["EmpName"].ToString();
                     vm.Code = dr["Code"].ToString();
@@ -542,7 +680,7 @@ FROM  PFSettlements  pfs
                     vm.LastUpdateBy = Convert.ToString(dr["LastUpdateBy"]);
                     vm.LastUpdateAt = Convert.ToString(dr["LastUpdateAt"]);
                     vm.LastUpdateFrom = Convert.ToString(dr["LastUpdateFrom"]);
-
+                    vm.IsJournal = Convert.ToBoolean(dr["IsJournal"]);
 
                     VMs.Add(vm);
                 }
@@ -702,7 +840,7 @@ Id
 ,ProvidentFundAmount
 
 ,Post
-,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom
+,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom,Loan
 
 ) VALUES (
 @Id
@@ -747,9 +885,10 @@ Id
 
 
 ,@Post
-,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom
+,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom,@Loan
 ) 
-";
+
+UPDATE EmployeeLeftInformation SET IsActive = 0 , IsArchive = 1 WHERE EmployeeId = @EmployeeId";
 
                     #endregion SqlText
                     #region SqlExecution
@@ -790,7 +929,7 @@ Id
                     cmdInsert.Parameters.AddWithValue("@EmployerContributionForfeitValue", vm.EmployerContributionForfeitValue);
                     cmdInsert.Parameters.AddWithValue("@EmployerProfitForfeitValue ", vm.EmployerProfitForfeitValue);
                     cmdInsert.Parameters.AddWithValue("@TotalForfeitValue", vm.TotalForfeitValue);
-                    cmdInsert.Parameters.AddWithValue("@TotalPayableAmount", vm.EmployeeTotalContribution + vm.EmployerTotalContribution + vm.EmployeeProfitValue + vm.EmployerProfitValue);
+                    cmdInsert.Parameters.AddWithValue("@TotalPayableAmount", vm.EmployeeTotalContribution + vm.EmployerTotalContribution + vm.EmployeeProfitValue + vm.EmployerProfitValue + vm.Loan);
                     cmdInsert.Parameters.AddWithValue("@AlreadyPaidAmount", vm.AlreadyPaidAmount);
                     cmdInsert.Parameters.AddWithValue("@NetPayAmount", vm.NetPayAmount);
                     cmdInsert.Parameters.AddWithValue("@ProvidentFundAmount", vm.ProvidentFundAmount);
@@ -804,6 +943,7 @@ Id
                     cmdInsert.Parameters.AddWithValue("@CreatedBy", vm.CreatedBy);
                     cmdInsert.Parameters.AddWithValue("@CreatedAt", vm.CreatedAt);
                     cmdInsert.Parameters.AddWithValue("@CreatedFrom", vm.CreatedFrom);
+                    cmdInsert.Parameters.AddWithValue("@Loan", vm.Loan);
 
 
 
@@ -904,7 +1044,7 @@ Id
 
         public string[] AutoJournalSave(int FiscalYearDetailId, string EmployeeId, string BranchId, SqlConnection currConn, SqlTransaction transaction)
         {
-               
+
             string[] retResults = new string[6];
             retResults[0] = "Fail";//Success or Fail
             retResults[1] = "Fail";// Success or Fail Message
@@ -945,7 +1085,7 @@ Id
                     TransactionType = 31,
                     JournalType = 1,
                     TransType = "PF",
-                    TransactionValue = Convert.ToDecimal(dtpf.Rows[0]["EmployeeTotalContribution"].ToString()) + Convert.ToDecimal(dtpf.Rows[0]["EmployerTotalContribution"].ToString())+ Convert.ToDecimal(dtpf.Rows[0]["EmployeeProfitValue"].ToString())+ Convert.ToDecimal(dtpf.Rows[0]["EmployerProfitValue"].ToString()),
+                    TransactionValue = Convert.ToDecimal(dtpf.Rows[0]["EmployeeTotalContribution"].ToString()) + Convert.ToDecimal(dtpf.Rows[0]["EmployerTotalContribution"].ToString()) + Convert.ToDecimal(dtpf.Rows[0]["EmployeeProfitValue"].ToString()) + Convert.ToDecimal(dtpf.Rows[0]["EmployerProfitValue"].ToString()),
 
                     GLJournalDetails = new List<GLJournalDetailVM>
                     {
@@ -1278,7 +1418,7 @@ Id
                 PFSettlementVM varPFDetailVM = new PFSettlementVM();
                 PFDetailDAL _PFDetailDAL = new PFDetailDAL();
 
-                varPFDetailVM = _PFDetailDAL.SelectDetailContribution_TillMonth(vm.FiscalYearDetailId, vm.EmployeeId, currConn, transaction).FirstOrDefault();
+                varPFDetailVM = _PFDetailDAL.SelectDetailContribution_TillMonth(vm, currConn, transaction).FirstOrDefault();
 
 
                 #endregion
@@ -1292,12 +1432,13 @@ Id
                     vm.EmpName = varPFDetailVM.EmpName;
                     vm.Department = varPFDetailVM.Department;
                     vm.NetPayAmount = varPFDetailVM.EmployeeTotalContribution;
-                    vm.TotalForfeitValue = varPFDetailVM.EmployerTotalContribution;
+                    //vm.TotalForfeitValue = varPFDetailVM.EmployerTotalContribution;
                     vm.ProvidentFundAmount = varPFDetailVM.EmployeeTotalContribution + varPFDetailVM.EmployerTotalContribution;
                     vm.EmployerProfitValue = varPFDetailVM.EmployerProfitValue;
                     vm.EmployeeProfitValue = varPFDetailVM.EmployeeProfitValue;
                     vm.EmployeeTotalContribution = varPFDetailVM.EmployeeTotalContribution;
                     vm.EmployerTotalContribution = varPFDetailVM.EmployerTotalContribution;
+                    vm.Loan = varPFDetailVM.Loan;
                     #endregion
 
                 }
@@ -1347,7 +1488,7 @@ Id
                     PFSettlementVM newPFSettlementVM = new PFSettlementVM();
                     string[] cFields = { "pfs.EmployeeId" };
                     string[] cValues = { vm.EmployeeId };
-                    newPFSettlementVM = SelectAll(0, cFields, cValues, currConn, transaction).FirstOrDefault();
+                    newPFSettlementVM = SelectAll("", 0, cFields, cValues, currConn, transaction).FirstOrDefault();
 
                     #endregion
 
@@ -1590,7 +1731,7 @@ Id
                     currConn.Open();
                 }
                 #endregion open connection and transaction
-                
+
                 #region sql statement
                 #region SqlText
 
@@ -1867,7 +2008,7 @@ AND PFSettlements.EmployeeId=@EmployeeId
             return retResults;
         }
 
-        public string[] AutoJournalSave(string JournalType, string TransactionForm, string TransactionCode, int Id, string BranchId, SqlConnection currConn, SqlTransaction transaction, ShampanIdentityVM auditvm)
+        public string[] AutoJournalSave(string JournalType, string TransactionForm, string TransactionCode, string BranchId, SqlConnection currConn, SqlTransaction transaction, ShampanIdentityVM auditvm)
         {
             if (currConn == null)
             {
@@ -1891,21 +2032,27 @@ AND PFSettlements.EmployeeId=@EmployeeId
             string Journal = @"SELECT
                                 JournalName,COAID
                                 FROM AutoJournalSetup
-                                WHERE  1=1 AND JournalFor = @JournalFor and IsActive=1";
+                                WHERE  1=1 AND JournalFor = @JournalFor and IsActive=1 and BranchId=@BranchId";
             SqlCommand cmdj = new SqlCommand(Journal, currConn, transaction);
-            cmdj.Parameters.AddWithValue("JournalFor", TransactionForm);
+            cmdj.Parameters.AddWithValue("@JournalFor", TransactionForm);
+            cmdj.Parameters.AddWithValue("@BranchId", BranchId);
             SqlDataAdapter adapterj = new SqlDataAdapter(cmdj);
             DataTable dtj = new DataTable();
             adapterj.Fill(dtj);
             if (dtj.Rows.Count > 0)
             {
                 EmployerCOAID = dtj.Rows[0]["COAID"].ToString();
-                EmployeeCOAID = dtj.Rows[1]["COAID"].ToString();              
+                EmployeeCOAID = dtj.Rows[1]["COAID"].ToString();
                 EmployeeProfitCOAID = dtj.Rows[2]["COAID"].ToString();
                 EmployerProfitCOAID = dtj.Rows[3]["COAID"].ToString();
                 BankCOAID = dtj.Rows[4]["COAID"].ToString();
             }
-
+            else
+            {
+                retResults[0] = "Fail";
+                retResults[1] = "Please set Chart of Account for Auto Journal";
+                return retResults;
+            }
             SettingDAL _settingDal = new SettingDAL();
             string IsAutoJournal = _settingDal.settingValue("PF", "IsAutoJournal").Trim();
 
@@ -1942,7 +2089,7 @@ AND PFSettlements.EmployeeId=@EmployeeId
                     JournalType = 1,
                     TransType = "PF",
                     TransactionValue = Convert.ToDecimal(dtpf.Rows[0]["Total"].ToString()),
-                   
+
 
                     GLJournalDetails = new List<GLJournalDetailVM>
                     {
@@ -1991,8 +2138,7 @@ AND PFSettlements.EmployeeId=@EmployeeId
                         }
                     }
                 };
-                vmj.Source = TransactionCode;
-                vmj.SourceId = Id;
+                vmj.Code = TransactionCode;
                 vmj.BranchId = BranchId;
                 GLJournalDAL glJournalDal = new GLJournalDAL();
                 retResults = glJournalDal.Insert(vmj);

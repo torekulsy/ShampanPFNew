@@ -166,18 +166,18 @@ namespace SymRepository.Loan
                 throw ex;
             }
         }
-        public List<EmployeeLoanDetailVM> SelectLoanStatementForReport(string ProjectId, string DepartmentId, string SectionId, string DesignationId, string CodeF, string CodeT, string BranchId)
+        public List<EmployeeLoanDetailVM> SelectLoanStatementForReport(string ProjectId, string DepartmentId, string SectionId, string DesignationId, string CodeF, string CodeT)
         {
             try
             {
-                return new EmployeeLoanDAL().SelectLoanStatementForReport(ProjectId, DepartmentId, SectionId, DesignationId, CodeF, CodeT, BranchId);
+                return new EmployeeLoanDAL().SelectLoanStatementForReport(ProjectId, DepartmentId, SectionId, DesignationId, CodeF, CodeT);
             }
             catch (Exception ex)
             {
                 throw ex;
             }
         }
-        
+
         public string[] Delete(EmployeeLoanVM vm, string[] ids)
         {
             try
@@ -227,7 +227,7 @@ namespace SymRepository.Loan
             }
         }
 
-        
+
         public DataTable getBalance(string date, string emploanId)
         {
             try
@@ -256,6 +256,18 @@ namespace SymRepository.Loan
             try
             {
                 return new EmployeeLoanDAL().ApprovedSettelment(loanId, EarlySellteDate);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public string[] Approved(EmployeeLoanVM vm, string ids)
+        {
+            try
+            {
+                return new EmployeeLoanDAL().Approved(vm, ids);
             }
             catch (Exception ex)
             {

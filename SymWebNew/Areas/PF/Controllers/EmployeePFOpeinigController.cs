@@ -59,8 +59,8 @@ namespace SymWebUI.Areas.PF.Controllers
             #endregion
             //ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
             EmployeePFOpeinigRepo arerepo = new EmployeePFOpeinigRepo();
-            string branchId = Session["BranchId"].ToString();
-            var getAllData = arerepo.SelectAll(branchId);
+            string BranchId = Session["BranchId"].ToString();
+            var getAllData = arerepo.SelectAll(BranchId);
             IEnumerable<EmployeePFOpeinigVM> filteredData;
             //Check whether the companies should be filtered by keyword
             if (!string.IsNullOrEmpty(param.sSearch))
@@ -101,7 +101,7 @@ namespace SymWebUI.Areas.PF.Controllers
                     && (OpeningValueFilter == "" || c.EmployerProfit.ToString().Contains(OpeningValueFilter.ToLower()))
                     && (OpeningDateFilter == "" || c.OpeningDate.ToLower().Contains(OpeningDateFilter.ToLower()))
                     //&& (PostFilter == "" || c.Post.ToLower().Contains(PostFilter.ToLower()))
-                    
+
                     );
             }
             #endregion Column Filtering
@@ -241,8 +241,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 vm.CreatedAt = DateTime.Now.ToString("yyyyMMddHHmmss");
                 vm.CreatedBy = identity.Name;
                 vm.CreatedFrom = identity.WorkStationIP;
-                vm.EmployeeId = empVM.empPFOpeinigVM.EmployeeId;
-                vm.BranchId = Session["BranchId"].ToString();
+
                 result = _eaRepo.Insert(vm);
 
                 return Json(result[0] + "~" + result[1] + "~" + result[2], JsonRequestBehavior.AllowGet);
@@ -300,7 +299,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 vm.LastUpdateFrom = identity.WorkStationIP;
 
                 result = _eaRepo.Post(vm);
-                
+
                 return Json(result[0] + "~" + result[1], JsonRequestBehavior.AllowGet);
             }
             catch (Exception)
@@ -381,7 +380,7 @@ namespace SymWebUI.Areas.PF.Controllers
             }
         }
 
-        public ActionResult DownloadExcel_Employee(string ProjectId, string DepartmentId, string SectionId , string DesignationId, string CodeF, string CodeT
+        public ActionResult DownloadExcel_Employee(string ProjectId, string DepartmentId, string SectionId, string DesignationId, string CodeF, string CodeT
             , string Orderby = null)
         {
             DataTable dt = new DataTable();
@@ -505,7 +504,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 return RedirectToAction("ImportEmployeePFOpeinig");
             }
         }
-        
+
 
 
 

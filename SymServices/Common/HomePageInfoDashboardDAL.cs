@@ -291,58 +291,123 @@ namespace SymServices.Common
 
             return vm;
         }
-        public PfInfoDashboardVM GetPfInfoDashboard()
+//        public PfInfoDashboardVM GetPfInfoDashboard()
+//        {
+//            #region Variables
+//            SqlConnection currConn = null;
+//            string sqlText = "";
+
+//            PfInfoDashboardVM vm = new PfInfoDashboardVM();
+//            #endregion
+
+//            try
+//            {
+//                #region Open connection
+//                currConn = _dbsqlConnection.GetConnection();
+//                if (currConn.State != ConnectionState.Open)
+//                {
+//                    currConn.Open();
+//                }
+//                #endregion
+
+//                #region SQL statement
+//                sqlText = @"SELECT COUNT(FiscalYearDetailId) AS TotalPerson
+//                              , ISNULL(SUM(PFValue),0) AS PFValue    
+//                          FROM SalaryPFDetail
+//                          where [FiscalYearDetailId] = (Select MAX([FiscalYearDetailId]) from SalaryPFDetail) and PFValue>0";
+
+//                using (SqlCommand objComm = new SqlCommand(sqlText, currConn))
+//                {
+//                    objComm.CommandType = CommandType.Text;
+
+//                    using (SqlDataReader dr = objComm.ExecuteReader())
+//                    {
+//                        if (dr.Read())
+//                        {
+//                            vm.TotalPerson = Convert.ToDecimal(dr["TotalPerson"].ToString());
+//                            vm.PFValue = Convert.ToDecimal(dr["PFValue"].ToString());
+//                        }
+//                    }
+//                }
+//                #endregion
+//            }
+//            #region catch
+//            catch (SqlException sqlex)
+//            {
+//                throw new ArgumentNullException("", "SQL:" + sqlText + FieldDelimeter + sqlex.Message.ToString());
+//            }
+//            catch (Exception ex)
+//            {
+//                throw new ArgumentNullException("", "SQL:" + sqlText + FieldDelimeter + ex.Message.ToString());
+//            }
+
+//            #endregion
+//            #region finally
+//            finally
+//            {
+//                if (currConn != null && currConn.State == ConnectionState.Open)
+//                {
+//                    currConn.Close();
+//                }
+//            }
+//            #endregion
+
+//            return vm;
+//        }
+
+        public PfInfoDashboardVM GetPfInfoDashboard(int branchId)
         {
-            #region Variables
             SqlConnection currConn = null;
             string sqlText = "";
-
             PfInfoDashboardVM vm = new PfInfoDashboardVM();
-            #endregion
 
             try
             {
-                #region Open connection
                 currConn = _dbsqlConnection.GetConnection();
                 if (currConn.State != ConnectionState.Open)
                 {
                     currConn.Open();
                 }
-                #endregion
 
-                #region SQL statement
-                sqlText = @"SELECT COUNT(FiscalYearDetailId) AS TotalPerson
-                              , ISNULL(SUM(PFValue),0) AS PFValue    
-                          FROM SalaryPFDetail
-                          where [FiscalYearDetailId] = (Select MAX([FiscalYearDetailId]) from SalaryPFDetail) and PFValue>0";
+                sqlText = @"
+            DECLARE @LastMonthStart DATE;
+            DECLARE @LastMonthEnd DATE;
+
+            SET @LastMonthStart = DATEADD(MONTH, DATEDIFF(MONTH, 0, GETDATE()) - 1, 0);
+            SET @LastMonthEnd = EOMONTH(@LastMonthStart);
+
+            SELECT
+                (SELECT COUNT(E.Id) FROM EmployeeInfo E WHERE E.BranchId = @BranchId AND E.IsActive = 1) AS TotalEmployee,
+                (SELECT ISNULL(SUM(ISNULL(P.EmployeePFValue, 0) + ISNULL(P.EmployeerPFValue, 0)), 0) FROM PFHeader P WHERE P.BranchId = @BranchId) AS TotalPF,
+                (SELECT TOP 1 ISNULL(P.EmployeePFValue, 0) + ISNULL(P.EmployeerPFValue, 0) FROM PFHeader P WHERE P.BranchId = @BranchId ORDER BY P.FiscalYearDetailId DESC) AS LastMonthPF,
+                (SELECT ISNULL(SUM(ISNULL(LD.InstallmentAmount, 0)), 0) FROM EmployeeLoanDetail LD LEFT JOIN EmployeeLoan L ON L.Id = LD.EmployeeLoanId WHERE LD.IsPaid = 1 AND TRY_CONVERT(DATE, CONVERT(VARCHAR(8), LD.PaymentScheduleDate), 112) BETWEEN @LastMonthStart AND @LastMonthEnd AND L.BranchId = @BranchId) AS LastMonthLoan,
+                (SELECT ISNULL(SUM(ISNULL(I.InvestmentValue, 0)), 0) FROM Investments I WHERE I.Post = 1 AND I.BranchId = @BranchId) AS TotalInvestment,
+                (SELECT ISNULL(SUM(ISNULL(JD.DrAmount, 0) - ISNULL(JD.CrAmount, 0)), 0) FROM GLJournalDetails JD LEFT JOIN COAs C ON C.Id = JD.COAId WHERE C.Name LIKE '%Cash at Bank%' AND C.BranchId = @BranchId) AS CashAtBank;";
 
                 using (SqlCommand objComm = new SqlCommand(sqlText, currConn))
                 {
                     objComm.CommandType = CommandType.Text;
+                    // Clean up type conversions by targeting parameter directly
+                    objComm.Parameters.AddWithValue("@BranchId", branchId.ToString());
 
                     using (SqlDataReader dr = objComm.ExecuteReader())
                     {
                         if (dr.Read())
                         {
-                            vm.TotalPerson = Convert.ToDecimal(dr["TotalPerson"].ToString());
-                            vm.PFValue = Convert.ToDecimal(dr["PFValue"].ToString());
+                            vm.TotalEmployee = Convert.ToDecimal(dr["TotalEmployee"]);
+                            vm.TotalPF = Convert.ToDecimal(dr["TotalPF"]);
+                            vm.LastMonthPF = Convert.ToDecimal(dr["LastMonthPF"]);
+                            vm.LastMonthLoan = Convert.ToDecimal(dr["LastMonthLoan"]);
+                            vm.TotalInvestment = Convert.ToDecimal(dr["TotalInvestment"]);
+                            vm.CashAtBank = Convert.ToDecimal(dr["CashAtBank"]);
                         }
                     }
                 }
-                #endregion
-            }
-            #region catch
-            catch (SqlException sqlex)
-            {
-                throw new ArgumentNullException("", "SQL:" + sqlText + FieldDelimeter + sqlex.Message.ToString());
             }
             catch (Exception ex)
             {
-                throw new ArgumentNullException("", "SQL:" + sqlText + FieldDelimeter + ex.Message.ToString());
+                throw new Exception("Error executing dashboard data metrics. SQL: " + sqlText, ex);
             }
-
-            #endregion
-            #region finally
             finally
             {
                 if (currConn != null && currConn.State == ConnectionState.Open)
@@ -350,10 +415,10 @@ namespace SymServices.Common
                     currConn.Close();
                 }
             }
-            #endregion
 
             return vm;
         }
+
         public GfInfoDashboardVM GetGfInfoDashboard()
         {
             #region Variables

@@ -38,15 +38,27 @@ namespace SymWebUI.Areas.PF.Controllers
             string permission = _repoSUR.SymRoleSession(identity.UserId, "10003", "index").ToString();
             Session["permission"] = permission;
             ViewBag.investmentId = investmentId;
+
             if (permission == "False")
             {
                 return Redirect("/PF/Home");
             }
 
-            InvestmentRenewVM investmentRenewVm = new InvestmentRenewVM() { InvestmentId = investmentId };
+            InvestmentRenewVM investmentRenewVm = new InvestmentRenewVM()
+            {
+                InvestmentId = investmentId
+            };
 
+          
+            var renewList = _repo.SelectAll(
+                0,
+                new[] { "inv.InvestmentId", "inv.TransType" },
+                new[] { investmentId.ToString(), AreaTypePFVM.TransType }
+            );
 
-            return View("~/Areas/PF/Views/InvestmentRenew/Index.cshtml",investmentRenewVm);
+            ViewBag.HasEncashed = renewList.Any(x => x.IsEncashed == true);
+
+            return View("~/Areas/PF/Views/InvestmentRenew/Index.cshtml", investmentRenewVm);
         }
         public ActionResult _index(JQueryDataTableParamModel param, int investmentId = 0)
         {

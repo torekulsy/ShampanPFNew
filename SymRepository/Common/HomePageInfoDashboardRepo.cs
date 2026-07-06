@@ -14,15 +14,27 @@ namespace SymRepository.Common
     {
        
      
-        public PfInfoDashboardVM GetPfInfoDashboard()
+        //public PfInfoDashboardVM GetPfInfoDashboard()
+        //{
+        //    try
+        //    {
+        //        return new HomePageInfoDashboardDAL().GetPfInfoDashboard();
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //        throw ex;
+        //    }
+        //}
+
+        public PfInfoDashboardVM GetPfInfoDashboard(int branchId)
         {
             try
             {
-                return new HomePageInfoDashboardDAL().GetPfInfoDashboard();
+                return new HomePageInfoDashboardDAL().GetPfInfoDashboard(branchId);
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
