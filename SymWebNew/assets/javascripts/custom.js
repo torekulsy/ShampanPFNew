@@ -703,17 +703,21 @@ function InitDropDowns() {
 
         var selected = dropdownEl.attr('data-selected');
         var dataCache = dropdownEl.attr('data-cache') ? true : false;
+        var disablePlaceholder = dropdownEl.attr('data-disable-placeholder') === 'true';
+        var hasSelectedValue = selected && selected !== '0';
 
         $.ajax({
             url: url,
             type: 'GET',
             cache: dataCache,
             success: function (jsonData, textStatus, XMLHttpRequest) {
-                var Listitems = '<option value="">Select</option>';
+                var Listitems = disablePlaceholder && !hasSelectedValue
+                    ? '<option value="" selected="selected" disabled="disabled">Select</option>'
+                    : (disablePlaceholder ? '<option value="" disabled="disabled">Select</option>' : '<option value="">Select</option>');
 
                 $.each(jsonData, function (i, item) {
 
-                    if (selected && selected == item.Value) {
+                    if (hasSelectedValue && selected == item.Value) {
                         Listitems += "<option selected='selected' value='" + item.Value + "'>" + item.Text + "</option>";
                     }
                     else {
