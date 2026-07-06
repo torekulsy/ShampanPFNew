@@ -8970,7 +8970,7 @@ WHERE
 
                 #region SqlText
 
-                sqlText = @"select b.Name AS Department, c.Name AS Designation,a.* from EmployeeInfo a
+                sqlText = @"select  b.Name AS Department, c.Name AS Designation,a.* from EmployeeInfo a
 left join Department b on a.Department = b.Id
 left join Designation c on a.Designation = c.Id
 where a.IsActive =1 

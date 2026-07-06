@@ -181,3 +181,33 @@ InsertEmployeeInfoForPF , Method : EmployeeInfoPFController
 SQL:SELECT * FROM EmployeeInfo EF               
                 WHERE 1=1 and EF.Id=@IdObject cannot be cast from DBNull to other types.
 
+
+2026-07-06 11:50:49 +06:00
+ Source : LoanReport , Method : LoanController
+Object reference not set to an instance of an object.
+   at SymWebUI.Areas.PF.Controllers.LoanController.AllLoanReport(EmployeeLoanVM vm) in d:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\LoanController.cs:line 1796
+
+2026-07-06 11:51:10 +06:00
+ Source : LoanReport , Method : LoanController
+Object reference not set to an instance of an object.
+   at SymWebUI.Areas.PF.Controllers.LoanController.AllLoanReport(EmployeeLoanVM vm) in d:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\LoanController.cs:line 1796
+
+2026-07-06 11:51:49 +06:00
+ Source : LoanReport , Method : LoanController
+Object reference not set to an instance of an object.
+   at SymWebUI.Areas.PF.Controllers.LoanController.AllLoanReport(EmployeeLoanVM vm) in d:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\LoanController.cs:line 1796
+
+2026-07-06 12:12:07 +06:00
+ Source : LoanReport , Method : LoanController
+Object reference not set to an instance of an object.
+   at SymWebUI.Areas.PF.Controllers.LoanController.AllLoanReport(EmployeeLoanVM vm) in d:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\LoanController.cs:line 1796
+
+2026-07-06 12:13:16 +06:00
+ Source : LoanReport , Method : LoanController
+Invalid report file path.
+   at CrystalDecisions.CrystalReports.Engine.EngineExceptionUtils.DoThrowException(String message, EngineExceptionErrorID id)
+   at CrystalDecisions.CrystalReports.Engine.ExceptionThrower.ThrowEngineException(String messageID, EngineExceptionErrorID id)
+   at CrystalDecisions.CrystalReports.Engine.ReportDocument.Load(String filename, OpenReportMethod openMethod, Int16 parentJob)
+   at CrystalDecisions.CrystalReports.Engine.ReportDocument.EnsureLoadReport()
+   at CrystalDecisions.CrystalReports.Engine.ReportDocument.get_DataDefinition()
+   at SymWebUI.Areas.PF.Controllers.LoanController.AllLoanReport(EmployeeLoanVM vm)

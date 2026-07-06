@@ -84,26 +84,10 @@ namespace SymWebUI.Areas.PF.Controllers
             var departmentFilter = Convert.ToString(Request["sSearch_3"]);
             var designationFilter = Convert.ToString(Request["sSearch_4"]);
             var loanTypeFilter = Convert.ToString(Request["sSearch_5"]);
-            var totalAmountFilter = Convert.ToString(Request["sSearch_6"]);
-            var startDateFilter = Convert.ToString(Request["sSearch_7"]);
-            var PrincipalAmountFilter = Convert.ToString(Request["sSearch_8"]);
-            var InterestAmountFilter = Convert.ToString(Request["sSearch_9"]);
-            var IsApproved = Convert.ToString(Request["sSearch_10"]);
-            DateTime fromDate = DateTime.MinValue;
-            DateTime toDate = DateTime.MaxValue;
-            if (startDateFilter.Contains('~'))
-            {
-                //Split date range filters with ~
-                fromDate = startDateFilter.Split('~')[0] == "" ? DateTime.MinValue : Convert.ToDateTime(startDateFilter.Split('~')[0]);
-                toDate = startDateFilter.Split('~')[1] == "" ? DateTime.MaxValue : Convert.ToDateTime(startDateFilter.Split('~')[1]);
-            }
-            var amountFrom = 0;
-            var amountTo = 0;
-            if (totalAmountFilter.Contains('~'))
-            {
-                amountFrom = totalAmountFilter.Split('~')[0] == "" ? 0 : Convert.ToInt32(totalAmountFilter.Split('~')[0]);
-                amountTo = totalAmountFilter.Split('~')[1] == "" ? 0 : Convert.ToInt32(totalAmountFilter.Split('~')[1]);
-            }
+            var principalAmountFilter = Convert.ToString(Request["sSearch_6"]);
+            var interestAmountFilter = Convert.ToString(Request["sSearch_7"]);
+            var totalAmountFilter = Convert.ToString(Request["sSearch_8"]);
+            var earlySettleFilter = Convert.ToString(Request["sSearch_9"]);
             var fromID = 0;
             var toID = 0;
             if (idFilter.Contains('~'))
@@ -129,7 +113,6 @@ namespace SymWebUI.Areas.PF.Controllers
                 var isSearchable7 = Convert.ToBoolean(Request["bSearchable_7"]);
                 var isSearchable8 = Convert.ToBoolean(Request["bSearchable_8"]);
                 var isSearchable9 = Convert.ToBoolean(Request["bSearchable_9"]);
-                var isSearchable10 = Convert.ToBoolean(Request["bSearchable_10"]);
                 filteredData = getAllData
                    .Where(c =>
                           isSearchable1 && c.Code.ToLower().Contains(param.sSearch.ToLower())
@@ -137,11 +120,10 @@ namespace SymWebUI.Areas.PF.Controllers
                        || isSearchable3 && c.Department.ToLower().Contains(param.sSearch.ToLower())
                        || isSearchable4 && c.Designation.ToLower().Contains(param.sSearch.ToLower())
                        || isSearchable5 && c.LoanType.ToLower().Contains(param.sSearch.ToLower())
-                       || isSearchable6 && c.StartDate.ToLower().Contains(param.sSearch.ToLower())
-                       || isSearchable7 && c.PrincipalAmount.ToString().ToLower().Contains(param.sSearch.ToLower())
-                       || isSearchable8 && c.InterestAmount.ToString().ToLower().Contains(param.sSearch.ToLower())
-                       || isSearchable9 && c.TotalAmount.ToString().ToLower().Contains(param.sSearch.ToLower())
-                       || isSearchable10 && c.IsApproved.ToString().ToLower().Contains(param.sSearch.ToLower())
+                       || isSearchable6 && c.PrincipalAmount.ToString().ToLower().Contains(param.sSearch.ToLower())
+                       || isSearchable7 && c.InterestAmount.ToString().ToLower().Contains(param.sSearch.ToLower())
+                       || isSearchable8 && c.TotalAmount.ToString().ToLower().Contains(param.sSearch.ToLower())
+                       || isSearchable9 && (c.IsEarlySellte ? "Yes" : "No").ToLower().Contains(param.sSearch.ToLower())
                     );
             }
             else
@@ -150,7 +132,7 @@ namespace SymWebUI.Areas.PF.Controllers
             }
             #endregion Search and Filter Data
             #region Column Filtering
-            if (codeFilter != "" || empNameFilter != "" || departmentFilter != "" || designationFilter != "" || loanTypeFilter != "" || (totalAmountFilter != "" && totalAmountFilter != "~") || (startDateFilter != "" && startDateFilter != "~") || IsApproved != "")
+            if (codeFilter != "" || empNameFilter != "" || departmentFilter != "" || designationFilter != "" || loanTypeFilter != "" || principalAmountFilter != "" || interestAmountFilter != "" || totalAmountFilter != "" || earlySettleFilter != "")
             {
                 filteredData = filteredData
                                 .Where(c =>
@@ -164,15 +146,13 @@ namespace SymWebUI.Areas.PF.Controllers
                                     &&
                                     (loanTypeFilter == "" || c.LoanType.ToLower().Contains(loanTypeFilter.ToLower()))
                                     &&
-                                    (fromDate == DateTime.MinValue || fromDate <= Convert.ToDateTime(c.StartDate))
+                                    (principalAmountFilter == "" || c.PrincipalAmount.ToString().ToLower().Contains(principalAmountFilter.ToLower()))
                                     &&
-                                    (toDate == DateTime.MaxValue || toDate >= Convert.ToDateTime(c.StartDate))
+                                    (interestAmountFilter == "" || c.InterestAmount.ToString().ToLower().Contains(interestAmountFilter.ToLower()))
                                     &&
-                                    (amountFrom == 0 || amountFrom <= Convert.ToInt32(c.TotalAmount))
+                                    (totalAmountFilter == "" || c.TotalAmount.ToString().ToLower().Contains(totalAmountFilter.ToLower()))
                                     &&
-                                    (amountTo == 0 || amountTo >= Convert.ToInt32(c.TotalAmount))
-                                     &&
-                                    (IsApproved == "" || c.IsApproved)
+                                    (earlySettleFilter == "" || (c.IsEarlySellte ? "Yes" : "No").ToLower().Contains(earlySettleFilter.ToLower()))
                                 );
             }
             #endregion Column Filtering
@@ -185,7 +165,6 @@ namespace SymWebUI.Areas.PF.Controllers
             var isSortable_7 = Convert.ToBoolean(Request["bSortable_7"]);
             var isSortable_8 = Convert.ToBoolean(Request["bSortable_8"]);
             var isSortable_9 = Convert.ToBoolean(Request["bSortable_9"]);
-            var isSortable_10 = Convert.ToBoolean(Request["bSortable_10"]);
             var sortColumnIndex = Convert.ToInt32(Request["iSortCol_0"]);
             Func<EmployeeLoanVM, string> orderingFunction = (c =>
                 sortColumnIndex == 1 && isSortable_1 ? c.Code :
@@ -193,11 +172,10 @@ namespace SymWebUI.Areas.PF.Controllers
                 sortColumnIndex == 3 && isSortable_3 ? c.Department :
                 sortColumnIndex == 4 && isSortable_4 ? c.Designation :
                 sortColumnIndex == 5 && isSortable_5 ? c.LoanType :
-                sortColumnIndex == 6 && isSortable_6 ? Ordinary.DateToString(c.StartDate) :
-                sortColumnIndex == 7 && isSortable_7 ? c.PrincipalAmount.ToString() :
-                sortColumnIndex == 8 && isSortable_8 ? c.InterestAmount.ToString() :
-                sortColumnIndex == 9 && isSortable_9 ? c.TotalAmount.ToString() :
-                sortColumnIndex == 10 && isSortable_10 ? c.IsApproved.ToString() :
+                sortColumnIndex == 6 && isSortable_6 ? c.PrincipalAmount.ToString() :
+                sortColumnIndex == 7 && isSortable_7 ? c.InterestAmount.ToString() :
+                sortColumnIndex == 8 && isSortable_8 ? c.TotalAmount.ToString() :
+                sortColumnIndex == 9 && isSortable_9 ? c.IsEarlySellte.ToString() :
                 "");
             var sortDirection = Request["sSortDir_0"]; // asc or desc
             if (sortDirection == "asc")
@@ -1823,7 +1801,7 @@ namespace SymWebUI.Areas.PF.Controllers
 
                 string rptLocation = "";
 
-                rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\Loan\" + ReportFileName + ".rpt";
+                rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\" + ReportFileName + ".rpt";
 
                 doc.Load(rptLocation);
 
@@ -1899,8 +1877,9 @@ namespace SymWebUI.Areas.PF.Controllers
 
                 #region Pull Data
 
+                var branchId = Convert.ToInt32(Session["BranchId"]);
                 EmployeeLoanRepo _loanRepo = new EmployeeLoanRepo();
-                var getAllData = _loanRepo.SelectAll(Convert.ToInt32(identity.BranchId), "");
+                var getAllData = _loanRepo.SelectAll(Convert.ToInt32(branchId), "");
 
                 dt = Ordinary.ListToDataTable(getAllData.ToList());
 

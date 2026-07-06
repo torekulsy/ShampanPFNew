@@ -547,7 +547,7 @@
         debugger;
         var annualInterestRate = 0;
         annualInterestRate = parseFloat(InterestRate) / 100;
-        var monthlyInterestRate = parseFloat(annualInterestRate) / 12;
+        var monthlyInterestRate = parseFloat(annualInterestRate) / installment;
         var installmentValue = 0;
         var installmentValue = Math.ceil((parseFloat(PrincipalAmount) * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, parseFloat(installment))) / (Math.pow(1 + monthlyInterestRate, parseFloat(installment)) - 1));
 
@@ -570,7 +570,7 @@
 
                         var NewPrincipleAmount = Math.round(parseFloat(PrincipalAmount));
 
-                        var InterestAmount = parseFloat(NewPrincipleAmount) * parseFloat(annualInterestRate) / 12;
+                        var InterestAmount = parseFloat(NewPrincipleAmount) * parseFloat(annualInterestRate) / installment;
                         var PrinciipleWithInterestAmount = parseFloat(PrincipalAmount) + parseFloat(InterestAmount);
                         var Deposit = Math.round(parseFloat(installmentValue));
                         if (i == totalCount) {
@@ -606,7 +606,9 @@
                     }
                     else if (intPolicy == "Rate")
                     {
-                        dIAmount = ((parseFloat(PrincipalAmount) * parseFloat(InterestRate) / 100) / 12);
+                        debugger;
+
+                        dIAmount = ((parseFloat(PrincipalAmount) * parseFloat(InterestRate) / 100) / installment);
                         totalInterest = parseFloat(totalInterest) + parseFloat(dIAmount);
                         totalInterest = totalInterest.toFixed(2);
                         dTAmount = parseFloat(dPAmount) + parseFloat(dIAmount);
@@ -641,7 +643,7 @@
                 var rate = $("#InterestRate").val() || 0;
                 if (intPolicy != "Reduce") {
                     if (rate > 0) {
-                        totalInterest = (parseFloat(PrincipalAmount) * parseFloat(InterestRate) / 100 / 12) * installment;
+                        totalInterest = (parseFloat(PrincipalAmount) * parseFloat(InterestRate) / 100 / installment) * installment;
                     }
                 }
 

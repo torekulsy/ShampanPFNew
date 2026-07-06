@@ -2325,8 +2325,8 @@ namespace SymWebUI.Areas.PF.Controllers
                 {
                     rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptIndividualEmployeeImageInfo.rpt";
                 }
-             
-              
+
+                string PhotName = "'~/Files/EmployeeInfo/" + dt.Rows[0]["PhotoName"] + "'";
 
                 CompanyRepo _CompanyRepo = new CompanyRepo();
                 CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
@@ -2338,6 +2338,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + ReportHead + "'";
                 doc.DataDefinition.FormulaFields["CompanyLogo"].Text = "'" + companyLogo + "'";
                 doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
+               // doc.DataDefinition.FormulaFields["EmpImage"].Text = Server.MapPath(PhotName);
               
                 var rpt = RenderReportAsPDF(doc);
                 doc.Close();

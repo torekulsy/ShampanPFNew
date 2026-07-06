@@ -145,7 +145,7 @@
                      "sClass": "center",
                      "fnRender": function (oObj) {
                          var loanId = oObj.aData[0];
-                         var isApproved = oObj.aData[10]; // adjust index if needed
+                         var isApproved = oObj.aData[11];
 
                          var checkbox = '<input onclick="CheckAll(this)" type="checkbox" data-Id="' + loanId + '">';
                          if (oObj.aData[9] == "Yes" || oObj.aData[9] == true) {
@@ -173,7 +173,7 @@
                          if (isApproved == "Not Approved") {
                              settlementBtn = '<a title="settlement" target="_blank" href="#" class="sym-btn-add-row" style="pointer-events: none; opacity: 0.5;"></a>';  // Disabled state
                              reportBtn = '<a title="settlement" target="_blank" href="#" class="sym-btn-report-row" style="pointer-events: none; opacity: 0.5;"></a>';  // Disabled state
-                             editBtn = '<a title="settlement" target="_blank" href="#" class="sym-btn-edit-row" style="pointer-events: none; opacity: 0.5;"></a>';  // Disabled state
+                             editBtn = '<a title="settlement" target="_blank" href="/PF/Loan/Edit?loanId=' + loanId + '" class="sym-btn-edit-row" ></a>';  // Disabled state
                          } else {
                              settlementBtn = '<a title="settlement" target="_blank" href="/PF/Loan/Settlement?loanId=' + loanId + '" class="sym-btn-add-row"></a>';  // Enabled state
                              if (oObj.aData[9] == "Yes" || oObj.aData[9] == true) {
