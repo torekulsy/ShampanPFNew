@@ -544,22 +544,7 @@ namespace SymWebUI.Areas.PF.Controllers
             return View(vm);
         }
 
-        /// <summary>
-        /// Edits an existing employee loan record or saves a new loan record based on the provided view model.
-        /// This method handles both "Save" and "Update" operations for employee loans. It calculates the loan details 
-        /// for each installment based on the specified interest policy and updates the loan record in the database.
-        /// </summary>
-        /// <param name="vm">The view model containing the updated employee loan information, including loan principal, interest rate, number of installments, etc.</param>
-        /// <param name="Save">Indicates whether the operation is "Save" or "Update".</param>
-        /// <returns>
-        /// Redirects to the "AllLoan" action after successfully saving or updating the loan, or returns an error message in the session if the operation fails.
-        /// </returns>
-        /// <remarks>
-        /// The method supports two operations: 
-        /// 1. **Save**: A new loan record is created with the calculated installment details based on the interest policy ("Reduce" or others).
-        /// 2. **Update**: An existing loan record is updated with the new data, and its installments are recalculated as needed.
-        /// </remarks>
-        /// <exception cref="Exception">Thrown if there is any error while saving or updating the loan record.</exception>
+      
 
         [HttpPost]
         public ActionResult Edit(EmployeeLoanVM vm, string Save)

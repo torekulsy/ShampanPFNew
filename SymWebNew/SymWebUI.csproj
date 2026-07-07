@@ -4523,6 +4523,7 @@
     <Content Include="Areas\PF\Views\Shared\_leftnavbar.cshtml" />
     <Content Include="Areas\PF\Views\Shared\_leftnavbar2 - Copy.cshtml" />
     <None Include="Properties\PublishProfiles\PFEGCB.pubxml" />
+    <None Include="Properties\PublishProfiles\PF_Single_New.pubxml" />
     <None Include="Properties\PublishProfiles\SymphonyHRM_New.pubxml" />
     <Content Include="Views\Home\ForgotPasswordView.cshtml" />
     <Content Include="Views\Company\Index.cshtml" />
@@ -5223,7 +5224,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>False</AutoAssignPort>
           <DevelopmentServerPort>50010</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>

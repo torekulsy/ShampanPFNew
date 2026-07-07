@@ -798,46 +798,7 @@
 
                 <canvas id="deptChart"></canvas>
             </div>
-            <div class="chart-box full-width">
-
-                <div class="flex-item-inner">
-                    <a href="#">
-                        <div class="card-front">
-                            <div class="dashbordCard" style="background: #899d23">
-                                <h2>Last Month PF</h2>
-                            </div>
-                            <div class="char_canva">
-                                <canvas id="myChartPF" style="width: 420px !important; height: 200px !important;"></canvas>
-                            </div>
-                            <div class="cardMain">
-                                <div class="card-flex">
-                                    @Html.LabelFor(model => model.PfInfoDashboardVMS.TotalPerson)
-                                    <span>
-                                        @Html.TextBoxFor(model => model.PfInfoDashboardVMS.TotalPerson, new
-                   {
-                       @placeholder =
-                           "TotalPerson",
-                       @class = "form-control"
-                   })
-                                    </span>
-                                </div>
-                                <div class="card-flex">
-                                    @Html.LabelFor(model => model.PfInfoDashboardVMS.PFValue)
-                                    <span>
-                                        @Html.TextBoxFor(model => model.PfInfoDashboardVMS.PFValue, new
-                   {
-                       @placeholder = "PFValue",
-                       @class = "form-control"
-                   })
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                    </a>
-                    <!-- /card -->
-                </div>
-            </div>
+            
         </div>
     </div>
 </div>
