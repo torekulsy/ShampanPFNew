@@ -179,6 +179,7 @@ SELECT
 ,l.RefundAmount
 ,isnull(l.RefundDate, '') RefundDate
 ,l.Remarks
+,l.LoanNo
 ,t.Name LoanType
  from EmployeeLoan l
 left outer join ViewEmployeeInformation ve on l.EmployeeId=ve.EmployeeId
@@ -218,6 +219,7 @@ WHERE l.IsArchive=0 and l.Id=@loanID
                     vm.Designation = dr["Designation"].ToString();
                     vm.Department = dr["Department"].ToString();
                     vm.Section = dr["Section"].ToString();
+                    vm.LoanNo = dr["LoanNo"].ToString();
                     //vm.Employee = dr["Salutation_E"].ToString() + " " + dr["MiddleName"].ToString() +" " +dr["LastName"].ToString();
                 }
                 dr.Close();

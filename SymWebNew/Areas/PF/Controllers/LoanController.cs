@@ -557,7 +557,8 @@ namespace SymWebUI.Areas.PF.Controllers
                 vm.CreatedAt = DateTime.Now.ToString("yyyyMMddHHmmss");
                 vm.CreatedBy = identity.Name;
                 vm.CreatedFrom = identity.WorkStationIP;
-                vm.BranchId = identity.BranchId;
+                //vm.BranchId = identity.BranchId;
+                vm.BranchId = Session["BranchId"].ToString();
                 vm.IsHold = false;
                 decimal cPAmount = vm.PrincipalAmount.Value;
                 decimal dPAmount = 0;
