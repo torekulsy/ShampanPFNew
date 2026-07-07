@@ -124,7 +124,15 @@
                     </div>
                 </div>
 
-
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">
+                        <label>Loan No</label>
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.LoanNo, new { @placeholder = "Loan No", @class = " cLoanNo required right form-control" })
+                        @Html.ValidationMessage("LoanNo")
+                    </div>
+                </div>
 
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
@@ -244,13 +252,14 @@
                     <div class="editor-field">
                         @if (Model.IsApproved)
                         {
-                            @Html.TextBoxFor(model => model.ApprovedDate, new { @onchange = "LoanSchudele(); LoanDate(this);", @placeholder = "Approved Date", @class = " form-control", @readonly = "readonly" })
+                            @Html.TextBoxFor(model => model.ApprovedDate, new { @onchange = "LoanSchudele(); LoanDate(this);", @placeholder = "Approved Date", @class = "required customDatePicker form-control", @readonly = "readonly" })
+                            
 
                         }
 
                         else
                         {
-                            @Html.TextBoxFor(model => model.ApprovedDate, new { @onchange = "LoanSchudele(); LoanDate(this);", @placeholder = "Approved Date", @class = "customDatePicker required form-control" })
+                            @Html.TextBoxFor(model => model.ApprovedDate, new { @onchange = "LoanSchudele(); LoanDate(this); ClearApprovedDateValidation();", @placeholder = "Approved Date", @class = "customDatePicker required form-control" })
                         }
                         @Html.ValidationMessageFor(model => model.ApprovedDate)
                     </div>
@@ -439,647 +448,7 @@
         </div>
     </div>
 }
-@*<script>
-    var isFormChanged = false;
 
-    $(document).ready(function () 
-
-        InitLoanDatePickers();
-
-        PFLoanTypeCheck();
-        PFBalanceLoad();
-
-        ApprovedCheck();
-        ToggleInterestAmount();
-
-        if (!$('#IsApproved').is(":checked")) {
-            setTimeout(function () {
-                LoanSchudele();
-            }, 500);
-        }
-
-        DisablePaidHoldDuplicateControls();
-
-        $(".form-control").on("change", function () {
-            isFormChanged = true;
-        });
-
-        $("#LoanType_E").on("change", function () {
-            PFLoanTypeCheck();
-            PFBalanceLoad();
-        });
-
-        $("#PrincipalAmount").on("change focusout", function () {
-            var PFloanType = GetPFLoanType();
-
-            if (PFloanType == "PF Loan" || PFloanType == "5") {
-                PFAvailableBalanceCheck();
-            }
-
-            LoanSchudele();
-        });
-
-        $("#NumberOfInstallment, #StartDate, #InterestRate, #InterestAmount").on("change focusout", function () {
-            LoanSchudele();
-        });
-
-        $(".intPolicy").on("change", function () {
-            ToggleInterestAmount();
-            LoanSchudele();
-        });
-
-        $("#IsApproved").on("change", function () {
-            ApprovedCheck();
-        });
-
-        $("#btnsave").on("click", function () {
-            btnClick();
-        });
-
-        $("#UpdateButton").on("click", function () {
-            btnClick();
-        });
-
-        $("#editJSON").on("click", function () {
-            var myData = $("#frmLoan").serialize();
-            var url = "/PF/Loan/Edit";
-            var res = submit(url, myData);
-
-            if (res == true) {
-                location.reload();
-            }
-        });
-    });
-
-
-    function InitLoanDatePickers() {
-        if ($.fn.datepicker) {
-            $(".customDatePicker").datepicker({
-                dateFormat: "dd-M-yy",
-                changeMonth: true,
-                changeYear: true
-            });
-        }
-
-        // Important:
-        // Approve checkbox checked korlei ApprovedDate auto set hobe na.
-        // Only not-approved hole blank rakha hobe.
-        if (!$("#IsApproved").is(":checked")) {
-            $("#ApprovedDate").val("");
-        }
-    }
-
-
-    function GetPFLoanType() {
-        var PFloanType = $("#LoanType_E :selected").text();
-
-        if (!PFloanType || PFloanType == "") {
-            PFloanType = $("#LoanType_E").val();
-        }
-
-        if (!PFloanType || PFloanType == "") {
-            PFloanType = '@(Model.LoanType_E ?? "")';
-        }
-
-        return $.trim(PFloanType);
-    }
-
-
-    function PFLoanTypeCheck() {
-        var PFloanType = GetPFLoanType();
-
-        if (PFloanType == "PF Loan" || PFloanType == "5") {
-            $(".Balance").show();
-            $(".AvailableRate").show();
-        } else {
-            $(".Balance").hide();
-            $(".AvailableRate").hide();
-        }
-    }
-
-
-    function PFBalanceLoad() {
-        var ApplicationDate = $("#ApplicationDate").val();
-        var EmployeeId = $(".cEmployeeId").val();
-        var PFloanType = GetPFLoanType();
-
-        if (PFloanType == "PF Loan" || PFloanType == "5") {
-            var url = "/PF/Loan/PFBalance?ApplicationDate=" + encodeURIComponent(ApplicationDate)
-                + "&emploanId=" + encodeURIComponent(EmployeeId);
-
-            $.getJSON(url, function (vm) {
-                $(".cBalance").val(vm.PFBalance);
-                $(".cAvailableRate").val(vm.AvailableRate);
-            });
-        }
-    }
-
-
-    function PFAvailableBalanceCheck() {
-        var PFBalance = parseFloat($(".cBalance").val()) || 0;
-        var PFAvailableRate = parseFloat($(".cAvailableRate").val()) || 0;
-        var PFPrincipalAmount = parseFloat($("#PrincipalAmount").val()) || 0;
-
-        var AvailableBalance = PFBalance * PFAvailableRate / 100;
-
-        if (AvailableBalance < PFPrincipalAmount) {
-            ShowResult("Fail", "Balance Not Available");
-            $("#PrincipalAmount").val(0);
-            return false;
-        }
-
-        return true;
-    }
-
-
-    function ApprovedCheck() {
-        var isApproved = $("#IsApproved").is(":checked");
-
-        if (isApproved) {
-            $(".Approved").show();
-
-            // Auto date set korbo na
-            // User manually ApprovedDate select korbe
-        } else {
-            $("#ApprovedDate").val("");
-            $(".Approved").hide();
-        }
-    }
-
-
-    function ToggleInterestAmount() {
-        var intPolicy = $(".intPolicy").val();
-
-        $("#InterestAmount").attr("readonly", true);
-
-        if (intPolicy == "Fixed") {
-            $("#InterestAmount").attr("readonly", false);
-        }
-
-        if (intPolicy != "Fixed") {
-            $("#InterestAmount").val($("#InterestAmount").val() || 0);
-        }
-    }
-
-
-    function btnClick() {
-        var PFloanType = GetPFLoanType();
-
-        if (PFloanType == "PF Loan" || PFloanType == "5") {
-            var isBalanceOk = PFAvailableBalanceCheck();
-
-            if (!isBalanceOk) {
-                return;
-            }
-        }
-
-        var PFPrincipalAmount = parseFloat($("#PrincipalAmount").val()) || 0;
-
-        if (PFPrincipalAmount <= 0) {
-            ShowResult("Fail", "Principal Amount is Required");
-            return;
-        }
-
-        if ($("#IsApproved").is(":checked")) {
-            var approvedDate = $.trim($("#ApprovedDate").val());
-
-            if (approvedDate == "") {
-                ShowResult("Fail", "Approved Date is Required");
-                return;
-            }
-        }
-
-        SaveData();
-    }
-
-
-    function SaveData() {
-        var id = parseInt($("#Id").val() || "0");
-
-        if (id > 0) {
-            $("#Operation").val("Update");
-
-            if (!valueCheck("Update")) {
-                return;
-            }
-
-            pageSubmit("frmLoan");
-        } else {
-            $("#Operation").val("Save");
-            pageSubmit("frmLoan");
-        }
-    }
-
-
-    function valueCheck(save) {
-        if (save != "Update") {
-            return true;
-        }
-
-        // Approved loan details table na thakle directly update allow
-        if ($("#SubPrincipalAmount").length == 0) {
-            return true;
-        }
-
-        var PrincipalAmount = parseFloat($("#PrincipalAmount").val()) || 0;
-        var SubPrincipalAmount = parseFloat($("#SubPrincipalAmount").val()) || 0;
-        var RefundAmount = parseFloat($("#RefundAmount").val()) || 0;
-
-        var diff = PrincipalAmount - (SubPrincipalAmount + RefundAmount);
-
-        if (Math.abs(diff) > 0.001) {
-            ShowResult("Fail", "Not match with the Principal Amount! Please Adjust " + diff.toFixed(3));
-            return false;
-        }
-
-        return true;
-    }
-
-
-    function LoanSchudele() {
-
-        PFBalanceLoad();
-
-        var intPolicy = $(".intPolicy").val();
-        $("#loanDetails").html("");
-
-        var installment = parseInt($("#NumberOfInstallment").val()) || 0;
-        var PrincipalAmount = parseFloat($("#PrincipalAmount").val()) || 0;
-        var OriginalPrincipalAmount = PrincipalAmount;
-
-        var InterestRate = parseFloat($("#InterestRate").val()) || 0;
-        var InterestAmount = parseFloat($("#InterestAmount").val()) || 0;
-
-        var totalInterest = 0;
-        var subtotal = 0;
-
-        var startDate = $("#StartDate").val();
-
-        if (installment <= 0 || PrincipalAmount <= 0 || startDate == "") {
-            return;
-        }
-
-        var dPAmount = 0;
-        var dIAmount = 0;
-        var dTAmount = 0;
-
-        var actualPrincipalPerInstallment = Math.floor(OriginalPrincipalAmount / installment);
-        var totalCount = installment - 1;
-
-        var url = "/PF/Loan/MonthCalculation?date=" + encodeURIComponent(startDate)
-            + "&number=" + encodeURIComponent(installment);
-
-        var annualInterestRate = InterestRate / 100;
-        var monthlyInterestRate = annualInterestRate / 12;
-
-        var installmentValue = 0;
-
-        if (intPolicy == "Reduce" && monthlyInterestRate > 0) {
-            installmentValue = Math.ceil(
-                (OriginalPrincipalAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, installment)) /
-                (Math.pow(1 + monthlyInterestRate, installment) - 1)
-            );
-        }
-
-        $.ajax({
-            type: "GET",
-            url: url,
-            error: function (xhr, status, error) {
-                ShowResult("Fail", "Loan schedule load failed");
-            },
-            success: function (response) {
-
-                var html = "";
-                html += "<table border='3' class='table table-striped table-responsive'>";
-                html += "<thead>";
-                html += "<caption><h1>Payment Schedule</h1></caption>";
-                html += "<tr>";
-                html += "<th>No.</th>";
-                html += "<th>Date</th>";
-                html += "<th>Amount</th>";
-                html += "<th>Interest</th>";
-                html += "<th>Total</th>";
-                html += "</tr>";
-                html += "</thead>";
-                html += "<tbody>";
-
-                var runningPrincipal = OriginalPrincipalAmount;
-
-                $.each(response, function (i, item) {
-
-                    if (intPolicy == "Reduce") {
-
-                        var interestPart = Math.round(runningPrincipal * annualInterestRate / 12);
-                        var deposit = Math.round(installmentValue);
-
-                        if (i == totalCount) {
-                            deposit = Math.round(runningPrincipal + interestPart);
-                        }
-
-                        var principalPart = deposit - interestPart;
-
-                        runningPrincipal = Math.round((runningPrincipal + interestPart) - installmentValue);
-
-                        dPAmount = principalPart;
-                        dIAmount = interestPart;
-                        dTAmount = deposit;
-
-                        totalInterest += dIAmount;
-                        subtotal += dTAmount;
-                    }
-                    else {
-                        dPAmount = OriginalPrincipalAmount / installment;
-
-                        if (intPolicy == "Fixed") {
-                            dIAmount = InterestAmount / installment;
-                        }
-                        else if (intPolicy == "Rate") {
-                            var totalRateInterest = ((OriginalPrincipalAmount * InterestRate / 100) / 12) * installment;
-                            dIAmount = totalRateInterest / installment;
-                        }
-                        else {
-                            dIAmount = 0;
-                        }
-
-                        if (i == totalCount) {
-                            dPAmount = OriginalPrincipalAmount - (actualPrincipalPerInstallment * (installment - 1));
-
-                            var totalInterestAmount = 0;
-
-                            if (intPolicy == "Fixed") {
-                                totalInterestAmount = InterestAmount;
-                            }
-                            else if (intPolicy == "Rate") {
-                                totalInterestAmount = ((OriginalPrincipalAmount * InterestRate / 100) / 12) * installment;
-                            }
-
-                            var interestPerInstallmentFloor = Math.floor(totalInterestAmount / installment);
-                            dIAmount = totalInterestAmount - (interestPerInstallmentFloor * (installment - 1));
-                        }
-                        else {
-                            dPAmount = Math.floor(dPAmount);
-                            dIAmount = Math.floor(dIAmount);
-                        }
-
-                        dTAmount = dPAmount + dIAmount;
-
-                        totalInterest += dIAmount;
-                        subtotal += dTAmount;
-                    }
-
-                    html += "<tr>";
-                    html += "<td>" + (i + 1) + "</td>";
-                    html += "<td>" + item.StartDate + "</td>";
-                    html += "<td class='text-right'>" + parseFloat(dPAmount).toFixed(2) + "</td>";
-                    html += "<td class='text-right'>" + parseFloat(dIAmount).toFixed(2) + "</td>";
-                    html += "<td class='text-right'>" + parseFloat(dTAmount).toFixed(2) + "</td>";
-                    html += "</tr>";
-
-                    $("#EndDate").val(item.StartDate);
-                });
-
-                html += "<tr>";
-                html += "<th>Total:</th>";
-                html += "<th>Installment = " + installment + "</th>";
-                html += "<th class='text-right'>Principle = " + parseFloat(OriginalPrincipalAmount).toFixed(2) + "</th>";
-                html += "<th class='text-right'>Interest = " + parseFloat(totalInterest).toFixed(2) + "</th>";
-                html += "<th class='text-right'>Subtotal = " + parseFloat(subtotal).toFixed(2) + "</th>";
-                html += "</tr>";
-
-                html += "</tbody>";
-                html += "</table>";
-
-                $("#loanDetails").html(html);
-
-                $("#TotalAmount").val(parseFloat(subtotal).toFixed(2));
-                $("#InterestAmount").val(parseFloat(totalInterest).toFixed(2));
-            }
-        });
-    }
-
-
-    function DisablePaidHoldDuplicateControls() {
-        var len = $(".IsHold").length;
-
-        $(".IsPaid").prop("disabled", true);
-        $(".IsHold").prop("disabled", true);
-        $(".HaveDuplicate").prop("disabled", true);
-
-        for (var i = 0; i < len; i++) {
-            if ($($(".IsPaid")[i]).is(":checked") || $($(".HaveDuplicate")[i]).is(":checked")) {
-                $($(".holdbtn")[i]).prop("disabled", true);
-                $($(".duplicatebtn")[i]).prop("disabled", true);
-            }
-
-            if ($($(".IsHold")[i]).is(":checked")) {
-                $($(".holdbtn")[i]).val("UnHold");
-            }
-        }
-    }
-
-
-    function LoanChange(sender) {
-
-        if (sender) {
-            var principalAmount = parseFloat($(sender).closest("tr").find(".principalAmount").val()) || 0;
-            var interestAmount = parseFloat($(sender).closest("tr").find(".interestAmount").val()) || 0;
-            var installmentAmount = principalAmount + interestAmount;
-
-            $(sender).closest("tr").find(".installmentAmount").val(installmentAmount.toFixed(3));
-        }
-
-        var totalPrincipalAmount = 0;
-        var totalInterestAmount = 0;
-        var totalInstallmentAmount = 0;
-
-        $.each($(".principalAmount"), function (i, item) {
-            var principalAmount = parseFloat($(item).closest("tr").find(".principalAmount").val()) || 0;
-            var interestAmount = parseFloat($(item).closest("tr").find(".interestAmount").val()) || 0;
-            var installmentAmount = parseFloat($(item).closest("tr").find(".installmentAmount").val()) || 0;
-
-            totalPrincipalAmount += principalAmount;
-            totalInterestAmount += interestAmount;
-            totalInstallmentAmount += installmentAmount;
-        });
-
-        $(".subPrincipalAmount").val(totalPrincipalAmount.toFixed(3));
-        $(".subInterestAmount").val(totalInterestAmount.toFixed(3));
-        $(".subInstallmentAmount").val(totalInstallmentAmount.toFixed(3));
-    }
-
-
-    function LoadPaidEdit(Id, emploanId) {
-        var url = "/PF/Loan/PaidEdit?Id=" + encodeURIComponent(Id)
-            + "&emploanId=" + encodeURIComponent(emploanId);
-
-        $.ajax({
-            type: "GET",
-            url: url,
-            success: function (response) {
-                ShowResult(response[0], response[1], "refreshparent");
-            }
-        });
-    }
-
-
-    function LoanEdit(sender, hold, dup) {
-
-        if (hold == false) {
-
-            var PaymentScheduleDate = $(sender).closest("tr").find(".cPaymentScheduleDate").val();
-            var url = "/Common/FiscalYear/FiscalPeriodLockCheck_PeriodDate?PeriodDate=" + encodeURIComponent(PaymentScheduleDate);
-
-            $.ajax({
-                url: url,
-                type: "Post",
-                traditional: true,
-                beforeSend: function () {
-                    $(".loading").show();
-                },
-                success: function (result) {
-                    UpdateData(result, sender, hold, dup);
-                },
-                complete: function () {
-                    $(".loading").fadeOut(200).hide("slow");
-                }
-            });
-        }
-        else {
-            Ask("Do you want to " + $(sender).val() + "?", function () {
-                SubmitLoanUpdate(sender, hold, dup);
-            });
-        }
-    }
-
-
-    function UpdateData(result, sender, hold, dup) {
-        var results = result.split("~");
-
-        if (results[0].toLowerCase() == "true") {
-            ShowResult("Fail", results[1]);
-        }
-        else {
-            Ask("Do you want to " + $(sender).val() + "?", function () {
-                SubmitLoanUpdate(sender, hold, dup);
-            });
-        }
-    }
-
-
-    function SubmitLoanUpdate(sender, hold, dup) {
-        var loanDetailsId = $(sender).closest("tr").find(".loanDetailsId").val();
-        var employeeId = $(sender).closest("tr").find(".employeeId").val();
-        var loanId = $(sender).closest("tr").find(".loanId").val();
-        var remarks = $(sender).closest("tr").find(".remarks").val();
-
-        var url = "/PF/Loan/LoanUpdate";
-
-        var val = {
-            loanDetailsId: loanDetailsId,
-            employeeId: employeeId,
-            loanId: loanId,
-            ishold: hold,
-            HaveDuplicate: dup,
-            remarks: remarks
-        };
-
-        $.ajax({
-            type: "GET",
-            url: url,
-            data: val,
-            success: function (response) {
-                ShowResult(response[0], response[1], "refreshparent");
-            }
-        });
-    }
-
-
-    function LoanUpdate(sender) {
-        Ask("Do you want to " + $(sender).val() + "?", function () {
-
-            var loanDetailsId = $(sender).closest("tr").find(".loanDetailsId").val();
-            var principalAmount = $(sender).closest("tr").find(".principalAmount").val();
-            var interestAmount = $(sender).closest("tr").find(".interestAmount").val();
-            var installmentAmount = $(sender).closest("tr").find(".installmentAmount").val();
-            var remarks = $(sender).closest("tr").find(".remarks").val();
-
-            var url = "/PF/Loan/LoanUpdateDetail";
-
-            var val = {
-                loanDetailsId: loanDetailsId,
-                principalAmount: principalAmount,
-                interestAmount: interestAmount,
-                installmentAmount: installmentAmount,
-                remarks: remarks
-            };
-
-            $.ajax({
-                type: "GET",
-                url: url,
-                data: val,
-                success: function (response) {
-                    ShowResult(response[0], response[1], "refreshparent");
-                }
-            });
-        });
-    }
-
-
-    function LoanDate(sender) {
-        var applicationDate = ParseLoanDate($("#ApplicationDate").val());
-        var approvedDate = ParseLoanDate($("#ApprovedDate").val());
-        var startDate = ParseLoanDate($("#StartDate").val());
-
-        if (applicationDate && approvedDate && applicationDate > approvedDate) {
-            ShowResult("Fail", "Approved Date cannot be before Application Date");
-            $(sender).val("");
-            return;
-        }
-
-        if (applicationDate && startDate && applicationDate > startDate) {
-            ShowResult("Fail", "Start Date cannot be before Application Date");
-            $(sender).val("");
-            return;
-        }
-
-        if (approvedDate && startDate && approvedDate > startDate) {
-            ShowResult("Fail", "Start Date cannot be before Approved Date");
-            $(sender).val("");
-            return;
-        }
-    }
-
-
-    function LoanDateRef(sender) {
-        var approvedDate = ParseLoanDate($("#ApprovedDate").val());
-        var refundDate = ParseLoanDate($("#RefundDate").val());
-
-        if (approvedDate && refundDate && approvedDate > refundDate) {
-            ShowResult("Fail", "Refund Date cannot be before Approved Date");
-            $(sender).val("");
-        }
-    }
-
-
-    function ParseLoanDate(dateText) {
-        if (!dateText || $.trim(dateText) == "") {
-            return null;
-        }
-
-        // Project e jodi ParseDate function already thake, seta use korbe
-        if (typeof ParseDate === "function") {
-            return ParseDate(dateText);
-        }
-
-        var parsedDate = new Date(dateText);
-
-        if (isNaN(parsedDate.getTime())) {
-            return null;
-        }
-
-        return parsedDate;
-    }
-</script>*@
 <script>
 
     function SaveData() {
@@ -1203,32 +572,83 @@
 
     });
 
+    //function btnClick() {
+
+    //    debugger;
+    //    var PFloanType = $('#LoanType_E :selected').text();
+
+    //    if (PFloanType == "PF Loan") {
+
+    //        PFAvailableBalanceCheck();
+    //    }
+    //    var PFPrincipalAmount = $('#PrincipalAmount').val();
+    //    if (PFPrincipalAmount == 0) {
+
+    //        ShowResult("Fail", "Principal Amount is Required ");
+    //        return;
+    //    }
+    //    if (PFPrincipalAmount != 0) {
+
+    //        SaveData();
+
+    //    }
+    //    //pageSubmit('frmLoan');
+
+
+    //}
+
     function btnClick() {
 
         debugger;
+
         var PFloanType = $('#LoanType_E :selected').text();
 
         if (PFloanType == "PF Loan") {
-
             PFAvailableBalanceCheck();
         }
+
         var PFPrincipalAmount = $('#PrincipalAmount').val();
-        if (PFPrincipalAmount == 0) {
 
-            ShowResult("Fail", "Principal Amount is Required ");
-            return;
+        if (PFPrincipalAmount == "" || parseFloat(PFPrincipalAmount) <= 0) {
+            ShowResult("Fail", "Principal Amount is Required");
+            $('#PrincipalAmount').focus();
+            return false;
         }
-        if (PFPrincipalAmount != 0) {
 
-            SaveData();
+        // Approved Date conditional required validation
+        if ($('#IsApproved').prop('checked')) {
 
+            var approvedDate = $.trim($('#ApprovedDate').val());
+
+            if (approvedDate == "") {
+
+                //ShowResult("Fail", "Approved Date is Required");
+
+                $('#ApprovedDate')
+                    .addClass('input-validation-error')
+                    .focus();
+
+                $('[data-valmsg-for="ApprovedDate"]')
+                    .removeClass('field-validation-valid')
+                    .addClass('field-validation-error text-danger')
+                    .text('Approved Date is Required');
+
+                return false;
+            }
+            else {
+                $('#ApprovedDate').removeClass('input-validation-error');
+
+                $('[data-valmsg-for="ApprovedDate"]')
+                    .removeClass('field-validation-error')
+                    .addClass('field-validation-valid')
+                    .text('');
+            }
         }
-        //pageSubmit('frmLoan');
 
+        SaveData();
 
+        return true;
     }
-
-
 
 
 
@@ -1239,7 +659,7 @@
     $(function () {
         InitDatePickers();
         LoanChange();
-        ApprovedCheck();
+        ApprovedCheck(false);
         valueCheck('');
         if ($('#IsApproved').is(":checked")) {
 
@@ -1265,18 +685,46 @@
         }
     });
 
+    //$('#IsApproved').change(function () {
+    //    ApprovedCheck();
+    //});
+
+    //function ApprovedCheck() {
+    //    if ($('#IsApproved').attr('checked')) {
+    //        $(".Approved").show();
+    //    }
+    //    else {
+    //        $('.Approved').hide();
+    //    }
+    //}
     $('#IsApproved').change(function () {
-        ApprovedCheck();
+        ApprovedCheck(true);
     });
 
-    function ApprovedCheck() {
-        if ($('#IsApproved').attr('checked')) {
+    function ApprovedCheck(isUserAction) {
+
+        if ($('#IsApproved').prop('checked')) {
+
             $(".Approved").show();
+
+            if (isUserAction === true) {
+                $("#ApprovedDate").val("");
+            }
         }
         else {
-            $('.Approved').hide();
+
+            $("#ApprovedDate").val("");
+            $(".Approved").hide();
+
+            $('#ApprovedDate').removeClass('input-validation-error');
+
+            $('[data-valmsg-for="ApprovedDate"]')
+                .removeClass('field-validation-error')
+                .addClass('field-validation-valid')
+                .text('');
         }
     }
+
     var change = false;
     $(".form-control").change(function () {
         change = true;
@@ -1378,7 +826,7 @@
 
         var annualInterestRate = 0;
         annualInterestRate = parseFloat(InterestRate) / 100;
-        var monthlyInterestRate = parseFloat(annualInterestRate) / 12;
+        var monthlyInterestRate = parseFloat(annualInterestRate) / installment;
         var installmentValue = 0;
         var installmentValue = Math.ceil((parseFloat(PrincipalAmount) * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, parseFloat(installment))) / (Math.pow(1 + monthlyInterestRate, parseFloat(installment)) - 1));
 
@@ -1388,59 +836,64 @@
             error: function (xhr, status, error) {
             },
             success: function (response) {
-                html += "<table border='3' border-collapse: collapse; class='table table-striped  table-responsive'><thead><caption><h1>Payment Schedule</h1></caption><tr><th>No.</th><th>Date</th><th>Amount</th><th>Interest</th><th>Total</th></tr></thead><tbody>"
+
+                var totalCount = response.length - 1;
+                var actualValue = parseFloat(PrincipalAmount / installment);
+                var iLoop = 0;
+
+                html += "<table border='3' border-collapse: collapse; class='table table-striped table-responsive'><thead><caption><h1>Payment Schedule</h1></caption><tr><th>No.</th><th>Date</th><th>Amount</th><th>Interest</th><th>Total</th></tr></thead><tbody>";
+
                 $.each(response, function (i, item) {
 
                     console.log(response);
-                    if (intPolicy == "Reduce") {
-                        debugger;
 
-                        //dIAmount = parseFloat(cPAmount) * parseFloat(parseFloat(InterestRate) / 100 / installment);
-                        //totalInterest = parseFloat(totalInterest) + parseFloat(dIAmount);
-                        //totalInterest = totalInterest.toFixed(2);
-                        //dTAmount = parseFloat(dPAmount) + parseFloat(dIAmount);
-                        //dTAmount = dTAmount.toFixed(2);
-                        //cPAmount = parseFloat(cPAmount) - parseFloat(dPAmount);
-                        //Subtotal = parseFloat(Subtotal) + parseFloat(dTAmount);
+                    if (intPolicy == "Reduce") {
 
                         var NewPrincipleAmount = Math.round(parseFloat(PrincipalAmount));
 
-                        var InterestAmount = parseFloat(NewPrincipleAmount) * parseFloat(annualInterestRate) / 12;
+                        var InterestAmount = parseFloat(NewPrincipleAmount) * parseFloat(annualInterestRate) / installment;
                         var PrinciipleWithInterestAmount = parseFloat(PrincipalAmount) + parseFloat(InterestAmount);
                         var Deposit = Math.round(parseFloat(installmentValue));
+
                         if (i == totalCount) {
                             Deposit = Math.round(parseFloat(PrinciipleWithInterestAmount));
-
                         }
+
                         var InterestPart = parseFloat(InterestAmount).toFixed(4);
                         var PrinciplePart = parseFloat(Deposit - InterestPart).toFixed(4);
-
 
                         PrincipalAmount = Math.round(PrinciipleWithInterestAmount - installmentValue);
 
                         dPAmount = PrinciplePart;
                         dIAmount = InterestPart;
                         dTAmount = Deposit;
+
                         totalInterest = parseFloat(totalInterest) + parseFloat(dIAmount);
                         Subtotal = parseFloat(Subtotal) + parseFloat(dTAmount);
-
                     }
                     else if (intPolicy == "Fixed") {
+
                         dIAmount = parseFloat(InterestAmount) / parseFloat(installment);
                         totalInterest = parseFloat(totalInterest) + parseFloat(dIAmount);
                         totalInterest = totalInterest.toFixed(2);
+
                         dTAmount = parseFloat(dPAmount) + parseFloat(dIAmount);
                         dTAmount = dTAmount.toFixed(2);
+
                         Subtotal = parseFloat(Subtotal) + parseFloat(dTAmount);
                     }
                     else if (intPolicy == "Rate") {
-                        dIAmount = ((parseFloat(PrincipalAmount) * parseFloat(InterestRate) / 100) / 12);
+
+                        dIAmount = ((parseFloat(PrincipalAmount) * parseFloat(InterestRate) / 100) / installment);
                         totalInterest = parseFloat(totalInterest) + parseFloat(dIAmount);
                         totalInterest = totalInterest.toFixed(2);
+
                         dTAmount = parseFloat(dPAmount) + parseFloat(dIAmount);
                         dTAmount = dTAmount.toFixed(2);
+
                         Subtotal = parseFloat(Subtotal) + parseFloat(dTAmount);
                     }
+
                     if (intPolicy != "Reduce") {
 
                         if (totalCount == i) {
@@ -1450,6 +903,7 @@
                             dIAmount = dIAmount.toFixed(2);
                             var val = dIAmount.toString().split('.')[0];
                             var amnt = parseInt(val);
+
                             dIAmount = parseInt(totalInterest) - (amnt * (installment - 1));
                         }
                         else {
@@ -1457,25 +911,31 @@
                             dIAmount = parseFloat(dIAmount).toFixed(4);
                         }
                     }
-                    dTAmount = parseFloat(dPAmount) + parseFloat(dIAmount);
-                    html += "<tr><td>" + (i + 1) + "</td><td>" + item.StartDate + "</td><td class='text-right' >" + parseFloat(dPAmount).toFixed(2) + "</td><td class='text-right'>" + parseFloat(dIAmount).toFixed(2) + "</td><td class='text-right'>" + parseFloat(dTAmount).toFixed(2) + "</td></tr>";
 
-                    $("#EndDate").val(item.StartDate)
+                    dTAmount = parseFloat(dPAmount) + parseFloat(dIAmount);
+
+                    html += "<tr><td>" + (i + 1) + "</td><td>" + item.StartDate + "</td><td class='text-right'>" + parseFloat(dPAmount).toFixed(2) + "</td><td class='text-right'>" + parseFloat(dIAmount).toFixed(2) + "</td><td class='text-right'>" + parseFloat(dTAmount).toFixed(2) + "</td></tr>";
+
+                    $("#EndDate").val(item.StartDate);
+
                     iLoop++;
                 });
-                // bottom line
+
                 PrincipalAmount = PrincipalAmt;
                 Subtotal = parseInt(PrincipalAmount) + parseInt(totalInterest);
+
                 var rate = $("#InterestRate").val() || 0;
+
                 if (intPolicy != "Reduce") {
                     if (rate > 0) {
-                        totalInterest = (parseFloat(PrincipalAmount) * parseFloat(InterestRate) / 100 / 12) * installment;
+                        totalInterest = (parseFloat(PrincipalAmount) * parseFloat(InterestRate) / 100 / installment) * installment;
                     }
                 }
 
-                html += "<tr><th>Total: </th><th> Installment= " + installment + "</th><th class='text-right' >Principle= " + parseFloat(PrincipalAmount).toFixed(2) + "</th><th class='text-right'>Interest= " + parseFloat(totalInterest).toFixed(2) + "</th><th class='text-right'>Subtotal= " + parseFloat(Subtotal).toFixed(2).toLocaleString('en') + "</th></tr>";
+                html += "<tr><th>Total: </th><th> Installment= " + installment + "</th><th class='text-right'>Principle= " + parseFloat(PrincipalAmount).toFixed(2) + "</th><th class='text-right'>Interest= " + parseFloat(totalInterest).toFixed(2) + "</th><th class='text-right'>Subtotal= " + parseFloat(Subtotal).toFixed(2).toLocaleString('en') + "</th></tr>";
 
                 html += "</tbody></table>";
+
                 $("#loanDetails").html(html);
                 $("#TotalAmount").val(parseFloat(Subtotal).toFixed(2));
                 $("#InterestAmount").val(parseFloat(totalInterest).toFixed(2));
@@ -1681,6 +1141,26 @@
             $(sender).val("");
         }
     }
+
+
+    function ClearApprovedDateValidation() {
+
+        var approvedDate = $.trim($('#ApprovedDate').val());
+
+        if (approvedDate != "") {
+
+            $('#ApprovedDate').removeClass('input-validation-error');
+
+            $('[data-valmsg-for="ApprovedDate"]')
+                .removeClass('field-validation-error')
+                .addClass('field-validation-valid')
+                .text('');
+        }
+    }
+
+    $('#ApprovedDate').on('change keyup blur', function () {
+        ClearApprovedDateValidation();
+    });
 </script>
 
 
