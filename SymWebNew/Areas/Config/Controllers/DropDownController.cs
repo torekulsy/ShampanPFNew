@@ -177,6 +177,7 @@ namespace SymWebUI.Areas.Config.Controllers
             return Json(reportTypes, JsonRequestBehavior.AllowGet);
         }
 
+        [AllowAnonymous]
         public JsonResult Branch()
         {
             return Json(new SelectList(new EmployeeInfoRepo().Branch(), "Id", "Name"), JsonRequestBehavior.AllowGet);

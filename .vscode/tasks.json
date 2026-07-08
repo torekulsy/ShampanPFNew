@@ -1,0 +1,30 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "iisexpress",
+            "type": "shell",
+            "command": "C:\\Program Files (x86)\\IIS Express\\iisexpress.exe",
+            "args": [
+                "/path:${workspaceFolder}\\SymWebNew",
+                "/port:8080"
+            ],
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "iisexpress",
+                "pattern": {
+                    "regexp": "^.*$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^Starting IIS Express ...",
+                    "endsPattern": "^IIS Express is running\\."
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        }
+    ]
+}

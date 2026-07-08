@@ -1,5 +1,6 @@
 ﻿using System.Web;
 using System.Web.Mvc;
+using SymWebUI.Filters;
 
 namespace SymWebUI
 {
@@ -8,6 +9,7 @@ namespace SymWebUI
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
             filters.Add(new HandleErrorAttribute());
+            filters.Add(new SessionTimeoutAuthorizeAttribute());
         }
     }
 }

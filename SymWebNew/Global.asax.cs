@@ -76,5 +76,21 @@ namespace SymWebUI
             
         }
 
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            Exception exception = Server.GetLastError();
+            
+            // Check if the error is related to session timeout
+            if (exception != null && (exception is HttpException || exception is NullReferenceException))
+            {
+                // Check if session is null or expired
+                if (Session != null && Session["User"] == null && HttpContext.Current.Request.IsAuthenticated)
+                {
+                    Server.ClearError();
+                    Response.Redirect("/Home/");
+                }
+            }
+        }
+
     }
 }
