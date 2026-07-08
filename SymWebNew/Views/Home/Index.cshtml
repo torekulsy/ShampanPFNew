@@ -391,10 +391,7 @@
                         <img src="~/Images/PF.png" alt="Alternate Text" />
                     </div>
 
-                    @using (Html.BeginForm("Login", "Home",
-                new { ReturnUrl = ViewBag.ReturnUrl },
-                FormMethod.Post,
-                new { @id = "frmLogin" }))
+                    @using (Html.BeginForm("Login", "Home",new { ReturnUrl = ViewBag.ReturnUrl },FormMethod.Post,new { @id = "frmLogin",autocomplete = "off"}))
                     {
                         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
@@ -402,8 +399,14 @@
                         <label for="userId">User ID</label>
                         <div class="input-wrap">
                             <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
-                            @Html.TextBoxFor(m => m.LogID,
-                    new { @class = "form-control", placeholder = "User ID", required = "required" })
+                           @Html.TextBoxFor(m => m.LogID,
+new
+{
+    @class = "form-control",
+    placeholder = "User ID",
+    required = "required",
+   
+})
 
                         </div>
 
@@ -423,8 +426,15 @@
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                             </svg>
 
-                            @Html.PasswordFor(m => m.Password,
-        new { @class = "form-control", placeholder = "Password", required = "required", id = "passwordField" })
+                           @Html.PasswordFor(m => m.Password,
+new
+{
+    @class = "form-control",
+    placeholder = "Password",
+    required = "required",
+    id = "passwordField",
+   
+})
 
                             <!-- RIGHT EYE ICON -->
                             <span class="toggle-password" onclick="togglePassword()">
@@ -453,7 +463,7 @@
                             <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" /><path d="M9 22v-4h6v4" /><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01" /></svg>
                             @Html.SimpleDropDownFor(m => m.BranchId,
                     "/Config/DropDown/Branch",
-                    new { @class = "form-control", required = "required", data_disable_placeholder = "true" })
+                     new { @class = "form-control", required = "required", data_disable_placeholder = "true" })
                         </div>
 
                         <div style="margin-top:10px; display:flex; justify-content:space-between;">
@@ -675,6 +685,54 @@
             eyeClose.style.display = "block";
         }
     }
+
+</script>
+<script>
+    $(document).ready(function () {
+
+        // Clear login fields after refresh
+        $("#LogID").val("");
+        $("#passwordField").val("");
+
+        // Reset branch dropdown
+        $("#BranchId").val("0").trigger("change");
+
+        // Remove browser saved values
+        $("#frmLogin")[0].reset();
+
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        var loginFailed = '@ViewBag.LoginFailed';
+
+        if (loginFailed === "True") {
+
+            $("#LogID").val("");
+            $("#passwordField").val("");
+            $("#BranchId").val("0").trigger("change");
+
+        }
+
+    });
+</script>
+<script>
+    window.onload = function () {
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    };
+</script>
+<script>
+
+    history.pushState(null, null, location.href);
+
+    window.onpopstate = function () {
+
+        history.go(1);
+
+    };
 
 </script>
 @*<script>
