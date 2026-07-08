@@ -11,7 +11,8 @@
     <div class="card">
         <div class="card-header p-3">
             <div class="th_thinbox_top">
-                <button type="button" title="Save Data" onclick="pageSubmit('frmLoan')" class="sym-btn-save">&nbsp;Save</button>
+                @*<button type="button" title="Save Data" onclick="pageSubmit('frmLoan')" class="sym-btn-save">&nbsp;Save</button>*@
+                <button type="button" title="Save Data" class="sym-btn-save btnsave">&nbsp;Save</button>
                 <div class="breadcrumb-container">
                     <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
                 </div>
@@ -167,8 +168,8 @@
                         @Html.LabelFor(model => model.ApprovedDate)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.ApprovedDate, new { @onchange = "LoanSchudele(); LoanDate(this);", @placeholder = "Approved Date", @class = "required customDatePicker  form-control" })
-                        @Html.ValidationMessageFor(model => model.ApprovedDate)
+                       @Html.TextBoxFor(model => model.ApprovedDate, new{@onchange = "LoanSchudele(); LoanDate(this); ClearApprovedDateValidation();",@placeholder = "Approved Date",@class = "customDatePicker form-control",autocomplete = "off"})
+                       @Html.ValidationMessageFor(model => model.ApprovedDate, "", new { @class = "text-danger" })
                     </div>
                 </div>
 
@@ -409,35 +410,133 @@
 
 <script>
     $(function () {
-        debugger;
 
         PFLoanTypeCheck();
-        ApprovedCheck();
+        ApprovedCheck(false);
         InitDatePickers();
-        ////InitDropDown();
+
         LoanSchudele();
         valiDation("frmLoan");
 
-
+        // jQuery UI datepicker hole date select korar sathe sathe validation clear hobe
+        if ($.fn.datepicker && $("#ApprovedDate").hasClass("hasDatepicker")) {
+            $("#ApprovedDate").datepicker("option", "onSelect", function () {
+                ClearApprovedDateValidation();
+                LoanSchudele();
+                LoanDate(this);
+            });
+        }
     });
 
-    $('#IsApproved').change(function () {
-        ApprovedCheck();
+    $('#IsApproved').off('change').on('change', function () {
+        ApprovedCheck(true);
     });
 
-    function ApprovedCheck() {
-        if ($('#IsApproved').attr('checked')) {
-            $(".approvedDate").show();
-            $("#ApprovedDate").addClass("required");
+    $('#ApprovedDate').off('change keyup blur').on('change keyup blur', function () {
+        ClearApprovedDateValidation();
+    });
+
+    $('.btnsave').off('click').on('click', function () {
+
+        var PFloanType = $('#LoanType_E :selected').text();
+
+        if (PFloanType == "PF Loan") {
+            PFAvailableBalanceCheck();
+        }
+        else {
+            PFInstallmentCheck();
+        }
+
+        var PFPrincipalAmount = $.trim($('#PrincipalAmount').val());
+
+        if (PFPrincipalAmount == "" || parseFloat(PFPrincipalAmount) <= 0) {
+            ShowResult("Fail", "Principal Amount is Required");
+            $('#PrincipalAmount').focus();
+            return false;
+        }
+
+        // Approved Date conditional validation
+        if ($('#IsApproved').prop('checked')) {
+
+            var approvedDate = $.trim($('#ApprovedDate').val());
+
+            if (approvedDate == "") {
+
+                ShowApprovedDateValidation("Approved Date is Required");
+
+                //ShowResult("Fail", "Approved Date is Required");
+
+                return false;
             }
             else {
-            $('.approvedDate').hide();
-            $('#ApprovedDate').removeClass("required");
+                ClearApprovedDateValidation();
             }
+        }
+        else {
+            ResetApprovedDateValidation();
+        }
+
+        pageSubmit('frmLoan');
+
+        return true;
+    });
+
+    function ApprovedCheck(isUserAction) {
+
+        if ($('#IsApproved').prop('checked')) {
+
+            $(".approvedDate").show();
+
+            $("#ApprovedDate").addClass("required");
+
+            if (isUserAction === true) {
+                $("#ApprovedDate").val("");
+                ResetApprovedDateValidation();
+            }
+        }
+        else {
+
+            $(".approvedDate").hide();
+
+            $("#ApprovedDate")
+                .val("")
+                .removeClass("required")
+                .removeClass("input-validation-error");
+
+            ResetApprovedDateValidation();
+        }
     }
-        //var ApprovedCheck = (".ApprovedCheck").
-        //if(".ApprovedCheck")
-    //}
+
+    function ShowApprovedDateValidation(message) {
+
+        $('#ApprovedDate')
+            .addClass('input-validation-error')
+            .focus();
+
+        $('[data-valmsg-for="ApprovedDate"]')
+            .removeClass('field-validation-valid')
+            .addClass('field-validation-error text-danger')
+            .text(message);
+    }
+
+    function ClearApprovedDateValidation() {
+
+        var approvedDate = $.trim($('#ApprovedDate').val());
+
+        if (approvedDate != "") {
+            ResetApprovedDateValidation();
+        }
+    }
+
+    function ResetApprovedDateValidation() {
+
+        $('#ApprovedDate').removeClass('input-validation-error');
+
+        $('[data-valmsg-for="ApprovedDate"]')
+            .removeClass('field-validation-error')
+            .addClass('field-validation-valid')
+            .text('');
+    }
 
 
     $('.intPolicy').change(function () {

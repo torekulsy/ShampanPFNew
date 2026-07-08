@@ -27,6 +27,7 @@ namespace SymWebUI.Controllers
     {
 
         [AllowAnonymous]
+        [OutputCache(NoStore = true, Duration = 150)]
         public ActionResult Index(string returnUrl)
         {
             string project = new AppSettingsReader().GetValue("CompanyName", typeof(string)).ToString();
@@ -452,9 +453,18 @@ namespace SymWebUI.Controllers
                 }
                 else
                 {
-                    retResults[0] = "Fail"; 
+                    retResults[0] = "Fail";
                     retResults[1] = "User Name or Password is invalid!";
-                    Session["result"] = retResults[0] + "~" + retResults[1];                  
+
+                    Session["result"] = retResults[0] + "~" + retResults[1];
+
+                    // Keep only message, clear login fields
+                    vm.LogID = "";
+                    vm.Password = "";
+                    vm.BranchId = 0;
+
+                    ViewBag.LoginFailed = true;
+
                     return View("Index", vm);
                 }
             }
@@ -464,24 +474,47 @@ namespace SymWebUI.Controllers
                 return RedirectToAction("Index");
             }
         }
+        //public ActionResult LogOut()
+        //{
+        //    HttpCookie authCookie = Request.Cookies[FormsAuthentication.FormsCookieName];
+        //    if (authCookie != null && authCookie.Value != "")
+        //    {
+        //        FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
+        //        authCookie.Expires = DateTime.Now.AddDays(-1);
+        //        HttpContext.Response.Cookies.Add(authCookie);
+        //    }
+
+        //    Session["User"] = "";
+        //    Session["FullName"] = "";
+        //    Session["UserType"] = "";
+        //    Session["EmployeeId"] = "";
+        //    Session["SessionDate"] = "";
+        //    Session["SessionYear"] = "";
+        //    Session["mgs"] = "";
+        //    //////Session.Abandon();
+
+
+        //    return RedirectToAction("Index");
+        //}
         public ActionResult LogOut()
         {
             HttpCookie authCookie = Request.Cookies[FormsAuthentication.FormsCookieName];
+
             if (authCookie != null && authCookie.Value != "")
             {
                 FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
                 authCookie.Expires = DateTime.Now.AddDays(-1);
-                HttpContext.Response.Cookies.Add(authCookie);
+                Response.Cookies.Add(authCookie);
             }
 
-            Session["User"] = "";
-            Session["FullName"] = "";
-            Session["UserType"] = "";
-            Session["EmployeeId"] = "";
-            Session["SessionDate"] = "";
-            Session["SessionYear"] = "";
-            Session["mgs"] = "";
-            //////Session.Abandon();
+
+            Session.Clear();
+            Session.Abandon();
+
+
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Response.Cache.SetNoStore();
+            Response.Cache.SetExpires(DateTime.UtcNow.AddDays(-1));
 
 
             return RedirectToAction("Index");
