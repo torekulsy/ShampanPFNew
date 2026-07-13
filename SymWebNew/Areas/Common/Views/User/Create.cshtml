@@ -87,11 +87,16 @@
 }
 <script>
 
+    $(function () {
+        valiDation("frmUser");
+    });
+
     $(function(){
         $('#FullName').autocomplete({ source: '@Url.Action("EmployeeCode", "Autocomplete", new { area = "Config" })', minLength: 2 });
         });
 
     function CreateUser() {
+        debugger;
         var pass = $(".passW").val();
         var conpass = $(".conpassW").val();
         if (pass != conpass) {
