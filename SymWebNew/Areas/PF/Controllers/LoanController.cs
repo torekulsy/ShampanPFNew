@@ -1830,7 +1830,7 @@ namespace SymWebUI.Areas.PF.Controllers
         /// An Excel file stream download if the user has permission and data is available;
         /// otherwise redirects to the SalarySheet view or Payroll Home on permission failure.
         /// </returns>
-        public ActionResult DownloadAllLoanReport(EmployeeLoanVM vm)
+        public ActionResult DownloadAllLoanReport(string StartDate = "", string EndDate = "")
         {
             string[] result = new string[6];
             DataSet ds = new DataSet();
@@ -1869,6 +1869,19 @@ namespace SymWebUI.Areas.PF.Controllers
 
                 dt = Ordinary.ListToDataTable(getAllData.ToList());
 
+                // Debug: Log data retrieval info
+                System.Diagnostics.Debug.WriteLine("Retrieved " + getAllData.Count() + " records from database");
+                System.Diagnostics.Debug.WriteLine("DataTable has " + dt.Rows.Count + " rows and " + dt.Columns.Count + " columns");
+
+                // Debug: Check if data is retrieved
+                if (dt.Rows.Count == 0)
+                {
+                    result[0] = "Fail";
+                    result[1] = "No Data Found in database";
+                    Session["result"] = result[0] + "~" + result[1];
+                    return RedirectToAction("AllLoan");
+                }
+
                 var toRemove = new string[] {  "Operation","PFBalance","AvailableRate","Id","LoanType_E","EmployeeId","NumberOfInstallment"
                                                 ,"PeriodName","ApplicationDate","ApprovedDate","IsApproved","EndDate","IsHold","Remarks"
                                                 ,"IsActive","IsArchive","CreatedBy","CreatedAt","CreatedFrom","LastUpdateBy","LastUpdateAt","LastUpdateFrom","Project"
@@ -1877,15 +1890,22 @@ namespace SymWebUI.Areas.PF.Controllers
                                                 ,"SettlementAmount","NoofInstallment","IsEarlySellte","EarlySellteDate"
                                             };
 
-                //List<string> oldColumnNames = new List<string> { "EmpName", "LoanTypeName", "PrincipalAmount", "InterestAmount", "InstallmentAmount" };
-                //List<string> newColumnNames = new List<string> { "Employee Name", "Type Name", "Principal Amount", "Interest Amount", "Installment Amount" };
-                //dt = Ordinary.DtColumnNameChangeList(dt, oldColumnNames, newColumnNames);
-
                 foreach (string col in toRemove)
                 {
-                    dt.Columns.Remove(col);
+                    if (dt.Columns.Contains(col))
+                    {
+                        dt.Columns.Remove(col);
+                    }
                 }
 
+                // Check if DataTable still has columns after removal
+                if (dt.Columns.Count == 0)
+                {
+                    result[0] = "Fail";
+                    result[1] = "No columns remaining after filtering";
+                    Session["result"] = result[0] + "~" + result[1];
+                    return RedirectToAction("AllLoan");
+                }
 
                 #endregion
 
@@ -1937,36 +1957,22 @@ namespace SymWebUI.Areas.PF.Controllers
 
                 #region Excel Download
 
+                ExcelSheetFormat(dt, workSheet, ReportHeaders);
+
                 using (var memoryStream = new MemoryStream())
                 {
-                    Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                    Response.AddHeader("content-disposition", "attachment;  filename=" + filename + ".xlsx");
                     excel.SaveAs(memoryStream);
-                    memoryStream.WriteTo(Response.OutputStream);
-                    Response.Flush();
-                    Response.End();
+                    byte[] fileBytes = memoryStream.ToArray();
+                    return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename + ".xlsx");
                 }
-
-                #endregion
-
-                #region Redirect
-
-                result[0] = "Success";
-                result[1] = "Successful~Data Download";
-
-                Session["result"] = result[0] + "~" + result[1];
-                return Redirect("SalarySheet");
 
                 #endregion
             }
             catch (Exception e)
             {
-                Session["result"] = result[0] + "~" + result[1];
-                FileLogger.Log(
-                    result[0].ToString() + Environment.NewLine + result[2].ToString() + Environment.NewLine +
-                    result[5].ToString(), this.GetType().Name,
-                    result[4].ToString() + Environment.NewLine + result[3].ToString());
-                return Redirect("SalarySheet");
+                Session["result"] = "Fail~" + e.Message;
+                FileLogger.Log(e.Message, this.GetType().Name, e.StackTrace);
+                return RedirectToAction("AllLoan");
             }
         }
 

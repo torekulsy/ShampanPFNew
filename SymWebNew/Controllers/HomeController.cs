@@ -122,7 +122,7 @@ namespace SymWebUI.Controllers
             ViewEmployeeInfoVM viewEmpInfoVM = new ViewEmployeeInfoVM();
             EmployeeInfoVM empInfoVM = new EmployeeInfoVM();
 
-            EmailSettings ems = new EmailSettings();
+            EmailSettingsSym ems = new EmailSettingsSym();
                      
                              
             #endregion
@@ -142,11 +142,11 @@ namespace SymWebUI.Controllers
 
                     #region Mail Data Assign
 
-                    SettingRepo _setDAL = new SettingRepo();
-                    ems.MailFromAddress = _setDAL.settingValue("Mail", "MailFromAddress");
-                    ems.Password = _setDAL.settingValue("Mail", "MailFromPSW");
-                    ems.UserName = ems.MailFromAddress;
-                    ems.ServerName = _setDAL.settingValue("Mail", "ServerName");
+                    //SettingRepo _setDAL = new SettingRepo();
+                    //ems.MailFromAddress = _setDAL.settingValue("Mail", "MailFromAddress");
+                    //ems.Password = _setDAL.settingValue("Mail", "MailFromPSW");
+                    //ems.UserName = ems.MailFromAddress;
+                    //ems.ServerName = _setDAL.settingValue("Mail", "ServerName");
 
                     string stMailBody = @"Dear vEmpName, \n Your password is  vPassword. \n Thanks & Regards \n HR Admin ";
 

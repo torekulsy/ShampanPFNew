@@ -2326,7 +2326,8 @@ namespace SymWebUI.Areas.PF.Controllers
                     rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptIndividualEmployeeImageInfo.rpt";
                 }
 
-                string PhotName = "'~/Files/EmployeeInfo/" + dt.Rows[0]["PhotoName"] + "'";
+                string photoFileName = dt.Rows[0]["Code"] + ".jpg";
+                string imagePath = Server.MapPath("~/Files/EmployeeInfo/" + photoFileName);
 
                 CompanyRepo _CompanyRepo = new CompanyRepo();
                 CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
@@ -2338,8 +2339,27 @@ namespace SymWebUI.Areas.PF.Controllers
                 doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + ReportHead + "'";
                 doc.DataDefinition.FormulaFields["CompanyLogo"].Text = "'" + companyLogo + "'";
                 doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
-               // doc.DataDefinition.FormulaFields["EmpImage"].Text = Server.MapPath(PhotName);
-              
+                
+                // Set employee image path for Crystal Reports using same format as CompanyLogo
+                string empImagePath = "";
+                if (System.IO.File.Exists(imagePath))
+                {
+                    empImagePath = imagePath;
+                }
+                else if (dt.Rows[0]["Code"] != null && !string.IsNullOrEmpty(dt.Rows[0]["Code"].ToString()))
+                {
+                    string altImagePath = Server.MapPath("~/Files/EmployeeInfo/" + dt.Rows[0]["Code"]+".jpg");
+                    if (System.IO.File.Exists(altImagePath))
+                    {
+                        empImagePath = altImagePath;
+                    }
+                }
+                
+                if (!string.IsNullOrEmpty(empImagePath))
+                {
+                    doc.DataDefinition.FormulaFields["EmpImage"].Text = "'" + empImagePath + "'";
+                }
+                                             
                 var rpt = RenderReportAsPDF(doc);
                 doc.Close();
                 return rpt;

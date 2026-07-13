@@ -1120,6 +1120,7 @@ Where 1=1
                         empViewVM.EmployeeId = dr["EmployeeId"].ToString();
                         empViewVM.Code = dr["Code"].ToString();             
                         empViewVM.EmpName = dr["EmpName"].ToString();
+                        empViewVM.EmpEmail = dr["Email"].ToString();
                         empViewVM.JoinDate = dr["JoinDate"].ToString();                       
                         empViewVM.Project = dr["Project"].ToString();
                         empViewVM.Department = dr["Department"].ToString();
@@ -1133,7 +1134,8 @@ Where 1=1
                         empViewVM.IsActive = Convert.ToBoolean(dr["IsActive"]);
                         empViewVM.IsArchive = Convert.ToBoolean(dr["IsArchive"]);                   
                         empViewVM.GrossSalary = Convert.ToDecimal(dr["GrossSalary"]);
-                        empViewVM.BasicSalary = Convert.ToDecimal(dr["BasicSalary"]);                    
+                        empViewVM.BasicSalary = Convert.ToDecimal(dr["BasicSalary"]);
+                        empViewVM.Password = dr["Password"].ToString();
                     
                         employeeInfoVMs.Add(empViewVM);
                     }

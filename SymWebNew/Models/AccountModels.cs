@@ -117,7 +117,7 @@ namespace SymWebUI.Models
         public string MailToAddress = "symphonyleave@gmail.com";
         public string MailFromAddress = "symphonyleave@gmail.com";
         public bool USsel = true;
-        public string Password = "vdki rypf aump rrvt";
+        public string Password = "hmml svme sxdg cuzy";
         public string UserName = "symphonyleave@gmail.com";
         public string ServerName = "smtp.gmail.com";
         public string Name { get; set; }
