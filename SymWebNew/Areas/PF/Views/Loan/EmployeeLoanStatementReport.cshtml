@@ -87,7 +87,7 @@
                     <label>Date To</label>
                 </div>
                 <div class="editor-field">
-                    @Html.TextBox("DateTo", "", new { @placeholder = "Date To", @class = "required customDatePicker form-control" })
+                    @Html.TextBox("DateTo", "", new { @placeholder = "Date To", @class = " customDatePicker form-control" })
 
                 </div>
             </div>
@@ -149,9 +149,15 @@
             var DateFrom = $("#DateFrom").val();
             var DateTo = $("#DateTo").val();
 
-            if (DateFrom === "" || DateTo === "") {
-                ShowResult("Fail","Date Required");
+            if (DateFrom === "" ) {
+                ShowResult("Fail","Date From Required");
                 $("#DateFrom").focus();
+                return false;
+            }
+
+            if (DateTo === "") {
+                ShowResult("Fail", "Date To Required");
+                $("#DateTo").focus();
                 return false;
             }
 
