@@ -166,7 +166,7 @@
                                 @Html.LabelFor(model => model.Address)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.Address, new { @placeholder = "Address", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.Address, new { @placeholder = "Address", @class = "required form-control" })
                                 @Html.ValidationMessageFor(model => model.Address)
                             </div>
                         </div>
@@ -201,7 +201,7 @@
                                 @Html.LabelFor(model => model.PostalCode)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.PostalCode, new { @placeholder = "Postal Code", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.PostalCode, new { @placeholder = "Postal Code", @class = "form-control isPositiveNumeric" })
                                 @Html.ValidationMessageFor(model => model.PostalCode)
                             </div>
                         </div>
@@ -210,7 +210,7 @@
                                 @Html.LabelFor(model => model.Phone)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.Phone, new { @placeholder = "Phone", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.Phone, new { @placeholder = "Phone", @class = "form-control isPositiveNumeric" })
                                 @Html.ValidationMessageFor(model => model.Phone)
                             </div>
                         </div>
@@ -219,7 +219,7 @@
                                 @Html.LabelFor(model => model.Mobile)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.Mobile, new { @placeholder = "Mobile", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.Mobile, new { @placeholder = "Mobile", @class = "form-control isPositiveNumeric" })
                                 @Html.ValidationMessageFor(model => model.Mobile)
                             </div>
                         </div>
@@ -228,7 +228,7 @@
                                 @Html.LabelFor(model => model.Fax)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.Fax, new { @placeholder = "Fax", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.Fax, new { @placeholder = "Fax", @class = "form-control isPositiveNumeric" })
                                 @Html.ValidationMessageFor(model => model.Fax)
                             </div>
                         </div>
@@ -238,7 +238,7 @@
                                 @Html.LabelFor(model => model.TaxId)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.TaxId, new { @placeholder = "TAX Id", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.TaxId, new { @placeholder = "TAX Id", @class = "form-control isPositiveNumeric" })
                                 @Html.ValidationMessageFor(model => model.TaxId)
                             </div>
                         </div>
@@ -247,7 +247,7 @@
                                 @Html.LabelFor(model => model.RegistrationNumber)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.RegistrationNumber, new { @placeholder = "Registration Number", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.RegistrationNumber, new { @placeholder = "Registration Number", @class = "form-control isPositiveNumeric" })
                                 @Html.ValidationMessageFor(model => model.RegistrationNumber)
                             </div>
                         </div>
@@ -256,7 +256,7 @@
                                 @Html.LabelFor(model => model.NumberOfEmployees)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.NumberOfEmployees, new { @placeholder = "Number Of Employees", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.NumberOfEmployees, new { @placeholder = "Number Of Employees", @class = "required form-control isPositiveNumeric" })
                                 @Html.ValidationMessageFor(model => model.NumberOfEmployees)
                             </div>
                         </div>
@@ -334,7 +334,7 @@
                             <!-- Preview Image -->
                             <img src="@Url.Content("~/Images/default-logo.png")"
                                  id="LogoImage"
-                                 alt="Logo Image" />
+                                 />
 
                             <!-- Upload UI -->
                             <div class="upload-content">

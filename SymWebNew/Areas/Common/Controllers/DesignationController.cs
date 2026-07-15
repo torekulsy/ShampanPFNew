@@ -323,7 +323,8 @@ namespace SymWebUI.Areas.Common.Controllers
             vm.CreatedAt = DateTime.Now.ToString("yyyyMMddHHmmss");
             vm.CreatedBy = identity.Name;
             vm.CreatedFrom = identity.WorkStationIP;
-            vm.BranchId = Convert.ToInt32(identity.BranchId);
+            //vm.BranchId = Convert.ToInt32(identity.BranchId);
+            vm.BranchId = Convert.ToInt32(Session["BranchId"]);
             try
             {
 

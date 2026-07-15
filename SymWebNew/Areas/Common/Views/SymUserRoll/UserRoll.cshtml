@@ -83,7 +83,7 @@
                             @Html.Label("All Report")
                         </div>
                         <div class="editor-field">
-                            @Html.CheckBox("IsRepot", new { @placeholder = "IsProcess", @class = " AllProcess form-control" })
+                            @Html.CheckBox("IsReport", new { @placeholder = "IsReport", @class = " AllReport form-control" })
                         </div>
                     </div>
                 </div>
@@ -137,45 +137,121 @@
             Selectemployee(empId);
         })
 
-        $(".AllIsAdd").click(function () {
-            if ($('.AllIsAdd').prop('checked') == false) {
-                $('.IsAdd').prop('checked', false);
-            }
-            else {
-                $('.IsAdd').prop('checked', true);
-            }
+        //$(".AllIsAdd").click(function () {
+        //    if ($('.AllIsAdd').prop('checked') == false) {
+        //        $('.IsAdd').prop('checked', false);
+        //    }
+        //    else {
+        //        $('.IsAdd').prop('checked', true);
+        //    }
+        //});
+        //$(".AllIIndex").click(function () {
+        //    if ($('.AllIIndex').prop('checked') == false) {
+        //        $('.IsIndex').prop('checked', false);
+        //    }
+        //    else {
+        //        $('.IsIndex').prop('checked', true);
+        //    }
+        //});
+        //$(".AllIEdit").click(function () {
+        //    if ($('.AllIEdit').prop('checked') == false) {
+        //        $('.IsEdit').prop('checked', false);
+        //    }
+        //    else {
+        //        $('.IsEdit').prop('checked', true);
+        //    }
+        //});
+        //$(".AllDelete").click(function () {
+        //    if ($('.AllDelete').prop('checked') == false) {
+        //        $('.IsDelete').prop('checked', false);
+        //    }
+        //    else {
+        //        $('.IsDelete').prop('checked', true);
+        //    }
+        //    $(".AllProcess").click(function () {
+        //        if ($('.AllProcess').prop('checked') == false) {
+        //            $('.IsProcess').prop('checked', false);
+        //        }
+        //        else {
+        //            $('.IsProcess').prop('checked', true);
+        //        }
+        //    });
+        //});
+
+        $(document).on("change", ".AllIsAdd", function () {
+            $(".IsAdd").prop("checked", $(this).prop("checked"));
         });
-        $(".AllIIndex").click(function () {
-            if ($('.AllIIndex').prop('checked') == false) {
-                $('.IsIndex').prop('checked', false);
-            }
-            else {
-                $('.IsIndex').prop('checked', true);
-            }
+
+        $(document).on("change", ".IsAdd", function () {
+            $(".AllIsAdd").prop(
+                "checked",
+                $(".IsAdd").length > 0 &&
+                $(".IsAdd").length === $(".IsAdd:checked").length
+            );
         });
-        $(".AllIEdit").click(function () {
-            if ($('.AllIEdit').prop('checked') == false) {
-                $('.IsEdit').prop('checked', false);
-            }
-            else {
-                $('.IsEdit').prop('checked', true);
-            }
+
+
+        $(document).on("change", ".AllIIndex", function () {
+            $(".IsIndex").prop("checked", $(this).prop("checked"));
         });
-        $(".AllDelete").click(function () {
-            if ($('.AllDelete').prop('checked') == false) {
-                $('.IsDelete').prop('checked', false);
-            }
-            else {
-                $('.IsDelete').prop('checked', true);
-            }
-            $(".AllProcess").click(function () {
-                if ($('.AllProcess').prop('checked') == false) {
-                    $('.IsProcess').prop('checked', false);
-                }
-                else {
-                    $('.IsProcess').prop('checked', true);
-                }
-            });
+
+        $(document).on("change", ".IsIndex", function () {
+            $(".AllIIndex").prop(
+                "checked",
+                $(".IsIndex").length > 0 &&
+                $(".IsIndex").length === $(".IsIndex:checked").length
+            );
+        });
+
+
+        $(document).on("change", ".AllIEdit", function () {
+            $(".IsEdit").prop("checked", $(this).prop("checked"));
+        });
+
+        $(document).on("change", ".IsEdit", function () {
+            $(".AllIEdit").prop(
+                "checked",
+                $(".IsEdit").length > 0 &&
+                $(".IsEdit").length === $(".IsEdit:checked").length
+            );
+        });
+
+
+        $(document).on("change", ".AllDelete", function () {
+            $(".IsDelete").prop("checked", $(this).prop("checked"));
+        });
+
+        $(document).on("change", ".IsDelete", function () {
+            $(".AllDelete").prop(
+                "checked",
+                $(".IsDelete").length > 0 &&
+                $(".IsDelete").length === $(".IsDelete:checked").length
+            );
+        });
+
+
+        $(document).on("change", ".AllProcess", function () {
+            $(".IsProcess").prop("checked", $(this).prop("checked"));
+        });
+
+        $(document).on("change", ".IsProcess", function () {
+            $(".AllProcess").prop(
+                "checked",
+                $(".IsProcess").length > 0 &&
+                $(".IsProcess").length === $(".IsProcess:checked").length
+            );
+        });
+
+        $(document).on("change", ".AllReport", function () {
+            $(".IsReport").prop("checked", $(this).prop("checked"));
+        });
+
+        $(document).on("change", ".IsReport", function () {
+            $(".AllReport").prop(
+                "checked",
+                $(".IsReport").length > 0 &&
+                $(".IsReport").length === $(".IsReport:checked").length
+            );
         });
     })
 

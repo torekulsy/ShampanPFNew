@@ -1,74 +1,125 @@
-﻿<style>
+﻿@{
+    ViewBag.Title = "Company List";
+}
+
+<style>
     .sym-btn-add:before {
         margin-right: 5px;
     }
+
+    .dataTable tbody td:nth-child(2) {
+        padding-right: 20px;
+    }
 </style>
+
 <div class="card">
     <div class="card-header p-3">
         <div class="th_thinbox_top">
             <p>Company List</p>
+
             <div class="breadcrumb-container">
                 <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
             </div>
         </div>
     </div>
 </div>
+
 <div class="thinbox">
+
     <div class="th_thinbox">
         <p>Company List</p>
     </div>
+
     <div class="custom-top">
+
         <div id="mainBtnAll">
-           @Html.ActionLink("  New", "Create", null, new { title = "Add New Company", @class = "sym-btn-add" })
+            @Html.ActionLink(
+                " New",
+                "Create",
+                null,
+                new
+                {
+                    title = "Add New Company",
+                    @class = "sym-btn-add"
+                })
         </div>
+
         <div class="table-search">
+
             <div class="mobile-search-toggle">
                 <i class="fa fa-search"></i>
             </div>
+
             <div id="dataTables_filter"></div>
+
         </div>
 
     </div>
+
     <table id="myDataTable" class="display">
+
         <thead>
+
+         
+            <tr>
+                <th class="center "></th>
+                <th class="left">Code</th>
+                <th class="left">Name</th>
+                <th class="left">Address</th>
+                <th class="left">Phone</th>
+                <th class="left">Remarks</th>
+                <th class="left">Is Active</th>
+            </tr>
+
+         
             <tr>
                 <th class="center">Action</th>
                 <th class="left">Code</th>
                 <th class="left">Name</th>
                 <th class="left">Address</th>
-                @*<th class="left">City</th>*@
-                @*<th class="left">Postal Code</th>*@
                 <th class="left">Phone</th>
-                @*<th class="left">Mobile</th>
-                <th class="left">Fax</th>*@
                 <th class="left">Remarks</th>
                 <th class="left">Is Active</th>
             </tr>
+
         </thead>
+
         <tbody></tbody>
+
     </table>
+
     <div class="custom-footer">
+
         <div id="footer-length"></div>
+
         <div id="footer-info"></div>
+
         <div id="footer-pagination"></div>
+
     </div>
+
 </div>
 
 <script language="javascript" type="text/javascript">
-    $(document).ready(function () {
-        $.datepicker.regional[""].dateFormat = 'dd/M/y';
-        $.datepicker.setDefaults($.datepicker.regional['']);
 
-        var oTable = $('#myDataTable').dataTable({
+    $(document).ready(function () {
+
+        $.datepicker.regional[""].dateFormat = "dd/M/y";
+        $.datepicker.setDefaults($.datepicker.regional[""]);
+
+        var oTable = $("#myDataTable").dataTable({
+
             "bServerSide": true,
-            "sAjaxSource": "/Common/Company/_index",
             "bProcessing": true,
-            "aLengthMenu": tablelength(),
-            "bJqueryUI": true,
-            "bAutoWidth": false,
             "bPaginate": true,
+            "bAutoWidth": false,
+
             "sPaginationType": "full_numbers",
             "iDisplayLength": 10,
+            "aLengthMenu": tablelength(),
+
+            "sAjaxSource": "/Common/Company/_index",
+
             "oLanguage": {
                 "oPaginate": {
                     "sPrevious": '<i class="fa fa-angle-left"></i>',
@@ -78,41 +129,139 @@
             },
 
             "fnDrawCallback": function () {
-                $('.dataTables_filter input')
-                    .attr('placeholder', 'Search...');
+
+                $(".dataTables_filter input")
+                    .attr("placeholder", "Search...");
+
             },
+
             "aoColumns": [
+
                 {
                     "sName": "Id",
                     "bSearchable": false,
                     "bSortable": false,
                     "sWidth": "5%",
                     "sClass": "center",
+
                     "fnRender": function (oObj) {
-                        return ' <a id="" title="Click on for Edit" style="text-decoration:none;" href="/Common/Company/Edit/' + oObj.aData[0] + '" class="sym-btn-edit-row"></a>'
-                            + '&nbsp; <a title="Click on for Delete" style="text-decoration:none;" data-url="/Company/Delete" onclick="deletedData(this, myDataTable,\'' + oObj.aData[0] + '\');" class="sym-btn-remove-row"></a>';
+
+                        var id = oObj.aData[0];
+
+                        return ""
+                            + '<a title="Click on for Edit" '
+                            + 'style="text-decoration:none;" '
+                            + 'href="/Common/Company/Edit/' + id + '" '
+                            + 'class="sym-btn-edit-row"></a>'
+
+                            + '&nbsp;'
+
+                            + '<a title="Click on for Delete" '
+                            + 'style="text-decoration:none;" '
+                            + 'data-url="/Common/Company/Delete/' + id + '" '
+                            + 'onclick="deletedData(this, myDataTable,\'' + id + '\');" '
+                            + 'class="sym-btn-remove-row"></a>';
                     }
                 },
-                { "sCode": "Code", "sWidth": "7%" },
-                { "sName": "Name", "sWidth": "10%" },
-                { "sAddress": "Address", "sWidth": "30%" },
-                //{ "sCity": "City", "sWidth": "8%" },
-                //{ "sPostalCode": "Postal Code", "sWidth": "8%" },
-                { "sPhone": "Phone", "sWidth": "10%" },
-                //{ "sMobile": "Mobile", "sWidth": "10%" },
-                //{ "sFax": "Fax", "sWidth": "10%" },
-                { "sRemarks": "Remarks", "sWidth": "10%" },
-                { "sIsActive": "Is Active", "sWidth": "10%" }
+
+                {
+                    "sName": "Code",
+                    "sWidth": "7%"
+                },
+
+                {
+                    "sName": "Name",
+                    "sWidth": "10%"
+                },
+
+                {
+                    "sName": "Address",
+                    "sWidth": "30%"
+                },
+
+                {
+                    "sName": "Phone",
+                    "sWidth": "10%"
+                },
+
+                {
+                    "sName": "Remarks",
+                    "sWidth": "10%"
+                },
+
+                {
+                    "sName": "IsActive",
+                    "sWidth": "10%"
+                }
             ]
         });
-        $("#footer-length").append($(".dataTables_length"));
-        $("#footer-info").append($(".dataTables_info"));
-        $("#footer-pagination").append($(".dataTables_paginate"));
-        $("#dataTables_filter").append($(".dataTables_filter"));
 
-        $(document).on("click", ".mobile-search-toggle", function (e) {
-            e.stopPropagation();
-            $("#dataTables_filter").slideToggle(150);
+
+        oTable.columnFilter({
+
+            sPlaceHolder: "head:after",
+
+            aoColumns: [
+
+                null,
+
+                {
+                    type: "text"
+                },
+
+                {
+                    type: "text"
+                },
+
+                {
+                    type: "text"
+                },
+
+                {
+                    type: "text"
+                },
+
+                {
+                    type: "text"
+                },
+
+                {
+                    type: "select",
+                    values: [
+                        "Yes",
+                        "No"
+                    ]
+                }
+            ]
         });
+
+        $("#footer-length").append(
+            $(".dataTables_length")
+        );
+
+        $("#footer-info").append(
+            $(".dataTables_info")
+        );
+
+        $("#footer-pagination").append(
+            $(".dataTables_paginate")
+        );
+
+        $("#dataTables_filter").append(
+            $(".dataTables_filter")
+        );
+
+        $(document).on(
+            "click",
+            ".mobile-search-toggle",
+            function (e) {
+
+                e.stopPropagation();
+
+                $("#dataTables_filter").slideToggle(150);
+            }
+        );
+
     });
+
 </script>

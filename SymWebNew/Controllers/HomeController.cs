@@ -26,19 +26,68 @@ namespace SymWebUI.Controllers
     public class HomeController : Controller
     {
 
+        //[AllowAnonymous]
+        //[OutputCache(NoStore = true, Duration = 150)]
+        //public ActionResult Index(string returnUrl)
+        //{
+        //    string project = new AppSettingsReader().GetValue("CompanyName", typeof(string)).ToString();
+        //    //return RedirectToAction("Login", "Home", new { area = "Acc" });
+
+        //    if (project.ToLower() == "acc")
+        //    {
+        //        return RedirectToAction("Login", "Home", new { area = "Acc" });
+        //    }
+
+        //    else if (project.ToLower() == "gdic" || project.ToLower() == "gdicbde")
+        //    {
+        //        return RedirectToAction("Login", "Home", new { area = "Sage" });
+        //    }
+        //    else if (project.ToLower() == "todo")
+        //    {
+        //        return RedirectToAction("Login", "Home", new { area = "ToDo" });
+        //    }
+          
+        //    UserLogsVM vm = new UserLogsVM();
+        //    Session["User"] = "";
+        //    Session["FullName"] = "";
+        //    Session["UserType"] = "";
+        //    Session["EmployeeId"] = "";
+        //    Session["SessionDate"] = "";
+        //    Session["SessionYear"] = "";
+        //    ViewBag.ReturnUrl = returnUrl;
+        //    vm.ReturnUrl = returnUrl;
+        //    vm.SessionDate = DateTime.Now.ToString("dd-MMM-yyyy");
+
+        //    string[] result = new string[6];
+        //    result[0] = "Fail1";
+        //    result[1] = "Fail1";
+
+        //    CommonRepo _cRepo = new CommonRepo();
+
+        //    return View(vm);
+        //}
+
+
         [AllowAnonymous]
-        [OutputCache(NoStore = true, Duration = 150)]
+        [OutputCache(NoStore = true, Duration = 0, VaryByParam = "*")]
         public ActionResult Index(string returnUrl)
         {
-            string project = new AppSettingsReader().GetValue("CompanyName", typeof(string)).ToString();
-            //return RedirectToAction("Login", "Home", new { area = "Acc" });
+            
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Response.Cache.SetNoStore();
+            Response.Cache.SetExpires(DateTime.UtcNow.AddDays(-1));
+            Response.Cache.SetRevalidation(HttpCacheRevalidation.AllCaches);
+
+            string project = new AppSettingsReader()
+                .GetValue("CompanyName", typeof(string))
+                .ToString();
 
             if (project.ToLower() == "acc")
             {
                 return RedirectToAction("Login", "Home", new { area = "Acc" });
             }
-
-            else if (project.ToLower() == "gdic" || project.ToLower() == "gdicbde")
+            else if (project.ToLower() == "gdic" ||
+                     project.ToLower() == "gdicbde")
             {
                 return RedirectToAction("Login", "Home", new { area = "Sage" });
             }
@@ -46,26 +95,59 @@ namespace SymWebUI.Controllers
             {
                 return RedirectToAction("Login", "Home", new { area = "ToDo" });
             }
-          
-            UserLogsVM vm = new UserLogsVM();
+
+ 
+            bool hasActiveSession =
+                Request.IsAuthenticated &&
+                Session["User"] != null &&
+                !string.IsNullOrWhiteSpace(Convert.ToString(Session["User"])) &&
+                Session["FullName"] != null &&
+                !string.IsNullOrWhiteSpace(Convert.ToString(Session["FullName"])) &&
+                Session["BranchId"] != null;
+
+            if (hasActiveSession)
+            {
+                bool isAdmin = false;
+
+                bool.TryParse(
+                    Convert.ToString(Session["UserType"]),
+                    out isAdmin
+                );
+
+                if (isAdmin)
+                {
+                    return RedirectToAction(
+                        "Index",
+                        "Home",
+                        new { area = "Common" }
+                    );
+                }
+
+                return RedirectToAction(
+                    "Index",
+                    "Home",
+                    new { area = "PF" }
+                );
+            }
+
+
             Session["User"] = "";
             Session["FullName"] = "";
             Session["UserType"] = "";
             Session["EmployeeId"] = "";
             Session["SessionDate"] = "";
             Session["SessionYear"] = "";
+
+            UserLogsVM vm = new UserLogsVM();
+
             ViewBag.ReturnUrl = returnUrl;
+
             vm.ReturnUrl = returnUrl;
             vm.SessionDate = DateTime.Now.ToString("dd-MMM-yyyy");
 
-            string[] result = new string[6];
-            result[0] = "Fail1";
-            result[1] = "Fail1";
-
-            CommonRepo _cRepo = new CommonRepo();
-
             return View(vm);
         }
+
         [AllowAnonymous]
         public ActionResult CheckConnectionDb()
         {
@@ -474,51 +556,116 @@ namespace SymWebUI.Controllers
                 return RedirectToAction("Index");
             }
         }
+
         //public ActionResult LogOut()
         //{
         //    HttpCookie authCookie = Request.Cookies[FormsAuthentication.FormsCookieName];
+
         //    if (authCookie != null && authCookie.Value != "")
         //    {
         //        FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
         //        authCookie.Expires = DateTime.Now.AddDays(-1);
-        //        HttpContext.Response.Cookies.Add(authCookie);
+        //        Response.Cookies.Add(authCookie);
         //    }
 
-        //    Session["User"] = "";
-        //    Session["FullName"] = "";
-        //    Session["UserType"] = "";
-        //    Session["EmployeeId"] = "";
-        //    Session["SessionDate"] = "";
-        //    Session["SessionYear"] = "";
-        //    Session["mgs"] = "";
-        //    //////Session.Abandon();
+
+        //    Session.Clear();
+        //    Session.Abandon();
+
+
+        //    Response.Cache.SetCacheability(HttpCacheability.NoCache);
+        //    Response.Cache.SetNoStore();
+        //    Response.Cache.SetExpires(DateTime.UtcNow.AddDays(-1));
 
 
         //    return RedirectToAction("Index");
         //}
+
         public ActionResult LogOut()
         {
-            HttpCookie authCookie = Request.Cookies[FormsAuthentication.FormsCookieName];
+            string loggedInUser =
+                Convert.ToString(Session["User"]);
 
-            if (authCookie != null && authCookie.Value != "")
+          
+            FormsAuthentication.SignOut();
+
+          
+            HttpCookie formsCookie =
+                Request.Cookies[FormsAuthentication.FormsCookieName];
+
+            if (formsCookie != null)
             {
-                FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
-                authCookie.Expires = DateTime.Now.AddDays(-1);
-                Response.Cookies.Add(authCookie);
+                formsCookie.Value = "";
+
+                formsCookie.Expires =
+                    DateTime.UtcNow.AddDays(-1);
+
+                formsCookie.Path = "/";
+
+                Response.Cookies.Add(formsCookie);
             }
 
+          
+            string companyName =
+                new AppSettingsReader()
+                    .GetValue("CompanyName", typeof(string))
+                    .ToString();
 
+            HttpCookie companyCookie =
+                Request.Cookies[companyName];
+
+            if (companyCookie != null)
+            {
+                companyCookie.Value = "";
+
+                companyCookie.Expires =
+                    DateTime.UtcNow.AddDays(-1);
+
+                companyCookie.Path = "/";
+
+                Response.Cookies.Add(companyCookie);
+            }
+
+          
+            if (!string.IsNullOrWhiteSpace(loggedInUser))
+            {
+                HttpContext.Application[
+                    "BasicTicket" + loggedInUser
+                ] = null;
+
+                HttpContext.Application[
+                    "RoleTicket" + loggedInUser
+                ] = null;
+            }
+
+          
             Session.Clear();
+            Session.RemoveAll();
             Session.Abandon();
 
+         
+            Response.Cache.SetCacheability(
+                HttpCacheability.NoCache
+            );
 
-            Response.Cache.SetCacheability(HttpCacheability.NoCache);
             Response.Cache.SetNoStore();
-            Response.Cache.SetExpires(DateTime.UtcNow.AddDays(-1));
 
+            Response.Cache.SetExpires(
+                DateTime.UtcNow.AddDays(-1)
+            );
 
-            return RedirectToAction("Index");
+            Response.Cache.SetRevalidation(
+                HttpCacheRevalidation.AllCaches
+            );
+
+            return RedirectToAction(
+                "Index",
+                "Home",
+                new { area = "" }
+            );
         }
+
+
         private ActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))

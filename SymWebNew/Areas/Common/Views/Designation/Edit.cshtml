@@ -72,12 +72,12 @@
     @Html.ValidationSummary(true)
     <div class=" tabMenu">
         <ul style="font-size: 1.4em;" class="tabDesign nav nav-tabs">
-            <li class="tabDefault active"><a data-toggle="tab" href="#Deposit">Basic</a></li>
+            @*<li class="tabDefault active"><a data-toggle="tab" href="#Deposit">Basic</a></li>
             <li class="tabDefault"><a data-toggle="tab" href="#VDS" class="vdsInfoTab">Insurance Plan</a></li>
             <li class="tabDefault"><a data-toggle="tab" href="#ENT" class="ENTInfoTab">Entitlement</a></li>
             <li class="tabDefault"><a data-toggle="tab" href="#ME" class="MEInfoTab">Mobile Expense</a></li>
             <li class="tabDefault"><a data-toggle="tab" href="#ITE" class="ITEInfoTab">International Travel</a></li>
-            <li class="tabDefault"><a data-toggle="tab" href="#DTE" class="ITEInfoTab">Domestic Travel</a></li>
+            <li class="tabDefault"><a data-toggle="tab" href="#DTE" class="ITEInfoTab">Domestic Travel</a></li>*@
         </ul>
     </div>
     <div class="tab-content">
@@ -241,6 +241,15 @@
                             </div>
                             <div class="editor-field">
                                 @Html.TextBoxFor(model => model.Remarks, new { @placeholder = "Remarks", @class = " form-control" })
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                            <div class="editor-label">
+                                @Html.LabelFor(model => model.DesignationGroupId)
+                            </div>
+                            <div class="editor-field">
+                                @Html.SimpleDropDownFor(model => model.DesignationGroupId, "/Config/DropDown/DesignationGroupDropDown", new { @class = " cDesignationGroupId required form-control", data_disable_placeholder = "true" })
+
                             </div>
                         </div>
                     </div>

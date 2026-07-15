@@ -134,66 +134,208 @@ namespace SymWebUI.Areas.Common.Controllers
                         JsonRequestBehavior.AllowGet);
         }
 
-        //public ActionResult _indexUserlist(JQueryDataTableParamVM param)
+       
+
+
+        public ActionResult _indexGrouplist(JQueryDataTableParamVM param)
+        {
+            UserGroupRepo _userGroupRepo = new UserGroupRepo();
+
+            #region Column Search
+
+            var Id = Convert.ToString(Request["sSearch_0"]);
+            var GroupName = Convert.ToString(Request["sSearch_1"]);
+            var IsSuper = Convert.ToString(Request["sSearch_2"]);
+
+            #endregion Column Search
+
+            #region Search and Filter Data
+
+            var getAllData = _userGroupRepo.SelectAll();
+
+            IEnumerable<UserGroupVM> filteredData;
+
+            if (!string.IsNullOrEmpty(param.sSearch))
+            {
+                var searchText = param.sSearch.Trim().ToLower();
+
+                var isSearchable0 = Convert.ToBoolean(Request["bSearchable_0"]);
+                var isSearchable1 = Convert.ToBoolean(Request["bSearchable_1"]);
+                var isSearchable2 = Convert.ToBoolean(Request["bSearchable_2"]);
+
+                filteredData = getAllData.Where(c =>
+                       (isSearchable0
+                        && c.Id.ToString().ToLower().Contains(searchText))
+
+                    || (isSearchable1
+                        && (c.GroupName ?? "").ToLower().Contains(searchText))
+
+                    || (isSearchable2
+                        && IsSuperSearchMatch(c.IsSuper, searchText))
+                );
+            }
+            else
+            {
+                filteredData = getAllData;
+            }
+
+            #endregion Search and Filter Data
+
+            #region Column Filtering
+
+            if (Id != "" || GroupName != "" || IsSuper != "")
+            {
+                filteredData = filteredData.Where(c =>
+                       (Id == ""
+                        || c.Id.ToString()
+                            .ToLower()
+                            .Contains(Id.Trim().ToLower()))
+
+                    && (GroupName == ""
+                        || (c.GroupName ?? "")
+                            .ToLower()
+                            .Contains(GroupName.Trim().ToLower()))
+
+                    && (IsSuper == ""
+                        || IsSuperSearchMatch(
+                            c.IsSuper,
+                            IsSuper.Trim().ToLower()
+                        ))
+                );
+            }
+
+            #endregion Column Filtering
+
+            #region Sorting
+
+            var isSortable_0 = Convert.ToBoolean(Request["bSortable_0"]);
+            var isSortable_1 = Convert.ToBoolean(Request["bSortable_1"]);
+            var isSortable_2 = Convert.ToBoolean(Request["bSortable_2"]);
+
+            var sortColumnIndex = Convert.ToInt32(Request["iSortCol_0"]);
+
+            Func<UserGroupVM, string> orderingFunction = c =>
+                sortColumnIndex == 0 && isSortable_0
+                    ? c.Id.ToString()
+
+                : sortColumnIndex == 1 && isSortable_1
+                    ? c.GroupName ?? ""
+
+                : sortColumnIndex == 2 && isSortable_2
+                    ? c.IsSuper ? "Super" : "Not Super"
+
+                : "";
+
+            var sortDirection = Request["sSortDir_0"];
+
+            if (sortDirection == "asc")
+            {
+                filteredData = filteredData.OrderBy(orderingFunction);
+            }
+            else
+            {
+                filteredData = filteredData.OrderByDescending(orderingFunction);
+            }
+
+            #endregion Sorting
+
+            #region Pagination
+
+            var totalDisplayRecords = filteredData.Count();
+
+            var displayedCompanies = filteredData
+                .Skip(param.iDisplayStart)
+                .Take(param.iDisplayLength);
+
+            #endregion Pagination
+
+            #region Result
+
+            var result = from c in displayedCompanies
+                         select new[]
+                         {
+                             Convert.ToString(c.Id),
+                             c.GroupName ?? "",
+                             c.IsSuper ? "Super" : "Not Super"
+                         };
+
+            return Json(new
+            {
+                sEcho = param.sEcho,
+                iTotalRecords = getAllData.Count(),
+                iTotalDisplayRecords = totalDisplayRecords,
+                aaData = result
+            },
+            JsonRequestBehavior.AllowGet);
+
+            #endregion Result
+        }
+
+        private bool IsSuperSearchMatch(bool isSuper, string searchValue)
+        {
+            if (string.IsNullOrWhiteSpace(searchValue))
+            {
+                return true;
+            }
+
+            var value = searchValue.Trim().ToLower();
+
+            // Super search
+            if (value == "super"
+                || value == "true"
+                || value == "yes"
+                || value == "1")
+            {
+                return isSuper;
+            }
+
+            // Not Super search
+            if (value == "not super"
+                || value == "notsuper"
+                || value == "false"
+                || value == "no"
+                || value == "0")
+            {
+                return !isSuper;
+            }
+
+            var displayValue = isSuper ? "super" : "not super";
+
+            return displayValue.Contains(value);
+        }
+
+
+
+        //public ActionResult _indexGrouplist(JQueryDataTableParamVM param)
         //{
         //    #region Column Search
         //    var idFilter = Convert.ToString(Request["sSearch_0"]);
-        //    var codeFilter = Convert.ToString(Request["sSearch_1"]);
-        //    var empNameFilter = Convert.ToString(Request["sSearch_2"]);
-        //    var departmentFilter = Convert.ToString(Request["sSearch_3"]);
-        //    var designationFilter = Convert.ToString(Request["sSearch_4"]);
-        //    var joinDateFilter = Convert.ToString(Request["sSearch_5"]);
-
-        //    DateTime fromDate = DateTime.MinValue;
-        //    DateTime toDate = DateTime.MaxValue;
-        //    if (joinDateFilter.Contains('~'))
-        //    {
-        //        //Split date range filters with ~
-        //        fromDate = joinDateFilter.Split('~')[0] == "" ? DateTime.MinValue : Ordinary.IsDate(joinDateFilter.Split('~')[0]) == true ? Convert.ToDateTime(joinDateFilter.Split('~')[0]) : DateTime.MinValue;
-        //        toDate = joinDateFilter.Split('~')[1] == "" ? DateTime.MaxValue : Ordinary.IsDate(joinDateFilter.Split('~')[1]) == true ? Convert.ToDateTime(joinDateFilter.Split('~')[1]) : DateTime.MinValue;
-        //    }
-
-
-        //    var fromID = 0;
-        //    var toID = 0;
-        //    if (idFilter.Contains('~'))
-        //    {
-        //        //Split number range filters with ~
-        //        fromID = idFilter.Split('~')[0] == "" ? 0 : Convert.ToInt32(idFilter.Split('~')[0]);
-        //        toID = idFilter.Split('~')[1] == "" ? 0 : Convert.ToInt32(idFilter.Split('~')[1]);
-        //    }
+        //    var GroupNameFilter = Convert.ToString(Request["sSearch_1"]);
+        //    var IsSuperFilter = Convert.ToString(Request["sSearch_2"]);
         //    #endregion Column Search
-        //    EmployeeInfoRepo _empRepo = new EmployeeInfoRepo();
-        //    var getAllData = _empRepo.SelectAllActiveEmp();
-        //    IEnumerable<EmployeeInfoVM> filteredData;
+
+        //    UserGroupRepo _userGroupRepo = new UserGroupRepo();
+        //    var getAllData = _userGroupRepo.SelectAll();
+        //    IEnumerable<UserGroupVM> filteredData;
         //    if (!string.IsNullOrEmpty(param.sSearch))
         //    {
         //        var isSearchable1 = Convert.ToBoolean(Request["bSearchable_1"]);
         //        var isSearchable2 = Convert.ToBoolean(Request["bSearchable_2"]);
-        //        var isSearchable3 = Convert.ToBoolean(Request["bSearchable_3"]);
-        //        var isSearchable4 = Convert.ToBoolean(Request["bSearchable_4"]);
-        //        var isSearchable5 = Convert.ToBoolean(Request["bSearchable_5"]);
-        //        filteredData = getAllData.Where(c =>isSearchable1 && c.Code.ToLower().Contains(param.sSearch.ToLower())
-        //            || isSearchable2 && c.EmpName.ToLower().Contains(param.sSearch.ToLower())
-        //            || isSearchable3 && c.Department.ToLower().Contains(param.sSearch.ToLower())
-        //            || isSearchable4 && c.Designation.ToLower().Contains(param.sSearch.ToLower())
-        //            || isSearchable5 && c.JoinDate.ToLower().Contains(param.sSearch.ToLower()));
+        //        filteredData = getAllData.Where(c => isSearchable1 && c.GroupName.ToLower().Contains(param.sSearch.ToLower())
+        //            || isSearchable2 && c.IsSuper.ToString().ToLower().Contains(param.sSearch.ToLower())
+        //          );
         //    }
         //    else
         //    {
         //        filteredData = getAllData;
         //    }
         //    #region Column Filtering
-        //    if (codeFilter != "" || empNameFilter != "" || departmentFilter != "" || designationFilter != "" || (joinDateFilter != "" && joinDateFilter != "~"))
+        //    if (GroupNameFilter != "" || IsSuperFilter != "")
         //    {
         //        filteredData = filteredData
         //                        .Where(c =>
-        //                            (codeFilter == "" || c.Code.ToLower().Contains(codeFilter.ToLower()))
-        //                            &&(empNameFilter == "" || c.EmpName.ToLower().Contains(empNameFilter.ToLower()))
-        //                            &&(departmentFilter == "" || c.Department.ToLower().Contains(departmentFilter.ToLower()))
-        //                            &&(designationFilter == "" || c.Designation.ToString().ToLower().Contains(designationFilter.ToLower()))
-        //                            &&(fromDate == DateTime.MinValue || fromDate <= Convert.ToDateTime(c.JoinDate))
-        //                            &&(toDate == DateTime.MaxValue || toDate >= Convert.ToDateTime(c.JoinDate))
+        //                            (GroupNameFilter == "" || c.GroupName.ToLower().Contains(GroupNameFilter.ToLower()))
+        //                            && (IsSuperFilter == "" || c.IsSuper.ToString().ToLower().Contains(IsSuperFilter.ToLower()))
         //                        );
         //    }
 
@@ -201,16 +343,10 @@ namespace SymWebUI.Areas.Common.Controllers
 
         //    var isSortable_1 = Convert.ToBoolean(Request["bSortable_1"]);
         //    var isSortable_2 = Convert.ToBoolean(Request["bSortable_2"]);
-        //    var isSortable_3 = Convert.ToBoolean(Request["bSortable_3"]);
-        //    var isSortable_4 = Convert.ToBoolean(Request["bSortable_4"]);
-        //    var isSortable_5 = Convert.ToBoolean(Request["bSortable_5"]);
         //    var sortColumnIndex = Convert.ToInt32(Request["iSortCol_0"]);
-        //    Func<EmployeeInfoVM, string> orderingFunction = (c =>
-        //        sortColumnIndex == 1 && isSortable_1 ? c.Code :
-        //        sortColumnIndex == 2 && isSortable_2 ? c.EmpName :
-        //        sortColumnIndex == 3 && isSortable_3 ? c.Department :
-        //        sortColumnIndex == 4 && isSortable_4 ? c.Designation :
-        //        sortColumnIndex == 5 && isSortable_5 ? Ordinary.DateToString(c.JoinDate) :
+        //    Func<UserGroupVM, string> orderingFunction = (c =>
+        //        sortColumnIndex == 1 && isSortable_1 ? c.GroupName :
+        //        sortColumnIndex == 2 && isSortable_2 ? c.IsSuper.ToString() :
         //        "");
         //    var sortDirection = Request["sSortDir_0"]; // asc or desc
         //    if (sortDirection == "asc")
@@ -221,81 +357,19 @@ namespace SymWebUI.Areas.Common.Controllers
         //    var result = from c in displayedCompanies
         //                 select new[] { 
         //        Convert.ToString(c.Id)
-        //        , c.Code
-        //        , c.EmpName 
-        //        , c.Department 
-        //        , c.Designation
-        //        , c.JoinDate
+        //        , c.GroupName
+        //        , c.IsSuper? "Super":"Not Super" 
         //    };
         //    return Json(new
-        //    {   sEcho = param.sEcho,
+        //    {
+        //        sEcho = param.sEcho,
         //        iTotalRecords = getAllData.Count(),
         //        iTotalDisplayRecords = filteredData.Count(),
         //        aaData = result
-        //    },JsonRequestBehavior.AllowGet);
+        //    }, JsonRequestBehavior.AllowGet);
         //}
-        public ActionResult _indexGrouplist(JQueryDataTableParamVM param)
-        {
-            #region Column Search
-            var idFilter = Convert.ToString(Request["sSearch_0"]);
-            var GroupNameFilter = Convert.ToString(Request["sSearch_1"]);
-            var IsSuperFilter = Convert.ToString(Request["sSearch_2"]);
-            #endregion Column Search
 
-            UserGroupRepo _userGroupRepo = new UserGroupRepo();
-            var getAllData = _userGroupRepo.SelectAll();
-            IEnumerable<UserGroupVM> filteredData;
-            if (!string.IsNullOrEmpty(param.sSearch))
-            {
-                var isSearchable1 = Convert.ToBoolean(Request["bSearchable_1"]);
-                var isSearchable2 = Convert.ToBoolean(Request["bSearchable_2"]);
-                filteredData = getAllData.Where(c => isSearchable1 && c.GroupName.ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable2 && c.IsSuper.ToString().ToLower().Contains(param.sSearch.ToLower())
-                  );
-            }
-            else
-            {
-                filteredData = getAllData;
-            }
-            #region Column Filtering
-            if (GroupNameFilter != "" || IsSuperFilter != "")
-            {
-                filteredData = filteredData
-                                .Where(c =>
-                                    (GroupNameFilter == "" || c.GroupName.ToLower().Contains(GroupNameFilter.ToLower()))
-                                    && (IsSuperFilter == "" || c.IsSuper.ToString().ToLower().Contains(IsSuperFilter.ToLower()))
-                                );
-            }
 
-            #endregion Column Filtering
-
-            var isSortable_1 = Convert.ToBoolean(Request["bSortable_1"]);
-            var isSortable_2 = Convert.ToBoolean(Request["bSortable_2"]);
-            var sortColumnIndex = Convert.ToInt32(Request["iSortCol_0"]);
-            Func<UserGroupVM, string> orderingFunction = (c =>
-                sortColumnIndex == 1 && isSortable_1 ? c.GroupName :
-                sortColumnIndex == 2 && isSortable_2 ? c.IsSuper.ToString() :
-                "");
-            var sortDirection = Request["sSortDir_0"]; // asc or desc
-            if (sortDirection == "asc")
-                filteredData = filteredData.OrderBy(orderingFunction);
-            else
-                filteredData = filteredData.OrderByDescending(orderingFunction);
-            var displayedCompanies = filteredData.Skip(param.iDisplayStart).Take(param.iDisplayLength);
-            var result = from c in displayedCompanies
-                         select new[] { 
-                Convert.ToString(c.Id)
-                , c.GroupName
-                , c.IsSuper? "Super":"Not Super" 
-            };
-            return Json(new
-            {
-                sEcho = param.sEcho,
-                iTotalRecords = getAllData.Count(),
-                iTotalDisplayRecords = filteredData.Count(),
-                aaData = result
-            }, JsonRequestBehavior.AllowGet);
-        }
         [Authorize(Roles = "Master,Admin,Account")]
         [HttpGet]
         public ActionResult Create()

@@ -20,43 +20,61 @@ namespace SymWebUI.Areas.Common.Controllers
         //GET: /Common/Home/    
 
 
+
+
         //public ActionResult Index()
         //{
-        //    AdminInfoDashboardVM vm = new AdminInfoDashboardVM();         
-        //    PfInfoDashboardVM vmPf = new PfInfoDashboardVM();  
-         
+        //    AdminInfoDashboardVM vm = new AdminInfoDashboardVM();
+        //    PfInfoDashboardVM vmPf = new PfInfoDashboardVM();
+
         //    HomePageInfoDashboardRepo _Repo = new HomePageInfoDashboardRepo();
         //    BranchRepo BranchRepo = new BranchRepo();
+
         //    int BranchId = Convert.ToInt32(Session["BranchId"].ToString());
-        //    BranchVM branch = BranchRepo.SelectById(Convert.ToInt32(BranchId));
+        //    BranchVM branch = BranchRepo.SelectById(BranchId);
         //    Session["BranchId"] = branch.Id;
 
         //    vm.BranchVM = branch;
-        //    vmPf = _Repo.GetPfInfoDashboard();
+
+        //    // Pass the BranchId token into your repo call here:
+        //    vmPf = _Repo.GetPfInfoDashboard(BranchId);
+
         //    vm.PfInfoDashboardVMS = vmPf;
         //    Session["BranchName"] = vm.BranchVM.Name;
-                              
+
         //    return View("Index", vm);
         //}
 
+        [OutputCache(NoStore = true, Duration = 0, VaryByParam = "*")]
         public ActionResult Index()
         {
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Response.Cache.SetNoStore();
+            Response.Cache.SetExpires(DateTime.UtcNow.AddDays(-1));
+            Response.Cache.SetRevalidation(HttpCacheRevalidation.AllCaches);
+
             AdminInfoDashboardVM vm = new AdminInfoDashboardVM();
             PfInfoDashboardVM vmPf = new PfInfoDashboardVM();
 
-            HomePageInfoDashboardRepo _Repo = new HomePageInfoDashboardRepo();
+            HomePageInfoDashboardRepo _Repo =
+                new HomePageInfoDashboardRepo();
+
             BranchRepo BranchRepo = new BranchRepo();
 
-            int BranchId = Convert.ToInt32(Session["BranchId"].ToString());
-            BranchVM branch = BranchRepo.SelectById(BranchId);
+            int BranchId =
+                Convert.ToInt32(Session["BranchId"].ToString());
+
+            BranchVM branch =
+                BranchRepo.SelectById(BranchId);
+
             Session["BranchId"] = branch.Id;
 
             vm.BranchVM = branch;
 
-            // Pass the BranchId token into your repo call here:
             vmPf = _Repo.GetPfInfoDashboard(BranchId);
 
             vm.PfInfoDashboardVMS = vmPf;
+
             Session["BranchName"] = vm.BranchVM.Name;
 
             return View("Index", vm);

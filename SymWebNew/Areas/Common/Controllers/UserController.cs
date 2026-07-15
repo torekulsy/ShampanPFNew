@@ -13,6 +13,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using System.Web.Security;
+using System.Text.RegularExpressions;
 namespace SymWebUI.Areas.Common.Controllers
 {
     [Authorize]
@@ -392,28 +393,210 @@ namespace SymWebUI.Areas.Common.Controllers
         /// Redirects to the Index page with a session result message indicating success or failure.
         /// Logs error details if the operation fails.
         /// </returns>
+        /// 
+
+
+        //[HttpPost]
+        //public ActionResult PasswordChange(UserLogsVM vm)
+        //{
+        //    string[] result = new string[6];
+        //    try
+        //    {
+        //        ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
+        //        vm.LastUpdateAt = DateTime.Now.ToString("yyyyMMddHHmmss");
+        //        vm.LastUpdateBy = identity.Name;
+        //        vm.LastUpdateFrom = identity.WorkStationIP;
+        //        vm.BranchId = Convert.ToInt32(identity.BranchId);
+        //        vm.IsAdmin = identity.IsAdmin;
+        //        result = _infoRepo.ChangePassword(vm);
+        //        Session["result"] = result[0] + "~" + result[1];
+        //        return RedirectToAction("Index");
+        //    }
+        //    catch (Exception)
+        //    {
+        //        Session["result"] = "Fail~Data Not Succeessfully!";
+        //        FileLogger.Log(result[0].ToString() + Environment.NewLine + result[2].ToString() + Environment.NewLine + result[5].ToString(), this.GetType().Name, result[4].ToString() + Environment.NewLine + result[3].ToString());
+        //        return RedirectToAction("Index");
+        //    }
+        //}
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult PasswordChange(UserLogsVM vm)
         {
             string[] result = new string[6];
+
+            result[0] = "Fail";
+            result[1] = "Password change failed.";
+            result[2] = "";
+            result[3] = "";
+            result[4] = "";
+            result[5] = "PasswordChange";
+
             try
             {
-                ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
-                vm.LastUpdateAt = DateTime.Now.ToString("yyyyMMddHHmmss");
-                vm.LastUpdateBy = identity.Name;
-                vm.LastUpdateFrom = identity.WorkStationIP;
-                vm.BranchId = Convert.ToInt32(identity.BranchId);
-                vm.IsAdmin = identity.IsAdmin;
-                result = _infoRepo.ChangePassword(vm);
-                Session["result"] = result[0] + "~" + result[1];
-                return RedirectToAction("Index");
+                ShampanIdentity currentIdentity =
+                    (ShampanIdentity)Thread.CurrentPrincipal.Identity;
+
+                bool canResetWithoutOldPassword =
+                    currentIdentity.IsAdmin ||
+                    currentIdentity.IsHRM;
+
+                string validationMessage =
+                    ValidatePasswordChange(
+                        vm,
+                        canResetWithoutOldPassword
+                    );
+
+                if (!string.IsNullOrWhiteSpace(validationMessage))
+                {
+                    Session["result"] =
+                        "Fail~" + validationMessage;
+
+                    return RedirectToAction("Index");
+                }
+
+                vm.LastUpdateAt =
+                    DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                vm.LastUpdateBy =
+                    currentIdentity.Name;
+
+                vm.LastUpdateFrom =
+                    currentIdentity.WorkStationIP;
+
+                vm.BranchId =
+                    Convert.ToInt32(currentIdentity.BranchId);
+
+                vm.IsAdmin =
+                    canResetWithoutOldPassword;
+
+                result =
+                    _infoRepo.ChangePassword(vm);
+
+                if (result == null ||
+                    result.Length < 2)
+                {
+                    Session["result"] =
+                        "Fail~Password change service returned an invalid response.";
+
+                    return RedirectToAction("Index");
+                }
+
+                string status =
+                    string.IsNullOrWhiteSpace(result[0])
+                        ? "Fail"
+                        : result[0];
+
+                string message =
+                    string.IsNullOrWhiteSpace(result[1]) ||
+                    result[1] == "Fail"
+                        ? "Password could not be changed. Please check the provided information."
+                        : result[1];
+
+                Session["result"] =
+                    status + "~" + message;
+
+                if (status == "Fail")
+                {
+                    FileLogger.Log(
+                        result[0] + Environment.NewLine +
+                        result[2] + Environment.NewLine +
+                        result[5],
+                        GetType().Name,
+                        result[4] + Environment.NewLine +
+                        result[3]
+                    );
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Session["result"] = "Fail~Data Not Succeessfully!";
-                FileLogger.Log(result[0].ToString() + Environment.NewLine + result[2].ToString() + Environment.NewLine + result[5].ToString(), this.GetType().Name, result[4].ToString() + Environment.NewLine + result[3].ToString());
-                return RedirectToAction("Index");
+                Session["result"] =
+                    "Fail~Password change failed due to an unexpected system error.";
+
+                FileLogger.Log(
+                    "Fail" + Environment.NewLine +
+                    ex.Message,
+                    GetType().Name,
+                    "PasswordChange"
+                );
             }
+
+            return RedirectToAction("Index");
+        }
+
+        private string ValidatePasswordChange(UserLogsVM vm,bool canResetWithoutOldPassword)
+        {
+            if (vm == null)
+            {
+                return "Password change information was not provided.";
+            }
+
+            if (string.IsNullOrWhiteSpace(vm.EmployeeId))
+            {
+                return "Selected employee information was not found.";
+            }
+
+            if (!canResetWithoutOldPassword &&
+                string.IsNullOrWhiteSpace(vm.OldPassword))
+            {
+                return "Current password is required.";
+            }
+
+            if (string.IsNullOrWhiteSpace(vm.Password))
+            {
+                return "New password is required.";
+            }
+
+            if (string.IsNullOrWhiteSpace(vm.confirmPassword))
+            {
+                return "Confirm password is required.";
+            }
+
+            if (vm.Password != vm.confirmPassword)
+            {
+                return "New password and confirm password do not match.";
+            }
+
+            if (Regex.IsMatch(vm.Password, @"\s"))
+            {
+                return "New password cannot contain spaces.";
+            }
+
+            bool hasMinimumLength =
+                vm.Password.Length >= 8;
+
+            bool hasUppercase =
+                Regex.IsMatch(vm.Password, @"[A-Z]");
+
+            bool hasLowercase =
+                Regex.IsMatch(vm.Password, @"[a-z]");
+
+            bool hasNumber =
+                Regex.IsMatch(vm.Password, @"[0-9]");
+
+            bool hasSpecialCharacter =
+                Regex.IsMatch(
+                    vm.Password,
+                    @"[^a-zA-Z0-9]"
+                );
+
+            if (!hasMinimumLength ||
+                !hasUppercase ||
+                !hasLowercase ||
+                !hasNumber ||
+                !hasSpecialCharacter)
+            {
+                return "New password must be at least 8 characters and include uppercase, lowercase, number and special character.";
+            }
+
+            if (!canResetWithoutOldPassword &&
+                vm.OldPassword == vm.Password)
+            {
+                return "New password cannot be the same as the current password.";
+            }
+
+            return null;
         }
         #endregion Methods
     }

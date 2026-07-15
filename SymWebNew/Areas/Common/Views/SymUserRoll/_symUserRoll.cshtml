@@ -50,5 +50,11 @@
                 @Html.CheckBoxFor(model => model.IsProcess, new { @placeholder = "IsProcess", @class = "IsProcess required form-control" })
             </div>
         </div>
+        
+        <div class="col-2">
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.IsReport, new { @placeholder = "IsReport", @class = "IsReport required form-control" })
+            </div>
+        </div>
     }
 </div>

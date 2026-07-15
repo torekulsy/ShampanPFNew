@@ -10476,7 +10476,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                 #region sql statement
                 #region sqlText
                 sqlText = @"SELECT Serial,BranchId,Code,Name,Remarks
-                            FROM DesignationGroup";
+                            FROM DesignationGroup Where IsArchive=0 ORDER BY Name";
                 #endregion
                 #region More Conditions
                 #endregion

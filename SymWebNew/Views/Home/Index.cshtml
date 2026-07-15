@@ -9,6 +9,13 @@
     <style>
     </style>
 
+
+    <meta http-equiv="Cache-Control"
+          content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma"
+          content="no-cache" />
+    <meta http-equiv="Expires"
+          content="0" />
 </head>
 <body>
 
@@ -391,7 +398,7 @@
                         <img src="~/Images/PF.png" alt="Alternate Text" />
                     </div>
 
-                    @using (Html.BeginForm("Login", "Home",new { ReturnUrl = ViewBag.ReturnUrl },FormMethod.Post,new { @id = "frmLogin",autocomplete = "off"}))
+                    @using (Html.BeginForm("Login", "Home", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @id = "frmLogin", autocomplete = "off" }))
                     {
                         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
@@ -399,13 +406,13 @@
                         <label for="userId">User ID</label>
                         <div class="input-wrap">
                             <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
-                           @Html.TextBoxFor(m => m.LogID,
+                            @Html.TextBoxFor(m => m.LogID,
 new
 {
     @class = "form-control",
     placeholder = "User ID",
     required = "required",
-   
+
 })
 
                         </div>
@@ -426,14 +433,14 @@ new
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                             </svg>
 
-                           @Html.PasswordFor(m => m.Password,
+                            @Html.PasswordFor(m => m.Password,
 new
 {
     @class = "form-control",
     placeholder = "Password",
     required = "required",
     id = "passwordField",
-   
+
 })
 
                             <!-- RIGHT EYE ICON -->
@@ -448,12 +455,8 @@ new
                                 </svg>
 
                                 <!-- Eye Closed -->
-                                <svg id="eyeClose" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.77 21.77 0 0 1 5.06-6.94" />
-                                    <path d="M1 1l22 22" />
-                                </svg>
+                                <i id="eyeClose" class="fa fa-eye-slash" style="font-size: 20px"></i>
+                               
 
                             </span>
 
@@ -525,7 +528,7 @@ new
     //    }
     //});
 
-   
+
 
     var realIp = "";
     $('#shwoname').click(function () {
@@ -734,6 +737,37 @@ new
 
     };
 
+</script>
+
+<script>
+    (function () {
+
+        window.addEventListener("pageshow", function (event) {
+
+            var navigationEntries =
+                window.performance &&
+                window.performance.getEntriesByType
+                    ? window.performance.getEntriesByType("navigation")
+                    : [];
+
+            var isBackForwardNavigation =
+                event.persisted ||
+                (
+                    navigationEntries.length > 0 &&
+                    navigationEntries[0].type === "back_forward"
+                ) ||
+                (
+                    window.performance &&
+                    window.performance.navigation &&
+                    window.performance.navigation.type === 2
+                );
+            if (isBackForwardNavigation) {
+                window.history.forward();
+            }
+
+        });
+
+    })();
 </script>
 @*<script>
         localStorage.removeItem("activeLink");
