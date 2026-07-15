@@ -379,7 +379,7 @@ namespace SymServices.Common
             SELECT
                 (SELECT COUNT(E.Id) FROM EmployeeInfo E WHERE E.BranchId = @BranchId AND E.IsActive = 1) AS TotalEmployee,
                 (SELECT ISNULL(SUM(ISNULL(P.EmployeePFValue, 0) + ISNULL(P.EmployeerPFValue, 0)), 0) FROM PFHeader P WHERE P.BranchId = @BranchId) AS TotalPF,
-                (SELECT TOP 1 ISNULL(P.EmployeePFValue, 0) + ISNULL(P.EmployeerPFValue, 0) FROM PFHeader P WHERE P.BranchId = @BranchId ORDER BY P.FiscalYearDetailId DESC) AS LastMonthPF,
+                ISNULL((SELECT TOP 1 ISNULL(P.EmployeePFValue, 0) + ISNULL(P.EmployeerPFValue, 0) FROM PFHeader P WHERE P.BranchId = 1 ORDER BY P.FiscalYearDetailId DESC),0) AS LastMonthPF,
                 (SELECT ISNULL(SUM(ISNULL(LD.InstallmentAmount, 0)), 0) FROM EmployeeLoanDetail LD LEFT JOIN EmployeeLoan L ON L.Id = LD.EmployeeLoanId WHERE LD.IsPaid = 1 AND TRY_CONVERT(DATE, CONVERT(VARCHAR(8), LD.PaymentScheduleDate), 112) BETWEEN @LastMonthStart AND @LastMonthEnd AND L.BranchId = @BranchId) AS LastMonthLoan,
                 (SELECT ISNULL(SUM(ISNULL(I.InvestmentValue, 0)), 0) FROM Investments I WHERE I.Post = 1 AND I.BranchId = @BranchId) AS TotalInvestment,
                 (SELECT ISNULL(SUM(ISNULL(JD.DrAmount, 0) - ISNULL(JD.CrAmount, 0)), 0) FROM GLJournalDetails JD LEFT JOIN COAs C ON C.Id = JD.COAId WHERE C.Name LIKE '%Cash at Bank%' AND C.BranchId = @BranchId) AS CashAtBank;";
