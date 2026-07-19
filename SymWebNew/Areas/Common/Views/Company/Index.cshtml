@@ -146,21 +146,30 @@
 
                     "fnRender": function (oObj) {
 
-                        var id = oObj.aData[0];
+                        var companyId = oObj.aData[0];
 
-                        return ""
-                            + '<a title="Click on for Edit" '
+                        return ''
+                            + '<a '
+                            + 'title="Click for Edit" '
                             + 'style="text-decoration:none;" '
-                            + 'href="/Common/Company/Edit/' + id + '" '
-                            + 'class="sym-btn-edit-row"></a>'
+                            + 'href="/Common/Company/Edit/' + companyId + '" '
+                            + 'class="sym-btn-edit-row">'
+                            + '</a>'
 
                             + '&nbsp;'
 
-                            + '<a title="Click on for Delete" '
+                            + '<a '
+                            + 'title="Click for Delete" '
                             + 'style="text-decoration:none;" '
-                            + 'data-url="/Common/Company/Delete/' + id + '" '
-                            + 'onclick="deletedData(this, myDataTable,\'' + id + '\');" '
-                            + 'class="sym-btn-remove-row"></a>';
+                            + 'href="javascript:void(0);" '
+                            + 'data-url="/Common/Company/Delete" '
+                            + 'onclick="deletedData('
+                            + 'this, '
+                            + '\'myDataTable\', '
+                            + '\'' + companyId + '\''
+                            + ');" '
+                            + 'class="sym-btn-remove-row">'
+                            + '</a>';
                     }
                 },
 

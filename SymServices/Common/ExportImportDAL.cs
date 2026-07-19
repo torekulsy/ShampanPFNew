@@ -10543,7 +10543,9 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
 	                         Mobile
 	                         ,Fax
 	                         ,Remarks
-                         FROM Branch";
+                         FROM Branch
+                         Where IsArchive=0
+                         ORDER BY Name";
                 #endregion
                 #region More Conditions
                 #endregion

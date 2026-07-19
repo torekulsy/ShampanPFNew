@@ -463,24 +463,24 @@ namespace SymWebUI.Areas.PF.Controllers
             {
                 EmployeeInfoForPFRepo repo = new EmployeeInfoForPFRepo();
 
-                // 🧩 Preserve old photo if updating and no new file uploaded
-                if (vm.Id > 0)
-                {
-                    var existing = repo.SelectById(vm.Id);
-                    if (file == null || file.ContentLength == 0)
-                    {
-                        vm.PhotoName = existing.PhotoName;
-                    }
-                }
+             
+                //if (vm.Id > 0)
+                //{
+                //    var existing = repo.SelectById(vm.Id);
+                //    if (file == null || file.ContentLength == 0)
+                //    {
+                //        vm.PhotoName = existing.PhotoName;
+                //    }
+                //}
 
-                // 🔹 Insert or Update
+
                 result = repo.InsertEmployeeInfoForPF(vm);
 
                 if (result[0] == "Success")
                 {
                     int employeeId = vm.Id > 0 ? vm.Id : Convert.ToInt32(result[2]);
 
-                    // 🔹 Only handle new file upload
+
                     if (file != null && file.ContentLength > 0)
                     {
                         var employee = repo.SelectById(employeeId);

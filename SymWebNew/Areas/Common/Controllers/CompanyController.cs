@@ -424,5 +424,129 @@ namespace SymWebUI.Areas.Common.Controllers
             }
             return View(company);
         }
+
+        [Authorize(Roles = "Master,Admin,Account")]
+        [HttpGet]
+        public JsonResult Delete(string ids)
+        {
+            string[] result = new string[6];
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(ids))
+                {
+                    return Json(
+                        "Fail~No company was selected for deletion.",
+                        JsonRequestBehavior.AllowGet
+                    );
+                }
+
+                string idText = ids
+                    .Split(
+                        new[] { '~' },
+                        StringSplitOptions.RemoveEmptyEntries
+                    )
+                    .FirstOrDefault();
+
+                int companyId;
+
+                if (string.IsNullOrWhiteSpace(idText) ||
+                    !int.TryParse(idText, out companyId) ||
+                    companyId <= 0)
+                {
+                    return Json(
+                        "Fail~Invalid company information.",
+                        JsonRequestBehavior.AllowGet
+                    );
+                }
+
+                ShampanIdentity currentIdentity =
+                    (ShampanIdentity)Thread.CurrentPrincipal.Identity;
+
+                CompanyVM company = new CompanyVM
+                {
+                    Id = companyId,
+
+                    LastUpdateAt =
+                        DateTime.Now.ToString("yyyyMMddHHmmss"),
+
+                    LastUpdateBy =
+                        currentIdentity.Name,
+
+                    LastUpdateFrom =
+                        currentIdentity.WorkStationIP
+                };
+
+                result = compRepo.Delete(company);
+
+                if (result == null || result.Length < 2)
+                {
+                    return Json(
+                        "Fail~Company deletion returned an invalid response.",
+                        JsonRequestBehavior.AllowGet
+                    );
+                }
+
+                string status =
+                    string.IsNullOrWhiteSpace(result[0])
+                        ? "Fail"
+                        : result[0];
+
+                string message = result[1];
+
+                if (status.Equals(
+                        "Success",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    if (string.IsNullOrWhiteSpace(message))
+                    {
+                        message = "Company deleted successfully.";
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(message) ||
+                        message.Equals(
+                            "Fail",
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        message = "Company could not be deleted.";
+                    }
+
+                    FileLogger.Log(
+                        "Status: " + status +
+                        Environment.NewLine +
+                        "Company Id: " + companyId +
+                        Environment.NewLine +
+                        "Details: " +
+                        (
+                            result.Length > 4
+                                ? result[4]
+                                : ""
+                        ),
+                        GetType().Name,
+                        "Company Delete"
+                    );
+                }
+
+                return Json(
+                    status + "~" + message,
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+            catch (Exception ex)
+            {
+                FileLogger.Log(
+                    ex.Message,
+                    GetType().Name,
+                    "Company Delete"
+                );
+
+                return Json(
+                    "Fail~An unexpected error occurred while deleting the company.",
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+        }
     }
 }
