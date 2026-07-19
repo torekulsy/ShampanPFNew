@@ -120,7 +120,6 @@
         z-index: 999;
         opacity: 1;
     }
-    
 </style>
 @using (Html.BeginForm("Create", "Company", FormMethod.Post, new { enctype = "multipart/form-data", @id = "createCompanyForm" }))
 {
@@ -166,7 +165,7 @@
                                 @Html.LabelFor(model => model.Address)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.Address, new { @placeholder = "Address", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.Address, new { @placeholder = "Address", @class = "required form-control" })
                                 @Html.ValidationMessageFor(model => model.Address)
                             </div>
                         </div>
@@ -201,7 +200,7 @@
                                 @Html.LabelFor(model => model.PostalCode)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.PostalCode, new { @placeholder = "Postal Code", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.PostalCode, new { @placeholder = "Postal Code", @class = "form-control isPositiveNumeric" })
                                 @Html.ValidationMessageFor(model => model.PostalCode)
                             </div>
                         </div>
@@ -210,7 +209,7 @@
                                 @Html.LabelFor(model => model.Phone)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.Phone, new { @placeholder = "Phone", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.Phone, new { @placeholder = "Phone", @class = "form-control isPositiveNumeric" })
                                 @Html.ValidationMessageFor(model => model.Phone)
                             </div>
                         </div>
@@ -219,7 +218,7 @@
                                 @Html.LabelFor(model => model.Mobile)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.Mobile, new { @placeholder = "Mobile", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.Mobile, new { @placeholder = "Mobile", @class = "form-control isPositiveNumeric" })
                                 @Html.ValidationMessageFor(model => model.Mobile)
                             </div>
                         </div>
@@ -228,7 +227,7 @@
                                 @Html.LabelFor(model => model.Fax)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.Fax, new { @placeholder = "Fax", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.Fax, new { @placeholder = "Fax", @class = "form-control isPositiveNumeric" })
                                 @Html.ValidationMessageFor(model => model.Fax)
                             </div>
                         </div>
@@ -238,7 +237,7 @@
                                 @Html.LabelFor(model => model.TaxId)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.TaxId, new { @placeholder = "TAX Id", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.TaxId, new { @placeholder = "TAX Id", @class = "form-control isPositiveNumeric" })
                                 @Html.ValidationMessageFor(model => model.TaxId)
                             </div>
                         </div>
@@ -247,7 +246,7 @@
                                 @Html.LabelFor(model => model.RegistrationNumber)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.RegistrationNumber, new { @placeholder = "Registration Number", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.RegistrationNumber, new { @placeholder = "Registration Number", @class = "form-control isPositiveNumeric" })
                                 @Html.ValidationMessageFor(model => model.RegistrationNumber)
                             </div>
                         </div>
@@ -256,7 +255,7 @@
                                 @Html.LabelFor(model => model.NumberOfEmployees)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.NumberOfEmployees, new { @placeholder = "Number Of Employees", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.NumberOfEmployees, new { @placeholder = "Number Of Employees", @class = "required form-control isPositiveNumeric" })
                                 @Html.ValidationMessageFor(model => model.NumberOfEmployees)
                             </div>
                         </div>
@@ -310,22 +309,22 @@
 
                 @*<div class="col-md-1">
 
-                    <div class="image-section">
+                        <div class="image-section">
 
-                        <div class="image-upload">
-                            <input type="file" accept=".jpg,.png,.gif,.jpeg" name="file" id="FileUpload" onchange="CheckImageSize(this);ShowpImagePreview(this);" />
+                            <div class="image-upload">
+                                <input type="file" accept=".jpg,.png,.gif,.jpeg" name="file" id="FileUpload" onchange="CheckImageSize(this);ShowpImagePreview(this);" />
+                            </div>
+                            <div class="action-buttons">
+                                <img src="@Url.Content("~/Images/default-logo.png")" id="LogoImage" alt="IMAGES" height="50" />
+
+                            </div>
                         </div>
-                        <div class="action-buttons">
-                            <img src="@Url.Content("~/Images/default-logo.png")" id="LogoImage" alt="IMAGES" height="50" />
 
-                        </div>
-                    </div>
-
-                </div>*@
+                    </div>*@
 
 
 
-                <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2 ">
+                <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
 
                     <div class="employee-image-card">
 
@@ -334,7 +333,7 @@
                             <!-- Preview Image -->
                             <img src="@Url.Content("~/Images/default-logo.png")"
                                  id="LogoImage"
-                                 alt="Logo Image" />
+                                 style="display:none;" />
 
                             <!-- Upload UI -->
                             <div class="upload-content">
@@ -342,7 +341,7 @@
                                 <p>Browse Logo to upload</p>
                             </div>
 
-                            <!-- File Input (Same function kept) -->
+                            <!-- File Input -->
                             <input type="file"
                                    accept=".jpg,.png,.gif,.jpeg"
                                    name="file"
@@ -354,14 +353,16 @@
                     </div>
 
                     <!-- File Info -->
-
                     <div class="file-info" data-fullname="No selected File">
                         <span id="fileName" class="file-name">
                             No selected File
                         </span>
-                        <span class="sym-btn-remove-row" onclick="removeFile()"></span>
-                    </div>
 
+                        <span class="sym-btn-remove-row"
+                              onclick="removeFile()">
+                        </span>
+
+                    </div>
 
                 </div>
 
@@ -375,19 +376,19 @@
         </div>
 
     </div>
-    
-     <div class="card">
-    <div class="card-header p-3">
-        <div class="">
-            <button type="submit" title="Save Data" class="sym-btn-save">&nbsp;Save</button>
+
+    <div class="card">
+        <div class="card-header p-3">
+            <div class="">
+                <button type="submit" title="Save Data" class="sym-btn-save">&nbsp;Save</button>
+            </div>
         </div>
     </div>
-</div>
 
     @*<p>
-      <input type="submit" class="btn btn-info" value="Create" />
+          <input type="submit" class="btn btn-info" value="Create" />
 
-    </p>*@
+        </p>*@
 }
 @section Scripts {
     <script>
@@ -410,42 +411,51 @@
 
 
         function ShowpImagePreview(input) {
+
             if (input.files && input.files[0]) {
+
                 var reader = new FileReader();
 
                 reader.onload = function (e) {
-                    $('#LogoImage').attr('src', e.target.result).show();
-                    $('.upload-content').hide();
+
+                    $("#LogoImage")
+                        .attr("src", e.target.result)
+                        .show();
+
+                    $(".upload-content").hide();
                 };
 
                 reader.readAsDataURL(input.files[0]);
 
-                // File name show
+                // Show File Name
                 var fileName = input.files[0].name;
-                $('#fileName').text(fileName);
-                $('.file-info').attr('data-fullname', fileName);
-            }
-        }
 
+                $("#fileName").text(fileName);
+
+                $(".file-info").attr("data-fullname", fileName);
+            }
+
+        }
 
         function removeFile() {
 
-            // Clear file input
-            const fileInput = document.getElementById("FileUpload");
-            fileInput.value = "";
+            // Clear File Input
+            $("#FileUpload").val("");
 
-            // Reset image preview (default image set)
-            const img = document.getElementById("LogoImage");
-            img.src = "/Images/default-logo.png";
+            // Hide Preview Image
+            $("#LogoImage")
+                .attr("src", "")
+                .hide();
 
-            // Show upload content again
-            document.querySelector(".upload-content").style.display = "block";
+            // Show Upload Placeholder
+            $(".upload-content").show();
 
-            // Reset file name text
-            document.getElementById("fileName").innerText = "No selected File";
+            // Reset File Name
+            $("#fileName").text("No selected File");
 
-            // Reset tooltip
-            document.querySelector(".file-info").setAttribute("data-fullname", "No selected File");
+            // Reset Tooltip
+            $(".file-info").attr("data-fullname", "No selected File");
+
         }
 
 
@@ -455,3 +465,38 @@
 
     </script>
 }
+<style>
+    .image-wrapper {
+        position: relative;
+        width: 100%;
+        height: 110px;
+        border: 2px dashed #4f7cff;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+    .upload-content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .image-wrapper input[type=file] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+</style>

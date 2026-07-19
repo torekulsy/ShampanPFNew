@@ -3,219 +3,441 @@
 @{
     ViewBag.Title = "Edit";
 }
-@using (Html.BeginForm("Edit", "Project", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmProject" }))
+
+@using (Html.BeginForm(
+    "Edit",
+    "Project",
+    FormMethod.Post,
+    new
+    {
+        enctype = "multipart/form-data",
+        id = "frmProject"
+    }))
 {
     @Html.ValidationSummary(true)
+
     @Html.HiddenFor(model => model.Id)
     @Html.HiddenFor(model => model.BranchId)
-     <div class="card">
-    <div class="card-header p-3">
-        <div class="th_thinbox_top">
-            <button type="submit" title="Update Data" class="sym-btn-update">&nbsp;Update</button>
-            <div class="breadcrumb-container">
-                <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+
+    <div class="card">
+        <div class="card-header p-3">
+            <div class="th_thinbox_top">
+
+                <button type="submit"
+                        title="Update Data"
+                        class="sym-btn-update">
+                    &nbsp;Update
+                </button>
+
+                <div class="breadcrumb-container">
+                    <ol class="breadcrumb"
+                        id="dynamicBreadcrumb"></ol>
+                </div>
+
             </div>
         </div>
     </div>
-</div>
-    
+
     <div class="thinbox">
+
         <div class="th_thinbox">
             <p>Project</p>
         </div>
+
         <div class="project card-body">
+
             <div class="row">
+
+                @* 01. Code *@
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.Code)
                     </div>
+
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Code, new { @placeholder = "Project Code", @class = " required form-control" })
+                        @Html.TextBoxFor(
+                            model => model.Code,
+                            new
+                            {
+                                placeholder = "Project Code",
+                                @class = "required form-control"
+                            })
+
                         @Html.ValidationMessageFor(model => model.Code)
                     </div>
                 </div>
+
+                @* 02. Name *@
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.Name)
                     </div>
+
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Name, new { @placeholder = "Project Name", @class = "required form-control" })
+                        @Html.TextBoxFor(
+                            model => model.Name,
+                            new
+                            {
+                                placeholder = "Project Name",
+                                @class = "required form-control"
+                            })
+
                         @Html.ValidationMessageFor(model => model.Name)
                     </div>
                 </div>
+
+                @* 03. Start Date *@
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.Startdate)
                     </div>
+
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Startdate, new { @onchange = "FromToDate(this);", @placeholder = "Start Date", @class = "customDatePicker form-control" })
+                        @Html.TextBoxFor(
+                            model => model.Startdate,
+                            new
+                            {
+                                onchange = "FromToDate(this);",
+                                placeholder = "Start Date",
+                                @class = "customDatePicker form-control"
+                            })
+
                         @Html.ValidationMessageFor(model => model.Startdate)
                     </div>
                 </div>
+
+                @* 04. End Date *@
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.EndDate)
                     </div>
+
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.EndDate, new { @onchange = "FromToDate(this);", @placeholder = "End Date", @class = "customDatePicker form-control" })
+                        @Html.TextBoxFor(
+                            model => model.EndDate,
+                            new
+                            {
+                                onchange = "FromToDate(this);",
+                                placeholder = "End Date",
+                                @class = "customDatePicker form-control"
+                            })
+
                         @Html.ValidationMessageFor(model => model.EndDate)
                     </div>
                 </div>
+
+                @* 05. Manpower *@
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.ManpowerRequired)
                     </div>
+
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.ManpowerRequired, new { @onchange = "NumberCheck(this);", @placeholder = "Manpower Required!", @class = "required form-control" })
-                        @Html.ValidationMessageFor(model => model.ManpowerRequired)
+                        @Html.TextBoxFor(
+                            model => model.ManpowerRequired,
+                            new
+                            {
+                                onchange = "NumberCheck(this);",
+                                placeholder = "Manpower Required",
+                                @class = "required form-control"
+                            })
+
+                        @Html.ValidationMessageFor(
+                            model => model.ManpowerRequired)
                     </div>
                 </div>
+
+                @* 06. Contact Name *@
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.ContactPerson)
                     </div>
+
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.ContactPerson, new { @placeholder = "Contact Person Name", @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.ContactPerson)
+                        @Html.TextBoxFor(
+                            model => model.ContactPerson,
+                            new
+                            {
+                                placeholder = "Contact Person Name",
+                                @class = "form-control"
+                            })
+
+                        @Html.ValidationMessageFor(
+                            model => model.ContactPerson)
                     </div>
                 </div>
-            </div>
-            <div class="row">
+
+                @* 07. Designation *@
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
-                        @Html.LabelFor(model => model.ContactPersonDesignation)
+                        @Html.LabelFor(
+                            model => model.ContactPersonDesignation)
                     </div>
+
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.ContactPersonDesignation, new { @placeholder = "Contact Person Designation", @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.ContactPersonDesignation)
+                        @Html.TextBoxFor(
+                            model => model.ContactPersonDesignation,
+                            new
+                            {
+                                placeholder = "Contact Person Designation",
+                                @class = "form-control"
+                            })
+
+                        @Html.ValidationMessageFor(
+                            model => model.ContactPersonDesignation)
                     </div>
                 </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
-                    <div class="editor-label">
-                        @Html.LabelFor(model => model.Address)
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Address, new { @placeholder = "Address", @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.Address)
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
-                    <div class="editor-label">
-                        @Html.LabelFor(model => model.Country)
-                    </div>
-                    <div class="editor-field">
-                        <select id="Country" name="Country" data-val="@Model.Country"  data-url="/Config/DropDown/CountryEN/"  class = " country form-control" ></select>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
-                    <div class="editor-label">
-                        @Html.LabelFor(model => model.Division)
-                    </div>
-                    <div class="editor-field">
-                        <select id="Division" name="Division" data-val="@Model.Division"  data-url="/Config/DropDown/Division/"  class = " division form-control" ></select>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
-                    <div class="editor-label">
-                        @Html.LabelFor(model => model.District)
-                    </div>
-                    <div class="editor-field">
-                        <select id="District" name="District" data-val="@Model.District"  data-url="/Config/DropDown/District/"  class = " district form-control" ></select>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
-                    <div class="editor-label">
-                        @Html.LabelFor(model => model.City)
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.City, new { @placeholder = "City", @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.City)
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
-                    <div class="editor-label">
-                        @Html.LabelFor(model => model.PostalCode)
-                    </div>
-                    <div class="editor-field">
-                        @Html.TextBoxFor(model => model.PostalCode, new { @placeholder = "Postal Code", @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.PostalCode)
-                    </div>
-                </div>
+
+                @* 08. Phone *@
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.Phone)
                     </div>
+
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Phone, new { @placeholder = "Phone", @class = "form-control" })
+                        @Html.TextBoxFor(
+                            model => model.Phone,
+                            new
+                            {
+                                placeholder = "Phone",
+                                @class = "form-control"
+                            })
+
                         @Html.ValidationMessageFor(model => model.Phone)
                     </div>
                 </div>
+
+                @* 09. Mobile *@
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.Mobile)
                     </div>
+
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Mobile, new { @placeholder = "Mobile", @class = "form-control" })
+                        @Html.TextBoxFor(
+                            model => model.Mobile,
+                            new
+                            {
+                                placeholder = "Mobile",
+                                @class = "form-control"
+                            })
+
                         @Html.ValidationMessageFor(model => model.Mobile)
                     </div>
                 </div>
+
+                @* 10. Fax *@
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.Fax)
                     </div>
+
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Fax, new { @placeholder = "Fax", @class = "form-control" })
+                        @Html.TextBoxFor(
+                            model => model.Fax,
+                            new
+                            {
+                                placeholder = "Fax",
+                                @class = "form-control"
+                            })
+
                         @Html.ValidationMessageFor(model => model.Fax)
                     </div>
                 </div>
+
+                @* 11. Address *@
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-4">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.Address)
+                    </div>
+
+                    <div class="editor-field">
+                        @Html.TextAreaFor(
+                            model => model.Address,
+                            new
+                            {
+                                placeholder = "Address",
+                                @class = "form-control"
+                            })
+
+                        @Html.ValidationMessageFor(model => model.Address)
+                    </div>
+                </div>
+
+                @* 12. Country *@
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.Country)
+                    </div>
+
+                    <div class="editor-field">
+                        <select id="Country"
+                                name="Country"
+                                data-val="@Model.Country"
+                                data-url="/Config/DropDown/CountryEN/"
+                                class="country form-control"></select>
+
+                        @Html.ValidationMessageFor(model => model.Country)
+                    </div>
+                </div>
+
+                @* 13. Division *@
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.Division)
+                    </div>
+
+                    <div class="editor-field">
+                        <select id="Division"
+                                name="Division"
+                                data-val="@Model.Division"
+                                data-url="/Config/DropDown/Division/"
+                                class="division form-control"></select>
+
+                        @Html.ValidationMessageFor(model => model.Division)
+                    </div>
+                </div>
+
+                @* 14. District *@
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.District)
+                    </div>
+
+                    <div class="editor-field">
+                        <select id="District"
+                                name="District"
+                                data-val="@Model.District"
+                                data-url="/Config/DropDown/District/"
+                                class="district form-control"></select>
+
+                        @Html.ValidationMessageFor(model => model.District)
+                    </div>
+                </div>
+
+                @* 15. City *@
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.City)
+                    </div>
+
+                    <div class="editor-field">
+                        @Html.TextBoxFor(
+                            model => model.City,
+                            new
+                            {
+                                placeholder = "City",
+                                @class = "form-control"
+                            })
+
+                        @Html.ValidationMessageFor(model => model.City)
+                    </div>
+                </div>
+
+                @* 16. Postal Code *@
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.PostalCode)
+                    </div>
+
+                    <div class="editor-field">
+                        @Html.TextBoxFor(
+                            model => model.PostalCode,
+                            new
+                            {
+                                placeholder = "Postal Code",
+                                @class = "form-control"
+                            })
+
+                        @Html.ValidationMessageFor(
+                            model => model.PostalCode)
+                    </div>
+                </div>
+
+                @* 17. Remarks *@
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.Remarks)
                     </div>
+
                     <div class="editor-field">
-                        @Html.TextAreaFor(model => model.Remarks, new { @placeholder = "Remarks", @class = "form-control" })
+                        @Html.TextAreaFor(
+                            model => model.Remarks,
+                            new
+                            {
+                                placeholder = "Remarks",
+                                @class = "form-control"
+                            })
+
                         @Html.ValidationMessageFor(model => model.Remarks)
                     </div>
                 </div>
-                <div class="col-md-1">
+
+                @* 18. Active - Edit page only *@
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.IsActive)
                     </div>
+
                     <div class="editor-field">
-                        @Html.CheckBoxFor(model => model.IsActive, new { @class = "" })
+                        @Html.CheckBoxFor(
+                            model => model.IsActive,
+                            new
+                            {
+                                @class = "form-check-input"
+                            })
+
+                        @Html.ValidationMessageFor(model => model.IsActive)
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
-    
-      <div class="card">
-    <div class="card-header p-3">
-        <div class="">
-            <button type="submit" title="Update Data" class="sym-btn-update">&nbsp;Update</button>
+
+    <div class="card">
+        <div class="card-header p-3">
+
+            <button type="submit"
+                    title="Update Data"
+                    class="sym-btn-update">
+                &nbsp;Update
+            </button>
+
         </div>
     </div>
-</div>
 }
 
 <script>
     $(function () {
+
         valiDation("frmProject");
 
         Country();
         Division();
         District();
+
         InitDateTimePickers();
         fromWriteColor("project");
     });
+
     function FromToDate(sender) {
-        var from = ParseDate($("#Startdate").val());
-        var to = ParseDate($("#EndDate").val());
-        if (from > to) {
+
+        var startDate = ParseDate($("#Startdate").val());
+        var endDate = ParseDate($("#EndDate").val());
+
+        if (!startDate || !endDate) {
+            return;
+        }
+
+        if (startDate > endDate) {
+
             $(sender).val("");
-            ShowResult("Fail", "To-Date can't be prior to Start-Date!");
+
+            ShowResult(
+                "Fail",
+                "End Date cannot be earlier than Start Date."
+            );
         }
     }
 </script>

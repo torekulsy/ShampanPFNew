@@ -99,13 +99,17 @@
                                 , { "sName": "IsSuper", "sWidth": "20%" }
             ]
         });
+
         oTable.columnFilter({
             sPlaceHolder: "head:after",
-            aoColumns: [{ type: "checkbox", "sClass": "chkAll" }
-                       , { type: "text" }
-                       , { type: "text" }
+            aoColumns: [
+                null,
+                { type: "text" },
+                { type: "text" }
             ]
         });
+
+
         $("#footer-length").append($(".dataTables_length"));
         $("#footer-info").append($(".dataTables_info"));
         $("#footer-pagination").append($(".dataTables_paginate"));

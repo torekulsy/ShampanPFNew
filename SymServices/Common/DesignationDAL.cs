@@ -1487,6 +1487,8 @@ SELECT
 Id
 ,Name
 FROM DesignationGroup
+Where IsArchive=0
+ORDER BY Name
 
 ";
 

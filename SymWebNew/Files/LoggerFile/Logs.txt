@@ -211,3 +211,7 @@ Invalid report file path.
    at CrystalDecisions.CrystalReports.Engine.ReportDocument.EnsureLoadReport()
    at CrystalDecisions.CrystalReports.Engine.ReportDocument.get_DataDefinition()
    at SymWebUI.Areas.PF.Controllers.LoanController.AllLoanReport(EmployeeLoanVM vm)
+
+2026-07-14 12:26:38 +06:00
+ Source : Object reference not set to an instance of an object. , Method : CompanyController
+Company _index

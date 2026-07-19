@@ -1794,13 +1794,13 @@ Where 1=1
                     vm.Email = dr["Email"].ToString();
                     vm.LogID = dr["LogId"].ToString();
                     vm.Password = dr["Password"].ToString();
-                    vm.VerificationCode = dr["VerificationCode"].ToString();
+                    vm.VerificationCode = dr["VerificationCode"] == DBNull.Value? null : dr["VerificationCode"].ToString();
                     vm.EmployeeId = dr["EmployeeId"].ToString();
                     vm.IsAdmin = Convert.ToBoolean(dr["IsAdmin"]);
                     vm.IsActive = Convert.ToBoolean(dr["IsActive"]);
                     vm.IsVerified = Convert.ToBoolean(dr["IsVerified"]);
                     vm.IsArchived = Convert.ToBoolean(dr["IsArchived"]);
-                    vm.IsApprove = Convert.ToBoolean(dr["IsApprove"]);
+                    vm.IsApprove = dr["IsApprove"] != DBNull.Value && Convert.ToBoolean(dr["IsApprove"]);
                 }
                 dr.Close();
                 #endregion
@@ -2796,137 +2796,516 @@ Where IsArchived=0 and BranchId=@BranchId and UserInfoId=@UserInfoId
         //            return retResults;
         //        }
         #endregion Backup
-        public string[] ChangePassword(UserLogsVM vm, SqlConnection VcurrConn, SqlTransaction Vtransaction)
+
+
+        //public string[] ChangePassword(UserLogsVM vm, SqlConnection VcurrConn, SqlTransaction Vtransaction)
+        //{
+        //    #region Variables
+        //    string[] retResults = new string[6];
+        //    retResults[0] = "Fail";//Success or Fail
+        //    retResults[1] = "Fail";// Success or Fail Message
+        //    retResults[2] = "0";
+        //    retResults[3] = "sqlText"; //  SQL Query
+        //    retResults[4] = "ex"; //catch ex
+        //    retResults[5] = "User Update"; //Method Name
+        //    int transResult = 0;
+        //    string sqlText = "";
+        //    bool iSTransSuccess = false;
+        //    #endregion
+        //    SqlConnection currConn = null;
+        //    SqlTransaction transaction = null;
+        //    try
+        //    {
+        //        #region open connection and transaction
+        //        #region New open connection and transaction
+        //        if (VcurrConn != null)
+        //        {
+        //            currConn = VcurrConn;
+        //        }
+        //        if (Vtransaction != null)
+        //        {
+        //            transaction = Vtransaction;
+        //        }
+        //        #endregion New open connection and transaction
+        //        if (currConn == null)
+        //        {
+        //            currConn = _dbsqlConnection.GetConnection();
+        //            if (currConn.State != ConnectionState.Open)
+        //            {
+        //                currConn.Open();
+        //            }
+        //        }
+        //        if (transaction == null) { transaction = currConn.BeginTransaction("UserUpdate"); }
+        //        #endregion open connection and transaction
+        //        if (vm != null)
+        //        {
+        //            #region Update Settings
+        //            sqlText = "";
+        //            sqlText = "update [User] set";
+        //            sqlText += " Password=@Password,";
+        //            sqlText += " LastUpdateBy=@LastUpdateBy,";
+        //            sqlText += " LastUpdateAt=@LastUpdateAt,";
+        //            sqlText += " LastUpdateFrom=@LastUpdateFrom";
+        //            sqlText += " WHERE 1=1 AND EmployeeId=@EmployeeId";
+        //            if (!vm.IsAdmin)
+        //            {
+        //                sqlText += " And Password=@OldPassword";
+        //            }
+        //            SqlCommand cmdUpdate = new SqlCommand(sqlText, currConn);
+        //            cmdUpdate.Parameters.AddWithValue("@EmployeeId", vm.EmployeeId);
+        //            vm.Password = Ordinary.Encrypt(vm.Password, true);
+        //            cmdUpdate.Parameters.AddWithValue("@Password", vm.Password);
+
+        //            if (!vm.IsAdmin)
+        //            {
+        //                vm.OldPassword = Ordinary.Encrypt(vm.OldPassword, true);
+        //                cmdUpdate.Parameters.AddWithValue("@OldPassword", vm.OldPassword);
+        //            }
+
+        //            cmdUpdate.Parameters.AddWithValue("@LastUpdateBy", vm.LastUpdateBy);
+        //            cmdUpdate.Parameters.AddWithValue("@LastUpdateAt", vm.LastUpdateAt);
+        //            cmdUpdate.Parameters.AddWithValue("@LastUpdateFrom", vm.LastUpdateFrom);
+        //            cmdUpdate.Transaction = transaction;
+        //            var exeRes = cmdUpdate.ExecuteNonQuery();
+        //            transResult = Convert.ToInt32(exeRes);
+        //            if (transResult == 0)
+        //            {
+        //                retResults[1] = "This employee is not a user Or Invalide old password!";
+        //                throw new ArgumentNullException("This employee is not a user Or Invalide old password!", "No user found");
+        //            }
+        //            retResults[2] = vm.EmployeeId.ToString();// Return Id
+        //            retResults[3] = sqlText; //  SQL Query
+        //            #region Commit
+        //            if (transResult <= 0)
+        //            {
+        //                throw new ArgumentNullException("User Update", "No user found");
+        //            }
+        //            #endregion Commit
+        //            #endregion Update Settings
+        //            iSTransSuccess = true;
+        //        }
+        //        else
+        //        {
+        //            throw new ArgumentNullException("User Update", "Could not found any user.");
+        //        }
+        //        if (iSTransSuccess == true)
+        //        {
+        //            if (Vtransaction == null)
+        //            {
+        //                if (transaction != null)
+        //                {
+        //                    transaction.Commit();
+        //                }
+        //            }
+        //            retResults[0] = "Success";
+        //            retResults[1] = "Requested User Information Successfully Updated.";
+        //        }
+        //        else
+        //        {
+        //            retResults[1] = "Unexpected error to update User.";
+        //            throw new ArgumentNullException("", "");
+        //        }
+        //    }
+        //    #region catch
+        //    catch (Exception ex)
+        //    {
+        //        retResults[0] = "Fail";//Success or Fail
+        //        retResults[4] = ex.Message; //catch ex
+        //        transaction.Rollback();
+        //        return retResults;
+        //    }
+        //    finally
+        //    {
+        //        if (VcurrConn == null)
+        //        {
+        //            if (currConn != null)
+        //            {
+        //                if (currConn.State == ConnectionState.Open)
+        //                {
+        //                    currConn.Close();
+        //                }
+        //            }
+        //        }
+        //    }
+        //    #endregion
+        //    return retResults;
+        //}
+
+        public string[] ChangePassword(UserLogsVM vm,SqlConnection VcurrConn,SqlTransaction Vtransaction)
         {
-            #region Variables
             string[] retResults = new string[6];
-            retResults[0] = "Fail";//Success or Fail
-            retResults[1] = "Fail";// Success or Fail Message
+
+            retResults[0] = "Fail";
+            retResults[1] = "Password could not be changed.";
             retResults[2] = "0";
-            retResults[3] = "sqlText"; //  SQL Query
-            retResults[4] = "ex"; //catch ex
-            retResults[5] = "User Update"; //Method Name
-            int transResult = 0;
-            string sqlText = "";
-            bool iSTransSuccess = false;
-            #endregion
+            retResults[3] = "";
+            retResults[4] = "";
+            retResults[5] = "ChangePassword";
+
             SqlConnection currConn = null;
             SqlTransaction transaction = null;
+
+            bool ownConnection =
+                VcurrConn == null;
+
+            bool ownTransaction =
+                Vtransaction == null;
+
+            string sqlText = "";
+
             try
             {
-                #region open connection and transaction
-                #region New open connection and transaction
-                if (VcurrConn != null)
+                if (vm == null)
                 {
-                    currConn = VcurrConn;
-                }
-                if (Vtransaction != null)
-                {
-                    transaction = Vtransaction;
-                }
-                #endregion New open connection and transaction
-                if (currConn == null)
-                {
-                    currConn = _dbsqlConnection.GetConnection();
-                    if (currConn.State != ConnectionState.Open)
-                    {
-                        currConn.Open();
-                    }
-                }
-                if (transaction == null) { transaction = currConn.BeginTransaction("UserUpdate"); }
-                #endregion open connection and transaction
-                if (vm != null)
-                {
-                    #region Update Settings
-                    sqlText = "";
-                    sqlText = "update [User] set";
-                    sqlText += " Password=@Password,";
-                    sqlText += " LastUpdateBy=@LastUpdateBy,";
-                    sqlText += " LastUpdateAt=@LastUpdateAt,";
-                    sqlText += " LastUpdateFrom=@LastUpdateFrom";
-                    sqlText += " WHERE 1=1 AND EmployeeId=@EmployeeId";
-                    if (!vm.IsAdmin)
-                    {
-                        sqlText += " And Password=@OldPassword";
-                    }
-                    SqlCommand cmdUpdate = new SqlCommand(sqlText, currConn);
-                    cmdUpdate.Parameters.AddWithValue("@EmployeeId", vm.EmployeeId);
-                    vm.Password = Ordinary.Encrypt(vm.Password, true);
-                    cmdUpdate.Parameters.AddWithValue("@Password", vm.Password);
+                    retResults[1] =
+                        "Password change information was not provided.";
 
-                    if (!vm.IsAdmin)
+                    return retResults;
+                }
+
+                if (string.IsNullOrWhiteSpace(vm.EmployeeId))
+                {
+                    retResults[1] =
+                        "Selected employee information was not found.";
+
+                    return retResults;
+                }
+
+                if (string.IsNullOrWhiteSpace(vm.Password))
+                {
+                    retResults[1] =
+                        "New password is required.";
+
+                    return retResults;
+                }
+
+                currConn =
+                    VcurrConn ??
+                    _dbsqlConnection.GetConnection();
+
+                if (currConn.State != ConnectionState.Open)
+                {
+                    currConn.Open();
+                }
+
+                transaction =
+                    Vtransaction;
+
+                int userCount = 0;
+
+
+                sqlText = @"
+            SELECT COUNT(1)
+            FROM [User]
+            WHERE EmployeeId = @EmployeeId
+        ";
+
+                using (SqlCommand userCommand =
+                    new SqlCommand(sqlText, currConn))
+                {
+                    userCommand.Parameters.AddWithValue(
+                        "@EmployeeId",
+                        vm.EmployeeId
+                    );
+
+                    if (transaction != null)
                     {
-                        vm.OldPassword = Ordinary.Encrypt(vm.OldPassword, true);
-                        cmdUpdate.Parameters.AddWithValue("@OldPassword", vm.OldPassword);
+                        userCommand.Transaction =
+                            transaction;
                     }
 
-                    cmdUpdate.Parameters.AddWithValue("@LastUpdateBy", vm.LastUpdateBy);
-                    cmdUpdate.Parameters.AddWithValue("@LastUpdateAt", vm.LastUpdateAt);
-                    cmdUpdate.Parameters.AddWithValue("@LastUpdateFrom", vm.LastUpdateFrom);
-                    cmdUpdate.Transaction = transaction;
-                    var exeRes = cmdUpdate.ExecuteNonQuery();
-                    transResult = Convert.ToInt32(exeRes);
-                    if (transResult == 0)
-                    {
-                        retResults[1] = "This employee is not a user Or Invalide old password!";
-                        throw new ArgumentNullException("This employee is not a user Or Invalide old password!", "No user found");
-                    }
-                    retResults[2] = vm.EmployeeId.ToString();// Return Id
-                    retResults[3] = sqlText; //  SQL Query
-                    #region Commit
-                    if (transResult <= 0)
-                    {
-                        throw new ArgumentNullException("User Update", "No user found");
-                    }
-                    #endregion Commit
-                    #endregion Update Settings
-                    iSTransSuccess = true;
+                    userCount =
+                        Convert.ToInt32(
+                            userCommand.ExecuteScalar()
+                        );
                 }
-                else
+
+                if (userCount <= 0)
                 {
-                    throw new ArgumentNullException("User Update", "Could not found any user.");
+                    retResults[1] =
+                        "Selected employee does not have a user account.";
+
+                    return retResults;
                 }
-                if (iSTransSuccess == true)
+
+                string encryptedOldPassword = null;
+
+
+                if (!vm.IsAdmin)
                 {
-                    if (Vtransaction == null)
+                    if (string.IsNullOrWhiteSpace(vm.OldPassword))
                     {
+                        retResults[1] =
+                            "Current password is required.";
+
+                        return retResults;
+                    }
+
+                    encryptedOldPassword =
+                        Ordinary.Encrypt(
+                            vm.OldPassword,
+                            true
+                        );
+
+                    int oldPasswordMatchCount = 0;
+
+                    sqlText = @"
+                SELECT COUNT(1)
+                FROM [User]
+                WHERE EmployeeId = @EmployeeId
+                  AND Password = @OldPassword
+            ";
+
+                    using (SqlCommand passwordCommand =
+                        new SqlCommand(sqlText, currConn))
+                    {
+                        passwordCommand.Parameters.AddWithValue(
+                            "@EmployeeId",
+                            vm.EmployeeId
+                        );
+
+                        passwordCommand.Parameters.AddWithValue(
+                            "@OldPassword",
+                            encryptedOldPassword
+                        );
+
                         if (transaction != null)
                         {
-                            transaction.Commit();
+                            passwordCommand.Transaction =
+                                transaction;
                         }
+
+                        oldPasswordMatchCount =
+                            Convert.ToInt32(
+                                passwordCommand.ExecuteScalar()
+                            );
                     }
-                    retResults[0] = "Success";
-                    retResults[1] = "Requested User Information Successfully Updated.";
+
+                    if (oldPasswordMatchCount <= 0)
+                    {
+                        retResults[1] =
+                            "Current password is incorrect.";
+
+                        return retResults;
+                    }
                 }
-                else
+
+                string encryptedNewPassword =
+                    Ordinary.Encrypt(
+                        vm.Password,
+                        true
+                    );
+
+
+                int samePasswordCount = 0;
+
+                sqlText = @"
+            SELECT COUNT(1)
+            FROM [User]
+            WHERE EmployeeId = @EmployeeId
+              AND Password = @NewPassword
+        ";
+
+                using (SqlCommand samePasswordCommand =
+                    new SqlCommand(sqlText, currConn))
                 {
-                    retResults[1] = "Unexpected error to update User.";
-                    throw new ArgumentNullException("", "");
+                    samePasswordCommand.Parameters.AddWithValue(
+                        "@EmployeeId",
+                        vm.EmployeeId
+                    );
+
+                    samePasswordCommand.Parameters.AddWithValue(
+                        "@NewPassword",
+                        encryptedNewPassword
+                    );
+
+                    if (transaction != null)
+                    {
+                        samePasswordCommand.Transaction =
+                            transaction;
+                    }
+
+                    samePasswordCount =
+                        Convert.ToInt32(
+                            samePasswordCommand.ExecuteScalar()
+                        );
                 }
+
+                if (samePasswordCount > 0)
+                {
+                    retResults[1] =
+                        "New password cannot be the same as the current password.";
+
+                    return retResults;
+                }
+
+                if (transaction == null)
+                {
+                    transaction =
+                        currConn.BeginTransaction(
+                            "UserPasswordChange"
+                        );
+                }
+
+                sqlText = @"
+            UPDATE [User]
+            SET
+                Password       = @NewPassword,
+                LastUpdateBy   = @LastUpdateBy,
+                LastUpdateAt   = @LastUpdateAt,
+                LastUpdateFrom = @LastUpdateFrom
+            WHERE EmployeeId = @EmployeeId
+        ";
+
+ 
+                if (!vm.IsAdmin)
+                {
+                    sqlText += @"
+                AND Password = @OldPassword
+            ";
+                }
+
+                int transResult = 0;
+
+                using (SqlCommand updateCommand =
+                    new SqlCommand(sqlText, currConn, transaction))
+                {
+                    updateCommand.Parameters.AddWithValue(
+                        "@NewPassword",
+                        encryptedNewPassword
+                    );
+
+                    updateCommand.Parameters.AddWithValue(
+                        "@LastUpdateBy",
+                        vm.LastUpdateBy ?? ""
+                    );
+
+                    updateCommand.Parameters.AddWithValue(
+                        "@LastUpdateAt",
+                        vm.LastUpdateAt ?? ""
+                    );
+
+                    updateCommand.Parameters.AddWithValue(
+                        "@LastUpdateFrom",
+                        vm.LastUpdateFrom ?? ""
+                    );
+
+                    updateCommand.Parameters.AddWithValue(
+                        "@EmployeeId",
+                        vm.EmployeeId
+                    );
+
+                    if (!vm.IsAdmin)
+                    {
+                        updateCommand.Parameters.AddWithValue(
+                            "@OldPassword",
+                            encryptedOldPassword
+                        );
+                    }
+
+                    transResult =
+                        updateCommand.ExecuteNonQuery();
+                }
+
+                if (transResult <= 0)
+                {
+                    if (ownTransaction &&
+                        transaction != null)
+                    {
+                        transaction.Rollback();
+                        transaction = null;
+                    }
+
+                    retResults[1] =
+                        !vm.IsAdmin
+                            ? "Current password is incorrect or was changed before saving."
+                            : "User password could not be updated.";
+
+                    return retResults;
+                }
+
+                if (ownTransaction &&
+                    transaction != null)
+                {
+                    transaction.Commit();
+                    transaction = null;
+                }
+
+                retResults[0] = "Success";
+                retResults[1] =
+                    "Password changed successfully.";
+
+                retResults[2] =
+                    vm.EmployeeId;
+
+                retResults[3] =
+                    sqlText;
+
+                return retResults;
             }
-            #region catch
-            catch (Exception ex)
+            catch (SqlException sqlException)
             {
-                retResults[0] = "Fail";//Success or Fail
-                retResults[4] = ex.Message; //catch ex
-                transaction.Rollback();
+                if (ownTransaction &&
+                    transaction != null)
+                {
+                    try
+                    {
+                        transaction.Rollback();
+                    }
+                    catch
+                    {
+                       
+                    }
+                }
+
+                retResults[0] = "Fail";
+                retResults[1] =
+                    "Password change failed due to a database error.";
+
+                retResults[3] =
+                    sqlText;
+
+                retResults[4] =
+                    sqlException.Message;
+
+                return retResults;
+            }
+            catch (Exception exception)
+            {
+                if (ownTransaction &&
+                    transaction != null)
+                {
+                    try
+                    {
+                        transaction.Rollback();
+                    }
+                    catch
+                    {
+                        // Rollback failure ignored
+                    }
+                }
+
+                retResults[0] = "Fail";
+                retResults[1] =
+                    "Password change failed due to an unexpected system error.";
+
+                retResults[3] =
+                    sqlText;
+
+                retResults[4] =
+                    exception.Message;
+
                 return retResults;
             }
             finally
             {
-                if (VcurrConn == null)
+                if (ownConnection &&
+                    currConn != null &&
+                    currConn.State == ConnectionState.Open)
                 {
-                    if (currConn != null)
-                    {
-                        if (currConn.State == ConnectionState.Open)
-                        {
-                            currConn.Close();
-                        }
-                    }
+                    currConn.Close();
                 }
             }
-            #endregion
-            return retResults;
         }
         
         public List<EmployeeInfoVM> SelectAllActiveEmp()

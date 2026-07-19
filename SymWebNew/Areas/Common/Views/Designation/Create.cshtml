@@ -71,12 +71,12 @@
     @Html.ValidationSummary(true)
     <div class=" tabMenu">
         <ul style="font-size: 1.4em;" class="tabDesign nav nav-tabs">
-            <li style="background-color: #b7e487" class="tabDefault active"><a data-toggle="tab" href="#Deposit">Basic</a></li>
-            <li style="background-color: #b7e487" class="tabDefault"><a data-toggle="tab" href="#VDS" class="vdsInfoTab">Insurance Plan</a></li>
+            @*<li style="background-color: #b7e487" class="tabDefault active"><a data-toggle="tab" href="#Deposit">Basic</a></li>*@
+            @*<li style="background-color: #b7e487" class="tabDefault"><a data-toggle="tab" href="#VDS" class="vdsInfoTab">Insurance Plan</a></li>
             <li style="background-color: #b7e487" class="tabDefault"><a data-toggle="tab" href="#ENT" class="ENTInfoTab">Entitlement</a></li>
             <li style="background-color: #b7e487" class="tabDefault"><a data-toggle="tab" href="#ME" class="MEInfoTab">Mobile Expense</a></li>
             <li style="background-color: #b7e487" class="tabDefault"><a data-toggle="tab" href="#ITE" class="ITEInfoTab">International Travel</a></li>
-            <li style="background-color: #b7e487" class="tabDefault"><a data-toggle="tab" href="#DTE" class="DTEInfoTab">Domestic Travel</a></li>
+            <li style="background-color: #b7e487" class="tabDefault"><a data-toggle="tab" href="#DTE" class="DTEInfoTab">Domestic Travel</a></li>*@
         </ul>
     </div>
     <div class="tab-content">
@@ -94,6 +94,7 @@
                             </div>
                             <div class="editor-field">
                                 @Html.TextBoxFor(model => model.Code, new { @placeholder = " Code", @class = " required form-control" })
+                                @Html.ValidationMessageFor(model => model.Code)
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
@@ -102,6 +103,7 @@
                             </div>
                             <div class="editor-field">
                                 @Html.TextBoxFor(model => model.Name, new { @placeholder = "Name", @class = "required form-control" })
+                                @Html.ValidationMessageFor(model => model.Name)
                             </div>
                         </div>
 
@@ -110,7 +112,8 @@
                                 @Html.LabelFor(model => model.DesignationGroupId)
                             </div>
                             <div class="editor-field">
-                                @Html.SimpleDropDownFor(model => model.DesignationGroupId, "/Config/DropDown/DesignationGroupDropDown", new { @class = " cDesignationGroupId required form-control" })
+                                @Html.SimpleDropDownFor(model => model.DesignationGroupId, "/Config/DropDown/DesignationGroupDropDown", new { @class = " cDesignationGroupId required form-control", data_disable_placeholder = "true" })
+                                @Html.ValidationMessageFor(model => model.DesignationGroupId)
 
                             </div>
                         </div>
@@ -120,7 +123,8 @@
                                 @Html.LabelFor(model => model.GradeId)
                             </div>
                             <div class="editor-field">
-                                @Html.SimpleDropDownFor(model => model.GradeId, "/Config/DropDown/Grade", new { @class = " cGradeId required form-control" })
+                                @Html.SimpleDropDownFor(model => model.GradeId, "/Config/DropDown/Grade", new { @class = " cGradeId required form-control", data_disable_placeholder = "true" })
+                                @Html.ValidationMessageFor(model => model.GradeId)
 
                             </div>
                         </div>
@@ -183,6 +187,7 @@
                             </div>
                             <div class="editor-field">
                                 @Html.TextBoxFor(model => model.AttendenceBonus, new { @placeholder = "Attendance Bonus", @class = "required form-control" })
+                                @Html.ValidationMessageFor(model => model.AttendenceBonus)
                             </div>
                         </div>
 
@@ -278,7 +283,7 @@
 
         </div>
 
-        <div id="VDS" class="tab-pane fade">
+        @*<div id="VDS" class="tab-pane fade">
             <div class="thinbox">
                 <div class="th_thinbox">
                     <p>Insurance Create</p>
@@ -361,14 +366,14 @@
                             </div>
                         </div>
 
-                        @*<div class="col-sm-2">
+                        <div class="col-sm-2">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.DinnerAmount)
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.DinnerAmount, new { @placeholder = "Dinner Amount", @class = " form-control" })
                     </div>
-                </div>*@
+                </div>
                     </div>
 
                     <div class="row">
@@ -376,9 +381,9 @@
                 </div>
             </div>
 
-        </div>
+        </div>*@
 
-        <div id="ENT" class="tab-pane fade">
+        @*<div id="ENT" class="tab-pane fade">
             <div class="thinbox">
                 <div class="th_thinbox">
                     <p>Entitlement Plan Create</p>
@@ -434,9 +439,9 @@
                 </div>
             </div>
 
-        </div>
+        </div>*@
 
-        <div id="ME" class="tab-pane fade">
+        @*<div id="ME" class="tab-pane fade">
             <div class="thinbox">
                 <div class="th_thinbox">
                     <p>Mobile Expense Create</p>
@@ -483,9 +488,9 @@
                 </div>
             </div>
 
-        </div>
+        </div>*@
 
-        <div id="ITE" class="tab-pane fade">
+        @*<div id="ITE" class="tab-pane fade">
             <div class="thinbox">
                 <div class="th_thinbox">
                     <p>International Travel Create</p>
@@ -525,9 +530,9 @@
                 </div>
             </div>
 
-        </div>
+        </div>*@
 
-        <div id="DTE" class="tab-pane fade">
+        @*<div id="DTE" class="tab-pane fade">
             <div class="thinbox">
                 <div class="th_thinbox">
                     <p>Domestic Travel Create</p>
@@ -567,14 +572,14 @@
                                 @Html.TextBoxFor(model => model.DomesticTravelC4, new { @placeholder = " Daily Expenses Overnight for Day Tip", @class = "form-control" })
                             </div>
                         </div>
-                        @*<div class="col-sm-3">
+                       <div class="col-sm-3">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.DomesticTravelC5)
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.DomesticTravelC5, new { @placeholder = "Domestic Travel C5", @class = "form-control" })
                     </div>
-                </div>*@
+                </div>
 
                     </div>
 
@@ -583,7 +588,7 @@
                 </div>
             </div>
 
-        </div>
+        </div>*@
 
 
     </div>
@@ -595,6 +600,10 @@
 
 
 <script>
+
+    $(function () {
+        valiDation("frmDesignation");
+    });
     $(function () {
         $("#frmDesignation").validate({
             ignore: [],

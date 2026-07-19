@@ -34,60 +34,246 @@ namespace SymWebUI.Areas.Common.Controllers
             return View("~/Areas/Common/Views/Company/Index.cshtml");
         }
 
+
         public ActionResult _index(JQueryDataTableParamModel param)
         {
-           
-            var getAllData = compRepo.SelectAll();
-            IEnumerable<CompanyVM> filteredData;
+            #region Column Search
 
-            if (!string.IsNullOrEmpty(param.sSearch))
+            var Id = Convert.ToString(Request["sSearch_0"]);
+            var Code = Convert.ToString(Request["sSearch_1"]);
+            var Name = Convert.ToString(Request["sSearch_2"]);
+            var Address = Convert.ToString(Request["sSearch_3"]);
+            var Phone = Convert.ToString(Request["sSearch_4"]);
+            var Remarks = Convert.ToString(Request["sSearch_5"]);
+            var IsActive = Convert.ToString(Request["sSearch_6"]);
+
+            #endregion Column Search
+
+            #region Get Data
+
+            var getAllData = compRepo.SelectAll() ?? new List<CompanyVM>();
+
+            IEnumerable<CompanyVM> filteredData = getAllData;
+
+            #endregion Get Data
+
+            #region Global Search
+
+            if (!string.IsNullOrWhiteSpace(param.sSearch))
             {
-                filteredData = getAllData.Where(c =>
-                    c.Code.ToLower().Contains(param.sSearch.ToLower()) ||
-                    c.Name.ToLower().Contains(param.sSearch.ToLower()) ||
-                    c.Address.ToLower().Contains(param.sSearch.ToLower()) ||
-                    c.City.ToLower().Contains(param.sSearch.ToLower()) ||
-                    c.PostalCode.ToLower().Contains(param.sSearch.ToLower()) ||
-                    c.Phone.ToLower().Contains(param.sSearch.ToLower()) ||
-                    c.Mobile.ToLower().Contains(param.sSearch.ToLower()) ||
-                    c.Fax.ToLower().Contains(param.sSearch.ToLower()) ||
-                    c.Remarks.ToLower().Contains(param.sSearch.ToLower()) ||
-                    c.IsActive.ToString().ToLower().Contains(param.sSearch.ToLower())
+                var searchText = param.sSearch.Trim().ToLower();
+
+                var isSearchable0 = Convert.ToBoolean(Request["bSearchable_0"]);
+                var isSearchable1 = Convert.ToBoolean(Request["bSearchable_1"]);
+                var isSearchable2 = Convert.ToBoolean(Request["bSearchable_2"]);
+                var isSearchable3 = Convert.ToBoolean(Request["bSearchable_3"]);
+                var isSearchable4 = Convert.ToBoolean(Request["bSearchable_4"]);
+                var isSearchable5 = Convert.ToBoolean(Request["bSearchable_5"]);
+                var isSearchable6 = Convert.ToBoolean(Request["bSearchable_6"]);
+
+                filteredData = filteredData.Where(c =>
+                       (isSearchable0 &&
+                        Convert.ToString(c.Id).ToLower().Contains(searchText))
+
+                    || (isSearchable1 &&
+                        Convert.ToString(c.Code).ToLower().Contains(searchText))
+
+                    || (isSearchable2 &&
+                        Convert.ToString(c.Name).ToLower().Contains(searchText))
+
+                    || (isSearchable3 &&
+                        Convert.ToString(c.Address).ToLower().Contains(searchText))
+
+                    || (isSearchable4 &&
+                        Convert.ToString(c.Phone).ToLower().Contains(searchText))
+
+                    || (isSearchable5 &&
+                        Convert.ToString(c.Remarks).ToLower().Contains(searchText))
+
+                    || (isSearchable6 &&
+                        (
+                            Convert.ToString(c.IsActive)
+                                .ToLower()
+                                .Contains(searchText)
+
+                            || (c.IsActive ? "yes" : "no")
+                                .Contains(searchText)
+
+                            || (c.IsActive ? "active" : "inactive")
+                                .Contains(searchText)
+                        ))
                 );
+            }
+
+            #endregion Global Search
+
+            #region Individual Column Filtering
+
+            if (!string.IsNullOrWhiteSpace(Code)
+                || !string.IsNullOrWhiteSpace(Name)
+                || !string.IsNullOrWhiteSpace(Address)
+                || !string.IsNullOrWhiteSpace(Phone)
+                || !string.IsNullOrWhiteSpace(Remarks)
+                || !string.IsNullOrWhiteSpace(IsActive))
+            {
+                filteredData = filteredData.Where(c =>
+                       (string.IsNullOrWhiteSpace(Code)
+                        || Convert.ToString(c.Code)
+                            .ToLower()
+                            .Contains(Code.Trim().ToLower()))
+
+                    && (string.IsNullOrWhiteSpace(Name)
+                        || Convert.ToString(c.Name)
+                            .ToLower()
+                            .Contains(Name.Trim().ToLower()))
+
+                    && (string.IsNullOrWhiteSpace(Address)
+                        || Convert.ToString(c.Address)
+                            .ToLower()
+                            .Contains(Address.Trim().ToLower()))
+
+                    && (string.IsNullOrWhiteSpace(Phone)
+                        || Convert.ToString(c.Phone)
+                            .ToLower()
+                            .Contains(Phone.Trim().ToLower()))
+
+                    && (string.IsNullOrWhiteSpace(Remarks)
+                        || Convert.ToString(c.Remarks)
+                            .ToLower()
+                            .Contains(Remarks.Trim().ToLower()))
+
+                    && IsActiveMatches(c.IsActive, IsActive)
+                );
+            }
+
+            #endregion Individual Column Filtering
+
+            #region Sorting
+
+            var isSortable0 = Convert.ToBoolean(Request["bSortable_0"]);
+            var isSortable1 = Convert.ToBoolean(Request["bSortable_1"]);
+            var isSortable2 = Convert.ToBoolean(Request["bSortable_2"]);
+            var isSortable3 = Convert.ToBoolean(Request["bSortable_3"]);
+            var isSortable4 = Convert.ToBoolean(Request["bSortable_4"]);
+            var isSortable5 = Convert.ToBoolean(Request["bSortable_5"]);
+            var isSortable6 = Convert.ToBoolean(Request["bSortable_6"]);
+
+            var sortColumnIndex = 0;
+
+            if (!string.IsNullOrWhiteSpace(Request["iSortCol_0"]))
+            {
+                int.TryParse(Request["iSortCol_0"], out sortColumnIndex);
+            }
+
+            Func<CompanyVM, string> orderingFunction = c =>
+                sortColumnIndex == 0 && isSortable0
+                    ? Convert.ToString(c.Id)
+
+                : sortColumnIndex == 1 && isSortable1
+                    ? Convert.ToString(c.Code)
+
+                : sortColumnIndex == 2 && isSortable2
+                    ? Convert.ToString(c.Name)
+
+                : sortColumnIndex == 3 && isSortable3
+                    ? Convert.ToString(c.Address)
+
+                : sortColumnIndex == 4 && isSortable4
+                    ? Convert.ToString(c.Phone)
+
+                : sortColumnIndex == 5 && isSortable5
+                    ? Convert.ToString(c.Remarks)
+
+                : sortColumnIndex == 6 && isSortable6
+                    ? Convert.ToString(c.IsActive)
+
+                : Convert.ToString(c.Id);
+
+            var sortDirection = Convert.ToString(Request["sSortDir_0"]);
+
+            if (sortDirection.Equals(
+                "desc",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                filteredData = filteredData
+                    .OrderByDescending(orderingFunction);
             }
             else
             {
-                filteredData = getAllData;
+                filteredData = filteredData
+                    .OrderBy(orderingFunction);
             }
+
+            #endregion Sorting
+
+            #region Pagination
+
+            var totalDisplayRecords = filteredData.Count();
 
             var displayedCompanies = filteredData
                 .Skip(param.iDisplayStart)
                 .Take(param.iDisplayLength);
 
-            var result = from c in displayedCompanies
-                         select new[] 
-                 {
-                     Convert.ToString(c.Id),
-                     c.Code,
-                     c.Name,                              
-                     c.Address,                           
-                     //c.City,                              
-                     //c.PostalCode,                        
-                     c.Phone,                             
-                     //c.Mobile,                            
-                     //c.Fax,                               
-                     c.Remarks,                           
-                     c.IsActive ? "Yes" : "No"            
-                 };
+            #endregion Pagination
 
-            return Json(new
-            {
-                sEcho = param.sEcho,
-                iTotalRecords = getAllData.Count(),
-                iTotalDisplayRecords = filteredData.Count(),
-                aaData = result
-            }, JsonRequestBehavior.AllowGet);
+            #region Result
+
+            var result = from c in displayedCompanies
+                         select new[]
+                         {
+                             Convert.ToString(c.Id),
+                             Convert.ToString(c.Code),
+                             Convert.ToString(c.Name),
+                             Convert.ToString(c.Address),
+                             Convert.ToString(c.Phone),
+                             Convert.ToString(c.Remarks),
+                             c.IsActive ? "Yes" : "No"
+                         };
+
+            return Json(
+                new
+                {
+                    sEcho = param.sEcho,
+                    iTotalRecords = getAllData.Count(),
+                    iTotalDisplayRecords = totalDisplayRecords,
+                    aaData = result
+                },
+                JsonRequestBehavior.AllowGet);
+
+            #endregion Result
         }
+
+        private bool IsActiveMatches(bool companyIsActive, string searchValue)
+        {
+            if (string.IsNullOrWhiteSpace(searchValue))
+            {
+                return true;
+            }
+
+            var value = searchValue.Trim().ToLower();
+
+            if (value == "true"
+                || value == "yes"
+                || value == "active"
+                || value == "1")
+            {
+                return companyIsActive;
+            }
+
+            if (value == "false"
+                || value == "no"
+                || value == "inactive"
+                || value == "0")
+            {
+                return !companyIsActive;
+            }
+
+            return Convert.ToString(companyIsActive)
+                .ToLower()
+                .Contains(value);
+        }
+
+
 
 
         /// <summary>
@@ -179,7 +365,7 @@ namespace SymWebUI.Areas.Common.Controllers
         public ActionResult Edit(int Id)
         {
             ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
-            CompanyVM company = compRepo.SelectById(Convert.ToInt32(identity.CompanyId));
+            CompanyVM company = compRepo.SelectById(Convert.ToInt32(Id));
 
             return View(company);
         }
@@ -237,6 +423,130 @@ namespace SymWebUI.Areas.Common.Controllers
             {
             }
             return View(company);
+        }
+
+        [Authorize(Roles = "Master,Admin,Account")]
+        [HttpGet]
+        public JsonResult Delete(string ids)
+        {
+            string[] result = new string[6];
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(ids))
+                {
+                    return Json(
+                        "Fail~No company was selected for deletion.",
+                        JsonRequestBehavior.AllowGet
+                    );
+                }
+
+                string idText = ids
+                    .Split(
+                        new[] { '~' },
+                        StringSplitOptions.RemoveEmptyEntries
+                    )
+                    .FirstOrDefault();
+
+                int companyId;
+
+                if (string.IsNullOrWhiteSpace(idText) ||
+                    !int.TryParse(idText, out companyId) ||
+                    companyId <= 0)
+                {
+                    return Json(
+                        "Fail~Invalid company information.",
+                        JsonRequestBehavior.AllowGet
+                    );
+                }
+
+                ShampanIdentity currentIdentity =
+                    (ShampanIdentity)Thread.CurrentPrincipal.Identity;
+
+                CompanyVM company = new CompanyVM
+                {
+                    Id = companyId,
+
+                    LastUpdateAt =
+                        DateTime.Now.ToString("yyyyMMddHHmmss"),
+
+                    LastUpdateBy =
+                        currentIdentity.Name,
+
+                    LastUpdateFrom =
+                        currentIdentity.WorkStationIP
+                };
+
+                result = compRepo.Delete(company);
+
+                if (result == null || result.Length < 2)
+                {
+                    return Json(
+                        "Fail~Company deletion returned an invalid response.",
+                        JsonRequestBehavior.AllowGet
+                    );
+                }
+
+                string status =
+                    string.IsNullOrWhiteSpace(result[0])
+                        ? "Fail"
+                        : result[0];
+
+                string message = result[1];
+
+                if (status.Equals(
+                        "Success",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    if (string.IsNullOrWhiteSpace(message))
+                    {
+                        message = "Company deleted successfully.";
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(message) ||
+                        message.Equals(
+                            "Fail",
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        message = "Company could not be deleted.";
+                    }
+
+                    FileLogger.Log(
+                        "Status: " + status +
+                        Environment.NewLine +
+                        "Company Id: " + companyId +
+                        Environment.NewLine +
+                        "Details: " +
+                        (
+                            result.Length > 4
+                                ? result[4]
+                                : ""
+                        ),
+                        GetType().Name,
+                        "Company Delete"
+                    );
+                }
+
+                return Json(
+                    status + "~" + message,
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+            catch (Exception ex)
+            {
+                FileLogger.Log(
+                    ex.Message,
+                    GetType().Name,
+                    "Company Delete"
+                );
+
+                return Json(
+                    "Fail~An unexpected error occurred while deleting the company.",
+                    JsonRequestBehavior.AllowGet
+                );
+            }
         }
     }
 }

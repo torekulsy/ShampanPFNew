@@ -188,14 +188,7 @@
                                 @Html.ValidationMessageFor(model => model.Designation)
                             </div>
                         </div>
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 hidden">
-                            <div class="editor-label">
-                                @Html.LabelFor(model => model.Project)
-                            </div>
-                            <div class="editor-field">
-                                @Html.SimpleDropDownFor(model => model.Project, "/Config/DropDown/Project", new { @placeholder = "Project", @class = "form-control " })
-                            </div>
-                        </div>
+
                         <div class="col-12 col-sm-6 col-md-4 col-lg-3 hidden">
                             <div class="editor-label">
                                 @Html.LabelFor(model => model.Section)
@@ -241,7 +234,7 @@
                                 @Html.LabelFor(model => model.BasicSalary)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.BasicSalary, new { @class = "required NumberCheck form-control", @required = "" })
+                                @Html.TextBoxFor(model => model.BasicSalary, new { @class = "required isPositiveNumeric form-control", @required = "" })
                                 @Html.ValidationMessageFor(model => model.BasicSalary)
                             </div>
                         </div>
@@ -250,7 +243,7 @@
                                 @Html.LabelFor(model => model.GrossSalary)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.GrossSalary, new { @class = "required NumberCheck form-control", @required = "" })
+                                @Html.TextBoxFor(model => model.GrossSalary, new { @class = "required isPositiveNumeric form-control", @required = "" })
                                 @Html.ValidationMessageFor(model => model.GrossSalary)
                             </div>
                         </div>
