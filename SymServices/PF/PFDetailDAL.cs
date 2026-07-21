@@ -2676,7 +2676,7 @@ order by SectionOrderNo ";
                 cmd.Parameters.AddWithValue("@ProjectId", PId);
                 cmd.Parameters.AddWithValue("@EmployeePFValue", dtid.Rows[0]["EmployeePFValue"].ToString());
                 cmd.Parameters.AddWithValue("@EmployeerPFValue", dtid.Rows[0]["EmployeerPFValue"].ToString());
-                cmdid.Parameters.AddWithValue("@BranchId", BranchId);
+                cmd.Parameters.AddWithValue("@BranchId", BranchId);
 
 
 
