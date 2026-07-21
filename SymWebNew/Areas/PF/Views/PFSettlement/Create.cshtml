@@ -86,6 +86,7 @@
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.Code, new { @placeholder = "Code", @class = "  form-control", @readonly = "readonly" })
                         @Html.ValidationMessageFor(model => model.Code)
+                        @Html.TextBoxFor(model => model.EmployeeId, new { @placeholder = "Code", @class = "  form-control hidden", @readonly = "readonly" })
                     </div>
                 </div>
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">

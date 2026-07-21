@@ -1959,6 +1959,128 @@ namespace SymWebUI.Areas.PF.Controllers
 
                  ds = _repo.IFRSReports(vm);
                  dt = ds.Tables[0];
+
+                 CompanyRepo _CompanyRepo = new CompanyRepo();
+                 CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
+                 FiscalYearRepo fyrepo = new FiscalYearRepo();
+
+                 //vm.DateFrom = fyrepo.FYPeriodDetail(vm.MonthFrom).FirstOrDefault().PeriodName;
+                 //vm.DateTo = fyrepo.FYPeriodDetail(vm.MonthTo).FirstOrDefault().PeriodName;
+
+                 ReportHead = "";
+                 if (dt.Rows.Count > 0)
+                 {
+                     if (vm.ReportType.ToUpper() == "BS")
+                     {
+                         //ReportHead = "Balance Sheet";
+                         fileName = "rptIFRSReportBS.rpt";
+                         dt1 = ds.Tables[1];
+                         vm.DateFrom = Ordinary.StringToDate(dt1.Rows[0]["FirstEnd"].ToString());
+                         vm.YearFrom = dt1.Rows[0]["FirstYear"].ToString();
+                         if (vm.YearFrom == "1900")
+                         {
+                             vm.YearFrom = (Convert.ToInt32(dt1.Rows[0]["LastYear"]) - 1).ToString();
+                         }
+                         vm.DateTo = Ordinary.StringToDate(dt1.Rows[0]["LastEnd"].ToString());
+                         vm.YearTo = dt1.Rows[0]["LastYear"].ToString();
+
+                     }
+                     else if (vm.ReportType.ToUpper() == "IS")
+                     {
+                         //ReportHead = "Income Statement";
+                         fileName = "rptIFRSReportIS.rpt";
+                         dt1 = ds.Tables[1];
+                         string json = JsonConvert.SerializeObject(dt1);
+                         vm.PFReport1VMs = JsonConvert.DeserializeObject<List<PFReport1VM>>(json);
+                         vm.PFReport1VM = vm.PFReport1VMs.FirstOrDefault();
+                         if (vm.YearFrom == "1900" || vm.YearFrom == null)
+                         {
+                             vm.YearFrom = (Convert.ToInt32(dt1.Rows[0]["LastYear"]) - 1).ToString();
+                         }
+                         vm.DateFrom = Ordinary.StringToDate(dt1.Rows[0]["FirstEnd"].ToString());
+                         vm.DateTo = Ordinary.StringToDate(dt1.Rows[0]["LastEnd"].ToString());
+                         vm.YearTo = dt1.Rows[0]["LastYear"].ToString();
+
+                         vm.PFReport1VM.FirstNetProfit = Math.Abs(vm.PFReport1VM.FirstNetProfit);
+                         vm.PFReport1VM.LastNetProfit = Math.Abs(vm.PFReport1VM.LastNetProfit);
+                     }
+                     else if (vm.ReportType.ToUpper() == "TB" || vm.ReportType.ToUpper() == "NC")
+                     {
+                         //ReportHead = "Trial Balance";
+                         fileName = "rptIFRSReportTB.rpt";
+                         if (vm.ReportType.ToUpper() == "NC")
+                         {
+                             fileName = "rptIFRSReportNC.rpt";
+
+                         }
+
+                         dt1 = ds.Tables[1];
+                         string json = JsonConvert.SerializeObject(dt1);
+                         vm.PFReport1VMs = JsonConvert.DeserializeObject<List<PFReport1VM>>(json);
+                         vm.PFReport1VM = vm.PFReport1VMs.FirstOrDefault();
+                         vm.DateFrom = Ordinary.StringToDate(dt1.Rows[0]["FirstEnd"].ToString());
+                         vm.YearFrom = dt1.Rows[0]["FirstYear"].ToString();
+
+                         vm.DateTo = Ordinary.StringToDate(dt1.Rows[0]["LastEnd"].ToString());
+                         vm.YearTo = dt1.Rows[0]["LastYear"].ToString();
+
+                         //vm.PFReport1VM.FirstNetProfit = Math.Abs(vm.PFReport1VM.FirstNetProfit);
+                         //vm.PFReport1VM.LastNetProfit = Math.Abs(vm.PFReport1VM.LastNetProfit);
+                     }
+
+                 }
+                 dt.TableName = "dtIFRSReport";
+                 rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\" + fileName;
+
+                 doc.Load(rptLocation);
+                 doc.SetDataSource(dt);
+                 string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
+                 FormulaFieldDefinitions crFormulaF = doc.DataDefinition.FormulaFields;
+
+                 CommonFormMethod _vCommonFormMethod = new CommonFormMethod();
+                 _vCommonFormMethod.FormulaField(doc, crFormulaF, "FirstNetProfit", vm.PFReport1VM.FirstNetProfit.ToString("#,##0.00"));
+                 _vCommonFormMethod.FormulaField(doc, crFormulaF, "LastNetProfit", vm.PFReport1VM.LastNetProfit.ToString("#,##0.00"));
+
+                 _vCommonFormMethod.FormulaField(doc, crFormulaF, "ReportHeaderA4", companyLogo);
+                 //_vCommonFormMethod.FormulaField(doc, crFormulaF, "ReportHead", ReportHead);
+                 _vCommonFormMethod.FormulaField(doc, crFormulaF, "TransType", AreaTypePFVM.TransType);
+                 _vCommonFormMethod.FormulaField(doc, crFormulaF, "DateFrom", vm.DateFrom);
+                 _vCommonFormMethod.FormulaField(doc, crFormulaF, "DateTo", vm.DateTo);
+                 _vCommonFormMethod.FormulaField(doc, crFormulaF, "YearFrom", vm.YearFrom);
+                 _vCommonFormMethod.FormulaField(doc, crFormulaF, "YearTo", vm.YearTo);
+                 _vCommonFormMethod.FormulaField(doc, crFormulaF, "Address", cvm.Address);
+                 _vCommonFormMethod.FormulaField(doc, crFormulaF, "CompanyName", cvm.Name);
+                 _vCommonFormMethod.FormulaField(doc, crFormulaF, "BranchName", Session["BranchName"].ToString());
+
+
+                 var rpt = RenderReportAsPDF(doc);
+                 doc.Close();
+                 return rpt;
+             }
+             catch (Exception)
+             {
+                 throw;
+             }
+         }
+         public ActionResult IFRSReportOld(PFReportVM vm)
+         {
+
+             try
+             {
+                 PFReportRepo _repo = new PFReportRepo();
+                 string ReportHead = "";
+                 string rptLocation = "";
+                 PFReport report = new PFReport();
+                 string fileName = "rptIFRSReportTB.rpt";
+                 ReportDocument doc = new ReportDocument();
+                 DataTable dt = new DataTable();
+                 DataTable dt1 = new DataTable();
+                 DataSet ds = new DataSet();
+                 vm.TransType = AreaTypePFVM.TransType;
+                 vm.BranchId = Session["BranchId"].ToString();
+
+                 ds = _repo.IFRSReports(vm);
+                 dt = ds.Tables[0];
               
                  CompanyRepo _CompanyRepo = new CompanyRepo();
                  CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();

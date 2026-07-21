@@ -102,28 +102,25 @@
                                 "bSortable": false,
                                 "sWidth": "5%",
                                 "sClass": "center",
-                            fnRender: function (oObj) {
+                            "fnRender": function (oObj) {
     var Code = encodeURIComponent(oObj.aData[1]);
+    var result = '<input onclick="CheckAll(this)" type="checkbox" data-Id="' + oObj.aData[0] + '">';
 
-    // Admin check
-    if ('@identity.IsAdmin'.toLowerCase() == "true") {
-        if (oObj.aData[8] == "Posted") {
-            // If "Posted", show disabled Post button
-            return ''
-                + '<a title="Click on for Post" data-url="/@ViewBag.TransType/PFSettlement/Post" onclick="btnPostNew(this);" data-Post="' + oObj.aData[7] + '" data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row" style="opacity:0.45;pointer-events:none;cursor:default;"></a>'
-            + ' <a title="Journal" class="sym-btn-bank-row" href="/@ViewBag.TransType/PFSettlement/JournalEntry/?Code=' + Code + '&Id=' + oObj.aData[0] + '"></a>';
-        } else {
-            // If not posted, show enabled Post button
-            return ''
-                + '<a title="Click on for Post" data-url="/@ViewBag.TransType/PFSettlement/Post" onclick="btnPostNew(this);" data-Post="' + oObj.aData[7] + '" data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row"></a>';
-        }
+    result += '&nbsp; <a title="Click on for Report" target="_blank" href="/@ViewBag.TransType/PFSettlement/ReportView?Id=' + oObj.aData[0] + '" class="sym-btn-report-row"></a>';
+
+    if (oObj.aData[8] == "Posted" || oObj.aData[8] == true) {
+        result += '&nbsp; <a title="Click on for Post" data-url="/@ViewBag.TransType/PFSettlement/Post" onclick="btnPostNew(this);" data-Post="' + oObj.aData[7] + '" data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row" style="opacity:0.45;pointer-events:none;cursor:default;"></a>';
+    } else {
+        result += '&nbsp; <a title="Click on for Post" data-url="/@ViewBag.TransType/PFSettlement/Post" onclick="btnPostNew(this);" data-Post="' + oObj.aData[7] + '" data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row"></a>';
     }
 
-    // Always render the following buttons for all users (admin or non-admin)
-    return ''
-        + ' <input onclick="CheckAll(this)" type="checkbox" data-Id="' + oObj.aData[0] + '">'
-        + '<a title="Click on for Report" target="_blank" href="/@ViewBag.TransType/PFSettlement/ReportView?Id=' + oObj.aData[0] + '" class="sym-btn-report-row"></a>'
-       
+    if (oObj.aData[9] == "Yes" || oObj.aData[9] == true) {
+        result += '<a title="Journal" class="sym-btn-bank-row" style="opacity:0.45;pointer-events:none;cursor:default;" href="/@ViewBag.TransType/PFSettlement/JournalEntry/?Code=' + Code + '"></a>';
+    } else {
+        result += '<a title="Journal" class="sym-btn-bank-row" href="/@ViewBag.TransType/PFSettlement/JournalEntry/?Code=' + Code + '"></a>';
+    }
+
+    return result;
 }
 
                             }

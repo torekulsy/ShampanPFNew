@@ -486,11 +486,11 @@
       <DependentUpon>rptGLTransaction.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Files\ReportFiles\PF\rptIFRSReportBS.cs">
+    <Compile Include="Files\ReportFiles\PF\rptIFRSReportBS - Copy.cs">
+      <DependentUpon>rptIFRSReportBS - Copy.rpt</DependentUpon>
       <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>rptIFRSReportBS.rpt</DependentUpon>
       <SubType>Component</SubType>
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Files\ReportFiles\PF\rptIFRSReportIS.cs">
       <AutoGen>True</AutoGen>
@@ -5020,9 +5020,17 @@
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptGLTransaction.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportBS - Copy.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>rptIFRSReportBS - Copy.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportBS.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptIFRSReportBS.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportIS - Copy.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>rptIFRSReportIS - Copy.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportIS.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
@@ -5031,6 +5039,10 @@
     <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportNC.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptIFRSReportNC.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportTB - Copy.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>rptIFRSReportTB - Copy.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportTB.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>

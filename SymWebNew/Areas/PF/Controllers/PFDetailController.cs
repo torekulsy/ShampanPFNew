@@ -221,8 +221,8 @@ namespace SymWebUI.Areas.PF.Controllers
             ShampanIdentity Identit = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
             string TransType = AreaTypePFVM.TransType;
 
-            string[] conditionFields = { "pfd.EmployeeId", "pfd.FiscalYearDetailId", "pfd.BranchId", "pfd.TransType" };
-            string[] conditionValues = { EmployeeId, fydid, Session["BranchId"].ToString(), TransType };
+            string[] conditionFields = { "pfd.EmployeeId", "pfd.FiscalYearDetailId", "pfd.BranchId"};
+            string[] conditionValues = { EmployeeId, fydid, Session["BranchId"].ToString()};
 
             getAllData = _repo.SelectFiscalPeriodHeader(conditionFields, conditionValues);
 
