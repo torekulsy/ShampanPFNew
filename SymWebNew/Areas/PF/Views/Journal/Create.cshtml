@@ -20,11 +20,7 @@
 @{
     string CompanyName = System.Configuration.ConfigurationManager.AppSettings["CompanyName"];
 }
-<style>
-    .fade:not(.show) {
-        opacity: 1;
-    }
-</style>
+
 @using (Html.BeginForm("CreateEdit", "Journal", FormMethod.Post,
     new { enctype = "multipart/form-data", id = "frmJournalEntry" }))
 {
@@ -683,4 +679,12 @@ else
 </script>
 <link rel="stylesheet" href="~/Content/AdminLte/dist/css/adminlte.min.css">
 
+<style>
+    .modal.fade {
+        opacity: 1 !important;
+    }
 
+    .modal-backdrop.fade {
+        opacity: .5!important;
+    }
+</style>
