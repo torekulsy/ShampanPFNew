@@ -1095,7 +1095,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 Session["result"] = result[0] + "~" + result[1];
 
                 // Optional: Log exception details
-                // FileLogger.Log(result[0] + Environment.NewLine + result[2] + Environment.NewLine + result[5], this.GetType().Name, result[4] + Environment.NewLine + result[3]);
+                 FileLogger.Log(result[0] + Environment.NewLine + result[2] + Environment.NewLine + result[5], this.GetType().Name, result[4] + Environment.NewLine + result[3]);
 
                 return RedirectToAction("ImportExportPF");
             }
