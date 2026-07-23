@@ -748,9 +748,10 @@ ORDER BY EmployeeId;
                 {
                     foreach (DataRow dataRow in dtEmployeeDetails.Tables[0].Rows)
                     {
-
-                        decimal EmployeeProfit = Convert.ToDecimal(dataRow["EmployeeProfit"].ToString());
-                        decimal EmployerProfit = Convert.ToDecimal(dataRow["EmployerProfit"].ToString());
+                        //decimal EmployeeProfit = Convert.ToDecimal(dataRow["EmployeeProfit"].ToString()); 
+                        //decimal EmployerProfit = Convert.ToDecimal(dataRow["EmployerProfit"].ToString());
+                        decimal EmployeeProfit = Math.Round(Convert.ToDecimal(dataRow["EmployeeProfit"]), 4);
+                        decimal EmployerProfit = Math.Round(Convert.ToDecimal(dataRow["EmployerProfit"]), 4);
 
                         decimal totalProfit = Convert.ToDecimal(dataRow["TotalValue"]) * Convert.ToDecimal(preDistributionFund.TotalValue) /
                                                          Convert.ToDecimal(dtEmployeeDetails.Tables[1].Rows[0]["TotalValue"]);
