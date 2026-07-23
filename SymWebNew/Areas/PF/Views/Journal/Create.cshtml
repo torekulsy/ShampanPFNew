@@ -20,7 +20,11 @@
 @{
     string CompanyName = System.Configuration.ConfigurationManager.AppSettings["CompanyName"];
 }
-
+<style>
+    .fade:not(.show) {
+        opacity: 1;
+    }
+</style>
 @using (Html.BeginForm("CreateEdit", "Journal", FormMethod.Post,
     new { enctype = "multipart/form-data", id = "frmJournalEntry" }))
 {

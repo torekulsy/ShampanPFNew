@@ -2027,7 +2027,8 @@ AND PFSettlements.EmployeeId=@EmployeeId
             string EmployerProfitCOAID = "";
             string EmployerCOAID = "";
             string EmployeeCOAID = "";
-            string BankCOAID = "";
+            string PayableMember = "";
+            string PayableCompany = "";
 
             string Journal = @"SELECT
                                 JournalName,COAID
@@ -2039,13 +2040,30 @@ AND PFSettlements.EmployeeId=@EmployeeId
             SqlDataAdapter adapterj = new SqlDataAdapter(cmdj);
             DataTable dtj = new DataTable();
             adapterj.Fill(dtj);
+
+            string ServiceYear = @"SELECT DATEDIFF(YEAR,TRY_CONVERT(date, a.JoinDate),ISNULL(TRY_CONVERT(date, b.LeftDate), GETDATE())) - CASE 
+        WHEN DATEADD(YEAR,DATEDIFF(YEAR,TRY_CONVERT(date, a.JoinDate),ISNULL(TRY_CONVERT(date, b.LeftDate), GETDATE())),
+                TRY_CONVERT(date, a.JoinDate)) > ISNULL(TRY_CONVERT(date, b.LeftDate), GETDATE())
+        THEN 1 ELSE 0 END AS ServiceYear
+FROM ViewEmployeeInformation a
+LEFT JOIN EmployeeLeftInformation b 
+ON a.EmployeeId = b.EmployeeId
+where a.Code = @Code and b.BranchId = @BranchId";
+            SqlCommand cmd = new SqlCommand(ServiceYear, currConn, transaction);
+            cmd.Parameters.AddWithValue("@Code", TransactionCode);
+            cmd.Parameters.AddWithValue("@BranchId", BranchId);
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+
             if (dtj.Rows.Count > 0)
             {
                 EmployerCOAID = dtj.Rows[0]["COAID"].ToString();
                 EmployeeCOAID = dtj.Rows[1]["COAID"].ToString();
                 EmployeeProfitCOAID = dtj.Rows[2]["COAID"].ToString();
                 EmployerProfitCOAID = dtj.Rows[3]["COAID"].ToString();
-                BankCOAID = dtj.Rows[4]["COAID"].ToString();
+                PayableMember = dtj.Rows[4]["COAID"].ToString();
+                PayableCompany = dtj.Rows[5]["COAID"].ToString();
             }
             else
             {
@@ -2078,70 +2096,130 @@ AND PFSettlements.EmployeeId=@EmployeeId
                 DataTable dtpf = new DataTable();
                 adapterid.Fill(dtpf);
 
-                GLJournalVM vmj = new GLJournalVM
+                if (Convert.ToInt32(dt.Rows[0][0].ToString()) >= 3)
                 {
-                    Id = 1,
-                    CreatedAt = DateTime.Now.ToString(),
-                    CreatedBy = "admin",
-                    CreatedFrom = "",
-                    TransactionDate = dtpf.Rows[0]["SettlementDate"].ToString(),
-                    TransactionType = 31,
-                    JournalType = 1,
-                    TransType = "PF",
-                    TransactionValue = Convert.ToDecimal(dtpf.Rows[0]["Total"].ToString()),
-
-
-                    GLJournalDetails = new List<GLJournalDetailVM>
+                    GLJournalVM vmj = new GLJournalVM
                     {
-                         new GLJournalDetailVM
-                        {
-                            COAId =Convert.ToInt32(BankCOAID),
-                            CrAmount = Convert.ToDecimal(dtpf.Rows[0]["Total"].ToString()),
-                            IsDr = false,
-                            IsYearClosing = false,
-                            Post = false
-                        }
-                        ,
-                        new GLJournalDetailVM
-                        {                                  
-                            COAId =Convert.ToInt32(EmployeeCOAID),
-                            DrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployeeTotalContribution"].ToString()),
-                            IsDr = true,
-                            IsYearClosing = false,
-                            Post = false
-                        },
-                        new GLJournalDetailVM
-                        {                                  
-                            COAId =Convert.ToInt32(EmployerCOAID),
-                            DrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployerTotalContribution"].ToString()),
-                            IsDr = true,
-                            IsYearClosing = false,
-                            Post = false
-                        },
+                        Id = 1,
+                        CreatedAt = DateTime.Now.ToString(),
+                        CreatedBy = "admin",
+                        CreatedFrom = "",
+                        TransactionDate = dtpf.Rows[0]["SettlementDate"].ToString(),
+                        TransactionType = 31,
+                        JournalType = 1,
+                        TransType = "PF",
+                        TransactionValue = Convert.ToDecimal(dtpf.Rows[0]["Total"].ToString()),
+
+
+                        GLJournalDetails = new List<GLJournalDetailVM>
+                        {  
+                             new GLJournalDetailVM
+                            {
+                                COAId =Convert.ToInt32(PayableMember),
+                                CrAmount = (Convert.ToDecimal(dtpf.Rows[0]["Total"].ToString())/2),
+                                IsDr = false,
+                                IsYearClosing = false,
+                                Post = false
+                            },
+                              new GLJournalDetailVM
+                            {
+                                COAId =Convert.ToInt32(PayableCompany),
+                                CrAmount = (Convert.ToDecimal(dtpf.Rows[0]["Total"].ToString())/2),
+                                IsDr = false,
+                                IsYearClosing = false,
+                                Post = false
+                            },
+                            new GLJournalDetailVM
+                            {                                  
+                                COAId =Convert.ToInt32(EmployeeCOAID),
+                                DrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployeeTotalContribution"].ToString()),
+                                IsDr = true,
+                                IsYearClosing = false,
+                                Post = false
+                            },
+                            new GLJournalDetailVM
+                            {                                  
+                                COAId =Convert.ToInt32(EmployerCOAID),
+                                DrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployerTotalContribution"].ToString()),
+                                IsDr = true,
+                                IsYearClosing = false,
+                                Post = false
+                            },
                        
-                        new GLJournalDetailVM
-                        {
-                            COAId =Convert.ToInt32(EmployeeProfitCOAID),
-                            DrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployeeProfitValue"].ToString()),
-                            IsDr = true,
-                            IsYearClosing = false,
-                            Post = false
+                            new GLJournalDetailVM
+                            {
+                                COAId =Convert.ToInt32(EmployeeProfitCOAID),
+                                DrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployeeProfitValue"].ToString()),
+                                IsDr = true,
+                                IsYearClosing = false,
+                                Post = false
+                            }
+                                                    ,
+                            new GLJournalDetailVM
+                            {
+                                COAId =Convert.ToInt32(EmployerProfitCOAID),
+                                DrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployerProfitValue"].ToString()),
+                                IsDr = true,
+                                IsYearClosing = false,
+                                Post = false
+                            }
                         }
-                                                ,
-                        new GLJournalDetailVM
+                    };
+                    vmj.Code = TransactionCode;
+                    vmj.BranchId = BranchId;
+                    GLJournalDAL glJournalDal = new GLJournalDAL();
+                    retResults = glJournalDal.Insert(vmj);
+                }
+                else
+                {
+                    GLJournalVM vmj = new GLJournalVM
+                    {
+                        Id = 1,
+                        CreatedAt = DateTime.Now.ToString(),
+                        CreatedBy = "admin",
+                        CreatedFrom = "",
+                        TransactionDate = dtpf.Rows[0]["SettlementDate"].ToString(),
+                        TransactionType = 31,
+                        JournalType = 1,
+                        TransType = "PF",
+                        TransactionValue = Convert.ToDecimal(dtpf.Rows[0]["Total"].ToString()),
+
+
+                        GLJournalDetails = new List<GLJournalDetailVM>
                         {
-                            COAId =Convert.ToInt32(EmployerProfitCOAID),
-                            DrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployerProfitValue"].ToString()),
-                            IsDr = true,
-                            IsYearClosing = false,
-                            Post = false
+                             new GLJournalDetailVM
+                            {
+                                COAId =Convert.ToInt32(PayableMember),
+                                CrAmount = (Convert.ToDecimal(dtpf.Rows[0]["Total"].ToString())/2),
+                                IsDr = false,
+                                IsYearClosing = false,
+                                Post = false
+                            },
+                      
+                            new GLJournalDetailVM
+                            {                                  
+                                COAId =Convert.ToInt32(EmployeeCOAID),
+                                DrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployeeTotalContribution"].ToString()),
+                                IsDr = true,
+                                IsYearClosing = false,
+                                Post = false
+                            },                     
+                       
+                            new GLJournalDetailVM
+                            {
+                                COAId =Convert.ToInt32(EmployeeProfitCOAID),
+                                DrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployeeProfitValue"].ToString()),
+                                IsDr = true,
+                                IsYearClosing = false,
+                                Post = false
+                            }                                          
                         }
-                    }
-                };
-                vmj.Code = TransactionCode;
-                vmj.BranchId = BranchId;
-                GLJournalDAL glJournalDal = new GLJournalDAL();
-                retResults = glJournalDal.Insert(vmj);
+                    };
+                    vmj.Code = TransactionCode;
+                    vmj.BranchId = BranchId;
+                    GLJournalDAL glJournalDal = new GLJournalDAL();
+                    retResults = glJournalDal.Insert(vmj);
+                }
 
                 #region SuccessResult
                 retResults[0] = "Success";
