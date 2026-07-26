@@ -120,7 +120,7 @@
 }
 
 .sym-btn-remove-row, .sym-btn-add-row, .sym-btn-download-row, .sym-btn-investment-row, .sym-btn-payment-row, .sym-btn-back-row, .sym-btn-bank-row, .sym-btn-post-row, .sym-btn-detail-row, .sym-btn-update-row, .sym-btn-cancel-row, .sym-btn-save-row, .sym-btn-edit-row, .sym-btn-audit-row, .sym-btn-password-row .sym-btn-remove-row, .sym-btn-report-row, .sym-btn-approve-row, .sym-btn-reject-row, .sym-btn-mail-row, .sym-btn-Excel-import-row, .sym-btn-Excel-Export-row, .sym-btn-ExportImport-row, .sym-btn-remove-row-minus, .sym-btn-duplicate-row {
-    font-size: 1.3em !important;
+    font-size: 13px !important;
     font-weight: bold;
     min-height: 26px;
     display: inline-flex;
@@ -990,7 +990,7 @@ tbody tr td #lnkEdit1 {
         height: 29px!important;
     } 
     .sym-btn-add, .sym-btn-back, .sym-btn-post, .sym-btn-update, .sym-btn-cancel, .sym-btn-save, .sym-btn-edit, .sym-btn-audit, .sym-btn-password, .sym-btn-detail, .sym-btn-remove, .sym-btn-add-upload, .sym-btn-report, .sym-btn-approve, .sym-btn-reject, .sym-btn-search, .sym-btn-Excel-import, .sym-btn-Excel-Export, .sym-btn-mail, .sym-btn-ExportImport, .sym-btn-print, .sym-btn-clear, .sym-btn-duplicate, .sym-btn-file-upload, .sym-btn-search, .sym-btn-refresh, .sym-btn-file-upload, .sym-btn-bank-row {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1;
     padding: 10px 12px!important;
     height: 35px;
@@ -1001,7 +1001,13 @@ tbody tr td #lnkEdit1 {
     width: max-content;
     font-weight: 600;
 }
-
+    .modal-footer>* {
+    margin: 0!important;
+}
+    .modal-footer {
+    
+    gap: 10px;
+}
     .sym-btn-report, .sym-btn-clear, .sym-btn-cancel, .sym-btn-Excel-Export, .sym-btn-save, .sym-btn-edit {
    font-size: 14px!important;
     height: 35px!important;
