@@ -2704,6 +2704,9 @@ order by SectionOrderNo ";
                 retResults[0] = "Fail";//Success or Fail
                 retResults[1] = ex.Message; //catch ex
                 if (transaction == null) { transaction.Rollback(); }
+
+                FileLogger.Log(retResults[0] + Environment.NewLine + retResults[2] + Environment.NewLine + retResults[5], this.GetType().Name, retResults[4] + Environment.NewLine + retResults[3]);
+
                 return retResults;
             }
             #endregion
@@ -2821,6 +2824,9 @@ order by SectionOrderNo ";
                     {
                         empVM = _dalemp.ViewSelectAllEmployee(item["EmpCode"].ToString(), null, null, null, null, null, null, null, null).FirstOrDefault();
 
+                        FileLogger.Log(retResults[0] + Environment.NewLine + retResults[2] + Environment.NewLine + "No Issue for get EmployeeCode", this.GetType().Name, retResults[4] + Environment.NewLine + retResults[3]);
+
+
                         if (empVM == null)
                         {
                             throw new ArgumentNullException("Employee Code " + item["EmpCode"].ToString() + " Not in System", "Employee Code " + item["EmpCode"].ToString() + " Not in System");
@@ -2884,6 +2890,9 @@ order by SectionOrderNo ";
 
                     retResults = UpdatePFHeader(FYDVM.Id, PId, avm.BranchId, currConn, transaction, avm);
 
+                    FileLogger.Log(retResults[0] + Environment.NewLine + retResults[2] + Environment.NewLine + "No Issue for Update header", this.GetType().Name, retResults[4] + Environment.NewLine + retResults[3]);
+
+
                     //SettingDAL _settingDal = new SettingDAL();
                     //string AutoJournal = _settingDal.settingValue("PF", "AutoJournal").Trim();
                     //if (AutoJournal == "Y")
@@ -2910,7 +2919,11 @@ order by SectionOrderNo ";
                 retResults[0] = "Fail";//Success or Fail
                 retResults[4] = ex.Message.ToString(); //catch ex
                 if (Vtransaction == null) { transaction.Rollback(); }
+
+                FileLogger.Log(retResults[0] + Environment.NewLine + retResults[2] + Environment.NewLine + retResults[5], this.GetType().Name, retResults[4] + Environment.NewLine + retResults[3]);
+
                 return retResults;
+
             }
 
             finally
@@ -3134,6 +3147,8 @@ order by SectionOrderNo ";
                     throw new ArgumentNullException("No Data Found for Process", "");
                 }
 
+                FileLogger.Log(retResults[0] + Environment.NewLine + retResults[2] + Environment.NewLine + "No Issue for details save", this.GetType().Name, retResults[4] + Environment.NewLine + retResults[3]);
+
                 #endregion SqlExecution
 
                 #region SuccessResult
@@ -3150,6 +3165,8 @@ order by SectionOrderNo ";
                 retResults[0] = "Fail";//Success or Fail
                 retResults[1] = ex.Message; //catch ex
                 if (transaction == null) { transaction.Rollback(); }
+
+                FileLogger.Log(retResults[0] + Environment.NewLine + retResults[2] + Environment.NewLine + retResults[5], this.GetType().Name, retResults[4] + Environment.NewLine + retResults[3]);
                 return retResults;
             }
 
