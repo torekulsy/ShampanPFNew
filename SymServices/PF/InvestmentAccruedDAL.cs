@@ -82,6 +82,11 @@ SELECT
 ,ISNULL(I.AitInterest,0) AitInterest
 ,ISNULL(I.NetInterest,0) NetInterest
 ,I.Post
+,CASE 
+    WHEN I.Post = 0 THEN 'Unpost'
+    WHEN I.Post = 1 THEN 'Posted'
+    ELSE ''
+END AS PostStatus
 ,I.CreatedBy
 ,I.CreatedAt
 ,I.CreatedFrom
@@ -149,7 +154,8 @@ WHERE  1=1
                     vm.AccruedInterest = Convert.ToDecimal(dr["AccruedInterest"].ToString());
                     vm.AitInterest = Convert.ToDecimal(dr["AitInterest"].ToString());
                     vm.NetInterest = Convert.ToDecimal(dr["NetInterest"].ToString());
-                    vm.Post = Convert.ToBoolean(dr["Post"].ToString());
+                    vm.Post = Convert.ToInt32(dr["Post"]) == 1;
+                    vm.PostStatus = dr["PostStatus"].ToString();
 
                     vm.CreatedAt = Ordinary.StringToDate(dr["CreatedAt"].ToString());
                     vm.CreatedBy = dr["CreatedBy"].ToString();

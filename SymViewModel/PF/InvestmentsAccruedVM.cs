@@ -26,6 +26,7 @@ namespace SymViewModel.PF
         public decimal AitInterest { get; set; }
         public decimal NetInterest { get; set; }
         public bool Post { get; set; }
+        public string PostStatus { get; set; }
         public string CreatedBy { get; set; }
         public string CreatedAt { get; set; }
         public string CreatedFrom { get; set; }

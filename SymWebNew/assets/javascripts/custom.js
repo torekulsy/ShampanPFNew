@@ -691,43 +691,207 @@ function Country() {
     });
 }
 
+//function InitDropDowns() {
+//    var dropdownElements = $('select.Dropdown:not(.DropdownInited)');
+//    $.each(dropdownElements, function (index, element) {
+//        var dropdownEl = $(element);
+//        var url = dropdownEl.attr('data-url');
+//        if (!url) {
+//            alert("no url");
+//            return;
+//        }
+
+//        var selected = dropdownEl.attr('data-selected');
+//        var dataCache = dropdownEl.attr('data-cache') ? true : false;
+//        var disablePlaceholder = dropdownEl.attr('data-disable-placeholder') === 'true';
+//        var hasSelectedValue = selected && selected !== '0';
+
+//        $.ajax({
+//            url: url,
+//            type: 'GET',
+//            cache: dataCache,
+//            success: function (jsonData, textStatus, XMLHttpRequest) {
+//                var Listitems = disablePlaceholder && !hasSelectedValue
+//                    ? '<option value="" selected="selected" disabled="disabled">Select</option>'
+//                    : (disablePlaceholder ? '<option value="" disabled="disabled">Select</option>' : '<option value="">Select</option>');
+
+//                $.each(jsonData, function (i, item) {
+
+//                    if (hasSelectedValue && selected == item.Value) {
+//                        Listitems += "<option selected='selected' value='" + item.Value + "'>" + item.Text + "</option>";
+//                    }
+//                    else {
+//                        Listitems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+//                    }
+//                });
+//                dropdownEl.html(Listitems).addClass("DropdownInited");
+//            }
+//        });
+//    });
+//}
+
 function InitDropDowns() {
-    var dropdownElements = $('select.Dropdown:not(.DropdownInited)');
+
+    var dropdownElements =
+        $("select.Dropdown:not(.DropdownInited)");
+
     $.each(dropdownElements, function (index, element) {
+
         var dropdownEl = $(element);
-        var url = dropdownEl.attr('data-url');
+
+        var url = dropdownEl.attr("data-url");
+
         if (!url) {
-            alert("no url");
+            console.warn(
+                "Dropdown data URL was not found.",
+                element
+            );
+
             return;
         }
 
-        var selected = dropdownEl.attr('data-selected');
-        var dataCache = dropdownEl.attr('data-cache') ? true : false;
-        var disablePlaceholder = dropdownEl.attr('data-disable-placeholder') === 'true';
-        var hasSelectedValue = selected && selected !== '0';
+        var selected =
+            dropdownEl.attr("data-selected");
+
+        var dataCache =
+            dropdownEl.attr("data-cache") === "true";
+        var placeholderSetting =
+            dropdownEl.attr(
+                "data-disable-placeholder"
+            );
+
+        if (
+            placeholderSetting === undefined ||
+            placeholderSetting === null ||
+            placeholderSetting === ""
+        ) {
+            placeholderSetting = "true";
+            dropdownEl.attr(
+                "data-disable-placeholder",
+                "true"
+            );
+        }
+
+        var disablePlaceholder =
+            String(placeholderSetting)
+                .toLowerCase() === "true";
+
+        var hasSelectedValue =
+            selected !== undefined &&
+            selected !== null &&
+            selected !== "" &&
+            selected !== "0";
 
         $.ajax({
             url: url,
-            type: 'GET',
+            type: "GET",
             cache: dataCache,
-            success: function (jsonData, textStatus, XMLHttpRequest) {
-                var Listitems = disablePlaceholder && !hasSelectedValue
-                    ? '<option value="" selected="selected" disabled="disabled">Select</option>'
-                    : (disablePlaceholder ? '<option value="" disabled="disabled">Select</option>' : '<option value="">Select</option>');
 
-                $.each(jsonData, function (i, item) {
+            success: function (jsonData) {
 
-                    if (hasSelectedValue && selected == item.Value) {
-                        Listitems += "<option selected='selected' value='" + item.Value + "'>" + item.Text + "</option>";
+                var listItems = "";
+
+                if (disablePlaceholder) {
+                    if (!hasSelectedValue) {
+
+                        listItems =
+                            '<option value="" ' +
+                            'selected="selected" ' +
+                            'disabled="disabled">' +
+                            'Select' +
+                            "</option>";
+
+                    } else {
+                        listItems =
+                            '<option value="" ' +
+                            'disabled="disabled">' +
+                            'Select' +
+                            "</option>";
                     }
-                    else {
-                        Listitems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+
+                } else {
+                    listItems =
+                        '<option value="">' +
+                        "Select" +
+                        "</option>";
+                }
+
+                $.each(jsonData || [], function (i, item) {
+
+                    var itemValue =
+                        item.Value === null ||
+                        item.Value === undefined
+                            ? ""
+                            : String(item.Value);
+
+                    var itemText =
+                        item.Text === null ||
+                        item.Text === undefined
+                            ? ""
+                            : item.Text;
+
+                    if (
+                        hasSelectedValue &&
+                        String(selected) === itemValue
+                    ) {
+                        listItems +=
+                            '<option selected="selected" ' +
+                            'value="' +
+                            htmlEncodeDropdownValue(
+                                itemValue
+                            ) +
+                            '">' +
+                            htmlEncodeDropdownValue(
+                                itemText
+                            ) +
+                            "</option>";
+                    } else {
+                        listItems +=
+                            '<option value="' +
+                            htmlEncodeDropdownValue(
+                                itemValue
+                            ) +
+                            '">' +
+                            htmlEncodeDropdownValue(
+                                itemText
+                            ) +
+                            "</option>";
                     }
                 });
-                dropdownEl.html(Listitems).addClass("DropdownInited");
+
+                dropdownEl
+                    .html(listItems)
+                    .addClass("DropdownInited")
+                    .trigger("change");
+            },
+
+            error: function (xhr) {
+
+                dropdownEl
+                    .html(
+                        '<option value="" ' +
+                        'selected="selected" ' +
+                        'disabled="disabled">' +
+                        "Unable to load data" +
+                        "</option>"
+                    )
+                    .addClass("DropdownInited");
+
+                console.error(
+                    "Dropdown data loading failed:",
+                    url,
+                    xhr
+                );
             }
         });
     });
+}
+
+function htmlEncodeDropdownValue(value) {
+
+    return $("<div>")
+        .text(value === null ? "" : value)
+        .html();
 }
 
 function InitCascadingDropDowns() {
