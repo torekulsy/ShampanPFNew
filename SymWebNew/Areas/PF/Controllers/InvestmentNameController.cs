@@ -483,10 +483,10 @@ namespace SymWebUI.Areas.PF.Controllers
                  {
                      return Redirect("/Common/Home");
                  }
+                 string[] conditionFields = { "inv.TransType", "inv.BranchId" };
+                 string[] conditionValues = { AreaTypePFVM.TransType, Session["BranchId"].ToString() };
 
-
-
-                 dt = new PFReportRepo().InvestmentAccruedSummery();
+                 dt = new PFReportRepo().InvestmentDownload(conditionFields, conditionValues);
 
                  ExcelPackage excel = new ExcelPackage();
                  string FileName = "Investment";

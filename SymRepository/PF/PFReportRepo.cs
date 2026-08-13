@@ -475,7 +475,18 @@ namespace SymRepository.PF
                 throw ex;
             }
         }
-
+        public DataTable InvestmentDownload(string[] conditionFields, string[] conditionValues)
+        {
+            try
+            {
+                return new PFReportDAL().InvestmentDownload(conditionFields, conditionValues);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+             
           public DataTable InvestmentSummery()
         {
             try
@@ -551,6 +562,8 @@ namespace SymRepository.PF
           }
         
         #endregion        
+        
+    
         
     }
 }

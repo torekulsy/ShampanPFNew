@@ -486,30 +486,6 @@
       <DependentUpon>rptGLTransaction.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Files\ReportFiles\PF\rptIFRSReportBlank.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>rptIFRSReportBlank.rpt</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Files\ReportFiles\PF\rptIFRSReportBS2.cs">
-      <DependentUpon>rptIFRSReportBS2.rpt</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <SubType>Component</SubType>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="Files\ReportFiles\PF\rptIFRSReportBS.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>rptIFRSReportBS.rpt</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Files\ReportFiles\PF\rptIFRSReportIS2.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>rptIFRSReportIS2.rpt</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Files\ReportFiles\PF\rptIFRSReportIS.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -520,12 +496,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>rptIFRSReportNC.rpt</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Files\ReportFiles\PF\rptIFRSReportTB2.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>rptIFRSReportTB2.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Files\ReportFiles\PF\rptIFRSReportTB.cs">
@@ -5044,21 +5014,9 @@
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptGLTransaction.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportBlank.rpt">
-      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
-      <LastGenOutput>rptIFRSReportBlank.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportBS2.rpt">
-      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
-      <LastGenOutput>rptIFRSReportBS2.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportBS.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptIFRSReportBS.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportIS2.rpt">
-      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
-      <LastGenOutput>rptIFRSReportIS2.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportIS.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
@@ -5067,10 +5025,6 @@
     <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportNC.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptIFRSReportNC.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportTB2.rpt">
-      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
-      <LastGenOutput>rptIFRSReportTB2.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Files\ReportFiles\PF\rptIFRSReportTB.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
