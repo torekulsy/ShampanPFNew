@@ -88,10 +88,11 @@ namespace SymWebUI.Areas.PF.Controllers
             var result = from c in displayedCompanies
                          select new[] { 
                 Convert.ToString(c.Id)
-                , c.Name                                          
+                , c.Name  
+                , c.GroupSL.ToString()                         
                 , c.IsActive? "Active":"Inactive"
                 , c.Remarks            
-                , c.GroupSL.ToString()            
+                           
             };
             return Json(new
             {

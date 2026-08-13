@@ -154,7 +154,8 @@
                                     {
                                         var postLink = '';
                                     }
-                                    var reportLink = '&nbsp; <a id="lnkEdit1" title="Click on for Report" style="text-decoration:none;" href="/@ViewBag.TransType/PFDetail/reportVeiw/' + id + '" class=" linkReport sym-btn-report-row"></a>';
+                                    @*var reportLink = '&nbsp; <a id="lnkEdit1" title="Click on for Report" style="text-decoration:none;" href="/@ViewBag.TransType/PFDetail/reportVeiw/' + id + '" class=" linkReport sym-btn-report-row"></a>';*@
+                                    var reportLink = '&nbsp; <a title="Click on for Report" href="/@ViewBag.TransType/PFDetail/PFContributionReport?PFHeaderId=' + id + '" class="sym-btn-report-row"></a>';
 
 
 

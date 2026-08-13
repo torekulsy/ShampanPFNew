@@ -30,20 +30,30 @@
                     }
                     else
                     {
-                        <button type="button" title="Update Data" onclick="UpdateData()" class="sym-btn-update">&nbsp;Update</button>
-                        <button type="button" title="Post Data" onclick="PostData(this)" class="sym-btn-post">&nbsp;Post</button>
+                        if (!Model.Post)
+                        {
+                            <button type="button" title="Update Data" onclick="UpdateData()" class="sym-btn-update">&nbsp;Update</button>
+                        }
+                        else
+                        {
+                             <p style="color: green">Already Posted</p>
+                        }
+
+                        
+                      
+                        @*<button type="button" title="Post Data" onclick="PostData(this)" class="sym-btn-post">&nbsp;Post</button>*@
                         @*<button type="button" title="Click to view GL Transaction Report" onclick="window.open('/@ViewBag.TransType/InvestmentRenew/ReportView?id=@Model.Id')" id="" class=" sym-btn-report ">&nbsp;Report</button>*@
 
                     }
                     @if (Model.Post)
                     {
-                        <button type="button" title="Post Data" onclick="EncashData(this)" class="sym-btn-post">&nbsp;Encash</button>
-                        <button type="button" title="A Click on for Journal" onclick="window.open('/@ViewBag.TransType/Journal/Create?JournalType=1&TransactionForm=RenewInvestment&TransactionId=@Model.Id')" id="" class=" sym-btn-bank-row">&nbsp;Journal</button>
-
+                        @*<button type="button" title="Post Data" onclick="EncashData(this)" class="sym-btn-post">&nbsp;Encash</button>
+                        <button type="button" title="A Click on for Journal" onclick="window.open('/@ViewBag.TransType/Journal/Create?JournalType=1&TransactionForm=RenewInvestment&TransactionId=@Model.Id')" id="" class=" sym-btn-bank-row">&nbsp;Journal</button>*@
+                       
                     }
-                    <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/InvestmentRenew?InvestmentId=@Model.InvestmentId" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>
-                    <button type="button" title="Add New InvestmentRenew" data-url="/@ViewBag.TransType/InvestmentRenew/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>
-
+                    @*<button type="button" title="Go To Index" data-url="/@ViewBag.TransType/InvestmentRenew?InvestmentId=@Model.InvestmentId" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>
+                    <button type="button" title="Add New InvestmentRenew" data-url="/@ViewBag.TransType/InvestmentRenew/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>*@
+                    
                 </div>
                 <div class="breadcrumb-container">
                     <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
@@ -225,7 +235,231 @@
             <p>@(Model.IsEncashed ? "Encashment" : "Renew")</p>
         </div>
         <div class="InvestmentRenew card-body">
-            <div class="row">
+
+            @if(Model.Post)
+            {
+                <div class="row">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.TransactionCode)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.TransactionCode, new { @placeholder = "Auto Code", @class = "  form-control", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.TransactionCode)
+                    </div>
+                </div>
+                @*<div class="col-md-3">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.InvestmentName)
+                        </div>
+                        <div class="editor-field">
+                            @Html.SimpleDropDownFor(model => model.InvestmentNameId, "/Config/DropDown/PF_InvestmentName", new { @class = " required form-control" })
+                            @Html.ValidationMessageFor(model => model.InvestmentNameId)
+                        </div>
+                    </div>*@
+
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.ReferenceNo)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.ReferenceNo, new { @placeholder = "Reference No.", @class = "  form-control", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.ReferenceNo)
+                    </div>
+                </div>
+                @if (Model.IsEncashed == false)
+                {
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.AditionAmount)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.AditionAmount, new { @placeholder = "Adition Amount", @class = "  isPositiveNumeric form-control", @readonly = "readonly" })
+                            @Html.ValidationMessageFor(model => model.AditionAmount)
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.EncashAmount)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.EncashAmount, new { @placeholder = "Encash Amount", @class = "  isPositiveNumeric form-control", @readonly = "readonly" })
+                            @Html.ValidationMessageFor(model => model.EncashAmount)
+                        </div>
+                    </div>
+                }
+
+
+
+
+                @if (Model.IsEncashed == false)
+                {
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.FromDate)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.FromDate, new { @placeholder = "From Date", @class = " customDatePicker   form-control ", @disabled = "disabled" })
+                            @Html.ValidationMessageFor(model => model.FromDate)
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.ToDate)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.ToDate, new { @onchange = "DateChange(this);", @placeholder = "To Date", @class = "customDatePicker  form-control", @disabled = "disabled" })
+                            @Html.ValidationMessageFor(model => model.ToDate)
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.MaturityDate)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.MaturityDate, new { @placeholder = "Maturity Date", @class = " customDatePicker noBeforeDate    form-control", @disabled = "disabled" })
+                            @Html.ValidationMessageFor(model => model.MaturityDate)
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.InvestmentMonth)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.InvestmentMonth, new { @placeholder = "Investment Month", @class = "form-control isPositiveNumeric", @readonly = "readonly" })
+                            @Html.ValidationMessageFor(model => model.InvestmentMonth)
+                        </div>
+                    </div>
+                    
+  
+                }
+                
+                @if (Model.IsEncashed == false)
+                { 
+                  <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">
+                        <label>@(Model.IsEncashed ? "Encashment Date" : "Renew Date")</label>
+                   
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.InvestmentDate, new { @placeholder = "Date", @class = " customDatePicker noBeforeDate  form-control", @autocomplete = "off", @disabled = "disabled" })
+                        @Html.ValidationMessageFor(model => model.InvestmentDate)
+                    </div>
+                </div>
+                }
+                else { 
+                   <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">
+                        <label>@(Model.IsEncashed ? "Encashment Date" : "Renew Date")</label>
+                   
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.InvestmentDate, new { @placeholder = "Date", @class = " customDatePicker   form-control", @autocomplete = "off", @disabled = "disabled" })
+                        @Html.ValidationMessageFor(model => model.InvestmentDate)
+                    </div>
+                </div>
+                }
+               
+
+                @if (Model.IsEncashed == false)
+                {
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.InterestRate)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.InterestRate, new { @placeholder = "Interest Rate", @class = " cInterest   isPositiveNumeric form-control", @Id = "InterestId", @readonly = "readonly" })
+                            @Html.ValidationMessageFor(model => model.InterestRate)
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.Interest)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.Interest, new { @placeholder = "Interest Value", @class = " cInterest   isPositiveNumeric form-control", @Id = "InterestValue", @readonly = "readonly" })
+                            @Html.ValidationMessageFor(model => model.Interest)
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.AIT)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.AIT, new { @placeholder = "AIT", @class = " cInterest   isPositiveNumeric form-control", @Id = "InterestAIT", @readonly = "readonly" })
+                            @Html.ValidationMessageFor(model => model.AIT)
+                        </div>
+                    </div>
+
+                }
+
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.BankCharge)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.BankCharge, new { @placeholder = "BankCharge Value", @class = "required cBankCharge isPositiveNumeric form-control", @Id = "BankChargeId", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.BankCharge)
+                    </div>
+                </div>
+
+                @if (Model.IsEncashed == true)
+                {
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 hidden">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.BankExciseDuty)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.BankExciseDuty, new { @placeholder = "BankExciseDuty Value", @class = " cBankExciseDuty isPositiveNumeric form-control required", @Id = "BankExciseDutyId", @readonly = "readonly" })
+                            @Html.ValidationMessageFor(model => model.BankExciseDuty)
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 hidden">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.SourceTaxDeduct)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.SourceTaxDeduct, new { @placeholder = "Source Tax Deduct", @class = " cSourceTaxDeduct isPositiveNumeric form-control", @Id = "SourceTaxDeductId", @readonly = "readonly" })
+                            @Html.ValidationMessageFor(model => model.SourceTaxDeduct)
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 hidden">
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.OtherCharge)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.OtherCharge, new { @placeholder = "Othe Charge", @class = " cOtheCharge isPositiveNumeric form-control", @Id = "OtheChargeId", @readonly = "readonly" })
+                            @Html.ValidationMessageFor(model => model.OtherCharge)
+                        </div>
+                    </div>
+                }
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.InvestmentValue)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.InvestmentValue, new { @placeholder = "Investment Value", @class = " cInvestmentValue   isPositiveNumeric form-control", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.InvestmentValue)
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.Remarks)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextAreaFor(model => model.Remarks, new { @placeholder = " Remarks", @class = "  form-control", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.Remarks)
+                    </div>
+                </div>
+            </div>
+            }
+            else
+            {
+                <div class="row">
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.TransactionCode)
@@ -262,7 +496,7 @@
                             @Html.LabelFor(model => model.AditionAmount)
                         </div>
                         <div class="editor-field">
-                            @Html.TextBoxFor(model => model.AditionAmount, new { @placeholder = "Adition Amount", @class = " required NumberCheck form-control" })
+                            @Html.TextBoxFor(model => model.AditionAmount, new { @placeholder = "Adition Amount", @class = "  isPositiveNumeric form-control" })
                             @Html.ValidationMessageFor(model => model.AditionAmount)
                         </div>
                     </div>
@@ -272,7 +506,7 @@
                             @Html.LabelFor(model => model.EncashAmount)
                         </div>
                         <div class="editor-field">
-                            @Html.TextBoxFor(model => model.EncashAmount, new { @placeholder = "Encash Amount", @class = " required NumberCheck form-control" })
+                            @Html.TextBoxFor(model => model.EncashAmount, new { @placeholder = "Encash Amount", @class = "  isPositiveNumeric form-control" })
                             @Html.ValidationMessageFor(model => model.EncashAmount)
                         </div>
                     </div>
@@ -288,7 +522,7 @@
                             @Html.LabelFor(model => model.FromDate)
                         </div>
                         <div class="editor-field">
-                            @Html.TextBoxFor(model => model.FromDate, new { @placeholder = "From Date", @class = " customDatePicker  required  form-control" })
+                            @Html.TextBoxFor(model => model.FromDate, new { @placeholder = "From Date", @class = " customDatePicker FromDate required  form-control" })
                             @Html.ValidationMessageFor(model => model.FromDate)
                         </div>
                     </div>
@@ -297,7 +531,7 @@
                             @Html.LabelFor(model => model.ToDate)
                         </div>
                         <div class="editor-field">
-                            @Html.TextBoxFor(model => model.ToDate, new { @onchange = "DateChange(this);", @placeholder = "To Date", @class = "customDatePicker noBeforeDate required  form-control" })
+                            @Html.TextBoxFor(model => model.ToDate, new { @placeholder = "To Date", @class = "customDatePicker ToDate required  form-control" })
                             @Html.ValidationMessageFor(model => model.ToDate)
                         </div>
                     </div>
@@ -306,7 +540,7 @@
                             @Html.LabelFor(model => model.MaturityDate)
                         </div>
                         <div class="editor-field">
-                            @Html.TextBoxFor(model => model.MaturityDate, new { @placeholder = "Maturity Date", @class = " customDatePicker noBeforeDate required   form-control" })
+                            @Html.TextBoxFor(model => model.MaturityDate, new { @placeholder = "Maturity Date", @class = " customDatePicker MaturityDate required   form-control" })
                             @Html.ValidationMessageFor(model => model.MaturityDate)
                         </div>
                     </div>
@@ -315,7 +549,7 @@
                             @Html.LabelFor(model => model.InvestmentMonth)
                         </div>
                         <div class="editor-field">
-                            @Html.TextBoxFor(model => model.InvestmentMonth, new { @placeholder = "Investment Month", @class = "form-control NumberCheck" })
+                            @Html.TextBoxFor(model => model.InvestmentMonth, new { @placeholder = "Investment Month", @class = "form-control isPositiveNumeric" })
                             @Html.ValidationMessageFor(model => model.InvestmentMonth)
                         </div>
                     </div>
@@ -331,7 +565,7 @@
                    
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.InvestmentDate, new { @placeholder = "Date", @class = " customDatePicker noBeforeDate required form-control", @autocomplete = "off" })
+                        @Html.TextBoxFor(model => model.InvestmentDate, new { @placeholder = "Date", @class = " customDatePicker ToDate required form-control", @autocomplete = "off" })
                         @Html.ValidationMessageFor(model => model.InvestmentDate)
                     </div>
                 </div>
@@ -357,7 +591,7 @@
                             @Html.LabelFor(model => model.InterestRate)
                         </div>
                         <div class="editor-field">
-                            @Html.TextBoxFor(model => model.InterestRate, new { @placeholder = "Interest Rate", @class = " cInterest  required NumberCheck form-control", @Id = "InterestId" })
+                            @Html.TextBoxFor(model => model.InterestRate, new { @placeholder = "Interest Rate", @class = " cInterest  required isPositiveNumeric form-control", @Id = "InterestId" })
                             @Html.ValidationMessageFor(model => model.InterestRate)
                         </div>
                     </div>
@@ -367,7 +601,7 @@
                             @Html.LabelFor(model => model.Interest)
                         </div>
                         <div class="editor-field">
-                            @Html.TextBoxFor(model => model.Interest, new { @placeholder = "Interest Value", @class = " cInterest  required NumberCheck form-control", @Id = "InterestValue", @readonly = "readonly" })
+                            @Html.TextBoxFor(model => model.Interest, new { @placeholder = "Interest Value", @class = "cInterest isPositiveNumeric form-control", @Id = "InterestValue", @readonly = "readonly" })
                             @Html.ValidationMessageFor(model => model.Interest)
                         </div>
                     </div>
@@ -377,7 +611,7 @@
                             @Html.LabelFor(model => model.AIT)
                         </div>
                         <div class="editor-field">
-                            @Html.TextBoxFor(model => model.AIT, new { @placeholder = "AIT", @class = " cInterest  required NumberCheck form-control", @Id = "InterestAIT" })
+                            @Html.TextBoxFor(model => model.AIT, new { @placeholder = "AIT", @class = " cInterest  required isPositiveNumeric form-control", @Id = "InterestAIT" })
                             @Html.ValidationMessageFor(model => model.AIT)
                         </div>
                     </div>
@@ -389,7 +623,7 @@
                         @Html.LabelFor(model => model.BankCharge)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.BankCharge, new { @placeholder = "BankCharge Value", @class = " cBankCharge NumberCheck form-control", @Id = "BankChargeId" })
+                        @Html.TextBoxFor(model => model.BankCharge, new { @placeholder = "BankCharge Value", @class = "required cBankCharge isPositiveNumeric form-control", @Id = "BankChargeId" })
                         @Html.ValidationMessageFor(model => model.BankCharge)
                     </div>
                 </div>
@@ -401,7 +635,7 @@
                             @Html.LabelFor(model => model.BankExciseDuty)
                         </div>
                         <div class="editor-field">
-                            @Html.TextBoxFor(model => model.BankExciseDuty, new { @placeholder = "BankExciseDuty Value", @class = " cBankExciseDuty NumberCheck form-control", @Id = "BankExciseDutyId" })
+                            @Html.TextBoxFor(model => model.BankExciseDuty, new { @placeholder = "BankExciseDuty Value", @class = " cBankExciseDuty isPositiveNumeric form-control required", @Id = "BankExciseDutyId" })
                             @Html.ValidationMessageFor(model => model.BankExciseDuty)
                         </div>
                     </div>
@@ -410,7 +644,7 @@
                             @Html.LabelFor(model => model.SourceTaxDeduct)
                         </div>
                         <div class="editor-field">
-                            @Html.TextBoxFor(model => model.SourceTaxDeduct, new { @placeholder = "Source Tax Deduct", @class = " cSourceTaxDeduct NumberCheck form-control", @Id = "SourceTaxDeductId" })
+                            @Html.TextBoxFor(model => model.SourceTaxDeduct, new { @placeholder = "Source Tax Deduct", @class = " cSourceTaxDeduct isPositiveNumeric form-control", @Id = "SourceTaxDeductId" })
                             @Html.ValidationMessageFor(model => model.SourceTaxDeduct)
                         </div>
                     </div>
@@ -419,7 +653,7 @@
                             @Html.LabelFor(model => model.OtherCharge)
                         </div>
                         <div class="editor-field">
-                            @Html.TextBoxFor(model => model.OtherCharge, new { @placeholder = "Othe Charge", @class = " cOtheCharge NumberCheck form-control", @Id = "OtheChargeId" })
+                            @Html.TextBoxFor(model => model.OtherCharge, new { @placeholder = "Othe Charge", @class = " cOtheCharge isPositiveNumeric form-control", @Id = "OtheChargeId" })
                             @Html.ValidationMessageFor(model => model.OtherCharge)
                         </div>
                     </div>
@@ -429,7 +663,7 @@
                         @Html.LabelFor(model => model.InvestmentValue)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.InvestmentValue, new { @placeholder = "Investment Value", @class = " cInvestmentValue  required NumberCheck form-control", @readonly = "readonly" })
+                        @Html.TextBoxFor(model => model.InvestmentValue, new { @placeholder = "Investment Value", @class = "cInvestmentValue isPositiveNumeric form-control", @readonly = "readonly" })
                         @Html.ValidationMessageFor(model => model.InvestmentValue)
                     </div>
                 </div>
@@ -443,6 +677,9 @@
                     </div>
                 </div>
             </div>
+            }
+
+            
         </div>
     </div>
 
@@ -455,18 +692,21 @@
                 }
                 else
                 {
-                    <button type="button" title="Update Data" onclick="UpdateData()" class="sym-btn-update">&nbsp;Update</button>
-                    <button type="button" title="Post Data" onclick="PostData(this)" class="sym-btn-post">&nbsp;Post</button>
-                    <button type="button" title="Click to view GL Transaction Report" onclick="window.open('/@ViewBag.TransType/InvestmentRenew/ReportView?id=@Model.Id')" id="" class=" sym-btn-report ">&nbsp;Report</button>
+                    if (!Model.Post)
+                        {
+                            <button type="button" title="Update Data" onclick="UpdateData()" class="sym-btn-update">&nbsp;Update</button>
+                        }
+                    @*<button type="button" title="Post Data" onclick="PostData(this)" class="sym-btn-post">&nbsp;Post</button>*@
+                    @*<button type="button" title="Click to view GL Transaction Report" onclick="window.open('/@ViewBag.TransType/InvestmentRenew/ReportView?id=@Model.Id')" id="" class=" sym-btn-report ">&nbsp;Report</button>*@
                 }
                 @if (Model.Post)
                 {
-                    <button type="button" title="Post Data" onclick="EncashData(this)" class="sym-btn-post">&nbsp;Encash</button>
-                    <button type="button" title="A Click on for Journal" onclick="window.open('/@ViewBag.TransType/Journal/Create?JournalType=1&TransactionForm=RenewInvestment&TransactionId=@Model.Id')" id="" class=" sym-btn-bank-row">&nbsp;Journal</button>
+                    @*<button type="button" title="Post Data" onclick="EncashData(this)" class="sym-btn-post">&nbsp;Encash</button>
+                    <button type="button" title="A Click on for Journal" onclick="window.open('/@ViewBag.TransType/Journal/Create?JournalType=1&TransactionForm=RenewInvestment&TransactionId=@Model.Id')" id="" class=" sym-btn-bank-row">&nbsp;Journal</button>*@
 
                 }
-                <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/InvestmentRenew?InvestmentId=@Model.InvestmentId" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>
-                <button type="button" title="Add New InvestmentRenew" data-url="/@ViewBag.TransType/InvestmentRenew/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>
+                @*<button type="button" title="Go To Index" data-url="/@ViewBag.TransType/InvestmentRenew?InvestmentId=@Model.InvestmentId" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>
+                <button type="button" title="Add New InvestmentRenew" data-url="/@ViewBag.TransType/InvestmentRenew/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>*@
             </div>
         </div>
     </div>
@@ -572,108 +812,62 @@
     function () {
         calculateInvestment();
     });
+    $("#AditionAmount, #EncashAmount").on("input change", function () {
+        calculateInvestment();
+    });
+
+    function numericValue(selector) {
+        var value = $(selector).val();
+        var parsedValue = parseFloat(String(value == null ? "" : value).replace(/,/g, '').trim());
+        return isFinite(parsedValue) ? parsedValue : 0;
+    }
 
 
     function calculateInvestment() {
-        debugger;
-
-
-        var InvestmentValue = $("#InvestmentVm_InvestmentValue").val();
-        var InvestmentRate = $("#InvestmentVm_InvestmentRate").val();
-        var InvestmentBankCharge = $("#InvestmentVm_BankCharge").val();
-
-
-        var InvestmentMonth = $("#InvestmentVm_InvestmentMonths").val();
-        var Investment_TotalAmount = $("#InvestmentVm_TotalAmount").val();
-
-        var bankChanrge = $("#BankChargeId").val();
-        var BankExciseDutyId = $("#BankExciseDutyId").val();
-        var SourceTaxDeduct = $("#SourceTaxDeductId").val();
-        var OtheCharge = $("#OtheChargeId").val();
-        var InterestValue = $("#InterestValue").val();
-        var NewInvestmentMonth = $("#InvestmentMonth").val();
-        var InterestAIT = $("#InterestAIT").val();
-        var AditionAmount = $("#AditionAmount").val();
-        var EncashAmount = $("#EncashAmount").val();
-
-        var Interest = $("#InterestId").val();
-
-        var FromDate = $("#InvestmentVm_FromDate").val();
-        var EncashRenewDate = $("#InvestmentDate").val();
-
-
-
+        var Investment_TotalAmount = numericValue("#InvestmentVm_TotalAmount");
+        var bankChanrge = numericValue("#BankChargeId");
+        var BankExciseDutyId = numericValue("#BankExciseDutyId");
+        var SourceTaxDeduct = numericValue("#SourceTaxDeductId");
+        var OtheCharge = numericValue("#OtheChargeId");
+        var NewInvestmentMonth = numericValue("#InvestmentMonth");
+        var AditionAmount = numericValue("#AditionAmount");
+        var EncashAmount = numericValue("#EncashAmount");
+        var Interest = numericValue("#InterestId");
         var resultInterest = 0;
+        var resultAIT = 0;
         var result = 0;
-
-        //if (!bankChanrge || !InterestId || !BankExciseDutyId) {
-
-        //    return;
-        //}
-        if (isNaN(BankExciseDutyId)) {
-            BankExciseDutyId = 0;
-        }
-        if (isNaN(bankChanrge)) {
-
-            bankChanrge = 0;
-        }
-        if (isNaN(Interest)) {
-
-            Interest = 0;
-        }
-        if (isNaN(SourceTaxDeduct)) {
-
-            SourceTaxDeduct = 0;
-        }
-        if (isNaN(OtheCharge)) {
-
-            OtheCharge = 0;
-        }
-        if (isNaN(InterestValue)) {
-
-            InterestValue = 0;
-        }
-        if (isNaN(NewInvestmentMonth)) {
-
-            NewInvestmentMonth = 0;
-        }
-        if (isNaN(InterestAIT)) {
-
-            InterestAIT = 0;
-        }
 
         var urlParams = new URLSearchParams(window.location.search);
         var encash = urlParams.get('Encash');
 
 
-        var FinalTotal = (parseFloat(Investment_TotalAmount) + parseFloat(AditionAmount) - parseFloat(EncashAmount)).toFixed(2);
+        var FinalTotal = Investment_TotalAmount + AditionAmount - EncashAmount;
 
         if (encash === "F") {
 
-            resultInterest = (((((parseFloat(FinalTotal) * parseFloat(Interest)) / 100) / 12) * NewInvestmentMonth)).toFixed(2);
+            resultInterest = ((FinalTotal * Interest / 100 / 12) * NewInvestmentMonth);
 
-            resultAIT = (((parseFloat(resultInterest) * 5) / 100)).toFixed(2);
+            resultAIT = resultInterest * 5 / 100;
 
-            $("#InterestValue").val(resultInterest);
-            $("#InterestAIT").val(resultAIT);
+            $("#InterestValue").val(resultInterest.toFixed(2));
+            $("#InterestAIT").val(resultAIT.toFixed(2));
 
-            result = ((parseFloat(FinalTotal) + parseFloat(resultInterest)) - (parseFloat(bankChanrge) + parseFloat(resultAIT))).toFixed(2);
+            result = FinalTotal + resultInterest - bankChanrge - resultAIT;
 
         }
         else {
-            resultInterest = (((((parseFloat(Investment_TotalAmount) * parseFloat(Interest)) / 100) / 12))).toFixed(2);
+            resultInterest = Investment_TotalAmount * Interest / 100 / 12;
 
-            resultAIT = (((parseFloat(resultInterest) * 5) / 100)).toFixed(2);
+            resultAIT = resultInterest * 5 / 100;
 
-            $("#InterestValue").val(resultInterest);
-            $("#InterestAIT").val(resultAIT);
+            $("#InterestValue").val(resultInterest.toFixed(2));
+            $("#InterestAIT").val(resultAIT.toFixed(2));
 
-
-            result = (parseFloat(Investment_TotalAmount) - (parseFloat(bankChanrge) + parseFloat(BankExciseDutyId) + parseFloat(SourceTaxDeduct) + parseFloat(OtheCharge))).toFixed(2);
+            result = Investment_TotalAmount - bankChanrge - BankExciseDutyId - SourceTaxDeduct - OtheCharge;
 
         }
 
-        $("#InvestmentValue").val(result);
+        $("#InvestmentValue").val(result.toFixed(2));
     }
 </script>
 

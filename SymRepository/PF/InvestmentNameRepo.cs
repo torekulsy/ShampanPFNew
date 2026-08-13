@@ -9,11 +9,11 @@ namespace SymRepository.PF
     public class InvestmentNameRepo
     {
 
-        public List<InvestmentNameVM> DropDown(string TransType = "PF")
+        public List<InvestmentNameVM> DropDown(string TransType = "PF", string BranchId = null)
         {
             try
             {
-                return new InvestmentNameDAL().DropDown(TransType);
+                return new InvestmentNameDAL().DropDown(TransType, BranchId);
             }
             catch (Exception ex)
             {

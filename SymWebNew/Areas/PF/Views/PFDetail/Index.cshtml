@@ -33,9 +33,13 @@
     <div class="custom-top">
         <div id="mainBtnAll">
             <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/PFDetail/IndexFiscalPeriod" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>
-            <button type="button" title="Click to view GL Transaction Report" onclick="window.open('/@ViewBag.TransType/PFDetail/PFContributionDetailsReport?id=@ViewBag.id')" id="" class=" sym-btn-report ">&nbsp;Report</button>
+            <a title="Click to view GL Transaction Report"
+               href="/@ViewBag.TransType/PFDetail/PFContributionDetailsReport?id=@ViewBag.id"
+               target="_blank" rel="noopener" class="sym-btn-report">&nbsp;Report</a>
             <button type="button" title="Click to Download GL Transaction Report" onclick="window.open('/@ViewBag.TransType/PFDetail/PFContributionDetailsDownload?id=@ViewBag.id')" id="" class=" sym-btn-Excel-Export ">&nbsp;Download</button>
-            <button type="button" title="Click to view GL Transaction Report Summary" onclick="window.open('/@ViewBag.TransType/PFDetail/PFContributionSummarysReport?id=@ViewBag.id')" id="" class=" sym-btn-report ">&nbsp;Report(Summary)</button>
+            <a title="Click to view GL Transaction Report Summary"
+               href="/@ViewBag.TransType/PFDetail/PFContributionSummarysReport?id=@ViewBag.id"
+               target="_blank" rel="noopener" class="sym-btn-report">&nbsp;Report(Summary)</a>
         </div>
         <div class="table-search">
             <div class="mobile-search-toggle">

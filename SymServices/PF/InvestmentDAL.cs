@@ -91,6 +91,7 @@ inv.Id
 ,inv.InvestmentValue
 ,inv.Remarks
 ,inv.Post
+,ISNULL(inv.IsApprove,0) IsApprove
 ,inv.IsActive
 ,inv.IsArchive
 ,inv.CreatedBy
@@ -181,6 +182,7 @@ WHERE  1=1 AND inv.IsArchive = 0
                     vm.InvestmentRate = Convert.ToDecimal(dr["InvestmentRate"]);
                     vm.InvestmentValue = Convert.ToDecimal(dr["InvestmentValue"]);
                     vm.Post = Convert.ToBoolean(dr["Post"]);
+                    vm.IsApprove = Convert.ToBoolean(dr["IsApprove"]);
                     vm.IsJournal = Convert.ToBoolean(dr["IsJournal"]);
 
 
@@ -703,8 +705,8 @@ Id
                     cmdInsert.Parameters.AddWithValue("@FromDate", Ordinary.DateToString(vm.FromDate) ?? Convert.DBNull);
                     cmdInsert.Parameters.AddWithValue("@ToDate", Ordinary.DateToString(vm.ToDate) ?? Convert.DBNull);
                     cmdInsert.Parameters.AddWithValue("@MaturityDate", Ordinary.DateToString(vm.MaturityDate) ?? Convert.DBNull);
-                    cmdInsert.Parameters.AddWithValue("@InvestmentRate", vm.InvestmentRate);
-                    cmdInsert.Parameters.AddWithValue("@InvestmentValue", vm.InvestmentValue);
+                    cmdInsert.Parameters.AddWithValue("@InvestmentRate", vm.InvestmentRate.HasValue ? (object)vm.InvestmentRate.Value : DBNull.Value);
+                    cmdInsert.Parameters.AddWithValue("@InvestmentValue", vm.InvestmentValue.HasValue ? (object)vm.InvestmentValue.Value : DBNull.Value);
                     cmdInsert.Parameters.AddWithValue("@Post", vm.Post);
                     cmdInsert.Parameters.AddWithValue("@Remarks", vm.Remarks ?? Convert.DBNull);
                     cmdInsert.Parameters.AddWithValue("@IsActive", true);
@@ -721,6 +723,28 @@ Id
                         retResults[3] = sqlText;
                         throw new ArgumentNullException("Unexpected error to update Investments.", "");
                     }
+
+                    #region Update InvestmentNames IsArchive
+
+                    sqlText = @" UPDATE InvestmentNames SET IsArchive = 1 WHERE Id = @InvestmentNameId AND IsArchive = 0";
+
+
+                    SqlCommand cmdUpdateInvestmentName = new SqlCommand(sqlText, currConn, transaction);
+
+                    cmdUpdateInvestmentName.Parameters.AddWithValue("@InvestmentNameId", vm.InvestmentNameId);
+
+
+                    var updateResult = cmdUpdateInvestmentName.ExecuteNonQuery();
+
+                    if (updateResult <= 0)
+                    {
+                        retResults[3] = sqlText;
+                        throw new ArgumentNullException("Unexpected error to update InvestmentNames IsArchive.", "");
+                    }
+
+                    #endregion Update InvestmentNames IsArchive
+
+
                     #endregion
                     #region  Comments
                     //                    #region Detail
@@ -971,8 +995,8 @@ Id
                     cmdUpdate.Parameters.AddWithValue("@FromDate", Ordinary.DateToString(vm.FromDate) ?? Convert.DBNull);
                     cmdUpdate.Parameters.AddWithValue("@ToDate", Ordinary.DateToString(vm.ToDate) ?? Convert.DBNull);
                     cmdUpdate.Parameters.AddWithValue("@MaturityDate", Ordinary.DateToString(vm.MaturityDate) ?? Convert.DBNull);
-                    cmdUpdate.Parameters.AddWithValue("@InvestmentRate", vm.InvestmentRate);
-                    cmdUpdate.Parameters.AddWithValue("@InvestmentValue", vm.InvestmentValue);
+                    cmdUpdate.Parameters.AddWithValue("@InvestmentRate", vm.InvestmentRate.HasValue ? (object)vm.InvestmentRate.Value : DBNull.Value);
+                    cmdUpdate.Parameters.AddWithValue("@InvestmentValue", vm.InvestmentValue.HasValue ? (object)vm.InvestmentValue.Value : DBNull.Value);
                     cmdUpdate.Parameters.AddWithValue("@Post", vm.Post);
 
 
@@ -1669,12 +1693,32 @@ WHERE  1=1 AND  inv.IsArchive = 0
                 if (ids.Length >= 1)
                 {
                     #region Update Settings
-                    for (int i = 0; i < ids.Length - 1; i++)
+                    ShampanIdentity identity = (ShampanIdentity)System.Threading.Thread.CurrentPrincipal.Identity;
+                    for (int i = 0; i < ids.Length; i++)
                     {
-                        retResults = _cDal.FielApproved("Investments", "Id", ids[i], currConn, transaction);
-                        if (retResults[0].ToLower() == "fail")
+                        int investmentId;
+                        if (!Int32.TryParse(ids[i], out investmentId))
                         {
-                            throw new ArgumentNullException("Investments Post", ids[i] + " could not Post.");
+                            throw new ArgumentException("Invalid investment record.");
+                        }
+
+                        string sqlText = @"UPDATE Investments
+                                           SET IsApprove = @IsApprove,
+                                               ApprovedBy = @ApprovedBy,
+                                               ApprovedAt = @ApprovedAt
+                                           WHERE Id = @Id
+                                             AND ISNULL(IsApprove, 0) = 0";
+
+                        SqlCommand cmdApprove = new SqlCommand(sqlText, currConn, transaction);
+                        cmdApprove.Parameters.AddWithValue("@IsApprove", true);
+                        cmdApprove.Parameters.AddWithValue("@ApprovedBy", identity.FullName);
+                        cmdApprove.Parameters.AddWithValue("@ApprovedAt", DateTime.Now);
+                        cmdApprove.Parameters.AddWithValue("@Id", investmentId);
+
+                        if (cmdApprove.ExecuteNonQuery() != 1)
+                        {
+                            retResults[1] = "This investment has already been approved or was not found.";
+                            throw new InvalidOperationException(retResults[1]);
                         }
                     }
                     #endregion Update Settings

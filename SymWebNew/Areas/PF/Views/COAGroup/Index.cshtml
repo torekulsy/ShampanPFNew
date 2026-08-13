@@ -35,10 +35,11 @@
                     <input type="checkbox" class="chkAll" />Select All
                 </th>
                 <th class="center">Group   Name </th>
+                <th class="center">Serial</th>
                 @*<th>GroupType </th>*@                
                 <th class="center">Active/Inactive</th>
                 <th class="center">Remarks</th>
-                <th class="center">Serial</th>
+                
             </tr>
         </thead>
         <tbody></tbody>
@@ -101,9 +102,10 @@
                                 }
                             }
                             , { "sGroupName": "GroupName ", "sWidth": "15%" }
+                            , { "sGroupSL": "GroupSL", "sWidth": "10%" }
                             , { "sIsActive": "IsActive", "sWidth": "10%" }
                             , { "sRemarks": "Remarks", "sWidth": "20%" }
-                            , { "sGroupSL": "GroupSL", "sWidth": "10%" }
+                           
             ]
         });
         $("#footer-length").append($(".dataTables_length"));

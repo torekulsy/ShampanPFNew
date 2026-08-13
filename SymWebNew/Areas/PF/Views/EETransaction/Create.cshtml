@@ -266,7 +266,7 @@
         }
 
         function RemoveItem(sender) {
-            Ask("Are you sure to delete the item!", function () {
+            Ask("Are you sure you want to delete this data?", function () {
                 $(sender).parents("div.row:first").remove();
                     calculation();
                 ShowHide();

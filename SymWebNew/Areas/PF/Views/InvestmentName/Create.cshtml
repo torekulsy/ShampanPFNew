@@ -13,6 +13,24 @@
         width: 30px;
     }
 
+    #detail #editorItemRows4 .interest-policy-detail-row {
+        margin-bottom: 10px;
+    }
+
+    #detail #editorItemRows4 .interest-policy-detail-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .interest-policy-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    .interest-policy-actions .sym-btn-edit-row {
+        margin-left: 8px;
+    }
+
 
     /* ===========================
    Bootstrap 3 Modal Animation
@@ -141,7 +159,6 @@
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.Code, new { @placeholder = "Code", @class = " required form-control" })
-                        @Html.ValidationMessageFor(model => model.Code)
                     </div>
                 </div>
 
@@ -255,7 +272,7 @@
                                 @Html.LabelFor(model => model.InvestmentNameDetails.FirstOrDefault().FromMonth)
                             </div>
                             <div>
-                                @Html.TextBox("FromMonth", null, new { @placeholder = "From Month", @class = "  NumberCheck right drFromMonth  form-control" })
+                                @Html.TextBox("FromMonth", null, new { @placeholder = "From Month", @class = "NumberCheck right drFromMonth form-control", min = "1", max = "12", step = "1", inputmode = "numeric" })
                             
                             </div>
                         </div>
@@ -264,7 +281,7 @@
                                 @Html.LabelFor(model => model.InvestmentNameDetails.FirstOrDefault().ToMonth)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBox("ToMonth", null, new { @placeholder = "To Month", @class = "  NumberCheck right  drToMonth  form-control" })
+                                @Html.TextBox("ToMonth", null, new { @placeholder = "To Month", @class = "NumberCheck right drToMonth form-control", min = "1", max = "12", step = "1", inputmode = "numeric" })
                                 
                             </div>
                         </div>
@@ -274,7 +291,7 @@
                                 @Html.LabelFor(model => model.InvestmentNameDetails.FirstOrDefault().InterestRate)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBox("InterestRate", null, new { @placeholder = "Interest Rate", @class = " NumberCheck crInterestRate  form-control" })
+                                @Html.TextBox("InterestRate", null, new { @placeholder = "Interest Rate", @class = "NumberCheck crInterestRate form-control", min = "0", inputmode = "decimal" })
                                 
                             </div>
                         </div>
@@ -408,7 +425,7 @@
                                     </div>
                                     <div class="col-1">
                                         <div class="editor-label">
-                                            <label>Post</label>
+                                            <label>Post Status</label>
                                         </div>
                                     </div>
 
@@ -457,62 +474,117 @@
 <script>
     $('.AddRow:not(.AddRowInited)').on("click", function () {
         var container = $(this).attr('data-container');
-        AddRow(container)
+        AddRow(container);
         return false;
     }).addClass("AddRowInited");
 
+    function validatePolicyValues(fromText, toText, interestRateText, existingPeriods) {
+        fromText = $.trim(fromText || "");
+        toText = $.trim(toText || "");
+        interestRateText = $.trim(interestRateText || "");
+
+        if (fromText === "") {
+            return { error: "Please enter Accrued From month." };
+        }
+        if (toText === "") {
+            return { error: "Please enter To Month." };
+        }
+        if (interestRateText === "") {
+            return { error: "Please enter Interest Rate." };
+        }
+
+        var fromMonth = Number(fromText);
+        var toMonth = Number(toText);
+        var interestRate = Number(interestRateText);
+
+        if (!isFinite(fromMonth) || Math.floor(fromMonth) !== fromMonth || fromMonth < 1 || fromMonth > 12) {
+            return { error: "Accrued From month must be a whole number between 1 and 12." };
+        }
+        if (!isFinite(toMonth) || Math.floor(toMonth) !== toMonth || toMonth < 1 || toMonth > 12) {
+            return { error: "To Month must be a whole number between 1 and 12." };
+        }
+        if (fromMonth > toMonth) {
+            return { error: "Accrued From cannot be greater than To Month." };
+        }
+        if (!isFinite(interestRate)) {
+            return { error: "Interest Rate must be a valid number." };
+        }
+        if (interestRate < 0) {
+            return { error: "Interest Rate cannot be negative." };
+        }
+
+        for (var index = 0; index < existingPeriods.length; index++) {
+            var period = existingPeriods[index];
+            if (fromMonth <= period.toMonth && period.fromMonth <= toMonth) {
+                return { error: "This policy period duplicates or overlaps an existing period." };
+            }
+        }
+
+        return {
+            error: null,
+            fromMonth: fromMonth,
+            toMonth: toMonth,
+            interestRate: interestRate
+        };
+    }
+
+    function getPolicyPeriods() {
+        var periods = [];
+
+        $("#detail #editorItemRows4 .row.details").each(function () {
+            var fromMonth = Number($(this).find(".dFromMonth").val());
+            var toMonth = Number($(this).find(".dToMonth").val());
+
+            if (isFinite(fromMonth) && isFinite(toMonth)) {
+                periods.push({ fromMonth: fromMonth, toMonth: toMonth });
+            }
+        });
+
+        return periods;
+    }
+
+    function validateInterestPolicyRows() {
+        var periods = [];
+        var errorMessage = null;
+
+        $("#detail #editorItemRows4 .row.details").each(function (index) {
+            var validation = validatePolicyValues(
+                $(this).find(".dFromMonth").val(),
+                $(this).find(".dToMonth").val(),
+                $(this).find(".dInterestRate").val(),
+                periods
+            );
+
+            if (validation.error) {
+                errorMessage = "Interest Policy row " + (index + 1) + ": " + validation.error;
+                return false;
+            }
+
+            periods.push({ fromMonth: validation.fromMonth, toMonth: validation.toMonth });
+        });
+
+        return errorMessage;
+    }
+
     function AddRow(container) {
-        var ItemExist = 0;
         var url = '/@ViewBag.TransType/InvestmentName/BlankItem';
         var oParam = { "FromMonth": "", "ToMonth": "", "InterestRate": "", "Remarks": "", };
 
-        var FromMonth = $('.drFromMonth').val();
-        var ToMonth = $('.drToMonth').val();
+        var fromMonth = $('.drFromMonth').val();
+        var toMonth = $('.drToMonth').val();
+        var interestRate = $(".crInterestRate").val();
+        var remarks = $(".drRemarks").val();
+        var validation = validatePolicyValues(fromMonth, toMonth, interestRate, getPolicyPeriods());
 
-        var InterestRate = $(".crInterestRate").val();
-        var Remarks = $(".drRemarks").val();
-
-
-        if (InterestRate == "") {
-            ShowResult("Fail", "Please select the Item!");
+        if (validation.error) {
+            ShowResult("Fail", validation.error);
             return;
         }
 
-        //if ((debitAmount != "") && (creditAmount != "")) {
-        //    ShowResult("Fail", "Please Enter Either Debit or Credit Amount, Not Both!");
-        //    return;
-        //}
-
-
-
-
-
-        if (InterestRate == "" ) {
-            ShowResult("Fail", "Please Enter Interest Rate!");
-            return;
-        }
-        if ( InterestRate < 1) {
-            ShowResult("Fail", "Interest Rate Zero Not Allowed!");
-            return;
-        }
-
-
-        oParam.FromMonth = FromMonth;
-        oParam.ToMonth = ToMonth;
-        oParam.InterestRate = InterestRate;
-        oParam.Remarks = Remarks;
-
-
-        //$.each($("input.dAccountId"), function (i, item) {
-        //    var addedItem = $(item).val();
-        //    if (accountId == addedItem) {
-        //        ItemExist = 1;
-        //    }
-        //});
-        //if (ItemExist == "1") {
-        //    ShowResult("Fail", "This Item Already Added!");
-        //    return;
-        //}
+        oParam.FromMonth = validation.fromMonth;
+        oParam.ToMonth = validation.toMonth;
+        oParam.InterestRate = validation.interestRate;
+        oParam.Remarks = remarks;
 
         $.ajax({
             url: url,
@@ -540,7 +612,7 @@
     }
 
     function RemoveProduct(sender) {
-        Ask("Are you sure to delete the item!", function () {
+        Ask("Are you sure you want to delete this data?", function () {
             $(sender).parents("div.row:first").remove();
             //ShowHide();
         });
@@ -590,7 +662,7 @@
         var Id = $(sender).attr("data-Id").split('~')[0];
         var getURL = "/@ViewBag.TransType/InvestmentName/AccruedDelete" + "?" + "ids=" + Id;
 
-        var questionMSG = "Are you sure to Delete Data!";
+        var questionMSG = "Are you sure you want to delete this data?";
 
         singleOperation(questionMSG, getURL);
 
@@ -606,12 +678,19 @@
 
         $("#frmInvestmentName").on("submit", function (e) {
 
-            var totalRows = $("#editorItemRows4")
+            var totalRows = $("#detail #editorItemRows4")
                     .find(".dInterestRate")
                     .length;
 
             if (totalRows === 0) {
-                ShowResult("Fail", "Please add Interest Policy");
+                ShowResult("Fail", "Please add at least one Interest Policy period.");
+                e.preventDefault();
+                return false;
+            }
+
+            var validationError = validateInterestPolicyRows();
+            if (validationError) {
+                ShowResult("Fail", validationError);
                 e.preventDefault();
                 return false;
             }

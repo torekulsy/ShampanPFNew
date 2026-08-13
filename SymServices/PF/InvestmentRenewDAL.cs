@@ -79,6 +79,9 @@ inv.Id
 ,inv.BankCharge
 ,isnull(inv.BankExciseDuty,0)BankExciseDuty
 ,inv.SourceTaxDeduct,inv.OtherCharge
+,inv.AditionAmount
+,inv.EncashAmount
+,inv.InterestRate
 ,inv.Interest
 ,inv.Remarks
 ,inv.Post
@@ -92,6 +95,8 @@ inv.Id
 ,inv.LastUpdateFrom
 ,isnull(inv.IsEncashed,0)IsEncashed
 ,Inv.AIT
+,DATEDIFF(month, CONVERT(date, inv.FromDate, 112), CONVERT(date, inv.ToDate, 112))
+    + CASE WHEN DAY(CONVERT(date, inv.ToDate, 112)) >= DAY(CONVERT(date, inv.FromDate, 112)) THEN 1 ELSE 0 END AS InvestmentMonth
 
 from InvestmentRenew inv
 WHERE  1=1 AND inv.IsArchive = 0
@@ -165,6 +170,10 @@ WHERE  1=1 AND inv.IsArchive = 0
                     vm.BankExciseDuty = Convert.ToDecimal(dr["BankExciseDuty"].ToString());
                     vm.SourceTaxDeduct = Convert.ToDecimal(dr["SourceTaxDeduct"].ToString());
                     vm.OtherCharge = Convert.ToDecimal(dr["OtherCharge"].ToString());
+                    vm.AditionAmount = dr["AditionAmount"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(dr["AditionAmount"]);
+                    vm.EncashAmount = dr["EncashAmount"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(dr["EncashAmount"]);
+                    vm.InterestRate = dr["InterestRate"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(dr["InterestRate"]);
+                    vm.InvestmentMonth = dr["InvestmentMonth"].ToString();
                     vm.Interest = Convert.ToDecimal(dr["Interest"].ToString());
                     vm.AIT = Convert.ToDecimal(dr["AIT"].ToString());
 
@@ -454,7 +463,7 @@ WHERE  1=1 AND inv.IsArchive = 0
                 #region SuccessResult
                 retResults[0] = "Success";
                 retResults[1] = "Data Save Successfully.";
-                retResults[2] = vm.Id.ToString();
+                retResults[2] = vm.InvestmentId.ToString();
                 #endregion SuccessResult
             }
             #endregion try
@@ -568,6 +577,8 @@ WHERE  1=1 AND inv.IsArchive = 0
                     sqlText += " , OtherCharge=@OtherCharge";
                     sqlText += " , AditionAmount=@AditionAmount";
                     sqlText += " , EncashAmount=@EncashAmount";
+                    sqlText += " , InterestRate=@InterestRate";
+                    sqlText += " , AIT=@AIT";
 
 
 
@@ -596,8 +607,10 @@ WHERE  1=1 AND inv.IsArchive = 0
                     cmdUpdate.Parameters.AddWithValue("@TransType", vm.TransType ?? "PF");
                     cmdUpdate.Parameters.AddWithValue("@SourceTaxDeduct", vm.SourceTaxDeduct);
                     cmdUpdate.Parameters.AddWithValue("@OtherCharge", vm.OtherCharge);
-                    cmdUpdate.Parameters.AddWithValue("@AditionAmount", vm.AditionAmount);
-                    cmdUpdate.Parameters.AddWithValue("@EncashAmount", vm.EncashAmount);
+                    cmdUpdate.Parameters.AddWithValue("@AditionAmount", vm.AditionAmount.HasValue ? (object)vm.AditionAmount.Value : DBNull.Value);
+                    cmdUpdate.Parameters.AddWithValue("@EncashAmount", vm.EncashAmount.HasValue ? (object)vm.EncashAmount.Value : DBNull.Value);
+                    cmdUpdate.Parameters.AddWithValue("@InterestRate", vm.InterestRate.HasValue ? (object)vm.InterestRate.Value : DBNull.Value);
+                    cmdUpdate.Parameters.AddWithValue("@AIT", vm.AIT.HasValue ? (object)vm.AIT.Value : DBNull.Value);
 
 
                     cmdUpdate.Transaction = transaction;

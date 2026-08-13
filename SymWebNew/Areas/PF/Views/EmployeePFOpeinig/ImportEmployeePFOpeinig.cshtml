@@ -19,7 +19,7 @@
     </div>
 </div>
 
-<div class="thinbox">
+<div class="thinbox" id="EmployeePFOpeningImportExportPage">
     
     <div class="card-body">
         <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/EmployeePFOpeinig" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>
@@ -41,7 +41,7 @@
                                         <div class="editor-label">
                                             <label>File</label>
                                             </div>
-                                            <input type="file" accept=".xlsx" name="file" id="FileUpload" style="width: 100%;" class="required" />
+                                            <input type="file" accept=".xlsx" name="file" id="FileUpload" style="width: 100%;" class="required importRequired" />
                                         </div>
                              
                                 <div class="col-md-12">
@@ -135,7 +135,7 @@
                                     <label>Order By</label>
                                 </div>
                                 <div class="editor-field">
-                                    @Html.SimpleDropDown("Orderby", "/Config/DropDown/EnumOrderBy?Module=Salary", new { @class = "required form-control" })
+                                @Html.SimpleDropDown("Orderby", "/Config/DropDown/EnumOrderBy?Module=Salary", new { @class = "required exportRequired form-control" })
                                 </div>
                             </div>
                         </div>
@@ -164,10 +164,14 @@
 <script>
     $(function () {
         InitDropdownsCommon();
-        valiDation('ImportEmployeePFOpeinigExcel');
+        valiDation('EmployeePFOpeningImportExportPage');
     });
 
     $('#btnExportFormEmployee').click(function () {
+        if (!validateRequiredFields("#EmployeePFOpeningImportExportPage", ".exportRequired")) {
+            return false;
+        }
+
         //var path = window.location.href;
         //var fid = $("#FiscalPeriodDetailId").val();
         var ProjectId = $("#ProjectId").val();
@@ -195,6 +199,10 @@
     });
 
     $('#btnExportFormOpening').click(function () {
+        if (!validateRequiredFields("#EmployeePFOpeningImportExportPage", ".exportRequired")) {
+            return false;
+        }
+
         //var path = window.location.href;
         //var fid = $("#FiscalPeriodDetailId").val();
         var ProjectId = $("#ProjectId").val();
@@ -226,6 +234,9 @@
 <script>
 
     function ImportExcle() {
+        if (!validateRequiredFields("#EmployeePFOpeningImportExportPage", ".importRequired")) {
+            return false;
+        }
 
         pageSubmit('ImportEmployeePFOpeinigExcel');
 

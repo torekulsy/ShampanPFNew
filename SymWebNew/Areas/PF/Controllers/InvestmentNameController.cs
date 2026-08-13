@@ -161,6 +161,26 @@ namespace SymWebUI.Areas.PF.Controllers
             string[] result = new string[6];
             try
             {
+                if (vm == null)
+                {
+                    return new HttpStatusCodeResult(400, "Investment data is required.");
+                }
+
+
+
+                if (!ModelState.IsValid)
+                {
+                    vm.TransType = AreaTypePFVM.TransType;
+                    Session["result"] = "Fail~Please correct the Interest Policy validation errors.";
+                    return View("~/Areas/PF/Views/InvestmentName/Create.cshtml", vm);
+                }
+
+                if (string.IsNullOrWhiteSpace(vm.Operation))
+                {
+                    ModelState.AddModelError("", "Operation is required.");
+                    return View("~/Areas/PF/Views/InvestmentName/Create.cshtml", vm);
+                }
+
                 if (vm.Operation.ToLower() == "add")
                 {
                     vm.CreatedAt = DateTime.Now.ToString("yyyyMMddHHmmss");

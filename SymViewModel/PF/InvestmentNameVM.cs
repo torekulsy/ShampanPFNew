@@ -60,5 +60,7 @@ namespace SymViewModel.PF
         public string TransType { get; set; }
 
         public string BranchId { get; set; }
+
+      
     }
 }

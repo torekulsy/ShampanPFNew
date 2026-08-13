@@ -53,5 +53,8 @@ namespace SymViewModel.PF
         public string Source { get; set; }
 
         public string CashCOAId { get; set; }
+
+        [Display(Name = "Account Head")]
+        public int? EntryCOAId { get; set; }
     }
 }

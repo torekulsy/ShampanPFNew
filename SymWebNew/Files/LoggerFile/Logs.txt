@@ -1,0 +1,246 @@
+
+2026-08-10 15:36:02 +06:00
+ Source : System.NullReferenceException , Method : PFDetailController.DownloadPFDetailsExcel
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at SymServices.PF.PFDetailDAL.ExportExcelFilePF(String Filepath, String FileName, String ProjectId, String DepartmentId, String SectionId, String DesignationId, String CodeF, String CodeT, Int32 fid, String Orderby, String BranchId) in d:\ShampanPFNew\SymServices\PF\PFDetailDAL.cs:line 2411
+   at SymRepository.PF.PFDetailRepo.ExportExcelFilePF(String Filepath, String FileName, String ProjectId, String DepartmentId, String SectionId, String DesignationId, String CodeF, String CodeT, Int32 fid, String Orderby, String BranchId) in d:\ShampanPFNew\SymRepository\PF\PFDetailRepo.cs:line 128
+   at SymWebUI.Areas.PF.Controllers.PFDetailController.DownloadPFDetailsExcel(String ProjectId, String DepartmentId, String SectionId, String DesignationId, String CodeF, String CodeT, Int32 fid, Int32 ETId, String Orderby) in d:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\PFDetailController.cs:line 994
+
+2026-08-10 16:18:38 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:18:38 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:18:38 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:18:38 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:18:38 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:18:38 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:19:31 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:19:31 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:19:31 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:19:31 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:19:34 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+2026-08-10 16:20:52 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:20:52 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:20:52 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:20:52 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+2026-08-10 16:25:27 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:27 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:27 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:27 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:27 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:27 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:27 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:27 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:27 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:27 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:28 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:28 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:28 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:28 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:28 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:28 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:28 +06:00
+ Source : Success
+0
+No Issue for get EmployeeCode , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:28 +06:00
+ Source : Fail
+0
+No Issue for details save , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:39 +06:00
+ Source : Success
+0
+No Issue for Update header , Method : PFDetailDAL
+ex
+sqlText
+
+2026-08-10 16:25:39 +06:00
+ Source : Success
+0
+PFProcess , Method : PFDetailController
+ex
+sqlText

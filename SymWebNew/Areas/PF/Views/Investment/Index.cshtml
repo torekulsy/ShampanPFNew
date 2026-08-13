@@ -50,15 +50,15 @@
 
                 <th class="center">Action</th>
                 <th class="left">Reference No</th>
-                <th class="left">Transaction Code</th>
+                <th class="left">Investment Code</th>
                 <th class="left">Investment Type</th>
                 <th class="left">Investment Name</th>
                 <th class="left">Investment Date</th>
                 <th class="left">Maturity Date</th>
                 <th>Investment Value</th>
                 <th class="left">Post</th>
-                <th class="left">Approve Status</th>
-                <th class="left">Encashed</th>
+                <th class="left">Status</th>
+                @*<th class="left">Encashed</th>*@
                 @*
                     ReferenceNo
                     InvestmentType
@@ -162,7 +162,7 @@
                             }
                             , { "sName": "Post", "sWidth": "8%" }
                             , { "sName": "Approve", "sWidth": "10%" }
-                            , { "sName": "IsEncashed", "sWidth": "10%" }
+                            //, { "sName": "IsEncashed", "sWidth": "10%" }
 
             ]
         });
@@ -216,7 +216,7 @@
         //////    }
         //////    else {
         //////        var url = $(sender).attr("data-url") + "?ids=" + Id + '~';
-        //////        var questionMSG = "Are you sure to Delete Data!";
+        //////        var questionMSG = "Are you sure you want to delete this data?";
         //////        singleOperation(questionMSG, url);
         //////    }
 

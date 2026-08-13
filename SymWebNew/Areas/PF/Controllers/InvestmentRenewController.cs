@@ -126,7 +126,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 ,c.AIT.ToString()
                 , c.ReferenceNo         
                 , c.Post ? "Posted" : "Not Posted"               
-                , c.IsEncashed ? "Yes" : "No"        
+                , c.IsEncashed ? "Encashed" : "Renew"        
             };
             return Json(new
             {
@@ -168,20 +168,27 @@ namespace SymWebUI.Areas.PF.Controllers
             ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
             try
             {
+                if (!vm.BankCharge.HasValue)
+                {
+                    ModelState.AddModelError("BankCharge", "This Field is Required");
+                    Session["result"] = "Fail~Bank charge & Excise Duty is required.";
+                    return View("~/Areas/PF/Views/InvestmentRenew/Create.cshtml", vm);
+                }
+
                 if (vm.Operation.ToLower() == "add")
                 {
                     vm.CreatedAt = DateTime.Now.ToString("yyyyMMddHHmmss");
                     vm.CreatedBy = identity.Name;
                     vm.CreatedFrom = identity.WorkStationIP;
                     vm.TransType = AreaTypePFVM.TransType;
-                                    
+                                 
                     result = _repo.Insert(vm);                            
                     
                     Session["result"] = result[0] + "~" + result[1];
                     if (result[0].ToLower() == "success")
                     {
                         //return RedirectToAction("Edit", new { id = result[2] });
-                        return RedirectToAction("Index", new { id = "0" });
+                        return RedirectToAction("Index", new { investmentId = result[2] });
                     }
                     else
                     {
@@ -196,7 +203,8 @@ namespace SymWebUI.Areas.PF.Controllers
                     vm.TransType = AreaTypePFVM.TransType;
                     result = _repo.Update(vm);
                     Session["result"] = result[0] + "~" + result[1];
-                    return RedirectToAction("Edit", new { id = result[2] });
+                    //return RedirectToAction("Edit", new { id = result[2] });
+                    return RedirectToAction("Index", new { investmentId = result[2] });
                 }
                 else
                 {
@@ -215,13 +223,20 @@ namespace SymWebUI.Areas.PF.Controllers
         public ActionResult Edit(string id)
         {
             Session["permission"] = _repoSUR.SymRoleSession(identity.UserId, "10003", "edit").ToString();
-            InvestmentRenewVM vm = new InvestmentRenewVM();
-           // vm = _repo.SelectAll(Convert.ToInt32(id)).FirstOrDefault();
-            //vm.detailVMs = _repoDetail.SelectByMasterId(Convert.ToInt32(id));
-            vm.InvestmentId = Convert.ToInt32(id);
+            int renewId;
+            if (!int.TryParse(id, out renewId))
+            {
+                return RedirectToAction("Index");
+            }
+
+            InvestmentRenewVM vm = _repo.SelectAll(renewId).FirstOrDefault();
+            if (vm == null)
+            {
+                Session["result"] = "Fail~Investment renewal data was not found.";
+                return RedirectToAction("Index");
+            }
+
             InvestmentRepo investmentRepo = new InvestmentRepo();
-            //vm.TransType ="PF";
-            //vm.InvestmentVm = investmentRepo.SelectAll(vm.InvestmentId).FirstOrDefault();
             vm.InvestmentVm = investmentRepo.SelectInvstmetForRenual(vm.InvestmentId).FirstOrDefault();
 
             vm.Operation = "update";
@@ -236,6 +251,23 @@ namespace SymWebUI.Areas.PF.Controllers
         {
             Session["permission"] = _repoSUR.SymRoleSession(identity.UserId, "10010", "edit").ToString();
             string[] a = ids.Split('~');
+            int renewId;
+            if (a.Length == 0 || !int.TryParse(a[0], out renewId))
+            {
+                return Json("Invalid investment renewal.", JsonRequestBehavior.AllowGet);
+            }
+
+            InvestmentRenewVM existing = _repo.SelectAll(renewId).FirstOrDefault();
+            if (existing == null)
+            {
+                return Json("Investment renewal data was not found.", JsonRequestBehavior.AllowGet);
+            }
+
+            if (existing.Post)
+            {
+                return Json("Data already posted.", JsonRequestBehavior.AllowGet);
+            }
+
             string[] result = new string[6];
             result = _repo.Post(a);
             return Json(result[1], JsonRequestBehavior.AllowGet);

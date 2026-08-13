@@ -2210,6 +2210,8 @@ And ProjectId = @ProjectId
                     ,Project
                     ,Section
                     ,SectionOrderNo
+                    ,Designation
+                    ,DesignationOrderNo
                     ,ts.BasicAmount
                     ,ts.EmployeePFValue
                     ,ts.EmployeerPFValue
@@ -2220,6 +2222,11 @@ And ProjectId = @ProjectId
                     ,p.Name Project
                     ,st.Name Section
                     ,st.OrderNo SectionOrderNo
+                    ,case
+                        when nullif(ltrim(rtrim(dg.Name)), '') is null then ve.EmpName
+                        else ve.EmpName + ' (' + dg.Name + ')'
+                     end Designation
+                    ,isnull(dg.OrderNo, 0) DesignationOrderNo
                     ,count(ts.employeeid)TotalEmployee
                     ,sum(isnull(ts.BasicSalary,0))BasicAmount
                     ,sum(isnull(ts.EmployeePFValue,0))EmployeePFValue
@@ -2233,6 +2240,7 @@ And ProjectId = @ProjectId
                      LEFT OUTER JOIN [Project] p on ts.ProjectId = p.Id  
                      LEFT OUTER JOIN [FiscalYearDetail] fs on ts.FiscalYearDetailId = fs.Id 
                      LEFT OUTER JOIN [Designation] dg on ts.DesignationId = dg.Id
+                     LEFT OUTER JOIN ViewEmployeeInformation ve on ts.EmployeeId = ve.EmployeeId and ph.BranchId = ve.BranchId
 
                     ";
 
@@ -2256,9 +2264,9 @@ And ProjectId = @ProjectId
 
                 sqlText += @" 
 group by  ts.PFHeaderId
-,fs.PeriodName  ,p.Name  ,st.Name  ,st.OrderNo 
+,fs.PeriodName, p.Name, st.Name, st.OrderNo, ve.EmpName, dg.Name, dg.OrderNo
 ) as ts
-order by SectionOrderNo ";
+order by SectionOrderNo, DesignationOrderNo, Designation ";
 
                 SqlDataAdapter da = new SqlDataAdapter(sqlText, currConn);
                 da.SelectCommand.Transaction = transaction;
@@ -2849,14 +2857,14 @@ order by SectionOrderNo ";
                                     vm.EmployeeId = empVM.EmployeeId;
                                     if (IsContributionNotSame == "Y")
                                     {
-                                        vm.EmployeePFValue = Convert.ToInt32(item["EmployeeContribution"].ToString());
-                                        vm.EmployeerPFValue = Convert.ToInt32(item["EmployerContribution"].ToString());
+                                        vm.EmployeePFValue = Convert.ToDecimal(item["EmployeeContribution"].ToString());
+                                        vm.EmployeerPFValue = Convert.ToDecimal(item["EmployerContribution"].ToString());
                                         LoanUpdate(empVM.EmployeeId, FYDVM, currConn, transaction);
                                     }
                                     else
                                     {
-                                        vm.EmployeePFValue = Convert.ToInt32(item["Amount"].ToString());
-                                        vm.EmployeerPFValue = Convert.ToInt32(item["Amount"].ToString());
+                                        vm.EmployeePFValue = Convert.ToDecimal(item["Amount"].ToString());
+                                        vm.EmployeerPFValue = Convert.ToDecimal(item["Amount"].ToString());
                                     }
                                     vm.Post = false;
                                     vm.Remarks = "";

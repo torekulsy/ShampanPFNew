@@ -61,7 +61,7 @@
                         @Html.LabelFor(model => model.JobAgeInMonth)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.JobAgeInMonth, new { @placeholder = "Job Age In Month", @class = "required  form-control", type = "number" })
+                        @Html.TextBoxFor(model => model.JobAgeInMonth, new { @placeholder = "Job Age In Month", @class = "isPositiveNumeric required  form-control", type = "number" })
                         @Html.ValidationMessageFor(model => model.JobAgeInMonth)
                     </div>
                 </div>
@@ -70,7 +70,7 @@
                         @Html.LabelFor(model => model.EmployeeContributionRatio)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.EmployeeContributionRatio, new { @placeholder = "Employee Contribution Ratio", @class = "required   form-control", type = "number" })
+                        @Html.TextBoxFor(model => model.EmployeeContributionRatio, new { @placeholder = "Employee Contribution Ratio", @class = "isPositiveNumeric required   form-control", type = "number" })
                         @Html.ValidationMessageFor(model => model.EmployeeContributionRatio)
                     </div>
                 </div>
@@ -79,7 +79,7 @@
                         @Html.LabelFor(model => model.EmployerContributionRatio)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.EmployerContributionRatio, new { @placeholder = "Employeer Contribution Ratio", @class = " required  form-control", type = "number" })
+                        @Html.TextBoxFor(model => model.EmployerContributionRatio, new { @placeholder = "Employeer Contribution Ratio", @class = "isPositiveNumeric required  form-control", type = "number" })
                         @Html.ValidationMessageFor(model => model.EmployerContributionRatio)
                     </div>
                 </div>
@@ -89,7 +89,7 @@
                         @Html.LabelFor(model => model.EmployeeProfitRatio)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.EmployeeProfitRatio, new { @placeholder = "Employee Profit Ratio", @class = "required   form-control", type = "number" })
+                        @Html.TextBoxFor(model => model.EmployeeProfitRatio, new { @placeholder = "Employee Profit Ratio", @class = "isPositiveNumeric required   form-control", type = "number" })
                         @Html.ValidationMessageFor(model => model.EmployeeProfitRatio)
                     </div>
                 </div>
@@ -98,7 +98,7 @@
                         @Html.LabelFor(model => model.EmployerProfitRatio)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.EmployerProfitRatio, new { @placeholder = "Employer Profit Ratio", @class = " required  form-control", type = "number" })
+                        @Html.TextBoxFor(model => model.EmployerProfitRatio, new { @placeholder = "Employer Profit Ratio", @class = "isPositiveNumeric required  form-control", type = "number" })
                         @Html.ValidationMessageFor(model => model.EmployerProfitRatio)
                     </div>
                 </div>

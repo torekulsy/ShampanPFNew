@@ -17,7 +17,7 @@
         <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
     </div>
 </div>
-<div class="thinbox mt-2">
+<div class="thinbox mt-2" id="EmployeeInfoImportExportPage">
     <div class="th_thinbox">
         <p>Employee Import / Export</p>
 
@@ -28,7 +28,7 @@
             <div class="importnandexport">
                 <div class="">
                     <label>File</label>
-                    <input type="File" accept=".xlsx" name="file" id="FileUpload" class="required" />
+                    <input type="File" accept=".xlsx" name="file" id="FileUpload" class="required importRequired" />
                 </div>
                 <div class="">
                     <label>&nbsp;</label>
@@ -51,6 +51,10 @@
     </div>
 </div>
 <script>
+    $(function () {
+        valiDation('EmployeeInfoImportExportPage');
+    });
+
     function ExportExcell() {
         var questionMSG = "Are you sure you want to export data?";
         Ask(questionMSG, function () {
@@ -59,16 +63,10 @@
     }
 
     function validateUpload(formId) {
-
-        var fileInput = $("#FileUpload");
-
-        // check empty
-        if (fileInput.val() === "" || fileInput.val() === null) {
-            ShowResult("Fail","Please choose a file");
+        if (!validateRequiredFields("#EmployeeInfoImportExportPage", ".importRequired")) {
             return false;
         }
 
-        // submit form
         pageSubmit(formId);
         return true;
     }

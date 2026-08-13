@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 namespace SymServices.PF
 {
     public class InvestmentNameDAL
@@ -17,7 +18,7 @@ namespace SymServices.PF
         #endregion
         #region Methods
         //==================DropDown=================
-        public List<InvestmentNameVM> DropDown(string TransType = "PF")
+        public List<InvestmentNameVM> DropDown(string TransType = "PF", string BranchId = null)
         {
             #region Variables
             SqlConnection currConn = null;
@@ -40,11 +41,16 @@ SELECT
 Id
 ,Name
    FROM InvestmentNames
-WHERE  1=1 AND IsArchive = 0 and TransType=@TransType
+WHERE IsArchive = 0
+AND IsActive = 1
+AND TransType = @TransType
+AND BranchId = @BranchId
+ORDER BY Name
 ";
 
                 SqlCommand objComm = new SqlCommand(sqlText, currConn);
                 objComm.Parameters.AddWithValue("@TransType", TransType);
+                objComm.Parameters.AddWithValue("@BranchId", BranchId ?? string.Empty);
 
                 
                 SqlDataReader dr;
@@ -436,6 +442,7 @@ WHERE  1=1
             try
             {
                 #region Validation
+                
                 #endregion Validation
                 #region open connection and transaction
                 #region New open connection and transaction
@@ -646,6 +653,8 @@ Id
             #endregion
             try
             {
+               
+
                 #region open connection and transaction
                 #region New open connection and transaction
                 if (VcurrConn != null)
@@ -1002,9 +1011,9 @@ INSERT INTO InvestmentNameDetails (
 
                         SqlCommand cmdInsert = new SqlCommand(sqlText, currConn, transaction);
                         cmdInsert.Parameters.AddWithValue("@InvestmentNameId", InvestmentNameVM.Id);
-                        cmdInsert.Parameters.AddWithValue("@FromMonth", vm.FromMonth);
-                        cmdInsert.Parameters.AddWithValue("@ToMonth", vm.ToMonth);
-                        cmdInsert.Parameters.AddWithValue("@InterestRate", vm.InterestRate);
+                        cmdInsert.Parameters.AddWithValue("@FromMonth", vm.FromMonth.Value);
+                        cmdInsert.Parameters.AddWithValue("@ToMonth", vm.ToMonth.Value);
+                        cmdInsert.Parameters.AddWithValue("@InterestRate", vm.InterestRate.Value);
                         cmdInsert.Parameters.AddWithValue("@Remarks", string.IsNullOrEmpty(vm.Remarks) ? Convert.DBNull : vm.Remarks);
                         cmdInsert.Parameters.AddWithValue("@TransType", InvestmentNameVM.TransType ?? "PF");
 
