@@ -36,9 +36,9 @@ namespace SymViewModel.PF
         [Display(Name = "Maturity Date")]
         public string MaturityDate { get; set; }
         [Display(Name = "Interest rate (%)")]
-        public decimal InvestmentRate { get; set; }
+        public decimal? InvestmentRate { get; set; }
         [Display(Name = "Investment Value")]
-        public decimal InvestmentValue { get; set; }
+        public decimal? InvestmentValue { get; set; }
 
         [Display(Name = "Investment Name")]
         public int InvestmentNameId { get; set; }

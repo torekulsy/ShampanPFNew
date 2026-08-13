@@ -36,7 +36,15 @@
                     }
                     else
                     {
-                        <button type="button" title="Update Data" onclick="UpdateData()" class="sym-btn-update">&nbsp;Update</button>
+                        if (@Model.IsApprove == true)
+                        { 
+                             <button type="button" title="Update Data" onclick="UpdateData()" class="sym-btn-update hidden">&nbsp;Update</button>
+                        }
+                        else
+                        {
+                             <button type="button" title="Update Data" onclick="UpdateData()" class="sym-btn-update">&nbsp;Update</button>
+                        }
+                       
                         if (@identity.IsAdmin == true)
                         {
                             if (@Model.Post == false)
@@ -59,7 +67,7 @@
                     {
                         if (@Model.Post == true && @Model.IsApprove == false)
                         {
-                            <button type="button" title="Approve Data" onclick="Approve(this)" class="sym-btn-post">&nbsp;Approve</button>
+                            <button type="button" title="Approve Data" onclick="Approve(this)" class="sym-btn-post investment-approve-btn">&nbsp;Approve</button>
 
                         }
                         else
@@ -95,24 +103,65 @@
                         @Html.ValidationMessageFor(model => model.TransactionCode)
                     </div>
                 </div>
+
                 <div class="col-12 col-sm-6 col-md-5 col-lg-6 col-xl-4">
+
                     <div class="editor-label">
                         @Html.LabelFor(model => model.InvestmentName)
                     </div>
+
                     <div class="editor-field">
-                        <div style="display: flex; align-items: center; gap:5px">
-                            @Html.SimpleDropDownFor(model => model.InvestmentNameId, InvestmentNameUrl, new { @class = "vInvestmentNameId required form-control" })
-                            <button type="button" title="Load All" onclick="InvestmentNameInfoLoad()" class=" fa fa-download" style="margin-right: 0">&nbsp;</button>
-                        </div>
+
+                        @if (Model.Operation == "update")
+                        {
+                            @Html.TextBoxFor(model => model.InvestmentName, new {@class = "form-control",@readonly = "readonly"})
+
+                            @Html.HiddenFor(model => model.InvestmentNameId)
+                        }
+                        else
+                        {
+                            <div style="display: grid; align-items: center; gap: 5px; grid-template-columns: 9fr 1fr;">
+
+                                @Html.SimpleDropDownFor(model => model.InvestmentNameId,InvestmentNameUrl,new { @class = "vInvestmentNameId required form-control" })
+
+                                <button type="button"title="Load All"onclick="InvestmentNameInfoLoad()"class="fa fa-undo"style="margin-right: 0">&nbsp;</button>
+                            </div>
+                        }
+
                         @Html.ValidationMessageFor(model => model.InvestmentNameId)
+
                     </div>
+
                 </div>
                 <div class="col-12 col-sm-6 col-md-3 col-lg-3 col-xl-2">
                     <div class="editor-label">
                         @Html.LabelFor(model => model.InvestmentType)
                     </div>
+
                     <div class="editor-field">
-                        @Html.SimpleDropDownFor(model => model.InvestmentTypeId, "/Config/DropDown/PF_EnumInvestmentType", new { @readonly = "readonly", @class = " cInvestmentTypeId   form-control" })
+
+                        @if (Model.Operation == "update")
+                        {
+                            @Html.TextBoxFor(model => model.InvestmentType, new
+            {
+                @class = "form-control",
+                @readonly = "readonly"
+            })
+
+                            @Html.HiddenFor(model => model.InvestmentTypeId)
+                        }
+                        else
+                        {
+                            @Html.SimpleDropDownFor(
+                model => model.InvestmentTypeId,
+                "/Config/DropDown/PF_EnumInvestmentType",
+                new
+                {
+                    @class = "cInvestmentTypeId form-control"
+                }
+            )
+                        }
+
                     </div>
                 </div>
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
@@ -168,7 +217,7 @@
                         @Html.LabelFor(model => model.InvestmentValue)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.InvestmentValue, new { @placeholder = "Investment Value", @class = " cInvestmentValue required NumberCheck form-control" })
+                        @Html.TextBoxFor(model => model.InvestmentValue, new { @placeholder = "Investment Value", @class = " cInvestmentValue required isPositiveNumeric form-control" })
                         @Html.ValidationMessageFor(model => model.InvestmentValue)
                     </div>
                 </div>
@@ -178,7 +227,7 @@
                         @Html.LabelFor(model => model.InvestmentRate)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.InvestmentRate, new { @placeholder = "Investment Rate", @class = " required NumberCheck  form-control" })
+                        @Html.TextBoxFor(model => model.InvestmentRate, new { @placeholder = "Investment Rate", @class = " required isPositiveNumeric  form-control" })
                         @Html.ValidationMessageFor(model => model.InvestmentRate)
                     </div>
                 </div>
@@ -216,7 +265,14 @@
                     }
                     else
                     {
-                        <button type="button" title="Update Data" onclick="UpdateData()" class="sym-btn-update">&nbsp;Update</button>
+                        if (@Model.IsApprove == true)
+                        { 
+                             <button type="button" title="Update Data" onclick="UpdateData()" class="sym-btn-update hidden">&nbsp;Update</button>
+                        }
+                        else
+                        {
+                             <button type="button" title="Update Data" onclick="UpdateData()" class="sym-btn-update">&nbsp;Update</button>
+                        }
                         if (@identity.IsAdmin == true)
                         {
                             if (@Model.Post == false)
@@ -239,7 +295,7 @@
                     {
                         if (@Model.Post == true && @Model.IsApprove == false)
                         {
-                            <button type="button" title="Approve Data" onclick="Approve(this)" class="sym-btn-post">&nbsp;Approve</button>
+                            <button type="button" title="Approve Data" onclick="Approve(this)" class="sym-btn-post investment-approve-btn">&nbsp;Approve</button>
 
                         }
                         else
@@ -282,17 +338,52 @@
         var questionMSG = "Are you sure to Post Data!";
         singlePostDlete(questionMSG, url);
     }
+    var investmentApprovalInProgress = false;
+
     function Approve(sender) {
-        debugger;
         var Id = $("#Id").val();
         var Approve = $("#IsApprove").val();
-        if (Approve.toLowerCase() == 'true') {
+        if (investmentApprovalInProgress || Approve.toLowerCase() == 'true') {
             ShowResult("Fail", "Data Already Approved!");
             return;
         }
+
         var url = '/@ViewBag.TransType/Investment/Approve?ids=' + Id + '~';
         var questionMSG = "Are you sure to Approve Data!";
-        singlePostDlete(questionMSG, url);
+        Ask(questionMSG, function () {
+            investmentApprovalInProgress = true;
+            var $approveButtons = $(".investment-approve-btn");
+            $approveButtons.prop("disabled", true);
+
+            $.ajax({
+                url: url,
+                type: 'Post',
+                beforeSend: function () { $(".loading").show(); },
+                complete: function () { $(".loading").fadeOut(200).hide("slow"); },
+                success: function (result) {
+                    var resultParts = result.split("~");
+                    var status = resultParts.length > 1 ? resultParts[0] : "Success";
+                    var message = resultParts.length > 1 ? resultParts[1] : result;
+
+                    ShowResult(status, message);
+
+                    if (status.toLowerCase() == "success") {
+                        $("#IsApprove").val("true");
+                        $approveButtons.removeAttr("onclick").html("&nbsp;Approved");
+                        setTimeout(function () { location.reload(); }, 1000);
+                        return;
+                    }
+
+                    investmentApprovalInProgress = false;
+                    $approveButtons.prop("disabled", false);
+                },
+                error: function () {
+                    investmentApprovalInProgress = false;
+                    $approveButtons.prop("disabled", false);
+                    ShowResult("Fail", "Unable to approve data. Please try again.");
+                }
+            });
+        });
     }
 
     function Reject(sender) {

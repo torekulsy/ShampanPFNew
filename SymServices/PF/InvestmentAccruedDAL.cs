@@ -83,7 +83,7 @@ SELECT
 ,ISNULL(I.NetInterest,0) NetInterest
 ,I.Post
 ,CASE 
-    WHEN I.Post = 0 THEN 'Unpost'
+    WHEN I.Post = 0 THEN 'Not Posted'
     WHEN I.Post = 1 THEN 'Posted'
     ELSE ''
 END AS PostStatus

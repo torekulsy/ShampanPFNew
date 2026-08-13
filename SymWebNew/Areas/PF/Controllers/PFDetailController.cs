@@ -853,31 +853,77 @@ namespace SymWebUI.Areas.PF.Controllers
             }
         }
 
-        /// <summary>
-        /// Created: 10 Apr 2025  
-        /// Created By: Md Torekul Islam  
-        /// Generates and returns a Crystal Report PDF for Provident Fund Contribution based on selected filters.
-        /// Loads data, sets company info and logos, and renders the report as a downloadable PDF.
-        /// </summary>
-        /// <param name="vm">PFReportVM containing filter values like PFHeaderId.</param>
-        /// <returns>PDF file containing the PF Contribution report.</returns>
-        public ActionResult PFContributionReport(PFReportVM vm)
+        
+        //public ActionResult PFContributionReport(PFReportVM vm)
+        //{
+        //    try
+        //    {
+        //        // Initialize values
+        //        string reportHead = "There are no data to Preview for GL Transaction for Contribution";
+        //        string rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptPFContribution.rpt";
+        //        ReportDocument doc = new ReportDocument();
+        //        DataTable dt;
+
+        //        // Prepare filter fields and values
+        //        string[] cFields = { "PFHeaderId" };
+        //        string[] cValues = { vm.PFHeaderId.ToString() == "0" ? "" : vm.PFHeaderId.ToString() };
+
+        //        // Get data for the report
+        //        PFReport report = new PFReport();
+        //        dt = new PFReportRepo().PFContributionReport(vm, cFields, cValues);
+
+        //        if (dt.Rows.Count > 0)
+        //        {
+        //            reportHead = "Contribution GL Transactions";
+        //        }
+
+        //        dt.TableName = "dtPFContribution";
+
+        //        // Load and bind data to Crystal Report
+        //        doc.Load(rptLocation);
+        //        doc.SetDataSource(dt);
+
+        //        // Load company info and set formula fields
+        //        string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
+        //        CompanyVM cvm = new CompanyRepo().SelectAll().FirstOrDefault();
+
+        //        doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text = "'" + companyLogo + "'";
+        //        doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + reportHead + "'";
+        //        doc.DataDefinition.FormulaFields["TransType"].Text = "'" + AreaTypePFVM.TransType + "'";
+        //        doc.DataDefinition.FormulaFields["Address"].Text = "'" + cvm.Address + "'";
+        //        doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
+        //        doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
+
+        //        // Render and return the report as PDF
+        //        var rpt = RenderReportAsPDF(doc);
+        //        doc.Close();
+        //        return rpt;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+      
+        public ActionResult PFContributionReport(int PFHeaderId)
         {
             try
             {
-                // Initialize values
+                PFReportVM vm = new PFReportVM();
+                vm.PFHeaderId = PFHeaderId;
+
                 string reportHead = "There are no data to Preview for GL Transaction for Contribution";
                 string rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptPFContribution.rpt";
+
                 ReportDocument doc = new ReportDocument();
-                DataTable dt;
 
-                // Prepare filter fields and values
                 string[] cFields = { "PFHeaderId" };
-                string[] cValues = { vm.PFHeaderId.ToString() == "0" ? "" : vm.PFHeaderId.ToString() };
+                string[] cValues = { PFHeaderId.ToString() };
 
-                // Get data for the report
-                PFReport report = new PFReport();
-                dt = new PFReportRepo().PFContributionReport(vm, cFields, cValues);
+                DataTable dt = new PFReportRepo()
+                    .PFContributionReport(vm, cFields, cValues);
+
 
                 if (dt.Rows.Count > 0)
                 {
@@ -886,13 +932,17 @@ namespace SymWebUI.Areas.PF.Controllers
 
                 dt.TableName = "dtPFContribution";
 
-                // Load and bind data to Crystal Report
+
                 doc.Load(rptLocation);
                 doc.SetDataSource(dt);
 
-                // Load company info and set formula fields
+
                 string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
-                CompanyVM cvm = new CompanyRepo().SelectAll().FirstOrDefault();
+
+                CompanyVM cvm = new CompanyRepo()
+                    .SelectAll()
+                    .FirstOrDefault();
+
 
                 doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text = "'" + companyLogo + "'";
                 doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + reportHead + "'";
@@ -901,10 +951,13 @@ namespace SymWebUI.Areas.PF.Controllers
                 doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
                 doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
 
-                // Render and return the report as PDF
+
                 var rpt = RenderReportAsPDF(doc);
+
                 doc.Close();
+
                 return rpt;
+
             }
             catch (Exception)
             {
@@ -939,19 +992,15 @@ namespace SymWebUI.Areas.PF.Controllers
         /// <param name="fid">Fiscal Period ID.</param>
         /// <param name="ETId">Employee Type ID (optional).</param>
         /// <param name="Orderby">Column name for ordering the result set.</param>
-        /// <returns>Redirects to ImportExportPF view after downloading the Excel file.</returns>
+        /// <returns>The generated Excel file, or redirects to ImportExportPF when validation or export fails.</returns>
         [HttpGet]
         public ActionResult DownloadPFDetailsExcel(string ProjectId, string DepartmentId, string SectionId, string DesignationId, string CodeF, string CodeT, int fid = 0, int ETId = 0, string Orderby = null)
         {
-            // Initialize dependencies and variables
             SymUserRoleRepo _reposur = new SymUserRoleRepo();
             PFDetailRepo _repo = new PFDetailRepo();
-            DataTable dt = new DataTable();
-            string[] result = new string[6];
 
             try
             {
-                // Check if user has permission to add (Role ID "1_38")
                 var permission = _reposur.SymRoleSession(identity.UserId, "1_38", "add").ToString();
                 Session["permission"] = permission;
 
@@ -960,18 +1009,36 @@ namespace SymWebUI.Areas.PF.Controllers
                     return Redirect("/PF/Home");
                 }
 
-                // Define file information and location
+                //if (fid <= 0)
+                //{
+                //    Session["result"] = "Fail~Please select a Fiscal Period.";
+                //    return RedirectToAction("ImportExportPF");
+                //}
+
+                //if (string.IsNullOrWhiteSpace(ProjectId))
+                //{
+                //    Session["result"] = "Fail~Please select a Project.";
+                //    return RedirectToAction("ImportExportPF");
+                //}
+
+                //if (string.IsNullOrWhiteSpace(Orderby))
+                //{
+                //    Session["result"] = "Fail~Please select an Order By value.";
+                //    return RedirectToAction("ImportExportPF");
+                //}
+
+                string BranchId = Convert.ToString(Session["BranchId"]);
+                if (string.IsNullOrWhiteSpace(BranchId))
+                {
+                    Session["result"] = "Fail~Branch information was not found. Please sign in again.";
+                    return RedirectToAction("ImportExportPF");
+                }
+
                 string FileName = "DownloadPFContribution.xls";
                 string fullPath = AppDomain.CurrentDomain.BaseDirectory + "Files\\Export\\";
-                string contentType = MimeMapping.GetMimeMapping(fullPath);
-                string BranchId = Session["BranchId"].ToString();
-                // Delete existing file if already exists
-                if (System.IO.File.Exists(fullPath + FileName))
-                {
-                    System.IO.File.Delete(fullPath + FileName);
-                }
+                DataTable dt;
                 string IsContributionNotSame = new SettingDAL().settingValue("PF", "IsContributionNotSame");
-                if (IsContributionNotSame=="Y")
+                if (string.Equals(IsContributionNotSame, "Y", StringComparison.OrdinalIgnoreCase))
                 {
                     dt = _repo.ExportExcelFile_PF(fullPath, FileName, ProjectId, DepartmentId, SectionId, DesignationId, CodeF, CodeT, fid, Orderby, BranchId);
                 }
@@ -979,44 +1046,37 @@ namespace SymWebUI.Areas.PF.Controllers
                 {
                     dt = _repo.ExportExcelFilePF(fullPath, FileName, ProjectId, DepartmentId, SectionId, DesignationId, CodeF, CodeT, fid, Orderby, BranchId);
                 }
-              
-                ExcelPackage excel = new ExcelPackage();
-                var workSheet = excel.Workbook.Worksheets.Add("Contribution");
 
-                // Load datatable into Excel worksheet
-                workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
-
-                // Define filename based on fiscal period
-                string filename = "PF of" + "-" + dt.Rows[0]["Fiscal Period"].ToString();
-
-                // Write the Excel file to the response stream for download
-                using (var memoryStream = new MemoryStream())
+                if (dt == null || dt.Rows.Count == 0)
                 {
-                    Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                    Response.AddHeader("content-disposition", "attachment;  filename=" + filename + ".xlsx");
-                    excel.SaveAs(memoryStream);
-                    memoryStream.WriteTo(Response.OutputStream);
-                    Response.Flush();
-                    Response.End();
+                    Session["result"] = "Fail~No PF contribution data was found for the selected criteria.";
+                    return RedirectToAction("ImportExportPF");
                 }
 
-                // Set success status in session
-                result[0] = "Successfull";
-                result[1] = "Successful~Data Download";
-                Session["result"] = result[0] + "~" + result[1];
+                string fiscalPeriod = Convert.ToString(dt.Rows[0]["Fiscal Period"]);
+                string downloadFileName = "PF of-" + fiscalPeriod + ".xlsx";
+                byte[] fileBytes;
 
-                return RedirectToAction("ImportExportPF");
+                using (ExcelPackage excel = new ExcelPackage())
+                {
+                    var workSheet = excel.Workbook.Worksheets.Add("Contribution");
+                    workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
+                    fileBytes = excel.GetAsByteArray();
+                }
+
+                Session["result"] = "Success~Data downloaded successfully.";
+                return File(
+                    fileBytes,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    downloadFileName);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Handle and log exception, then redirect
-                Session["result"] = result[0] + "~" + result[1];
+                Session["result"] = "Fail~PF contribution download failed. Please try again.";
                 FileLogger.Log(
-                    result[0].ToString() + Environment.NewLine +
-                    result[2].ToString() + Environment.NewLine +
-                    result[5].ToString(),
-                    this.GetType().Name,
-                    result[4].ToString() + Environment.NewLine + result[3].ToString());
+                    ex.GetType().FullName,
+                    this.GetType().Name + ".DownloadPFDetailsExcel",
+                    ex.ToString());
 
                 return RedirectToAction("ImportExportPF");
             }
@@ -1053,8 +1113,30 @@ namespace SymWebUI.Areas.PF.Controllers
                     return Redirect("/Payroll/Home");
                 }
 
+                if (file == null || file.ContentLength <= 0)
+                {
+                    Session["result"] = "Fail~Please select an Excel file to upload.";
+                    return RedirectToAction("ImportExportPF");
+                }
+
+                if (FYDId <= 0 || string.IsNullOrWhiteSpace(PId))
+                {
+                    Session["result"] = "Fail~Please select Fiscal Year, Fiscal Period and Project.";
+                    return RedirectToAction("ImportExportPF");
+                }
+
+                string extension = Path.GetExtension(file.FileName);
+                if (!string.Equals(extension, ".xlsx", StringComparison.OrdinalIgnoreCase))
+                {
+                    Session["result"] = "Fail~Only .xlsx files are allowed.";
+                    return RedirectToAction("ImportExportPF");
+                }
+
                 // Define file storage path
-                string fullPath = AppDomain.CurrentDomain.BaseDirectory + "Files\\Export\\" + file.FileName;
+                string safeFileName = Path.GetFileName(file.FileName);
+                string exportDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Files", "Export");
+                Directory.CreateDirectory(exportDirectory);
+                string fullPath = Path.Combine(exportDirectory, safeFileName);
 
                 // Delete file if it already exists
                 if (System.IO.File.Exists(fullPath))
@@ -1063,10 +1145,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 }
 
                 // Save uploaded file to server
-                if (file != null && file.ContentLength > 0)
-                {
-                    file.SaveAs(fullPath);
-                }
+                file.SaveAs(fullPath);
 
                 // Set audit metadata for import
                 ShampanIdentityVM vm = new ShampanIdentityVM
@@ -1081,7 +1160,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 };
 
                 // Call repository method to import the Excel data
-                result = _repo.ImportExcelFile(fullPath, file.FileName, vm, FYDId, PId);
+                result = _repo.ImportExcelFile(fullPath, safeFileName, vm, FYDId, PId);
 
                 // Store result in session and redirect
                 Session["result"] = result[0] + "~" + result[1];
@@ -1092,13 +1171,13 @@ namespace SymWebUI.Areas.PF.Controllers
 
                 // Optionally redirect to: return RedirectToAction("OpeningBalance");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // On failure, log result and redirect to import page
-                Session["result"] = result[0] + "~" + result[1];
-
-                // Optional: Log exception details
-                 FileLogger.Log(result[0] + Environment.NewLine + result[2] + Environment.NewLine + result[5], this.GetType().Name, result[4] + Environment.NewLine + result[3]);
+                Session["result"] = "Fail~PF contribution upload failed. Please verify the Excel file and try again.";
+                FileLogger.Log(
+                    ex.GetType().FullName,
+                    this.GetType().Name + ".ImportPFDetailExcel",
+                    ex.ToString());
 
                 return RedirectToAction("ImportExportPF");
             }

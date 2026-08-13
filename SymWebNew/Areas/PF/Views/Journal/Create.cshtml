@@ -173,11 +173,10 @@
 
                     <div class="col-4">
                         <div class="editor-label">
-                            @Html.LabelFor(model => model.GLJournalDetails.FirstOrDefault().COAId)
+                            @Html.LabelFor(model => model.EntryCOAId)
                         </div>
                         <div style="font-size:14px" class="editor-field">
-                            @Html.SimpleDropDownFor(model => model.GLJournalDetails.FirstOrDefault().COAId, PF_COAUrl, new { @class = "COAId  form-control selectDropdown" })
-                            @Html.HiddenFor(model => model.GLJournalDetails.FirstOrDefault().COAId)
+                            @Html.SimpleDropDownFor(model => model.EntryCOAId, PF_COAUrl, new { @class = "COAId form-control selectDropdown" })
                             @Html.HiddenFor(model => model.CashCOAId)
                         </div>
                     </div>
@@ -455,7 +454,7 @@ else
     }
 
     function RemoveProduct(sender) {
-        Ask("Are you sure to delete the item!", function () {
+        Ask("Are you sure you want to delete this data?", function () {
             $(sender).parents("div.row:first").remove();
             calculation();
             ShowHide();

@@ -99,7 +99,8 @@ namespace SymWebUI.Areas.Config.Controllers
         }
         public JsonResult PF_InvestmentName(string TransType = "PF")
         {
-            return Json(new SelectList(new InvestmentNameRepo().DropDown(TransType), "Id", "Name"), JsonRequestBehavior.AllowGet);
+            string branchId = Convert.ToString(Session["BranchId"]);
+            return Json(new SelectList(new InvestmentNameRepo().DropDown(TransType, branchId), "Id", "Name"), JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult PF_TransactionMedia()

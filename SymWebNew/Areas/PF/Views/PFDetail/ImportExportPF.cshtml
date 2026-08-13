@@ -19,7 +19,7 @@
     </div>
 </div>
 
-<div class="thinbox">
+<div class="thinbox" id="ImportExportPFPage">
     
     <div class="card-body">
         <div class="row">
@@ -37,7 +37,7 @@
 
                                 <div class="editor-field">
                                     @*<div>@Html.TextBox("fYear", @Session["SessionYear"].ToString(), new { @class = "fiscalyearCom form-control" }) </div>*@
-                                    @Html.SimpleDropDown("FiscalYear", "/Config/DropDown/DropDownYear", new { @class = " fiscalyearCom required form-control selectDropdown" })
+                                    @Html.SimpleDropDown("FiscalYear", "/Config/DropDown/DropDownYear", new { @class = "fiscalyearCom required importRequired exportRequired form-control selectDropdown" })
                                 </div>
                             </div>
                             <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
@@ -47,7 +47,7 @@
 
                                 <div class="editor-field">
                                     <div>
-                                        @Html.SimpleDropDown("FiscalPeriodDetailId", "/Config/DropDown/DropDownPeriodByFYear?year=" + @Session["SessionYear"].ToString(), new { @class = "required fpDetailsCom form-control" })
+                                        @Html.SimpleDropDown("FiscalPeriodDetailId", "/Config/DropDown/DropDownPeriodByFYear?year=" + @Session["SessionYear"].ToString(), new { @class = "required importRequired exportRequired fpDetailsCom form-control" })
                                     </div>
                                 </div>
                             </div>
@@ -57,7 +57,7 @@
                                 </div>
                                 <div class="editor-field">
                                     <div>
-                                        @Html.SimpleDropDown("ProjectId", "/Config/DropDown/Project", new { @Id = "ProjectId", @class = "required sectionsCom form-control " })
+                                        @Html.SimpleDropDown("ProjectId", "/Config/DropDown/Project", new { @Id = "ProjectId", @class = "required importRequired exportRequired sectionsCom form-control" })
                                     </div>
                                 </div>
                             </div>
@@ -150,20 +150,20 @@
                                 </div>
                             </div>*@
 
-                            <div class="col-sm-4 col-md-6 col-lg-6 col-xl-4">
+                            @*<div class="col-sm-4 col-md-6 col-lg-6 col-xl-4">
                                 <div class="editor-label">
                                     <label>@Session["ProjectLabel"]</label>
                                 </div>
                                 <div class="editor-field">
                                     @Html.SimpleDropDown("ProjectId", "/Config/DropDown/Project", new { @class = "projectsCom form-control" })
                                 </div>
-                            </div>
+                            </div>*@
                             <div class="col-sm-4 col-md-6 col-lg-6 col-xl-4">
                                 <div class="editor-label">
                                     <label>Order By</label>
                                 </div>
                                 <div class="editor-field">
-                                    @Html.SimpleDropDown("Orderby", "/Config/DropDown/EnumOrderBy?Module=Salary", new { @class = "required form-control" })
+                                    @Html.SimpleDropDown("Orderby", "/Config/DropDown/EnumOrderBy?Module=Salary", new { @class = "required exportRequired form-control" })
                                 </div>
                             </div>
 
@@ -193,7 +193,7 @@
 
                                 <div class="col-8 col-sm-8 col-md-6">
                                     <label>File</label>
-                                    <input type="file" accept=".xlsx" name="file" id="FileUpload" style="width: 100%;" class="required" />
+                                    <input type="file" accept=".xlsx" name="file" id="FileUpload" style="width: 100%;" class="required importRequired" />
 
                                 </div>
                                 <div class="col-4 col-sm-4 col-md-6">
@@ -217,47 +217,60 @@
 <script>
     $(function () {
         InitDropdownsCommon();
-        valiDation('ImportPFDetailExcel');
+        loadFiscalPeriods();
+
+        $('#FiscalYear').on('change.pfImportExport', function () {
+            loadFiscalPeriods();
+        });
+
+        valiDation('ImportExportPFPage');
     });
+
+    function loadFiscalPeriods() {
+        var fiscalYear = $('#FiscalYear').val();
+        var $fiscalPeriod = $('#FiscalPeriodDetailId');
+
+        $fiscalPeriod.html("<option value=''>Select</option>");
+
+        if (!fiscalYear) {
+            return;
+        }
+
+        $.getJSON('/Config/DropDown/DropDownPeriodByFYear', { year: fiscalYear })
+            .done(function (data) {
+                var options = "<option value=''>Select</option>";
+
+                $.each(data, function (index, item) {
+                    options += '<option value="' + item.Value + '">' + item.Text + '</option>';
+                });
+
+                $fiscalPeriod.html(options).trigger('change');
+            })
+            .fail(function () {
+                ShowResult('Fail', 'Fiscal Period data could not be loaded.');
+            });
+    }
+
     $('#btnSearch').click(function () {
-        //var path = window.location.href;
-        var fid = $("#FiscalPeriodDetailId").val();
-        var ProjectId = $("#ProjectId").val();
-        var DepartmentId = $("#DepartmentId").val();
-        var SectionId = $("#SectionId").val();
-        var DesignationId = $("#DesignationId").val();
-        var CodeF = $("#CodeF").val();
-        var CodeT = $("#CodeT").val();
-        var ETId = $("#EarningTypeId").val();
-        var Orderby = $("#Orderby").val();
-
-        if (fid == "") {
-            ShowResult('Fail', "Please Select Fiscal year");
-            return;
-        }
-        if (ProjectId == "") {
-            ShowResult('Fail', "Please Select Project Id");
-            return;
-        }
-        //if (ETId == "") {
-        //    ShowResult('Fail', "Please Select  Earning Type!");
-        //    return false;
-        //}
-
-        if (Orderby == "") {
-            ShowResult('Fail', "Please Select Order By ");
+        var requiredDownloadFields = '#FiscalYear, #FiscalPeriodDetailId, #ProjectId, #Orderby';
+        if (!validateRequiredFields("#ImportExportPFPage", requiredDownloadFields)) {
             return false;
         }
 
-        window.location = '@Url.Action("DownloadPFDetailsExcel", "PFDetail")' + '?fid=' + fid
-                  + '&ProjectId=' + ProjectId
-                  + '&DepartmentId=' + DepartmentId
-                  + '&SectionId=' + SectionId
-                  + '&DesignationId=' + DesignationId
-                  + '&CodeF=' + CodeF
-                  + '&CodeT=' + CodeT
-                  + '&ETId=' + ETId
-                  + '&Orderby=' + Orderby
+        var downloadParameters = {
+            fid: $('#FiscalPeriodDetailId').val(),
+            ProjectId: $('#ProjectId').val() || '',
+            DepartmentId: $('#DepartmentId').val() || '',
+            SectionId: $('#SectionId').val() || '',
+            DesignationId: $('#DesignationId').val() || '',
+            CodeF: $('#CodeF').val() || '',
+            CodeT: $('#CodeT').val() || '',
+            ETId: $('#EarningTypeId').val() || 0,
+            Orderby: $('#Orderby').val() || ''
+        };
+
+        window.location.href = '@Url.Action("DownloadPFDetailsExcel", "PFDetail")' + '?' + $.param(downloadParameters);
+        return false;
     });
 </script>
 
@@ -265,17 +278,22 @@
 
     function ImportOtherEarning() {
         debugger;
+        var requiredImportFields = '#FiscalYear, #FiscalPeriodDetailId, #ProjectId, #FileUpload';
+        if (!validateRequiredFields("#ImportExportPFPage", requiredImportFields)) {
+            return false;
+        }
+
         var FiscalYearDetailId = $('#FiscalPeriodDetailId').val();
         var ProjectId = $('#ProjectId').val();
 
-        if (FiscalYearDetailId == "") {
-            ShowResult('Fail', "Please Select Fiscal year");
-            return;
-        }
-        if (ProjectId == "") {
-            ShowResult('Fail', "Please Select Project Id");
-            return;
-        }
+        //if (FiscalYearDetailId == "") {
+        //    ShowResult('Fail', "Please Select Fiscal year");
+        //    return;
+        //}
+        //if (ProjectId == "") {
+        //    ShowResult('Fail', "Please Select Project Id");
+        //    return;
+        //}
         $('#FYDId').val(FiscalYearDetailId);
         $('#PId').val(ProjectId);
 

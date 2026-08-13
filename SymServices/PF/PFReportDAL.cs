@@ -8987,6 +8987,7 @@ order by FiscalYear,  y.TransType,case when COASL='9999' then 'D' when COASL='88
                   Left Outer Join EnumInvestmentTypes it on it.Id=n.InvestmentTypeId
                   Left Outer Join BankNames b on b.Id=n.BankNameId
                  left outer join FiscalYearDetail fd on ia.FiscalYearDetailId=fd.Id
+                 WHERE  1=1 AND n.IsArchive = 0
                  order by n.Code";
 
                 SqlDataAdapter da = new SqlDataAdapter(sqlText, currConn);

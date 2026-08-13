@@ -134,7 +134,7 @@ namespace SymWebUI.Areas.PF.Controllers
           , c.InvestmentValue.ToString()
           , c.Post ? "Posted" : "Not Posted"               
           , c.IsEncashed ? "Encashed" : "Not Encashed"
-          , c.IsJournal ? "Yes" : "No"
+          //, c.IsJournal ? "Yes" : "No"
      
       };
             return Json(new
@@ -188,7 +188,8 @@ namespace SymWebUI.Areas.PF.Controllers
                     Session["result"] = result[0] + "~" + result[1];
                     if (result[0].ToLower() == "success")
                     {
-                        return RedirectToAction("Edit", new { id = result[2] });
+                        //return RedirectToAction("Edit", new { id = result[2] });
+                        return RedirectToAction("Index");
                     }
                     else
                     {
@@ -902,19 +903,42 @@ namespace SymWebUI.Areas.PF.Controllers
         public JsonResult Approve(string ids)
         {
             Session["permission"] = _repoSUR.SymRoleSession(identity.UserId, "10010", "edit").ToString();
-            string[] a = ids.Split('~');
-
-            InvestmentVM vm = _repo.SelectAll(Convert.ToInt32(a[0])).FirstOrDefault();
-            if (vm.IsApprove)
+            if (Session["permission"].ToString() == "False")
             {
-                return Json("Already Posted", JsonRequestBehavior.AllowGet);
-
+                return Json("Fail~You do not have permission to approve this data.", JsonRequestBehavior.AllowGet);
             }
 
-            string[] result = new string[6];
-            result = _repo.Approve(a);
+            string[] approvalIds = (ids ?? string.Empty)
+                .Split(new[] { '~' }, StringSplitOptions.RemoveEmptyEntries);
 
-            return Json(result[1], JsonRequestBehavior.AllowGet);
+            if (approvalIds.Length == 0)
+            {
+                return Json("Fail~No investment record was selected.", JsonRequestBehavior.AllowGet);
+            }
+
+            foreach (string approvalId in approvalIds)
+            {
+                int investmentId;
+                if (!Int32.TryParse(approvalId, out investmentId))
+                {
+                    return Json("Fail~Invalid investment record.", JsonRequestBehavior.AllowGet);
+                }
+
+                InvestmentVM vm = _repo.SelectAll(investmentId).FirstOrDefault();
+                if (vm == null)
+                {
+                    return Json("Fail~Investment record was not found.", JsonRequestBehavior.AllowGet);
+                }
+
+                if (vm.IsApprove)
+                {
+                    return Json("Fail~This investment has already been approved.", JsonRequestBehavior.AllowGet);
+                }
+            }
+
+            string[] result = _repo.Approve(approvalIds);
+
+            return Json(result[0] + "~" + result[1], JsonRequestBehavior.AllowGet);
         }
 
         [Authorize(Roles = "Admin")]

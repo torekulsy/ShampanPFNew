@@ -4,7 +4,7 @@
 @{
     Layout = null;
 }
-<div class="row details">
+<div class="row details interest-policy-detail-row">
     @using (Html.BeginCollectionItem("InvestmentNameDetails"))
     {
 
@@ -14,18 +14,18 @@
 
     <div class="col-2 offset-xl-1">
         <div class="editor-field">
-            @Html.TextBoxFor(model => model.FromMonth, new { @placeholder = "From Month", @class = " dFromMonth form-control NumberCheck", @readonly = "readonly" })
+            @Html.TextBoxFor(model => model.FromMonth, new { @placeholder = "From Month", @class = "required dFromMonth form-control NumberCheck", @readonly = "readonly", min = "1", max = "12", step = "1" })
         </div>
     </div>
     <div class="col-2">
         <div class="editor-field">
-            @Html.TextBoxFor(model => model.ToMonth, new { @placeholder = "To Month", @class = "dToMonth form-control NumberCheck", @readonly = "readonly" })
+            @Html.TextBoxFor(model => model.ToMonth, new { @placeholder = "To Month", @class = "required dToMonth form-control NumberCheck", @readonly = "readonly", min = "1", max = "12", step = "1" })
         </div>
     </div>
 
     <div class="col-2">
         <div class="editor-field">
-            @Html.TextBoxFor(model => model.InterestRate, new { @class = " right dInterestRate  form-control NumberCheck", @readonly = "readonly" })
+            @Html.TextBoxFor(model => model.InterestRate, new { @class = "required right dInterestRate form-control NumberCheck", @readonly = "readonly", min = "0" })
         </div>
     </div>
     <div class="col-2">
@@ -33,9 +33,9 @@
             @Html.TextAreaFor(model => model.Remarks, new { @placeholder = "Remarks", @rows = "1", @class = "  form-control" })
         </div>
     </div>
-         <div class="col-2">
-        <a id="" onclick="RemoveProduct(this);" title="Delete" class="sym-btn-remove-row "></a>&nbsp;
-        <a id="" onclick="EditProduct(this);" title="Edit" class="sym-btn-edit-row"></a>
+    <div class="col-2 interest-policy-actions">
+        <a onclick="RemoveProduct(this);" title="Delete" class="sym-btn-remove-row"></a>
+        <a onclick="EditProduct(this);" title="Edit" class="sym-btn-edit-row"></a>
     </div>
 
     }

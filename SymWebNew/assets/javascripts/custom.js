@@ -421,13 +421,41 @@ function ParseDate(input) {
 //        }
 //    });
 //}
+function validateRequiredFields(container, fieldSelector) {
+    var $container = typeof container === "string" ? $(container) : container;
+    var selector = fieldSelector || ".required";
+    var isValid = true;
+
+    $container.find(selector).each(function () {
+        var $field = $(this);
+        var value = $field.val();
+        var isEmpty = value === null || $.trim(String(value)) === "";
+        var $parent = $field.parent();
+        var $message = $parent.children(".RequiredField").first();
+
+        if ($message.length === 0) {
+            $parent.append('<p class="RequiredField" style="color:red; font-size: 13px">This Field is Required</p>');
+            $message = $parent.children(".RequiredField").last();
+        }
+
+        if (isEmpty) {
+            $message.show();
+            isValid = false;
+        }
+        else {
+            $message.hide();
+        }
+    });
+
+    return isValid;
+}
+
 function valiDation(sender) {
     //$("textarea").attr('maxlength', '200');
     //$("input:text").attr('data-val', 'number');
     //$(sender).attr('data-val', 'number');
 
-    $("#" + sender + " .required").parent().append('<p class="RequiredField" style="color:red;" >Value is Required</p>');
-    $("#" + sender + " .RequiredField").hide();
+    // Inline messages are created only after the first failed action.
 
 
     $(".required").change(function () {
@@ -460,15 +488,7 @@ function valiDation(sender) {
     });
 }
 function pageSubmit(sender) {
-    var a = 0;
-    
-    for (var i = 0; i < $('#' + sender + ' .required').length; i++) {
-        if ($($('#' + sender + ' .required')[i]).val() == "") {
-            $($('#' + sender + ' .required')[i]).parent().find('.RequiredField').show();
-            a++;
-        }
-    }
-    if (a == 0) {
+    if (validateRequiredFields("#" + sender)) {
         debugger;
         //$("#" + sender).submit();
         $(".loading").show();
@@ -488,6 +508,8 @@ function pageSubmit(sender) {
         }
 
     }
+
+    return false;
 }
 
 function BackToList(sender) {
@@ -1009,7 +1031,7 @@ function SelectAllForDelete() {
 function deletedOne(sender) {
     var url = $(sender).attr("data-url") + "~";
     //alert(url);
-    Ask("Are you sure to Delete!", function () {
+    Ask("Are you sure you want to delete this data?", function () {
         $.getJSON(url, function (item, textStatus, jqXHR) {
             if (result.indexOf("~") > -1) {
                 ShowResult(result.split("~")[0], result.split("~")[1]);
@@ -1081,7 +1103,7 @@ function deletedData(sender, checkboxId, id) {
         ShowResult("Fail", "Select first to Delete!");
         return;
     }
-    Ask("Are you sure to Delete!", function () {
+    Ask("Are you sure you want to delete this data?", function () {
         
         $.getJSON(url, function (result, textStatus, jqXHR) {
 
@@ -1465,7 +1487,7 @@ function CheckFileSize(sender) {
     }
 }
 function FileDelete(sender) {
-    Ask("Are you sure to delete this file!", function () {
+    Ask("Are you sure you want to delete this data?", function () {
         var url = "/Config/DropDown/FileDelete?filepath=" + $(sender).attr('data-url') + "&table=" + $(sender).attr('data-table') + "&field=" + $(sender).attr('data-field') + "&id=" + $(sender).attr('data-id');
         $.ajax({
             type: "GET",
@@ -1874,7 +1896,7 @@ function btnDeleteNoSplit(sender) {
         return;
     }
     var url = $(sender).attr("data-url") + "?ids=" + Id + '~';
-    var questionMSG = "Are you sure to Delete Data!";
+    var questionMSG = "Are you sure you want to delete this data?";
     singleOperation(questionMSG, url);
 }
 
@@ -1888,7 +1910,7 @@ function btnDelete(sender) {
         return;
     }
     var url = $(sender).attr("data-url") + "?ids=" + Id + '~';
-    var questionMSG = "Are you sure to Delete Data!";
+    var questionMSG = "Are you sure you want to delete this data?";
     singleOperation(questionMSG, url);
 }
 function singleOperation(questionMSG, url) {

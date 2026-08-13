@@ -8,6 +8,8 @@ namespace SymOrdinary
 {
     public class FileLogger
     {
+        private static readonly object LogFileLock = new object();
+
         public static void Log(string source, string actionName, string message)
         {
             /*Create Message object and assign values with log parameter*/
@@ -18,42 +20,49 @@ namespace SymOrdinary
 
             /*Create new parameterized thread object*/
             Thread newThread = new Thread(new ParameterizedThreadStart(FileLogger.WriteToFile));
+            newThread.IsBackground = true;
 
             /*Start thread*/
             newThread.Start(messageTemplate);
         }
         public static void WriteToFile(object messageTemplate)
         {
-            /*Cast message object with the value of parameter*/
-            MessageTemplate msTemplate = (MessageTemplate)messageTemplate;
-
-            /*Assign log path*/
-            string path = HostingEnvironment.MapPath("~/Files/LoggerFile/Logs.txt");
-            if (string.IsNullOrEmpty(path))
+            try
             {
-                return;
+                MessageTemplate msTemplate = messageTemplate as MessageTemplate;
+                string path = HostingEnvironment.MapPath("~/Files/LoggerFile/Logs.txt");
+                if (msTemplate == null || string.IsNullOrEmpty(path))
+                {
+                    return;
+                }
+
+                string directory = Path.GetDirectoryName(path);
+                string logText = Environment.NewLine
+                    + DateTime.Now.ToString("yyyy-MM-dd H:mm:ss zzz")
+                    + Environment.NewLine
+                    + " Source : " + msTemplate.Source + " , Method : " + msTemplate.ActionName
+                    + Environment.NewLine
+                    + msTemplate.Message
+                    + Environment.NewLine;
+
+                lock (LogFileLock)
+                {
+                    if (!Directory.Exists(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
+
+                    File.AppendAllText(path, logText);
+                }
             }
-            //string path = Application.StartupPath + "\\Logs.txt";
-            string curDate = DateTime.Now.ToString("yyyy-MM-dd H:mm:ss zzz");
-
-            /*Assign message header line*/
-            string dateText = Environment.NewLine + curDate + Environment.NewLine + " Source : " + msTemplate.Source + " , Method : " + msTemplate.ActionName;
-
-            if (!string.IsNullOrEmpty(path) && !File.Exists(path))
+            catch (IOException)
             {
-                // Create a file to write to.
-
-                File.WriteAllText(path, "");
-
+                // Logging must never interrupt the application when the log file is locked.
             }
-            /*Write message header line*/
-            File.AppendAllText(path, dateText);
-            /*Write a new line*/
-            File.AppendAllText(path, Environment.NewLine);
-            /*Write message*/
-            File.AppendAllText(path, msTemplate.Message);
-            /*Write another new line after the message*/
-            File.AppendAllText(path, Environment.NewLine);
+            catch (UnauthorizedAccessException)
+            {
+                // Logging must never interrupt the application when the log path is unavailable.
+            }
         }
 
         public class MessageTemplate
