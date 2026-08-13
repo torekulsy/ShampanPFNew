@@ -256,7 +256,7 @@
     })
 
     $(function () {
-        setTimeout(function () { SelectRoll(); }, 200);
+        setTimeout(function () { window.SelectRoll(); }, 200);
 
         //function SelectemployeeFilter() {
         //    var Id = $("#Id").val();
@@ -273,11 +273,11 @@
         //        },
         //    });
         //}
-        function SelectRoll() {
+        window.SelectRoll = function () {
             var Id = $("#Id").val();
             var gid = '@Model.Id';
             var symarea = $("#symArea").val();
-            var url = "/Common/SymUserRoll/SelectUserForRollSearch?gid=" + gid + "&SymArea=" + symarea;
+            var url = "/Common/SymUserRoll/SelectUserForRollSearch?gid=" + encodeURIComponent(gid) + "&SymArea=" + encodeURIComponent(symarea || "");
             $.ajax({
                 url: url,
                 type: 'GET',

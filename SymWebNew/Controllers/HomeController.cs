@@ -500,7 +500,7 @@ namespace SymWebUI.Controllers
 
                     SymUserRoleRepo _repo = new SymUserRoleRepo();
                     sessiondt = _repo.RollByUserId(result.Item2.Id.ToString().Trim());
-                    if (!string.IsNullOrEmpty(Session[result.Item2.Id.ToString().Trim() + "-SymRoll"] as string))
+                    if (Session[result.Item2.Id.ToString().Trim() + "-SymRoll"] != null)
                     {
                         Session.Remove(result.Item2.Id.ToString().Trim() + "-SymRoll");
                     }

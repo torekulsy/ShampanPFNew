@@ -1949,7 +1949,7 @@ namespace SymWebUI.Areas.PF.Controllers
                  string ReportHead = "";
                  string rptLocation = "";
                  PFReport report = new PFReport();
-                 string fileName = "rptIFRSReportTB.rpt";
+                 string fileName = "rptIFRSReportBlank.rpt";
                  ReportDocument doc = new ReportDocument();
                  DataTable dt = new DataTable();
                  DataTable dt1 = new DataTable();

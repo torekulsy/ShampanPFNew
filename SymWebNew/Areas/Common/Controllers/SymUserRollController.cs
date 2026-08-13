@@ -487,11 +487,19 @@ namespace SymWebUI.Areas.Common.Controllers
         }
         public ActionResult SelectUserForRollSearch(string gid, string SymArea)
         {
+            ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
+            SymUserRollVM vm = new SymUserRollVM();
+            vm.CreatedAt = DateTime.Now.ToString("yyyyMMddHHmmss");
+            vm.CreatedBy = identity.Name;
+            vm.CreatedFrom = identity.WorkStationIP;
+            vm.BranchId = Convert.ToInt32(identity.BranchId);
+            vm.GroupId = Convert.ToInt32(gid);
+            _Repo.SelectAllSymRollwithInsert(vm);
 
             UserGroupVM uservm = new UserGroupVM();
             uservm.SymUserRollVMs = _Repo.SelectAllSymUserRollByGroupId(gid, SymArea);
 
-            return View("SymUserRoll", uservm);
+            return PartialView("SymUserRoll", uservm);
         }
         [Authorize(Roles = "Master,Admin,Account")]
         public JsonResult SymUserRollDelete(string ids)

@@ -1,4 +1,5 @@
 ﻿@using SymOrdinary
+@using SymRepository.Common
 @using System.Threading;
 @{
     ShampanIdentity identity = null;
@@ -16,6 +17,10 @@
 @{
     string CompanyName = System.Configuration.ConfigurationManager.AppSettings["CompanyName"];
     string BranchName = Session["BranchName"] != null ? Session["BranchName"].ToString() : "No Branch Selected";
+    SymUserRoleRepo roleRepo = new SymUserRoleRepo();
+    bool canViewUser = roleRepo.SymRoleSession(identity.UserId, "1_4", "index");
+    bool canViewSymUserRoll = roleRepo.SymRoleSession(identity.UserId, "1_14", "index");
+    bool canViewUserGroup = roleRepo.SymRoleSession(identity.UserId, "1_70", "index");
 }
 
 <style>
@@ -64,7 +69,10 @@
                         </ul>
                     </li>
 
-                    <li class="User"><a href="/Common/User/">User <b class="caret" style="opacity: 0"></b></a></li>
+                    @if (canViewUser)
+                    {
+                        <li class="User"><a href="/Common/User/">User <b class="caret" style="opacity: 0"></b></a></li>
+                    }
                     <li class="dropdown Setup">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="menu-icon">⚙️</span>Setup</a>
                         <ul class="dropdown-menu ">
@@ -89,13 +97,22 @@
                             <li><a class="" href="/Common/FiscalYear">Fiscal Year</a></li>
                             <li><a class="" href="/Common/Settings">Settings</a></li>
                             <li><a class="DBUpdate " href="/Common/DBUpdate/DBUpdate">DB Update </a></li>
-                            <li class="dropdown dropdown-submenu">
-                                <a href="#" class="dropdown-toggle " data-toggle="dropdown">User</a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="" href="/Common/SymUserRoll">Sym User Roll</a></li>
-                                    <li><a class="" href="/Common/UserGroup">User Group</a></li>
-                                </ul>
-                            </li>
+                            @if (canViewSymUserRoll || canViewUserGroup)
+                            {
+                                <li class="dropdown dropdown-submenu">
+                                    <a href="#" class="dropdown-toggle " data-toggle="dropdown">User</a>
+                                    <ul class="dropdown-menu">
+                                        @if (canViewSymUserRoll)
+                                        {
+                                            <li><a class="" href="/Common/SymUserRoll">Sym User Roll</a></li>
+                                        }
+                                        @if (canViewUserGroup)
+                                        {
+                                            <li><a class="" href="/Common/UserGroup">User Group</a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
 
 
 
