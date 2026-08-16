@@ -155,13 +155,24 @@ namespace SymWebUI.Areas.PF.Controllers
             ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
             try
             {
+                string branchId = Session["BranchId"].ToString();
+                BankBranchVM selectedBankBranch = new BankBranchRepo()
+                    .SelectAll(vm.BankBranchId, new[] { "bb.BranchId", "bb.TransType" }, new[] { branchId, AreaTypePFVM.TransType })
+                    .FirstOrDefault();
+
+                if (selectedBankBranch == null)
+                {
+                    Session["result"] = "Fail~Please select a bank branch for the current branch.";
+                    return View("~/Areas/PF/Views/PFBankDeposit/Create.cshtml", vm);
+                }
+
                 if (vm.Operation.ToLower() == "add")
                 {
                     vm.CreatedAt = DateTime.Now.ToString("yyyyMMddHHmmss");
                     vm.CreatedBy = identity.Name;
                     vm.CreatedFrom = identity.WorkStationIP;
                     vm.TransType = AreaTypePFVM.TransType;
-                    vm.BranchId = Session["BranchId"].ToString();
+                    vm.BranchId = branchId;
                     result = _repo.Insert(vm);
                     Session["result"] = result[0] + "~" + result[1];
                     if (result[0].ToLower() == "success")

@@ -421,7 +421,7 @@ Id
 ,TotalValue
 ,Post
 ,TransType
-,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom
+,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom,BranchId
 ) VALUES (
 @Id
 ,@Code
@@ -430,7 +430,7 @@ Id
 ,@TotalValue
 ,@Post
 ,@TransType
-,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom
+,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom,@BranchId
 ) 
 ";
                     SqlCommand cmdInsert = new SqlCommand(sqlText, currConn, transaction);
@@ -447,7 +447,7 @@ Id
                     cmdInsert.Parameters.AddWithValue("@CreatedAt", vm.CreatedAt);
                     cmdInsert.Parameters.AddWithValue("@CreatedFrom", vm.CreatedFrom);
                     cmdInsert.Parameters.AddWithValue("@TransType", vm.TransType ?? "PF");
-
+                    cmdInsert.Parameters.AddWithValue("@BranchId", vm.BranchId);
                     var exeRes = cmdInsert.ExecuteNonQuery();
                     transResult = Convert.ToInt32(exeRes);
                     if (transResult <= 0)

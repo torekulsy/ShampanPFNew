@@ -95,7 +95,7 @@
                         @Html.LabelFor(model => model.TransactionMedia)
                     </div>
                     <div class="editor-field">
-                        @Html.SimpleDropDownFor(model => model.TransactionMediaId, "/Config/DropDown/PF_TransactionMedia", new { @class = "  form-control" })
+                        @Html.SimpleDropDownFor(model => model.TransactionMediaId, "/Config/DropDown/PF_TransactionMedia", new { @class = "required  form-control" })
                         
                     </div>
                 </div>
@@ -128,7 +128,7 @@
                     </div>
                     <div class="editor-field">
 
-                        @Html.TextBoxFor(model => model.DepositAmount, new { @placeholder = "Deposit Amount", @class = " required right NumberCheck form-control" })
+                        @Html.TextBoxFor(model => model.DepositAmount, new { @placeholder = "Deposit Amount", @class = " required right isPositiveNumeric form-control" })
 
                         
                     </div>

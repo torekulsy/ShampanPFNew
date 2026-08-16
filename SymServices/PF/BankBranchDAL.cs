@@ -27,7 +27,7 @@ namespace SymServices.PF
         /// A JSON result containing the PF balance, available rate, interest rates for different durations,
         /// and a flag indicating whether the rates are sourced from settings.
         /// </returns>
-        public List<BankBranchVM> DropDown( string TransType="PF")
+        public List<BankBranchVM> DropDown(string TransType = "PF", string BranchId = null)
         {
             #region Variables
             SqlConnection currConn = null;
@@ -52,11 +52,15 @@ bb.Id
 ,b.Name BankName
    FROM BankBranchs bb
 LEFT OUTER JOIN BankNames b ON bb.BankId = b.Id
-WHERE  1=1 AND bb.IsArchive = 0 and bb.TransType=@TransType
+WHERE  1=1
+  AND bb.IsArchive = 0
+  AND bb.TransType = @TransType
+  AND (@BranchId IS NULL OR @BranchId = '' OR bb.BranchId = @BranchId)
 ";
 
                 SqlCommand objComm = new SqlCommand(sqlText, currConn);
                 objComm.Parameters.AddWithValue("@TransType", TransType);
+                objComm.Parameters.AddWithValue("@BranchId", (object)BranchId ?? DBNull.Value);
 
                 SqlDataReader dr;
                 dr = objComm.ExecuteReader();

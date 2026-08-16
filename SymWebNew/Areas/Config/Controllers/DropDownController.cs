@@ -132,7 +132,8 @@ namespace SymWebUI.Areas.Config.Controllers
 
         public JsonResult PF_BankBranchName(string TransType = "PF")
         {
-            return Json(new SelectList(new BankBranchRepo().DropDown(TransType), "Id", "Name"), JsonRequestBehavior.AllowGet);
+            string branchId = Session["BranchId"] == null ? null : Session["BranchId"].ToString();
+            return Json(new SelectList(new BankBranchRepo().DropDown(TransType, branchId), "Id", "Name"), JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult PF_EnumBankAccountType()

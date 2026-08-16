@@ -139,7 +139,7 @@ namespace SymWebUI.Areas.PF.Controllers
                     vm.CreatedBy = identity.Name;
                     vm.CreatedFrom = identity.WorkStationIP;
                     vm.TransType = AreaTypePFVM.TransType;
-
+                    vm.BranchId = Session["BranchId"].ToString();
                     result = _repo.Insert(vm);
                     Session["result"] = result[0] + "~" + result[1];
                     if (result[0].ToLower() == "success")

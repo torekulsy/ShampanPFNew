@@ -7,11 +7,11 @@ namespace SymRepository.PF
 {
     public class BankBranchRepo
     {
-        public List<BankBranchVM> DropDown(string TransType = "PF")
+        public List<BankBranchVM> DropDown(string TransType = "PF", string BranchId = null)
         {
             try
             {
-                return new BankBranchDAL().DropDown(TransType);
+                return new BankBranchDAL().DropDown(TransType, BranchId);
             }
             catch (Exception ex)
             {
