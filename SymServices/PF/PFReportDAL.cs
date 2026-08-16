@@ -8944,6 +8944,93 @@ order by FiscalYear,  y.TransType,case when COASL='9999' then 'D' when COASL='88
             return ds;
         }
 
+        public DataTable InvestmentDownload(string[] conditionFields, string[] conditionValues)
+        {
+            string[] retResults = new string[6];
+            DataTable dt = new DataTable();
+            SqlTransaction transaction = null;
+            try
+            {
+                #region Variables
+                SqlConnection currConn = null;
+                string sqlText = "";
+                #endregion
+                #region open connection and transaction
+                currConn = _dbsqlConnection.GetConnection();
+                if (currConn.State != ConnectionState.Open)
+                {
+                    currConn.Open();
+                }
+                if (transaction == null) { transaction = currConn.BeginTransaction("ExportExcelFile"); }
+                #endregion open connection and transaction
+                #region DataRead From DB
+                #region sql statement
+                sqlText = @"
+
+SELECT
+inv.Id
+,inv.Name
+,Isnull(inv.Code,'-')Code
+,et.Name [Invertment Type]
+,Isnull(InvestmentDate,'20210101')InvestmentDate
+,Isnull(FromDate,'20210101')FromDate
+,Isnull(ToDate,'20210101')ToDate
+,Isnull(MaturityDate,'20210101')MaturityDate
+,Isnull(AitInterest,0)AitInterest
+
+,inv.Address
+
+from InvestmentNames inv
+Left Join EnumInvestmentTypes et on et.Id=inv.InvestmentTypeId
+WHERE  1=1 AND inv.IsArchive = 0
+";
+
+          
+                string cField = "";
+                if (conditionFields != null && conditionValues != null && conditionFields.Length == conditionValues.Length)
+                {
+                    for (int i = 0; i < conditionFields.Length; i++)
+                    {
+                        if (string.IsNullOrWhiteSpace(conditionFields[i]) || string.IsNullOrWhiteSpace(conditionValues[i]))
+                        {
+                            continue;
+                        }
+                        cField = conditionFields[i].ToString();
+                        cField = Ordinary.StringReplacing(cField);
+                        sqlText += " AND " + conditionFields[i] + "=@" + cField;
+                    }
+                }
+
+                SqlCommand objComm = new SqlCommand(sqlText, currConn, transaction);
+                if (conditionFields != null && conditionValues != null && conditionFields.Length == conditionValues.Length)
+                {
+                    for (int j = 0; j < conditionFields.Length; j++)
+                    {
+                        if (string.IsNullOrWhiteSpace(conditionFields[j]) || string.IsNullOrWhiteSpace(conditionValues[j]))
+                        {
+                            continue;
+                        }
+                        cField = conditionFields[j].ToString();
+                        cField = Ordinary.StringReplacing(cField);
+                        objComm.Parameters.AddWithValue("@" + cField, conditionValues[j]);
+                    }
+                }
+
+                SqlDataAdapter da = new SqlDataAdapter(objComm);
+                da.Fill(dt);
+                #endregion
+
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                retResults[0] = "Fail";
+                retResults[1] = ex.Message;
+                throw ex;
+            }
+            return dt;
+        }
+
         public DataTable InvestmentAccruedSummery()
         {
             string[] retResults = new string[6];

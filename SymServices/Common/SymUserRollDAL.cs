@@ -1752,9 +1752,16 @@ from SymUserDefaultRoll where 1=1";
 
                 sqlText = @"SELECT DISTINCT
 symArea
-   FROM SymUserDefaultRoll
+FROM SymUserDefaultRoll
 WHERE IsArchive=0 and IsActive=1
-    ORDER BY symArea
+UNION
+SELECT 'ESS' symArea
+WHERE EXISTS (
+    SELECT 1
+    FROM UserGroup
+    WHERE IsArchive=0 and IsActive=1 and IsESS=1
+)
+ORDER BY symArea
 ";
 
                 SqlCommand _objComm = new SqlCommand();
@@ -1977,71 +1984,95 @@ Where u.id=@userId
 
         public bool SymRollSessionBackup(string UserId, string symArea, string symController, string symAction)
         {
-            DataTable dt = new DataTable();
-            DataTable returndt = new DataTable();
             bool result = false;
 
             try
             {
-                dt = HttpContext.Current.Session[UserId.ToString().Trim() + "-SymRoll"] as DataTable;
+                ShampanIdentity identity = HttpContext.Current.User != null ? HttpContext.Current.User.Identity as ShampanIdentity : null;
+                if (identity != null && identity.IsAdmin)
+                {
+                    return true;
+                }
 
-                returndt = dt.Select("symArea='" + symArea + "' and symController='" + symController + "'").CopyToDataTable();
+                DataTable dt = HttpContext.Current.Session[UserId.ToString().Trim() + "-SymRoll"] as DataTable;
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    return false;
+                }
+
+                string area = (symArea ?? "").Replace("'", "''");
+                string controller = (symController ?? "").Replace("'", "''");
+                DataRow[] rows = dt.Select("symArea='" + area + "' and symController='" + controller + "'");
+                if (rows.Length == 0)
+                {
+                    return false;
+                }
+
                 if (symAction.ToLower() == "index")
-                    result = Convert.ToBoolean(returndt.Rows[0]["IsIndex"]);
+                    result = Convert.ToBoolean(rows[0]["IsIndex"]);
                 else if (symAction.ToLower() == "add")
-                    result = Convert.ToBoolean(returndt.Rows[0]["IsAdd"]);
+                    result = Convert.ToBoolean(rows[0]["IsAdd"]);
                 else if (symAction.ToLower() == "edit")
-                    result = Convert.ToBoolean(returndt.Rows[0]["IsEdit"]);
+                    result = Convert.ToBoolean(rows[0]["IsEdit"]);
                 else if (symAction.ToLower() == "delete")
-                    result = Convert.ToBoolean(returndt.Rows[0]["IsDelete"]);
+                    result = Convert.ToBoolean(rows[0]["IsDelete"]);
                 else if (symAction.ToLower() == "report")
-                    result = Convert.ToBoolean(returndt.Rows[0]["IsReport"]);
+                    result = Convert.ToBoolean(rows[0]["IsReport"]);
                 else if (symAction.ToLower() == "process")
-                    result = Convert.ToBoolean(returndt.Rows[0]["IsProcess"]);
+                    result = Convert.ToBoolean(rows[0]["IsProcess"]);
             }
             catch (Exception)
             {
                 return result;
 
             }
-            return result = true;
+            return result;
         }
 
         public bool SymRoleSession(string UserId, string DefaultRollId, string symAction)
         {
-            DataTable dt = new DataTable();
-            DataTable returndt = new DataTable();
             bool result = false;
 
             try
             {
-                dt = HttpContext.Current.Session[UserId.ToString().Trim() + "-SymRoll"] as DataTable;
-                if (dt.Rows.Count > 0)
+                ShampanIdentity identity = HttpContext.Current.User != null ? HttpContext.Current.User.Identity as ShampanIdentity : null;
+                if (identity != null && identity.IsAdmin)
                 {
-                    returndt = dt.Select("DefaultRollId='" + DefaultRollId + "'").CopyToDataTable();
-                    if (returndt.Rows.Count > 0)
-                    {
-                        if (symAction.ToLower() == "index")
-                            result = Convert.ToBoolean(returndt.Rows[0]["IsIndex"]);
-                        else if (symAction.ToLower() == "add")
-                            result = Convert.ToBoolean(returndt.Rows[0]["IsAdd"]);
-                        else if (symAction.ToLower() == "edit")
-                            result = Convert.ToBoolean(returndt.Rows[0]["IsEdit"]);
-                        else if (symAction.ToLower() == "delete")
-                            result = Convert.ToBoolean(returndt.Rows[0]["IsDelete"]);
-                        else if (symAction.ToLower() == "report")
-                            result = Convert.ToBoolean(returndt.Rows[0]["IsReport"]);
-                        else if (symAction.ToLower() == "process")
-                            result = Convert.ToBoolean(returndt.Rows[0]["IsProcess"]);
-                    }
+                    return true;
                 }
+
+                DataTable dt = HttpContext.Current.Session[UserId.ToString().Trim() + "-SymRoll"] as DataTable;
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    return false;
+                }
+
+                string defaultRollId = (DefaultRollId ?? "").Replace("'", "''");
+                DataRow[] rows = dt.Select("DefaultRollId='" + defaultRollId + "'");
+                if (rows.Length == 0)
+                {
+                    return false;
+                }
+
+                if (symAction.ToLower() == "index")
+                    result = Convert.ToBoolean(rows[0]["IsIndex"]);
+                else if (symAction.ToLower() == "add")
+                    result = Convert.ToBoolean(rows[0]["IsAdd"]);
+                else if (symAction.ToLower() == "edit")
+                    result = Convert.ToBoolean(rows[0]["IsEdit"]);
+                else if (symAction.ToLower() == "delete")
+                    result = Convert.ToBoolean(rows[0]["IsDelete"]);
+                else if (symAction.ToLower() == "report")
+                    result = Convert.ToBoolean(rows[0]["IsReport"]);
+                else if (symAction.ToLower() == "process")
+                    result = Convert.ToBoolean(rows[0]["IsProcess"]);
             }
             catch (Exception)
             {
-                return result=true;
+                return result;
 
             }
-            return result = true;
+            return result;
         }
 
     }
