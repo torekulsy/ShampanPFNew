@@ -142,6 +142,7 @@ namespace SymWebUI.Areas.PF.Controllers
                     vm.CreatedBy = identity.Name;
                     vm.CreatedFrom = identity.WorkStationIP;
                     vm.TransType = AreaTypePFVM.TransType;
+                    vm.BranchId = Session["BranchId"].ToString();
                     result = _repo.Insert(vm);
                     Session["result"] = result[0] + "~" + result[1];
                     if (result[0].ToLower() == "success")
@@ -294,88 +295,88 @@ namespace SymWebUI.Areas.PF.Controllers
         //}
 
 
-        [HttpGet]
-        public ActionResult ReportView(int id)
-        {
-            try
-            {
-                string ReportHead = "";
-                string rptLocation = "";
-                PFReport report = new PFReport();
+        //[HttpGet]
+        //public ActionResult ReportView(int id)
+        //{
+        //    try
+        //    {
+        //        string ReportHead = "";
+        //        string rptLocation = "";
+        //        PFReport report = new PFReport();
 
 
-                string[] cFields = { "robi.Id", };
-                string[] cValues = { id.ToString() == "0" ? "" : id.ToString() };
+        //        string[] cFields = { "robi.Id", };
+        //        string[] cValues = { id.ToString() == "0" ? "" : id.ToString() };
 
-                ReportDocument doc = new ReportDocument();
-                DataTable dt = new DataTable();
+        //        ReportDocument doc = new ReportDocument();
+        //        DataTable dt = new DataTable();
 
-                WithdrawVM Withdrawvm = new WithdrawVM();
+        //        WithdrawVM Withdrawvm = new WithdrawVM();
 
-                var Result = _repo.SelectAll(Session["BranchId"].ToString(), 0, cFields, cValues);
+        //        var Result = _repo.SelectAll(Session["BranchId"].ToString(), 0, cFields, cValues);
 
-                dt = JsonConvert.DeserializeObject<DataTable>(JsonConvert.SerializeObject(Result));
-
-
-
-                ReportHead = "There are no data to Preview for GL Transaction for Return on Investment";
-                if (dt.Rows.Count > 0)
-                {
-                    ReportHead = "Return on Bank Investment GL Transactions";
-                }
-                dt.TableName = "dtReturnOnBankInterest";
-                rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptReturnOnBankInterest.rpt";
-
-                doc.Load(rptLocation);
-                doc.SetDataSource(dt);
-                string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
-                FormulaFieldDefinitions ffds = doc.DataDefinition.FormulaFields;
-                CompanyRepo _CompanyRepo = new CompanyRepo();
-                CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
-
-                doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text = "'" + companyLogo + "'";
-                doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + ReportHead + "'";
-                doc.DataDefinition.FormulaFields["Address"].Text = "'" + cvm.Address + "'";
-                doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
-                doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
-                //doc.DataDefinition.FormulaFields["frmGroupBy"].Text = "'" + groupBy + "'";
-
-                doc.DataDefinition.FormulaFields["TransType"].Text = "'" + AreaTypePFVM.TransType + "'";
-
-                var rpt = RenderReportAsPDF(doc);
-                doc.Close();
-                return rpt;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        //        dt = JsonConvert.DeserializeObject<DataTable>(JsonConvert.SerializeObject(Result));
 
 
-        [HttpGet]
-        public ActionResult reportVeiw(int id)
-        {
-            try
-            {
 
-                PFReportVM vm = new PFReportVM();
-                ReturnOnBankInterestVM ReturnOnBankInterestvm = new ReturnOnBankInterestVM();
-                PFReport report = new PFReport();
-                ReturnOnBankInterestvm = _repo.SelectAll(Session["BranchId"].ToString(), Convert.ToInt32(id)).FirstOrDefault();
-                vm.Id = id;
-                vm.Code = ReturnOnBankInterestvm.Code;
-                vm.TransType = AreaTypePFVM.TransType;
+        //        ReportHead = "There are no data to Preview for GL Transaction for Return on Investment";
+        //        if (dt.Rows.Count > 0)
+        //        {
+        //            ReportHead = "Return on Bank Investment GL Transactions";
+        //        }
+        //        dt.TableName = "dtReturnOnBankInterest";
+        //        rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptReturnOnBankInterest.rpt";
 
-                return PartialView("~/Areas/PF/Views/ReturnOnBankInterest/reportVeiw.cshtml", vm);
+        //        doc.Load(rptLocation);
+        //        doc.SetDataSource(dt);
+        //        string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
+        //        FormulaFieldDefinitions ffds = doc.DataDefinition.FormulaFields;
+        //        CompanyRepo _CompanyRepo = new CompanyRepo();
+        //        CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
+
+        //        doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text = "'" + companyLogo + "'";
+        //        doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + ReportHead + "'";
+        //        doc.DataDefinition.FormulaFields["Address"].Text = "'" + cvm.Address + "'";
+        //        doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
+        //        doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
+        //        //doc.DataDefinition.FormulaFields["frmGroupBy"].Text = "'" + groupBy + "'";
+
+        //        doc.DataDefinition.FormulaFields["TransType"].Text = "'" + AreaTypePFVM.TransType + "'";
+
+        //        var rpt = RenderReportAsPDF(doc);
+        //        doc.Close();
+        //        return rpt;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
 
 
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        //[HttpGet]
+        //public ActionResult reportVeiw(int id)
+        //{
+        //    try
+        //    {
+
+        //        PFReportVM vm = new PFReportVM();
+        //        ReturnOnBankInterestVM ReturnOnBankInterestvm = new ReturnOnBankInterestVM();
+        //        PFReport report = new PFReport();
+        //        ReturnOnBankInterestvm = _repo.SelectAll(Session["BranchId"].ToString(), Convert.ToInt32(id)).FirstOrDefault();
+        //        vm.Id = id;
+        //        vm.Code = ReturnOnBankInterestvm.Code;
+        //        vm.TransType = AreaTypePFVM.TransType;
+
+        //        return PartialView("~/Areas/PF/Views/ReturnOnBankInterest/reportVeiw.cshtml", vm);
+
+
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
         //[HttpGet]
         //public ActionResult ROB_GLTransactionReport(string id)
         //{
@@ -391,6 +392,103 @@ namespace SymWebUI.Areas.PF.Controllers
         //        throw;
         //    }
         //}
+
+        [HttpGet]
+        public ActionResult ReportView(int id = 0)
+        {
+            try
+            {
+                string ReportHead = "";
+                string rptLocation = "";
+
+                PFReport report = new PFReport();
+
+                string[] cFields = 
+        { 
+            "robi.Id" 
+        };
+
+                string[] cValues = 
+        { 
+            id == 0 ? "" : id.ToString() 
+        };
+
+
+                ReportDocument doc = new ReportDocument();
+                DataTable dt = new DataTable();
+
+
+                var Result = _repo.SelectAll(
+                    Session["BranchId"].ToString(),
+                    0,
+                    cFields,
+                    cValues
+                );
+
+
+                dt = JsonConvert.DeserializeObject<DataTable>(
+                        JsonConvert.SerializeObject(Result)
+                     );
+
+
+                ReportHead = "There are no data to Preview for GL Transaction for Return on Investment";
+
+                if (dt.Rows.Count > 0)
+                {
+                    ReportHead = "Return on Bank Investment GL Transactions";
+                }
+
+
+                dt.TableName = "dtReturnOnBankInterest";
+
+
+                rptLocation = AppDomain.CurrentDomain.BaseDirectory
+                            + @"Files\ReportFiles\PF\\rptReturnOnBankInterest.rpt";
+
+
+                doc.Load(rptLocation);
+
+                doc.SetDataSource(dt);
+
+
+                string companyLogo = AppDomain.CurrentDomain.BaseDirectory
+                                    + "Images\\COMPANYLOGO.png";
+
+
+                CompanyRepo _CompanyRepo = new CompanyRepo();
+                CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
+
+
+                doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text
+                    = "'" + companyLogo + "'";
+
+                doc.DataDefinition.FormulaFields["ReportHead"].Text
+                    = "'" + ReportHead + "'";
+
+                doc.DataDefinition.FormulaFields["Address"].Text
+                    = "'" + cvm.Address + "'";
+
+                doc.DataDefinition.FormulaFields["CompanyName"].Text
+                    = "'" + cvm.Name + "'";
+
+                doc.DataDefinition.FormulaFields["BranchName"].Text
+                    = "'" + Session["BranchName"].ToString() + "'";
+
+                doc.DataDefinition.FormulaFields["TransType"].Text
+                    = "'" + AreaTypePFVM.TransType + "'";
+
+
+                var rpt = RenderReportAsPDF(doc);
+
+                doc.Close();
+
+                return rpt;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
         [HttpPost]
         public ActionResult ROB_GLTransactionReport(PFReportVM vm)

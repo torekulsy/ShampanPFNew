@@ -263,7 +263,7 @@
                                 @Html.LabelFor(model => model.EmployeeNID)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.EmployeeNID, new { @placeholder = "NID  ", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.EmployeeNID, new { @placeholder = "NID  ", @class = "form-control isPositiveNumeric" })
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
@@ -271,7 +271,7 @@
                                 @Html.LabelFor(model => model.EmployeeTIN)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.EmployeeTIN, new { @placeholder = "TIN", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.EmployeeTIN, new { @placeholder = "TIN", @class = "form-control isPositiveNumeric" })
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
@@ -313,7 +313,8 @@
                                 @Html.LabelFor(model => model.EmployeeBankAccountNumber)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.EmployeeBankAccountNumber, new { @placeholder = "Bank Account Number", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.EmployeeBankAccountNumber, new { @placeholder = "Bank Account Number", @class = "required form-control isPositiveNumeric" })
+                                @Html.ValidationMessageFor(model => model.EmployeeBankAccountNumber)
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 col-md-4 col-lg-3">

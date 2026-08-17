@@ -46,6 +46,7 @@ namespace SymServices.PF
         {
 
             #region Initializ
+            bool isUpdate = vm != null && vm.Id > 0;
             string sqlText = "";
             int Id = 0;
             string[] retResults = new string[6];
@@ -117,7 +118,7 @@ namespace SymServices.PF
 
                 if (vm != null)
                 {
-                    if (vm.Id > 0)
+                    if (isUpdate)
                     {
                         sqlText = "  ";
                         sqlText += @" Update EmployeeInfo set
@@ -360,7 +361,8 @@ namespace SymServices.PF
                     , @NomineeShare
                     , @EmployeeBankNameId
                     , @NomineeBankNameId
-                )";
+                );
+                SELECT CAST(SCOPE_IDENTITY() AS INT);";
                         SqlCommand cmdInsert = new SqlCommand(sqlText, currConn, transaction);
                         cmdInsert.Parameters.AddWithValue("@Code", vm.Code);
                         cmdInsert.Parameters.AddWithValue("@Name", vm.Name);
@@ -417,7 +419,7 @@ namespace SymServices.PF
                         cmdInsert.Parameters.AddWithValue("@EmployeeBankNameId", vm.EmployeeBankNameId);
                         cmdInsert.Parameters.AddWithValue("@NomineeBankNameId", vm.NomineeBankNameId);
 
-                        cmdInsert.ExecuteNonQuery();
+                        vm.Id = Convert.ToInt32(cmdInsert.ExecuteScalar());
                     }
                 }
                 else
@@ -440,7 +442,10 @@ namespace SymServices.PF
                 #endregion Commit
                 #region SuccessResult
                 retResults[0] = "Success";
-                retResults[1] = "Data Save Successfully";
+                retResults[1] = isUpdate
+                    ? "Data Updated Successfully"
+                    : "Data Saved Successfully";
+                retResults[2] = vm.Id.ToString();
                 #endregion SuccessResult
             }
             #endregion try

@@ -69,7 +69,7 @@
                     </div>
                     <div class="editor-field">
                         @Html.SimpleDropDownFor(model => model.BankBranchId, PF_BankBranchNameUrl, new { @class = "required  form-control" })
-                        @Html.ValidationMessageFor(model => model.BankBranchId)
+                      
                     </div>
                 </div>
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
@@ -78,7 +78,7 @@
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.TransactionDate, new { @placeholder = "R Bank Interest Date", @class = " customDatePicker required  form-control" })
-                        @Html.ValidationMessageFor(model => model.TransactionDate)
+                       
                     </div>
                 </div>
 
@@ -87,8 +87,8 @@
                         @Html.LabelFor(model => model.TotalValue)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.TotalValue, new { @placeholder = "Total Interest Value", @class = " required cTotalInterestValue right NumberCheck form-control" })
-                        @Html.ValidationMessageFor(model => model.TotalValue)
+                        @Html.TextBoxFor(model => model.TotalValue, new { @placeholder = "Total Interest Value", @class = " required cTotalInterestValue right isPositiveNumeric form-control" })
+                      
                     </div>
                 </div>
                 <div class="col-12 col-sm-6 col-md-4 col-lg-5 col-xl-3">
@@ -97,7 +97,7 @@
                     </div>
                     <div class="editor-field">
                         @Html.TextAreaFor(model => model.Remarks, new { @placeholder = " Remarks", @class = "  form-control" })
-                        @Html.ValidationMessageFor(model => model.Remarks)
+                       
                     </div>
                 </div>
             </div>

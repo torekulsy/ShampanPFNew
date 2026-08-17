@@ -502,7 +502,15 @@ namespace SymWebUI.Areas.PF.Controllers
                 }
 
                 Session["result"] = result[0] + "~" + result[1];
-                return RedirectToAction("Index");
+                if (result[0].Equals("Success", StringComparison.OrdinalIgnoreCase))
+                {
+                    int employeeId = vm.Id > 0 ? vm.Id : Convert.ToInt32(result[2]);
+                    return RedirectToAction("Edit", new { id = employeeId });
+                }
+
+                return vm.Id > 0
+                    ? View("~/Areas/PF/Views/EmployeeInfoPF/Edit.cshtml", vm)
+                    : View("~/Areas/PF/Views/EmployeeInfoPF/Create.cshtml", vm);
             }
             catch (Exception ex)
             {
@@ -514,7 +522,9 @@ namespace SymWebUI.Areas.PF.Controllers
                     this.GetType().Name,
                     ex.Message + Environment.NewLine + result[3]
                 );
-                return View(vm);
+                return vm.Id > 0
+                    ? View("~/Areas/PF/Views/EmployeeInfoPF/Edit.cshtml", vm)
+                    : View("~/Areas/PF/Views/EmployeeInfoPF/Create.cshtml", vm);
             }
         }
 
