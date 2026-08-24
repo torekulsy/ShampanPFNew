@@ -39,7 +39,14 @@ function goBack() {
 //////    o.style.height = "1px";
 //////    o.style.height = (25 + o.scrollHeight) + "px";
 //////}
-
+$(document).on("mousedown", function (e) {
+    if (
+        !$(e.target).closest(".select2-container").length &&
+        !$(e.target).closest(".selectDropdown").length
+    ) {
+        $(".selectDropdown").select2("close");
+    }
+});
 $(function () {
     $(".hasDatepicker").datepicker({
         changeMonth: true,
