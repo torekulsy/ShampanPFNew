@@ -27,7 +27,6 @@
                 @*<th class="center">Action</th>*@
                 <th class="center">WPPF Code</th>
                 <th class="center">Employee Name</th>
-                <th class="center">Distribution Date</th>
                 <th class="center">Employee Profit</th>
                 <th class="center">Post Status</th>
 
@@ -64,15 +63,14 @@
 
                              { "sName": "Code", "sWidth": "10%" }
                             , { "sName": "ProjectName", "sWidth": "20%" }
-                            , { "sName": "DistributionDate", "sWidth": "10%" }
                             , {
                                 "sName": "TotalPF",
                                 "sWidth": "10%", "sClass": "right",
                                 "fnRender": function (oObj) {
-                                    return formatNumberWithCommas(oObj.aData[3]);
+                                    return formatNumberWithCommas(oObj.aData[2]);
                                 }
                             }                         
-                            , { "sName": "Post", "sWidth": "12%" }
+                            , { "sName": "Post", "sWidth": "12%", "sClass": "center" }
             ]
         });
 

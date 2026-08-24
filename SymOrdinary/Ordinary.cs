@@ -2857,37 +2857,27 @@ namespace SymOrdinary
         {
             DataTable dataTable = new DataTable(typeof(T).Name);
 
-            PropertyInfo[] props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-            // ✅ FIX 1: Column type must handle Nullable
-            foreach (PropertyInfo prop in props)
+            //Get all the properties
+            PropertyInfo[] Props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (PropertyInfo prop in Props)
             {
-                Type colType = prop.PropertyType;
-
-                // Handle Nullable<T>
-                if (colType.IsGenericType && colType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                {
-                    colType = Nullable.GetUnderlyingType(colType);
-                }
-
-                dataTable.Columns.Add(prop.Name, colType);
+                //Setting column names as Property names
+                dataTable.Columns.Add(prop.Name, prop.PropertyType);
             }
+
+
 
             foreach (T item in items)
             {
-                var values = new object[props.Length];
-
-                for (int i = 0; i < props.Length; i++)
+                var values = new object[Props.Length];
+                for (int i = 0; i < Props.Length; i++)
                 {
-                    object val = props[i].GetValue(item, null);
-
-                    // ✅ FIX 2: null -> DBNull
-                    values[i] = val ?? DBNull.Value;
+                    //inserting property values to datatable rows
+                    values[i] = Props[i].GetValue(item, null);
                 }
-
                 dataTable.Rows.Add(values);
             }
-
+            //put a breakpoint here and check datatable
             return dataTable;
         }
 
@@ -3028,8 +3018,13 @@ namespace SymOrdinary
             return ws;
         }
 
-       
 
+
+
+        public static int NextId(string p, SqlConnection currConn, SqlTransaction transaction)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 

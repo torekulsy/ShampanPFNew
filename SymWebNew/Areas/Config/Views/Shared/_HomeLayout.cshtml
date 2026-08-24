@@ -128,7 +128,6 @@
                 //  $(".dialog-alert").dialog('open');
                 var msg = '@Session["result"]';
 
-                TempData.Remove("msg");
                 msg = msg.split("~");
                 ShowResult(msg[0], msg[1]);
             }

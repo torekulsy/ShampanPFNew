@@ -80,6 +80,7 @@ namespace SymViewModel.Common
         public string symArea { get; set; }
         [Display(Name = "Group Name")] 
         public int GroupId { get; set; }
+        public string GroupName { get; set; }
 
         [Display(Name = "Photo Name")] 
         public string PhotoName { get; set; }

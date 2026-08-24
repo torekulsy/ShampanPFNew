@@ -28,8 +28,10 @@ namespace SymViewModel.Common
         public bool IsSuper { get; set; }
         public List<SymUserRollVM> SymUserRollVMs { get; set; }
 
+        [Display(Name = "Admin")]
         public bool IsAdmin { get; set; }
 
+        [Display(Name = "GL")]
         public bool IsHRM { get; set; }
 
         public bool IsAttendance { get; set; }
@@ -38,8 +40,10 @@ namespace SymViewModel.Common
 
         public bool IsTAX { get; set; }
 
+        [Display(Name = "PF")]
         public bool IsPF { get; set; }
 
+        [Display(Name = "WPPF")]
         public bool IsGF { get; set; }
 
         public bool IsESS { get; set; }
