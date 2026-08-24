@@ -62,7 +62,8 @@ namespace SymServices.PF
 
                 sqlText = @"
 SELECT
- pfo.EmployeeId
+ pfo.Id
+,pfo.EmployeeId
 ,e.EmpName
 ,e.Code
 ,e.Designation
@@ -116,6 +117,7 @@ From EmployeePFPayment pfo
                 while (dr.Read())
                 {
                     vm = new EmployeePFPaymentVM();
+                    vm.Id = dr["Id"].ToString();
                     vm.EmployeeId = dr["EmployeeId"].ToString();
                     vm.EmployeeContribution = Convert.ToDecimal(dr["EmployeeContribution"]);
                     vm.EmployerContribution = Convert.ToDecimal(dr["EmployerContribution"]);
