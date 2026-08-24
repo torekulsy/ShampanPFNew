@@ -745,13 +745,18 @@
             var expandedSubMenu = localStorage.getItem("expandedSubMenu");
             var activeMenu = localStorage.getItem("activeMenu");
 
+            function setMenuArrow($el, isOpen) {
+                $el.children("p")
+                    .children("i.right")
+                    .removeClass(isOpen ? "fa-angle-left" : "fa-angle-down")
+                    .addClass(isOpen ? "fa-angle-down" : "fa-angle-left");
+            }
+
             function openMenu($el) {
                 $el.addClass("treeview-expanded");
                 $el.next(".nav-treeview").show();
 
-                $el.find("i.fas.fa-angle-left")
-                    .removeClass("fa-angle-left")
-                    .addClass("fa-angle-down");
+                setMenuArrow($el, true);
             }
 
             // =========================
@@ -785,9 +790,7 @@
 
                         $(this).addClass("treeview-expanded");
 
-                        $(this).find("i.fas.fa-angle-left")
-                            .removeClass("fa-angle-left")
-                            .addClass("fa-angle-down");
+                        setMenuArrow($(this), true);
                     });
 
                 // Last Parent Highlight
@@ -818,9 +821,7 @@
 
                     $target.slideUp(200);
 
-                    $this.find("i.fa-angle-down")
-                        .removeClass("fa-angle-down")
-                        .addClass("fa-angle-left");
+                    setMenuArrow($this, false);
 
                     localStorage.removeItem("expandedMenu");
                 }
@@ -833,18 +834,14 @@
                             .next(".nav-treeview")
                             .slideUp(200);
 
-                        $(this).find("i.fa-angle-down")
-                            .removeClass("fa-angle-down")
-                            .addClass("fa-angle-left");
+                        setMenuArrow($(this), false);
                     });
 
                     $this.addClass("treeview-expanded");
 
                     $target.slideDown(200);
 
-                    $this.find("i.fa-angle-left")
-                        .removeClass("fa-angle-left")
-                        .addClass("fa-angle-down");
+                    setMenuArrow($this, true);
 
                     localStorage.setItem("expandedMenu", menuId);
                 }
@@ -868,9 +865,7 @@
 
                     $target.slideUp(200);
 
-                    $this.find("i.fa-angle-down")
-                        .removeClass("fa-angle-down")
-                        .addClass("fa-angle-left");
+                    setMenuArrow($this, false);
 
                     localStorage.removeItem("expandedSubMenu");
                 }
@@ -886,18 +881,14 @@
                                 .next(".nav-treeview")
                                 .slideUp(200);
 
-                            $(this).find("i.fa-angle-down")
-                                .removeClass("fa-angle-down")
-                                .addClass("fa-angle-left");
+                            setMenuArrow($(this), false);
                         });
 
                     $this.addClass("treeview-expanded");
 
                     $target.slideDown(200);
 
-                    $this.find("i.fa-angle-left")
-                        .removeClass("fa-angle-left")
-                        .addClass("fa-angle-down");
+                    setMenuArrow($this, true);
 
                     localStorage.setItem("expandedSubMenu", menuId);
                 }
@@ -946,9 +937,7 @@
 
                             $submenu.removeClass("treeview-expanded");
 
-                            $submenu.find("i.fa-angle-down")
-                                .removeClass("fa-angle-down")
-                                .addClass("fa-angle-left");
+                            setMenuArrow($submenu, false);
 
                             $submenuTree.slideUp(200);
                         }

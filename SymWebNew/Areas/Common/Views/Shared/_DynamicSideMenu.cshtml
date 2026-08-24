@@ -5,94 +5,102 @@
 @functions {
     public static string GetMenuIcon(string title)
     {
-        if (string.IsNullOrWhiteSpace(title)) return "fa fa-circle-o";
+        if (string.IsNullOrWhiteSpace(title)) return "fas fa-circle";
         
         string t = title.Trim().ToLowerInvariant();
         
         // Modules/Areas
-        if (t == "admin") return "fa fa-cogs";
-        if (t == "pf") return "fa fa-briefcase";
-        if (t == "gl") return "fa fa-book";
-        if (t == "wppf") return "fa fa-users";
+        if (t == "admin") return "fas fa-cogs";
+        if (t == "pf") return "fas fa-briefcase";
+        if (t == "gl") return "fas fa-book";
+        if (t == "wppf") return "fas fa-users";
         
         // Groups
-        if (t == "setup") return "fa fa-wrench";
-        if (t == "transaction") return "fa fa-exchange";
-        if (t == "reports") return "fa fa-bar-chart-o";
+        if (t == "setup") return "fas fa-wrench";
+        if (t == "transaction") return "fas fa-exchange-alt";
+        if (t == "reports") return "fas fa-chart-bar";
         
         // Subgroups
-        if (t == "master data") return "fa fa-database";
-        if (t == "user") return "fa fa-users";
-        if (t == "bank") return "fa fa-university";
-        if (t == "coa") return "fa fa-sitemap";
-        if (t == "voucher entry" || t == "voucher") return "fa fa-file-text-o";
-        if (t == "employee") return "fa fa-user";
-        if (t == "financial reports") return "fa fa-bar-chart-o";
-        if (t == "loan") return "fa fa-money";
+        if (t == "master data") return "fas fa-database";
+        if (t == "user") return "fas fa-users";
+        if (t == "bank") return "fas fa-university";
+        if (t == "coa") return "fas fa-sitemap";
+        if (t == "voucher entry" || t == "voucher") return "fas fa-file-alt";
+        if (t == "employee") return "fas fa-user";
+        if (t == "financial reports") return "fas fa-chart-bar";
+        if (t == "loan") return "fas fa-money-bill";
         
         // Leaves / Specific Titles
-        if (t == "home") return "fa fa-home";
-        if (t == "user") return "fa fa-user";
-        if (t == "designation group") return "fa fa-folder-open-o";
-        if (t == "branch") return "fa fa-building-o";
-        if (t == "section") return "fa fa-th-list";
-        if (t == "department") return "fa fa-sitemap";
-        if (t == "designation") return "fa fa-briefcase";
-        if (t == "project") return "fa fa-tasks";
-        if (t == "company") return "fa fa-building";
-        if (t == "fiscal year") return "fa fa-calendar";
-        if (t == "settings") return "fa fa-sliders";
-        if (t == "db update") return "fa fa-database";
-        if (t == "sym user roll" || t == "sym user role") return "fa fa-key";
-        if (t == "user group") return "fa fa-group";
-        if (t == "investment register") return "fa fa-list-alt";
-        if (t == "bank name") return "fa fa-university";
-        if (t == "bank branch") return "fa fa-map-marker";
-        if (t == "coa group") return "fa fa-folder-open";
-        if (t == "coa sub group") return "fa fa-folder-open-o";
-        if (t == "coa category") return "fa fa-tags";
-        if (t == "investment type") return "fa fa-tag";
-        if (t == "transaction media") return "fa fa-credit-card";
-        if (t == "settlement policy") return "fa fa-gavel";
-        if (t == "auto journal setup") return "fa fa-magic";
-        if (t == "contribution") return "fa fa-gift";
-        if (t == "investment") return "fa fa-bar-chart-o";
-        if (t == "journal voucher") return "fa fa-file-text";
-        if (t == "payment voucher") return "fa fa-minus-square-o";
-        if (t == "receipt voucher") return "fa fa-plus-square-o";
-        if (t == "bank deposit" || t == "bank deposits") return "fa fa-download";
-        if (t == "withdraw" || t == "withdraws") return "fa fa-upload";
-        if (t == "return on bank interest" || t == "return on bank interests") return "fa fa-money";
-        if (t == "bank charge") return "fa fa-minus-circle";
-        if (t == "employee info") return "fa fa-user";
-        if (t == "employee resign") return "fa fa-times-circle";
-        if (t == "employee transfer") return "fa fa-exchange";
-        if (t == "opening") return "fa fa-play";
-        if (t == "payment") return "fa fa-money";
-        if (t == "break month") return "fa fa-pause";
-        if (t == "forfeiture") return "fa fa-ban";
-        if (t == "profit distribution") return "fa fa-bar-chart-o";
-        if (t == "settlement") return "fa fa-check-circle-o";
-        if (t == "year closing") return "fa fa-calendar";
-        if (t == "loan collection") return "fa fa-inbox";
-        if (t == "ledger") return "fa fa-book";
-        if (t == "trial balance") return "fa fa-gavel";
-        if (t == "income statement (p / l)" || t == "income statement (p/l)") return "fa fa-bar-chart-o";
-        if (t == "balance sheet") return "fa fa-bar-chart-o";
-        if (t == "net change") return "fa fa-refresh";
-        if (t == "all employee") return "fa fa-users";
-        if (t == "employee statement") return "fa fa-file-text-o";
-        if (t == "employee ledger") return "fa fa-book";
-        if (t == "loan statement") return "fa fa-file-pdf-o";
-        if (t == "schedule of loan member") return "fa fa-table";
-        if (t == "loan early settelment") return "fa fa-clock-o";
-        if (t == "loan monthly payment") return "fa fa-calendar-o";
-        if (t == "loan repayment to bank") return "fa fa-university";
-        if (t == "loan sattlement") return "fa fa-check";
-        if (t == "loan closed") return "fa fa-lock";
-        if (t == "final settlement") return "fa fa-flag";
+        if (t == "home") return "fas fa-home";
+        if (t == "user") return "fas fa-user";
+        if (t == "designation group") return "fas fa-folder-open";
+        if (t == "branch") return "fas fa-building";
+        if (t == "section") return "fas fa-list";
+        if (t == "department") return "fas fa-sitemap";
+        if (t == "designation") return "fas fa-briefcase";
+        if (t == "project") return "fas fa-tasks";
+        if (t == "company") return "fas fa-building";
+        if (t == "fiscal year") return "fas fa-calendar-alt";
+        if (t == "settings") return "fas fa-sliders-h";
+        if (t == "db update") return "fas fa-database";
+        if (t == "sym user roll" || t == "sym user role") return "fas fa-key";
+        if (t == "user group") return "fas fa-users";
+        if (t == "investment register") return "fas fa-list-alt";
+        if (t == "bank name") return "fas fa-university";
+        if (t == "bank branch") return "fas fa-map-marker-alt";
+        if (t == "coa group") return "fas fa-folder-open";
+        if (t == "coa sub group") return "fas fa-folder-open";
+        if (t == "coa category") return "fas fa-tags";
+        if (t == "investment type") return "fas fa-tag";
+        if (t == "transaction media") return "fas fa-credit-card";
+        if (t == "settlement policy") return "fas fa-gavel";
+        if (t == "auto journal setup") return "fas fa-magic";
+        if (t == "contribution") return "fas fa-gift";
+        if (t == "investment") return "fas fa-chart-bar";
+        if (t == "journal voucher") return "fas fa-file-alt";
+        if (t == "payment voucher") return "fas fa-minus-square";
+        if (t == "receipt voucher") return "fas fa-plus-square";
+        if (t == "bank deposit" || t == "bank deposits") return "fas fa-download";
+        if (t == "withdraw" || t == "withdraws") return "fas fa-upload";
+        if (t == "return on bank interest" || t == "return on bank interests") return "fas fa-money-bill";
+        if (t == "bank charge") return "fas fa-minus-circle";
+        if (t == "employee info") return "fas fa-user";
+        if (t == "employee resign") return "fas fa-times-circle";
+        if (t == "employee transfer") return "fas fa-exchange-alt";
+        if (t == "opening") return "fas fa-play";
+        if (t == "payment") return "fas fa-money-bill";
+        if (t == "break month") return "fas fa-pause";
+        if (t == "forfeiture") return "fas fa-ban";
+        if (t == "profit distribution") return "fas fa-chart-bar";
+        if (t == "settlement") return "fas fa-check-circle";
+        if (t == "year closing") return "fas fa-calendar-alt";
+        if (t == "loan collection") return "fas fa-inbox";
+        if (t == "ledger") return "fas fa-book";
+        if (t == "trial balance") return "fas fa-gavel";
+        if (t == "income statement (p / l)" || t == "income statement (p/l)") return "fas fa-chart-bar";
+        if (t == "balance sheet") return "fas fa-chart-bar";
+        if (t == "net change") return "fas fa-sync-alt";
+        if (t == "all employee") return "fas fa-users";
+        if (t == "employee statement") return "fas fa-file-alt";
+        if (t == "employee ledger") return "fas fa-book";
+        if (t == "loan statement") return "fas fa-file-pdf";
+        if (t == "schedule of loan member") return "fas fa-table";
+        if (t == "loan early settelment") return "fas fa-clock";
+        if (t == "loan monthly payment") return "fas fa-calendar-alt";
+        if (t == "loan repayment to bank") return "fas fa-university";
+        if (t == "loan sattlement") return "fas fa-check";
+        if (t == "loan closed") return "fas fa-lock";
+        if (t == "final settlement") return "fas fa-flag";
         
-        return "fa fa-circle-o";
+        return "fas fa-circle";
+    }
+
+    public static bool ShouldOpenAsDialogReport(string url, string parentKey)
+    {
+        return !string.IsNullOrWhiteSpace(url)
+            && !string.IsNullOrWhiteSpace(parentKey)
+            && parentKey.IndexOf("reports", StringComparison.OrdinalIgnoreCase) >= 0
+            && url.IndexOf("ReportVeiw", StringComparison.OrdinalIgnoreCase) >= 0;
     }
 }
 @{
@@ -112,8 +120,7 @@
 {
     var activeClass = item.IsCurrent ? " active-menu" : "";
     var linkClass = "nav-link" + activeClass;
-    if (!string.IsNullOrWhiteSpace(item.Url)
-        && item.Url.IndexOf("ReportVeiw", StringComparison.OrdinalIgnoreCase) >= 0)
+    if (ShouldOpenAsDialogReport(item.Url, parentKey))
     {
         linkClass += " linkReport";
     }
@@ -131,8 +138,7 @@
     {
         var activeClass = node.IsCurrent ? " active-menu" : "";
         var linkClass = "nav-link" + activeClass;
-        if (!string.IsNullOrWhiteSpace(node.Url)
-            && node.Url.IndexOf("ReportVeiw", StringComparison.OrdinalIgnoreCase) >= 0)
+        if (ShouldOpenAsDialogReport(node.Url, parentKey))
         {
             linkClass += " linkReport";
         }
@@ -262,7 +268,7 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <li class="nav-item">
                 <a href="@currentModel.HomeUrl" class="nav-link homeColor">
-                    <i class="nav-icon fa fa-home"></i>
+                    <i class="nav-icon fas fa-home"></i>
                     <p>Home</p>
                 </a>
             </li>

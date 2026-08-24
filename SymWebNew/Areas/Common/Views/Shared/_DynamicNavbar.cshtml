@@ -2,11 +2,18 @@
 @using System.Linq
 @model SymServices.Common.DynamicNavbarViewModel
 @{
-    Func<string, string, string> menuLinkClass = (url, baseClass) =>
+    Func<string, string, bool> shouldOpenAsDialogReport = (url, groupTitle) =>
+    {
+        return !string.IsNullOrWhiteSpace(url)
+            && !string.IsNullOrWhiteSpace(groupTitle)
+            && groupTitle.Equals("Reports", StringComparison.OrdinalIgnoreCase)
+            && url.IndexOf("ReportVeiw", StringComparison.OrdinalIgnoreCase) >= 0;
+    };
+
+    Func<string, string, string, string> menuLinkClass = (url, baseClass, groupTitle) =>
     {
         var linkClass = baseClass;
-        if (!string.IsNullOrWhiteSpace(url)
-            && url.IndexOf("ReportVeiw", StringComparison.OrdinalIgnoreCase) >= 0)
+        if (shouldOpenAsDialogReport(url, groupTitle))
         {
             linkClass += " linkReport";
         }
@@ -49,7 +56,7 @@
                 {
                     if (!node.IsDropdown)
                     {
-                        <li class="@node.CssClass @(node.IsCurrent ? "active" : string.Empty)"><a class="@menuLinkClass(node.Url, string.Empty)" href="@node.Url">@node.Title</a></li>
+                        <li class="@node.CssClass @(node.IsCurrent ? "active" : string.Empty)"><a class="@menuLinkClass(node.Url, string.Empty, node.Title)" href="@node.Url">@node.Title</a></li>
                     }
                     else
                     {
@@ -79,7 +86,7 @@
                                                 <ul class="multi-column-dropdown">
                                                     @foreach (var item in node.Items)
                                                     {
-                                                        <li class="@(item.IsCurrent ? "active" : string.Empty)"><a class="@menuLinkClass(item.Url, "btn btn-info")" href="@item.Url">@item.Title</a></li>
+                                                        <li class="@(item.IsCurrent ? "active" : string.Empty)"><a class="@menuLinkClass(item.Url, "btn btn-info", node.Title)" href="@item.Url">@item.Title</a></li>
                                                     }
                                                 </ul>
                                             </div>
@@ -92,7 +99,7 @@
                                                     <li class="sym-menu-group-title">@subGroup.Title</li>
                                                     @foreach (var item in subGroup.Items)
                                                     {
-                                                        <li class="@(item.IsCurrent ? "active" : string.Empty)"><a class="@menuLinkClass(item.Url, "btn btn-info")" href="@item.Url">@item.Title</a></li>
+                                                        <li class="@(item.IsCurrent ? "active" : string.Empty)"><a class="@menuLinkClass(item.Url, "btn btn-info", node.Title)" href="@item.Url">@item.Title</a></li>
                                                     }
                                                 </ul>
                                             </div>
@@ -104,7 +111,7 @@
                                             <ul class="multi-column-dropdown">
                                                 @foreach (var item in node.Items)
                                                 {
-                                                    <li class="@(item.IsCurrent ? "active" : string.Empty)"><a class="@menuLinkClass(item.Url, "btn btn-info")" href="@item.Url">@item.Title</a></li>
+                                                    <li class="@(item.IsCurrent ? "active" : string.Empty)"><a class="@menuLinkClass(item.Url, "btn btn-info", node.Title)" href="@item.Url">@item.Title</a></li>
                                                 }
                                                 @foreach (var subGroup in node.SubGroups)
                                                 {
@@ -113,7 +120,7 @@
                                                         <ul class="dropdown-menu">
                                                             @foreach (var item in subGroup.Items)
                                                             {
-                                                                <li class="@(item.IsCurrent ? "active" : string.Empty)"><a class="@menuLinkClass(item.Url, "dropdown btn btn-info")" href="@item.Url">@item.Title</a></li>
+                                                                <li class="@(item.IsCurrent ? "active" : string.Empty)"><a class="@menuLinkClass(item.Url, "dropdown btn btn-info", node.Title)" href="@item.Url">@item.Title</a></li>
                                                             }
                                                         </ul>
                                                     </li>
