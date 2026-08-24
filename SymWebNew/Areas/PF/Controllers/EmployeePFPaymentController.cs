@@ -360,38 +360,30 @@ namespace SymWebUI.Areas.PF.Controllers
         }
 
 
+        [HttpPost]
         public ActionResult MultiplePost(string ids)
         {
-            
-            string[]  strId = ids.Split('~');
-            var employeePFPaymentVM = _eaRepo.SelectByIdAll(strId[0]);
-            if (employeePFPaymentVM != null)
-            {
-                if (employeePFPaymentVM.Post == true)
-                {
-                    string[] resultpf = new string[6];
-                    resultpf[0] = "Fail";
-                    resultpf[1] = "Data Already Posted";
-                    return Json(resultpf, JsonRequestBehavior.AllowGet);
-                }
-            }
-           
             var permission = _reposur.SymRoleSession(identity.UserId, "1_38", "delete").ToString();
             Session["permission"] = permission;
             if (permission == "False")
             {
-                return Redirect("/Payroll/Home");
+                return Json(new[] { "Fail", "You do not have permission to post this transaction." });
             }
-            string[] result = new string[6];
+
+            string[] postIds = (ids ?? string.Empty)
+                .Split(new[] { '~' }, StringSplitOptions.RemoveEmptyEntries);
+            if (postIds.Length == 0)
+            {
+                return Json(new[] { "Fail", "Select data to post." });
+            }
 
             EmployeePFPaymentVM EarningVM = new EmployeePFPaymentVM();
 
             EarningVM.LastUpdateAt = DateTime.Now.ToString("yyyyMMddHHmmss");
             EarningVM.LastUpdateBy = identity.Name;
             EarningVM.LastUpdateFrom = identity.WorkStationIP;
-            string[] a = ids.Split('~');
-            result = _eaRepo.MultiplePost(EarningVM, a);
-            return Json(result[1], JsonRequestBehavior.AllowGet);
+            string[] result = _eaRepo.MultiplePost(EarningVM, postIds);
+            return Json(new[] { result[0], result[1] });
         }
 
         public ActionResult ImportEmployeePFPayment()

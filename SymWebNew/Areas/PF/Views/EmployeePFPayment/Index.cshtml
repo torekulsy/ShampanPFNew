@@ -117,9 +117,15 @@
 
                              if ('@identity.IsAdmin'.toLowerCase() == "true")
                              {
-                                 return '  &nbsp;  <a title="Click on for Edit" id="lnkEdit1" style="text-decoration:none;" Onclick="otherearningEdit(this);"  class=" sym-btn-edit-row"  data-Id="' + oObj.aData[0] + '"></a>'
-                                + '&nbsp; <a title="Click on for Post" style="text-decoration:none;" data-url="/@ViewBag.TransType/EmployeePFPayment/MultiplePost" onclick="postedData(this, myDataTable,\'' + oObj.aData[0] + '\');"  class="sym-btn-post-row"></a>'
-                                 ;
+                                 var editLink = '  &nbsp;  <a title="Click on for Edit" id="lnkEdit1" style="text-decoration:none;" Onclick="otherearningEdit(this);"  class=" sym-btn-edit-row"  data-Id="' + oObj.aData[0] + '"></a>';
+
+                                 if (oObj.aData[8] === "Posted") {
+                                     return editLink
+                                         + '&nbsp; <span title="Data already posted" class="sym-btn-post-row employee-payment-post-disabled" aria-disabled="true" style="opacity:0.45;pointer-events:none;cursor:default;"></span>';
+                                 }
+
+                                 return editLink
+                                     + '&nbsp; <a title="Click on for Post" style="text-decoration:none;" data-url="/@ViewBag.TransType/EmployeePFPayment/MultiplePost" data-id="' + oObj.aData[0] + '" onclick="postEmployeePFPayment(this);" class="sym-btn-post-row"></a>';
                              }
                              else {
                                  return '  &nbsp;  <a title="Click on for Edit" id="lnkEdit1" style="text-decoration:none;" Onclick="otherearningEdit(this);"  class=" sym-btn-edit-row"  data-Id="' + oObj.aData[0] + '"></a>';
@@ -174,5 +180,46 @@
         var parts = value.split('.');
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         return parts[0] + '.' + parts[1];
+    }
+
+    function postEmployeePFPayment(sender) {
+        var $sender = $(sender);
+        var id = $sender.attr("data-id");
+
+        if (!id || $sender.hasClass("employee-payment-posting")) {
+            return false;
+        }
+
+        Ask("Are you sure to Post!", function () {
+            $sender.addClass("employee-payment-posting")
+                .css({ "pointer-events": "none", "opacity": "0.45" });
+
+            $.ajax({
+                url: $sender.attr("data-url"),
+                type: "POST",
+                dataType: "json",
+                data: { ids: id },
+                success: function (result) {
+                    var status = result && result.length > 0 ? result[0] : "Fail";
+                    var message = result && result.length > 1 ? result[1] : "Unable to post data.";
+
+                    ShowResult(status, message);
+                    if (status === "Success") {
+                        setTimeout(function () { location.reload(); }, 1000);
+                        return;
+                    }
+
+                    $sender.removeClass("employee-payment-posting")
+                        .css({ "pointer-events": "", "opacity": "" });
+                },
+                error: function () {
+                    ShowResult("Fail", "Unable to post data. Please try again.");
+                    $sender.removeClass("employee-payment-posting")
+                        .css({ "pointer-events": "", "opacity": "" });
+                }
+            });
+        }, function () { });
+
+        return false;
     }
 </script>

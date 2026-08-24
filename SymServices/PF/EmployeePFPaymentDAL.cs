@@ -1416,11 +1416,15 @@ WHERE 1 = 1
 
                 #endregion open connection and transaction
 
-                if (Ids.Length > 1)
+                string[] postIds = (Ids ?? new string[0])
+                    .Where(id => !string.IsNullOrWhiteSpace(id))
+                    .ToArray();
+
+                if (postIds.Length > 0)
                 {
                     #region Update Settings
 
-                    for (int i = 0; i < Ids.Length - 1; i++)
+                    for (int i = 0; i < postIds.Length; i++)
                     {
                         #region Exist
 
@@ -1429,11 +1433,11 @@ WHERE 1 = 1
                         sqlText += " WHERE Id=@Id ";
                         SqlCommand cmdExist = new SqlCommand(sqlText, currConn);
                         cmdExist.Transaction = transaction;
-                        cmdExist.Parameters.AddWithValue("@Id", Ids[i]);
+                        cmdExist.Parameters.AddWithValue("@Id", postIds[i]);
                         ////cmdExist.Parameters.AddWithValue("@EmployeeId", vm.EmployeeId);
                         ////cmdExist.Parameters.AddWithValue("@EarningDate", Ordinary.DateToString(vm.EarningDate));
                         var exeChk = cmdExist.ExecuteScalar();
-                        string empId = exeChk.ToString();
+                        string empId = exeChk == null ? string.Empty : exeChk.ToString();
 
                         if (string.IsNullOrWhiteSpace(empId))
                         {
@@ -1442,10 +1446,14 @@ WHERE 1 = 1
 
                         #endregion Exist
 
-                        vm.Id = Ids[i];
+                        vm.Id = postIds[i];
                         vm.EmployeeId = empId;
 
                         retResults = Post(vm, currConn, transaction);
+                        if (!string.Equals(retResults[0], "Success", StringComparison.OrdinalIgnoreCase))
+                        {
+                            throw new InvalidOperationException(retResults[1]);
+                        }
 
                     }
                     retResults[2] = "";// Return Id
