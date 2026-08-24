@@ -152,11 +152,17 @@
     else
     {
         var openClass = node.IsCurrent ? " treeview-expanded last-parent-active" : "";
+        var childCount = (node.Items == null ? 0 : node.Items.Count)
+            + (node.SubGroups == null ? 0 : node.SubGroups.Count);
         <li class="nav-item">
             <a class="nav-link has-treeview-a@openClass" href="#" data-menu-id="@parentKey-@node.CssClass">
                 <i class="nav-icon @GetMenuIcon(node.Title)"></i>
                 <p>
                     @node.Title
+                    @if (childCount > 0)
+                    {
+                        <span class="menu-child-count" aria-label="@childCount child menus">@childCount</span>
+                    }
                     <i class="fas fa-angle-left right"></i>
                 </p>
             </a>
@@ -173,11 +179,16 @@
                     foreach (var subGroup in node.SubGroups)
                     {
                         var subGroupActive = subGroup.Items != null && subGroup.Items.Any(i => i.IsCurrent);
+                        var subGroupCount = subGroup.Items == null ? 0 : subGroup.Items.Count;
                         <li class="nav-item">
                             <a class="nav-link has-treeview-a@(subGroupActive ? " treeview-expanded last-parent-active" : "")" href="#" data-menu-id="@parentKey-@node.CssClass-@subGroup.Title">
                                 <i class="nav-icon @GetMenuIcon(subGroup.Title)"></i>
                                 <p>
                                     @subGroup.Title
+                                    @if (subGroupCount > 0)
+                                    {
+                                        <span class="menu-child-count" aria-label="@subGroupCount child menus">@subGroupCount</span>
+                                    }
                                     <i class="fas fa-angle-left right"></i>
                                 </p>
                             </a>
@@ -205,6 +216,22 @@
         color: #fff !important;
     }
 
+    .nav-sidebar .menu-child-count {
+        position: absolute;
+        top: 50%;
+        right: 33px;
+        min-width: 13px;
+        height: 16px;
+        padding: 0 5px;
+        border-radius: 4px;
+        background-color: #17a2b8;
+        color: #fff;
+        font-size: 9px;
+        font-weight: 700;
+        line-height: 16px;
+        text-align: center;
+        transform: translateY(-50%);
+    }
     .sidebar {
         height: calc(100vh - 118px) !important;
         width: 247px !important;
@@ -402,11 +429,16 @@
             {
                 DynamicNavbarViewModel moduleModel = service.BuildNavbarViewModel(module.Title);
                 var moduleActive = module.IsCurrent || (moduleModel.Nodes != null && moduleModel.Nodes.Any(n => n.IsCurrent));
+                var submenuCount = moduleModel.Nodes == null ? 0 : moduleModel.Nodes.Count;
                 <li class="nav-item">
                     <a class="nav-link has-treeview@(moduleActive ? " treeview-expanded" : "")" href="#" data-menu-id="module-@module.Title">
                         <i class="nav-icon @GetMenuIcon(module.Title)"></i>
                         <p>
                             @module.Title
+                            @if (submenuCount > 0)
+                            {
+                                <span class="menu-child-count" aria-label="@submenuCount submenus">@submenuCount</span>
+                            }
                             <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>
