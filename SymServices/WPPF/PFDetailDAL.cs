@@ -2813,114 +2813,114 @@ order by SectionOrderNo ";
             #endregion
         }
 
-//        public string[] AutoJournalSave(string TransactionMonth, string TransactionForm, string TransactionCode, string BranchId, SqlConnection currConn, SqlTransaction transaction, ShampanIdentityVM auditvm)
-//        {
-//            if (currConn == null)
-//            {
-//                currConn = _dbsqlConnection.GetConnection();
-//                if (currConn.State != ConnectionState.Open)
-//                {
-//                    currConn.Open();
-//                }
-//            }
+        public string[] AutoJournalSave(string TransactionMonth, string TransactionForm, string TransactionCode, string BranchId, SqlConnection currConn, SqlTransaction transaction, ShampanIdentityVM auditvm)
+        {
+            if (currConn == null)
+            {
+                currConn = _dbsqlConnection.GetConnection();
+                if (currConn.State != ConnectionState.Open)
+                {
+                    currConn.Open();
+                }
+            }
 
-//            string[] retResults = new string[6];
-//            retResults[0] = "Fail";//Success or Fail
-//            retResults[1] = "Fail";// Success or Fail Message
+            string[] retResults = new string[6];
+            retResults[0] = "Fail";//Success or Fail
+            retResults[1] = "Fail";// Success or Fail Message
 
-//            string EmployeeCOAID = "";
-//            string EmployerCOAID = "";
-//            string BankCOAID = "";
+            string EmployeeCOAID = "";
+            string EmployerCOAID = "";
+            string BankCOAID = "";
 
-//            string startdata = @"Select PeriodEnd from FiscalYearDetail where PeriodName=@PeriodName ";
-//            SqlCommand cmdd = new SqlCommand(startdata, currConn, transaction);
-//            cmdd.Parameters.AddWithValue("@PeriodName", TransactionMonth);
-//            SqlDataAdapter adapterd = new SqlDataAdapter(cmdd);
-//            DataTable dtd = new DataTable();
-//            adapterd.Fill(dtd);
+            string startdata = @"Select PeriodEnd from FiscalYearDetail where PeriodName=@PeriodName ";
+            SqlCommand cmdd = new SqlCommand(startdata, currConn, transaction);
+            cmdd.Parameters.AddWithValue("@PeriodName", TransactionMonth);
+            SqlDataAdapter adapterd = new SqlDataAdapter(cmdd);
+            DataTable dtd = new DataTable();
+            adapterd.Fill(dtd);
 
-           
 
-//            string Journal = @"Select JournalFor, JournalName,Nature,GroupName,COAID from AutoJournalSetup ";
-//            SqlCommand cmdj = new SqlCommand(Journal, currConn, transaction);
-//            cmdj.Parameters.AddWithValue("JournalFor", TransactionForm);
-//            SqlDataAdapter adapterj = new SqlDataAdapter(cmdj);
-//            DataTable dtj = new DataTable();
-//            adapterj.Fill(dtj);
-//            if(dtj.Rows.Count>0)
-//            {
-//                EmployeeCOAID = dtj.Rows[0]["COAID"].ToString();
-//                EmployerCOAID = dtj.Rows[1]["COAID"].ToString();
-//                BankCOAID = dtj.Rows[2]["COAID"].ToString();
 
-//            }
+            string Journal = @"Select JournalFor, JournalName,Nature,GroupName,COAID from AutoJournalSetup ";
+            SqlCommand cmdj = new SqlCommand(Journal, currConn, transaction);
+            cmdj.Parameters.AddWithValue("JournalFor", TransactionForm);
+            SqlDataAdapter adapterj = new SqlDataAdapter(cmdj);
+            DataTable dtj = new DataTable();
+            adapterj.Fill(dtj);
+            if (dtj.Rows.Count > 0)
+            {
+                EmployeeCOAID = dtj.Rows[0]["COAID"].ToString();
+                EmployerCOAID = dtj.Rows[1]["COAID"].ToString();
+                BankCOAID = dtj.Rows[2]["COAID"].ToString();
 
-//            SettingDAL _settingDal = new SettingDAL();
-//            string IsAutoJournal = _settingDal.settingValue("PF", "IsAutoJournal").Trim();
+            }
 
-//            if (IsAutoJournal == "Y")
-//            {
+            SettingDAL _settingDal = new SettingDAL();
+            string IsAutoJournal = _settingDal.settingValue("PF", "IsAutoJournal").Trim();
 
-//                string id = @"Select SUM(pd.EmployeePFValue) EmployeePFValue, SUM(pd.EmployeerPFValue) EmployeerPFValue from PFDetails pd
-//                             LEFT OUTER JOIN PFHeader ph on ph.id=pd.PFHeaderId where ph.Code=@Code";
-//                SqlCommand cmdid = new SqlCommand(id, currConn, transaction);
-//                cmdid.Parameters.AddWithValue("@Code", TransactionCode);               
-//                SqlDataAdapter adapterid = new SqlDataAdapter(cmdid);
-//                DataTable dtpf = new DataTable();
-//                adapterid.Fill(dtpf);
+            if (IsAutoJournal == "Y")
+            {
 
-//                GLJournalVM vmj = new GLJournalVM
-//                {
-//                    Id = 1,
-//                    CreatedAt = DateTime.Now.ToString(),
-//                    CreatedBy = "admin",
-//                    CreatedFrom = "",                   
-//                    TransactionType = 31,
-//                    JournalType = 1,
-//                    TransType = "PF",
-                 
+                string id = @"Select SUM(pd.EmployeePFValue) EmployeePFValue, SUM(pd.EmployeerPFValue) EmployeerPFValue from PFDetails pd
+                             LEFT OUTER JOIN PFHeader ph on ph.id=pd.PFHeaderId where ph.Code=@Code";
+                SqlCommand cmdid = new SqlCommand(id, currConn, transaction);
+                cmdid.Parameters.AddWithValue("@Code", TransactionCode);
+                SqlDataAdapter adapterid = new SqlDataAdapter(cmdid);
+                DataTable dtpf = new DataTable();
+                adapterid.Fill(dtpf);
 
-//                    GLJournalDetails = new List<GLJournalDetailVM>
-//                    {
-//                        new GLJournalDetailVM
-//                        {                                  
-//                            COAId =Convert.ToInt32(EmployeeCOAID),
-//                            CrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployeePFValue"].ToString()),
-//                            IsDr = false,
-//                            IsYearClosing = false,
-//                            Post = false
-//                        },
-//                        new GLJournalDetailVM
-//                        {                                  
-//                            COAId =Convert.ToInt32(EmployerCOAID),
-//                            CrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployeerPFValue"].ToString()),
-//                            IsDr = false,
-//                            IsYearClosing = false,
-//                            Post = false
-//                        },
-//                            new GLJournalDetailVM
-//                        {
-//                            COAId =Convert.ToInt32(BankCOAID),
-//                            DrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployeePFValue"].ToString()) + Convert.ToDecimal(dtpf.Rows[0]["EmployeerPFValue"].ToString()),
-//                            IsDr = true,
-//                            IsYearClosing = false,
-//                            Post = false
-//                        }
-//                    }
-//                };
-//                vmj.Code = TransactionCode;
-//                vmj.TransactionDate = dtd.Rows[0][0].ToString();
-//                vmj.BranchId = BranchId;
-//                vmj.Remarks = "Contribution Employee & Employer";
-//                GLJournalDAL glJournalDal = new GLJournalDAL();
-//                retResults = glJournalDal.Insert(vmj);             
-//            }
+                GLJournalVM vmj = new GLJournalVM
+                {
+                    Id = 1,
+                    CreatedAt = DateTime.Now.ToString(),
+                    CreatedBy = "admin",
+                    CreatedFrom = "",
+                    TransactionType = 31,
+                    JournalType = 1,
+                    TransType = "PF",
 
-//            #region Results
-//            return retResults;
-//            #endregion
 
-//        }
+                    GLJournalDetails = new List<GLJournalDetailVM>
+                    {
+                        new GLJournalDetailVM
+                        {                                  
+                            COAId =Convert.ToInt32(EmployeeCOAID),
+                            CrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployeePFValue"].ToString()),
+                            IsDr = false,
+                            IsYearClosing = false,
+                            Post = false
+                        },
+                        new GLJournalDetailVM
+                        {                                  
+                            COAId =Convert.ToInt32(EmployerCOAID),
+                            CrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployeerPFValue"].ToString()),
+                            IsDr = false,
+                            IsYearClosing = false,
+                            Post = false
+                        },
+                            new GLJournalDetailVM
+                        {
+                            COAId =Convert.ToInt32(BankCOAID),
+                            DrAmount = Convert.ToDecimal(dtpf.Rows[0]["EmployeePFValue"].ToString()) + Convert.ToDecimal(dtpf.Rows[0]["EmployeerPFValue"].ToString()),
+                            IsDr = true,
+                            IsYearClosing = false,
+                            Post = false
+                        }
+                    }
+                };
+                vmj.Code = TransactionCode;
+                vmj.TransactionDate = dtd.Rows[0][0].ToString();
+                vmj.BranchId = BranchId;
+                vmj.Remarks = "Contribution Employee & Employer";
+                GLJournalDAL glJournalDal = new GLJournalDAL();
+                retResults = glJournalDal.Insert(vmj);
+            }
+
+            #region Results
+            return retResults;
+            #endregion
+
+        }
         /// <summary>
         /// Inserts a new PF Details into the database with the provided details from the view model.
         /// Handles optional SQL connection and transaction management for use in broader transactional operations.

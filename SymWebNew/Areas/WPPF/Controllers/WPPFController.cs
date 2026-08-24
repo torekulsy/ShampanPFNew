@@ -1,4 +1,4 @@
-﻿using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.CrystalReports.Engine;
 using JQueryDataTables.Models;
 using SymOrdinary;
 using SymRepository.Common;
@@ -29,7 +29,7 @@ namespace SymWebUI.Areas.WPPF.Controllers
     {
         public WPPFController()
         {
-            ViewBag.TransType = AreaTypePFVM.TransType;
+            ViewBag.TransType = AreaTypeWPPFVM.TransType;
         }
         //
         // GET: /WPPF/WPPF/
@@ -54,8 +54,8 @@ namespace SymWebUI.Areas.WPPF.Controllers
 
             string[] conditionFields = { "pfd.EmployeeId", "pfd.FiscalYearDetailId" };
             string[] conditionValues = { EmployeeId, fydid };
-
-            getAllData = _repo.SelectFiscalPeriodHeader(conditionFields, conditionValues);
+            string TransType = AreaTypeWPPFVM.TransType;
+            getAllData = _repo.SelectFiscalPeriodHeader(TransType, conditionFields, conditionValues);
 
             if (!string.IsNullOrEmpty(param.sSearch))
             {
@@ -93,7 +93,7 @@ namespace SymWebUI.Areas.WPPF.Controllers
             Func<PFHeaderVM, string> orderingFunction = (c =>
                 sortColumnIndex == 1 && isSortable_1 ? c.Code :
                 sortColumnIndex == 2 && isSortable_2 ? c.ProjectName :
-                sortColumnIndex == 3 && isSortable_3 ? c.PeriodStart :
+                sortColumnIndex == 3 && isSortable_3 ? c.FiscalPeriod :
                 sortColumnIndex == 4 && isSortable_4 ? c.TotalPF.ToString() :
                 sortColumnIndex == 5 && isSortable_5 ? c.Post.ToString() :
                
@@ -113,10 +113,6 @@ namespace SymWebUI.Areas.WPPF.Controllers
                     , c.ProjectName
                     , c.FiscalPeriod
                     , c.TotalPF.ToString()
-                    , c.DistributedValue.ToString()
-                    , c.EmployeePFValue.ToString()
-                    , c.EmployeerPFValue.ToString()
-                    , c.TotalEmployeeValue.ToString()
                     , c.Post ? "Yes" : "No"
                  };
             return Json(new
@@ -129,23 +125,25 @@ namespace SymWebUI.Areas.WPPF.Controllers
              JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Create(string fydid, decimal? TotalProfit, int? FiscalYear)
+        public ActionResult Create(decimal? TotalProfit, string fydid, int? FiscalYear)
         {
             if (string.IsNullOrEmpty(fydid))
                 return View();
 
             if (TotalProfit == null || TotalProfit <= 0)
                 return Json("Fail~Invalid Total Profit", JsonRequestBehavior.AllowGet);
-
+           
             ShampanIdentityVM vm = new ShampanIdentityVM
             {
                 CreatedAt = DateTime.Now.ToString("yyyyMMddHHmmss"),
                 CreatedBy = identity.Name,
-                CreatedFrom = identity.WorkStationIP
+                CreatedFrom = identity.WorkStationIP,
+                BranchId = Session["BranchId"].ToString()
             };
 
+            string TransType = AreaTypeWPPFVM.TransType;
             WPPFRepo repo = new WPPFRepo();
-            string[] result = repo.Insert(TotalProfit, fydid, FiscalYear, vm);
+            string[] result = repo.Insert(TotalProfit, fydid, FiscalYear,TransType, vm);
 
             string mgs = result[0] + "~" + result[1];
             Session["result"] = mgs;
@@ -162,11 +160,11 @@ namespace SymWebUI.Areas.WPPF.Controllers
 
 
                 WPPFRepo _repo = new WPPFRepo();
-                string[] conditionFields = { "b.code" };
+                string[] conditionFields = { "b.Code" };
                 string[] conditionValues = { code.ToString() };
 
-
-                var pfh = _repo.SelectProfitDistribution(conditionFields, conditionValues).FirstOrDefault();
+                string TransType = AreaTypeWPPFVM.TransType;
+                var pfh = _repo.SelectProfitDistribution(TransType, conditionFields, conditionValues).FirstOrDefault();
                 ViewBag.PeriodName = pfh.FiscalPeriod + " (" + pfh.ProjectName + " )";
 
                 return View();
@@ -187,8 +185,8 @@ namespace SymWebUI.Areas.WPPF.Controllers
 
             string[] conditionFields = { "b.Code" };
             string[] conditionValues = { code.ToString() };
-
-            getAllData = _repo.SelectProfitDistribution(conditionFields, conditionValues);
+            string TransType = AreaTypeWPPFVM.TransType;
+            getAllData = _repo.SelectProfitDistribution(TransType, conditionFields, conditionValues);
 
             if (!string.IsNullOrEmpty(param.sSearch))
             {
@@ -197,14 +195,12 @@ namespace SymWebUI.Areas.WPPF.Controllers
                 var isSearchable2 = Convert.ToBoolean(Request["bSearchable_2"]);
                 var isSearchable3 = Convert.ToBoolean(Request["bSearchable_3"]);
                 var isSearchable4 = Convert.ToBoolean(Request["bSearchable_4"]);
-                var isSearchable5 = Convert.ToBoolean(Request["bSearchable_5"]);
                 filteredData = getAllData
                     .Where(c =>
                           isSearchable1 && c.Code.ToLower().Contains(param.sSearch.ToLower())
                        || isSearchable2 && c.ProjectName.ToLower().Contains(param.sSearch.ToLower())
-                       || isSearchable3 && c.FiscalPeriod.ToLower().Contains(param.sSearch.ToLower())
-                       || isSearchable4 && c.TotalPF.ToString().ToLower().Contains(param.sSearch.ToLower())
-                       || isSearchable5 && c.Post.ToString().ToLower().Contains(param.sSearch.ToLower())
+                       || isSearchable3 && c.TotalPF.ToString().ToLower().Contains(param.sSearch.ToLower())
+                       || isSearchable4 && c.Post.ToString().ToLower().Contains(param.sSearch.ToLower())
                     );
             }
             else
@@ -216,15 +212,13 @@ namespace SymWebUI.Areas.WPPF.Controllers
             var isSortable_2 = Convert.ToBoolean(Request["bSortable_2"]);
             var isSortable_3 = Convert.ToBoolean(Request["bSortable_3"]);
             var isSortable_4 = Convert.ToBoolean(Request["bSortable_4"]);
-            var isSortable_5 = Convert.ToBoolean(Request["bSortable_5"]);
 
             var sortColumnIndex = Convert.ToInt32(Request["iSortCol_0"]);
             Func<PFHeaderVM, string> orderingFunction = (c =>
                 sortColumnIndex == 1 && isSortable_1 ? c.Code :
                 sortColumnIndex == 2 && isSortable_2 ? c.ProjectName :
-                sortColumnIndex == 3 && isSortable_3 ? c.FiscalPeriod :
-                sortColumnIndex == 4 && isSortable_4 ? c.TotalPF.ToString() :
-                sortColumnIndex == 5 && isSortable_5 ? c.Post.ToString() :
+                sortColumnIndex == 3 && isSortable_3 ? c.TotalPF.ToString() :
+                sortColumnIndex == 4 && isSortable_4 ? c.Post.ToString() :
                                                            "");
 
             var sortDirection = Request["sSortDir_0"]; // asc or desc
@@ -239,7 +233,6 @@ namespace SymWebUI.Areas.WPPF.Controllers
                  //c.Id.ToString()
                  c.Code
                 , c.ProjectName
-                , c.DistributionDate
                 ,c.TotalPF.ToString()
                 , c.Post?"Yes":"No"
             };
@@ -271,9 +264,9 @@ namespace SymWebUI.Areas.WPPF.Controllers
                 {
                     Id = Convert.ToInt32(ids.Split('~')[0])
                 };
-
+                string TransType = AreaTypeWPPFVM.TransType;
                 // Prepare the result variable to hold the outcome of the post operation
-                string[] result = _repo.PostHeader(headerVm);
+                string[] result = _repo.PostHeader(TransType, headerVm);
 
                 // Return the second result element (status message) as the response
                 return Json(result[1], JsonRequestBehavior.AllowGet);
@@ -312,10 +305,10 @@ namespace SymWebUI.Areas.WPPF.Controllers
                 ReportDocument doc = new ReportDocument();
                 DataSet ds = new DataSet();
                 DataTable dt = new DataTable();
-
+                string TransType = AreaTypeWPPFVM.TransType;
                 // RepoCall → load all WPPF headers without filtering
                 WPPFRepo _repo = new WPPFRepo();
-                var getAllData = _repo.SelectAll();
+                var getAllData = _repo.SelectAll(TransType);
 
                 dt = Ordinary.ListToDataTable(getAllData.ToList());
 
@@ -466,7 +459,7 @@ namespace SymWebUI.Areas.WPPF.Controllers
                     return Redirect("/Payroll/Home");
                 }
 
-                string FileName = "WPPFReport.xls";
+                string FileName = "WPPF Profit Value Report.xls";
                 string fullPath = AppDomain.CurrentDomain.BaseDirectory + "Files\\Export\\";
 
                 if (System.IO.File.Exists(fullPath + FileName))
@@ -478,31 +471,57 @@ namespace SymWebUI.Areas.WPPF.Controllers
 
 
                 #region Pull Data
-
+                string TransType = AreaTypeWPPFVM.TransType;
                 WPPFRepo _repo = new WPPFRepo();
-                var getAllData = _repo.SelectAll();
+                var getAllData = _repo.SelectAll(TransType);
 
                 dt = Ordinary.ListToDataTable(getAllData.ToList());
 
                 // Remove unwanted columns
-                var toRemove = new string[]
-                {
-                    "Id","FiscalYearDetailId","ProjectId","PeriodStart","Post","Remarks","IsActive","IsArchive","CreatedBy","CreatedAt","CreatedFrom","LastUpdateBy","LastUpdateAt",
-                    "LastUpdateFrom","Operation","DistributionDate","PeriodEnd","TransType","ProjectName","TotalEmployerValue"
-                };
+                string[] toRemove =
+{
+    "Id",
+    "FiscalYearDetailId",
+    "DistributionDate",
+    "EmployeePFValue",
+    "EmployeerPFValue",
+    "TotalEmployeeValue",
+    "Post",
+    "Remarks",
+    "IsActive",
+    "IsArchive",
+    "CreatedBy",
+    "CreatedAt",
+    "CreatedFrom",
+    "LastUpdateBy",
+    "LastUpdateAt",
+    "LastUpdateFrom",
+    "TotalEmployerValue",
+    "Operation",
+    "ProjectId",
+    "PeriodStart",
+    "PeriodEnd",
+    "TransType",
+    "DistributedValue"
+};
+
+
                 foreach (string col in toRemove)
                 {
                     if (dt.Columns.Contains(col))
                         dt.Columns.Remove(col);
                 }
 
-                // Rename columns for Excel
-                dt.Columns["Code"].ColumnName = "Code";
-                dt.Columns["FiscalPeriod"].ColumnName = "Period Name";
-                dt.Columns["TotalPF"].ColumnName = "Total Profit";
-                dt.Columns["EmployeePFValue"].ColumnName = "WPPF Value";
-                dt.Columns["EmployeerPFValue"].ColumnName = "WWF Value";
-                dt.Columns["TotalEmployeeValue"].ColumnName = "BWWF Value";
+                // Rename safely
+                if (dt.Columns.Contains("Code"))
+                    dt.Columns["Code"].ColumnName = "Code";
+                if (dt.Columns.Contains("ProjectName"))
+                    dt.Columns["ProjectName"].ColumnName = "Project Name";
+                if (dt.Columns.Contains("FiscalPeriod"))
+                    dt.Columns["FiscalPeriod"].ColumnName = "Fiscal Period";
+
+                if (dt.Columns.Contains("TotalPF"))
+                    dt.Columns["TotalPF"].ColumnName = "Total Profit";
 
                 #endregion
 
@@ -523,7 +542,7 @@ namespace SymWebUI.Areas.WPPF.Controllers
 
                 #region Report Info
 
-                string filename = "WPPF_ExcelReport";
+                string filename = "WPPF Profit Value Excel Report";
 
                 CompanyRepo cRepo = new CompanyRepo();
                 CompanyVM comInfo = cRepo.SelectById(1);
@@ -568,7 +587,7 @@ namespace SymWebUI.Areas.WPPF.Controllers
                 result[1] = "Successful~Excel Downloaded";
 
                 Session["result"] = result[0] + "~" + result[1];
-                return Redirect("/PF/WPPF/IndexFiscalPeriod");
+                return Redirect("/WPPF/WPPF/IndexFiscalPeriod");
 
                 #endregion
             }
@@ -578,7 +597,7 @@ namespace SymWebUI.Areas.WPPF.Controllers
 
                 FileLogger.Log("DownloadAllWPPFReport", this.GetType().Name, e.Message + Environment.NewLine + e.StackTrace);
 
-                return Redirect("/PF/WPPF/IndexFiscalPeriod");
+                return Redirect("/WPPF/WPPF/IndexFiscalPeriod");
             }
         }
 
@@ -608,8 +627,8 @@ namespace SymWebUI.Areas.WPPF.Controllers
 
                 string[] conditionFields = { "b.Code" };
                 string[] conditionValues = { code };
-
-                var getAllData = _repo.SelectProfitDistribution(conditionFields, conditionValues);
+                string TransType = AreaTypeWPPFVM.TransType;
+                var getAllData = _repo.SelectProfitDistribution(TransType, conditionFields, conditionValues);
 
                 dt = Ordinary.ListToDataTable(getAllData.ToList());
 
@@ -672,7 +691,7 @@ namespace SymWebUI.Areas.WPPF.Controllers
                     return Redirect("/Payroll/Home");
                 }
 
-                string FileName = "WPPFDistributionReport.xls";
+                string FileName = "WPPF Profit Distribution Report.xls";
                 string fullPath = AppDomain.CurrentDomain.BaseDirectory + "Files\\Export\\";
 
                 if (System.IO.File.Exists(fullPath + FileName))
@@ -690,17 +709,38 @@ namespace SymWebUI.Areas.WPPF.Controllers
                 // If 'code' is provided, filter by it, otherwise fetch all data
                 string[] conditionFields = { "b.Code" };
                 string[] conditionValues = { code };
-
-                var getAllData = _repo.SelectProfitDistribution(conditionFields, conditionValues);
+                string TransType = AreaTypeWPPFVM.TransType;
+                var getAllData = _repo.SelectProfitDistribution(TransType, conditionFields, conditionValues);
                 dt = Ordinary.ListToDataTable(getAllData.ToList());
 
 
                 // Remove unwanted columns
                 var toRemove = new string[]
                         {
-                            "Id","WPPFHeaderId","EmployeeId","IsArchive","CreatedBy","CreatedAt","CreatedFrom",
-                            "LastUpdateBy","LastUpdateAt","LastUpdateFrom","FiscalYearDetailId","FiscalPeriod","EmployeePFValue","EmployeerPFValue","TotalEmployeeValue","Post","Remarks","IsActive",
-                            "TotalEmployerValue","Operation","ProjectId","PeriodStart","PeriodEnd","TransType"
+                            "Id",
+    "FiscalYearDetailId",
+    "DistributionDate",
+    "EmployeePFValue",
+    "EmployeerPFValue",
+    "TotalEmployeeValue",
+    "Post",
+    "Remarks",
+    "IsActive",
+    "IsArchive",
+    "CreatedBy",
+    "CreatedAt",
+    "CreatedFrom",
+    "LastUpdateBy",
+    "LastUpdateAt",
+    "LastUpdateFrom",
+    "TotalEmployerValue",
+    "Operation",
+    "ProjectId",
+    "PeriodStart",
+    "PeriodEnd",
+    "TransType",
+    "DistributedValue",
+    "FiscalPeriod"
                         };
 
                 foreach (string col in toRemove)
@@ -710,9 +750,8 @@ namespace SymWebUI.Areas.WPPF.Controllers
                 }
 
                 // Rename columns for Excel
-                dt.Columns["Code"].ColumnName = "WPPF Code";
+                dt.Columns["Code"].ColumnName = "Code";
                 dt.Columns["ProjectName"].ColumnName = "Employee Name";
-                dt.Columns["DistributionDate"].ColumnName = "Distribution Date";
                 dt.Columns["TotalPF"].ColumnName = "Employee Profit";
 
                 #endregion
@@ -776,7 +815,7 @@ namespace SymWebUI.Areas.WPPF.Controllers
                 result[1] = "Successful~Excel Downloaded";
                 Session["result"] = result[0] + "~" + result[1];
 
-                return Redirect("/PF/WPPF/ProfitDistribution");
+                return Redirect("/WPPF/WPPF/ProfitDistribution");
 
                 #endregion
             }
@@ -784,7 +823,7 @@ namespace SymWebUI.Areas.WPPF.Controllers
             {
                 Session["result"] = "Fail~Process Fail";
                 FileLogger.Log("DownloadAllWPPFProfitDistributionReport", this.GetType().Name, e.Message);
-                return Redirect("/PF/WPPF/ProfitDistribution");
+                return Redirect("/WPPF/WPPF/ProfitDistribution");
             }
         }
     }

@@ -1,0 +1,295 @@
+@using System
+@using System.Linq
+@using SymServices.Common
+
+@functions {
+    public static string GetMenuIcon(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title)) return "fa fa-circle-o";
+        
+        string t = title.Trim().ToLowerInvariant();
+        
+        // Modules/Areas
+        if (t == "admin") return "fa fa-cogs";
+        if (t == "pf") return "fa fa-briefcase";
+        if (t == "gl") return "fa fa-book";
+        if (t == "wppf") return "fa fa-users";
+        
+        // Groups
+        if (t == "setup") return "fa fa-wrench";
+        if (t == "transaction") return "fa fa-exchange";
+        if (t == "reports") return "fa fa-bar-chart-o";
+        
+        // Subgroups
+        if (t == "master data") return "fa fa-database";
+        if (t == "user") return "fa fa-users";
+        if (t == "bank") return "fa fa-university";
+        if (t == "coa") return "fa fa-sitemap";
+        if (t == "voucher entry" || t == "voucher") return "fa fa-file-text-o";
+        if (t == "employee") return "fa fa-user";
+        if (t == "financial reports") return "fa fa-bar-chart-o";
+        if (t == "loan") return "fa fa-money";
+        
+        // Leaves / Specific Titles
+        if (t == "home") return "fa fa-home";
+        if (t == "user") return "fa fa-user";
+        if (t == "designation group") return "fa fa-folder-open-o";
+        if (t == "branch") return "fa fa-building-o";
+        if (t == "section") return "fa fa-th-list";
+        if (t == "department") return "fa fa-sitemap";
+        if (t == "designation") return "fa fa-briefcase";
+        if (t == "project") return "fa fa-tasks";
+        if (t == "company") return "fa fa-building";
+        if (t == "fiscal year") return "fa fa-calendar";
+        if (t == "settings") return "fa fa-sliders";
+        if (t == "db update") return "fa fa-database";
+        if (t == "sym user roll" || t == "sym user role") return "fa fa-key";
+        if (t == "user group") return "fa fa-group";
+        if (t == "investment register") return "fa fa-list-alt";
+        if (t == "bank name") return "fa fa-university";
+        if (t == "bank branch") return "fa fa-map-marker";
+        if (t == "coa group") return "fa fa-folder-open";
+        if (t == "coa sub group") return "fa fa-folder-open-o";
+        if (t == "coa category") return "fa fa-tags";
+        if (t == "investment type") return "fa fa-tag";
+        if (t == "transaction media") return "fa fa-credit-card";
+        if (t == "settlement policy") return "fa fa-gavel";
+        if (t == "auto journal setup") return "fa fa-magic";
+        if (t == "contribution") return "fa fa-gift";
+        if (t == "investment") return "fa fa-bar-chart-o";
+        if (t == "journal voucher") return "fa fa-file-text";
+        if (t == "payment voucher") return "fa fa-minus-square-o";
+        if (t == "receipt voucher") return "fa fa-plus-square-o";
+        if (t == "bank deposit" || t == "bank deposits") return "fa fa-download";
+        if (t == "withdraw" || t == "withdraws") return "fa fa-upload";
+        if (t == "return on bank interest" || t == "return on bank interests") return "fa fa-money";
+        if (t == "bank charge") return "fa fa-minus-circle";
+        if (t == "employee info") return "fa fa-user";
+        if (t == "employee resign") return "fa fa-times-circle";
+        if (t == "employee transfer") return "fa fa-exchange";
+        if (t == "opening") return "fa fa-play";
+        if (t == "payment") return "fa fa-money";
+        if (t == "break month") return "fa fa-pause";
+        if (t == "forfeiture") return "fa fa-ban";
+        if (t == "profit distribution") return "fa fa-bar-chart-o";
+        if (t == "settlement") return "fa fa-check-circle-o";
+        if (t == "year closing") return "fa fa-calendar";
+        if (t == "loan collection") return "fa fa-inbox";
+        if (t == "ledger") return "fa fa-book";
+        if (t == "trial balance") return "fa fa-gavel";
+        if (t == "income statement (p / l)" || t == "income statement (p/l)") return "fa fa-bar-chart-o";
+        if (t == "balance sheet") return "fa fa-bar-chart-o";
+        if (t == "net change") return "fa fa-refresh";
+        if (t == "all employee") return "fa fa-users";
+        if (t == "employee statement") return "fa fa-file-text-o";
+        if (t == "employee ledger") return "fa fa-book";
+        if (t == "loan statement") return "fa fa-file-pdf-o";
+        if (t == "schedule of loan member") return "fa fa-table";
+        if (t == "loan early settelment") return "fa fa-clock-o";
+        if (t == "loan monthly payment") return "fa fa-calendar-o";
+        if (t == "loan repayment to bank") return "fa fa-university";
+        if (t == "loan sattlement") return "fa fa-check";
+        if (t == "loan closed") return "fa fa-lock";
+        if (t == "final settlement") return "fa fa-flag";
+        
+        return "fa fa-circle-o";
+    }
+}
+@{
+    var service = new DynamicMenuService();
+    string currentAreaToken = Convert.ToString(ViewContext.RouteData.DataTokens["area"]);
+    string currentArea = string.IsNullOrWhiteSpace(currentAreaToken) ? "Admin" : currentAreaToken.Trim();
+    if (string.Equals(currentArea, "Common", StringComparison.OrdinalIgnoreCase))
+    {
+        currentArea = "Admin";
+    }
+
+    DynamicNavbarViewModel currentModel = service.BuildNavbarViewModel(currentArea);
+    string moduleLogo = System.Configuration.ConfigurationManager.AppSettings["Logo"] ?? "LOGO_Sym.png";
+}
+
+@helper RenderItem(DynamicMenuItem item, string parentKey)
+{
+    var activeClass = item.IsCurrent ? " active-menu" : "";
+    var linkClass = "nav-link" + activeClass;
+    if (!string.IsNullOrWhiteSpace(item.Url)
+        && item.Url.IndexOf("ReportVeiw", StringComparison.OrdinalIgnoreCase) >= 0)
+    {
+        linkClass += " linkReport";
+    }
+    <li class="nav-item">
+        <a class="@linkClass" href="@item.Url" data-menu-id="@parentKey-@item.Title">
+            <i class="nav-icon @GetMenuIcon(item.Title)"></i>
+            <p>@item.Title</p>
+        </a>
+    </li>
+}
+
+@helper RenderNode(DynamicMenuNode node, string parentKey)
+{
+    if (!node.IsDropdown)
+    {
+        var activeClass = node.IsCurrent ? " active-menu" : "";
+        var linkClass = "nav-link" + activeClass;
+        if (!string.IsNullOrWhiteSpace(node.Url)
+            && node.Url.IndexOf("ReportVeiw", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            linkClass += " linkReport";
+        }
+        <li class="nav-item">
+            <a class="@linkClass" href="@node.Url" data-menu-id="@parentKey-@node.CssClass">
+                <i class="nav-icon @GetMenuIcon(node.Title)"></i>
+                <p>@node.Title</p>
+            </a>
+        </li>
+    }
+    else
+    {
+        var openClass = node.IsCurrent ? " treeview-expanded last-parent-active" : "";
+        <li class="nav-item">
+            <a class="nav-link has-treeview-a@openClass" href="#" data-menu-id="@parentKey-@node.CssClass">
+                <i class="nav-icon @GetMenuIcon(node.Title)"></i>
+                <p>
+                    @node.Title
+                    <i class="fas fa-angle-left right"></i>
+                </p>
+            </a>
+            <ul class="nav nav-treeview">
+                @if (node.Items != null)
+                {
+                    foreach (var item in node.Items)
+                    {
+                        @RenderItem(item, parentKey + "-" + node.CssClass)
+                    }
+                }
+                @if (node.SubGroups != null)
+                {
+                    foreach (var subGroup in node.SubGroups)
+                    {
+                        var subGroupActive = subGroup.Items != null && subGroup.Items.Any(i => i.IsCurrent);
+                        <li class="nav-item">
+                            <a class="nav-link has-treeview-a@(subGroupActive ? " treeview-expanded last-parent-active" : "")" href="#" data-menu-id="@parentKey-@node.CssClass-@subGroup.Title">
+                                <i class="nav-icon @GetMenuIcon(subGroup.Title)"></i>
+                                <p>
+                                    @subGroup.Title
+                                    <i class="fas fa-angle-left right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                @foreach (var item in subGroup.Items)
+                                {
+                                    @RenderItem(item, parentKey + "-" + node.CssClass + "-" + subGroup.Title)
+                                }
+                            </ul>
+                        </li>
+                    }
+                }
+            </ul>
+        </li>
+    }
+}
+
+<style>
+    .main-sidebar {
+        font-size: 14px;
+    }
+
+    .nav-sidebar .nav-link:hover {
+        background-color: #17A2ED !important;
+        color: #fff !important;
+    }
+
+    .sidebar {
+        height: calc(100vh - 118px) !important;
+        width: 247px !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    .main-sidebar .brandLogo {
+        background: #fff;
+        text-align: center;
+        padding: 3px;
+        display: flex;
+        margin: 7px;
+        height: 62px;
+        border-radius: 4px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .main-sidebar .brandLogo img {
+        margin: auto;
+        max-height: 100%;
+    }
+
+    .nav-treeview {
+        padding-left: 16px !important;
+    }
+
+    .nav-treeview > .nav-item {
+        position: relative !important;
+    }
+
+    .nav-treeview > .nav-item::before {
+        content: "" !important;
+        position: absolute !important;
+        left: -8px !important;
+        top: 20px !important;
+        width: 8px !important;
+        border-top: 1px solid #fff !important;
+    }
+
+    .nav-treeview > .nav-item::after {
+        content: "" !important;
+        position: absolute !important;
+        left: -8px !important;
+        top: 0 !important;
+        height: 100% !important;
+        border-left: 1px solid #fff !important;
+    }
+
+    .nav-treeview > .nav-item:last-child::after {
+        height: 20px !important;
+    }
+</style>
+
+<section>
+    <a href="@currentModel.HomeUrl" class="brandLogo">
+        <img src="@Url.Content("~/Images/" + moduleLogo)" alt="Company Logo">
+    </a>
+    <nav class="sidebar">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <li class="nav-item">
+                <a href="@currentModel.HomeUrl" class="nav-link homeColor">
+                    <i class="nav-icon fa fa-home"></i>
+                    <p>Home</p>
+                </a>
+            </li>
+
+            @foreach (var module in currentModel.Modules.Where(m => m != null && m.IsVisible))
+            {
+                DynamicNavbarViewModel moduleModel = service.BuildNavbarViewModel(module.Title);
+                var moduleActive = module.IsCurrent || (moduleModel.Nodes != null && moduleModel.Nodes.Any(n => n.IsCurrent));
+                <li class="nav-item">
+                    <a class="nav-link has-treeview@(moduleActive ? " treeview-expanded" : "")" href="#" data-menu-id="module-@module.Title">
+                        <i class="nav-icon @GetMenuIcon(module.Title)"></i>
+                        <p>
+                            @module.Title
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @if (moduleModel.Nodes != null)
+                        {
+                            foreach (var node in moduleModel.Nodes)
+                            {
+                                @RenderNode(node, "module-" + module.Title)
+                            }
+                        }
+                    </ul>
+                </li>
+            }
+        </ul>
+    </nav>
+</section>

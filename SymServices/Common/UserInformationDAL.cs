@@ -20,6 +20,37 @@ namespace SymServices.Common
         private static string PassPhrase = DBConstant.PassPhrase;
         private static string EnKey = DBConstant.EnKey;
         #endregion
+
+        private static bool UserGroupColumnExists(SqlConnection currConn, string columnName)
+        {
+            string sql = @"
+SELECT COUNT(1)
+FROM sys.columns c
+INNER JOIN sys.objects o ON c.object_id = o.object_id
+WHERE o.name = 'UserGroup' AND c.name = @ColumnName";
+
+            using (SqlCommand command = new SqlCommand(sql, currConn))
+            {
+                command.Parameters.AddWithValue("@ColumnName", columnName);
+                return Convert.ToInt32(command.ExecuteScalar()) > 0;
+            }
+        }
+
+        private static string UserGroupBitExpression(SqlConnection currConn, string preferredColumn, string fallbackColumn, string alias)
+        {
+            if (!string.IsNullOrWhiteSpace(preferredColumn) && UserGroupColumnExists(currConn, preferredColumn))
+            {
+                return ",isnull(ug." + preferredColumn + ",0)" + alias + Environment.NewLine;
+            }
+
+            if (!string.IsNullOrWhiteSpace(fallbackColumn) && UserGroupColumnExists(currConn, fallbackColumn))
+            {
+                return ",isnull(ug." + fallbackColumn + ",0)" + alias + Environment.NewLine;
+            }
+
+            return ",cast(0 as bit)" + alias + Environment.NewLine;
+        }
+
         #region New Methods
 
         //==================SelectAll=================
@@ -198,14 +229,17 @@ WHERE  1=1
 ,[User].FullName
 ,[User].Email
 ,[User].EmployeeId
-,isnull(ug.IsAdmin,0)IsAdmin
-,isnull(ug.IsESS,0)IsESS
-,isnull(ug.IsHRM,0)IsHRM
-,isnull(ug.IsAttendance,0)IsAttendance
-,isnull(ug.IsPayroll,0)IsPayroll
-,isnull(ug.IsTAX,0)IsTAX
-,isnull(ug.IsPF,0)IsPF
-,isnull(ug.IsGF,0)IsGF
+";
+                sqlText += UserGroupBitExpression(currConn, "IsAdmin", null, "IsAdmin");
+                sqlText += UserGroupBitExpression(currConn, "IsESS", null, "IsESS");
+                sqlText += UserGroupBitExpression(currConn, "IsGL", "IsHRM", "IsHRM");
+                sqlText += UserGroupBitExpression(currConn, "IsAttendance", null, "IsAttendance");
+                sqlText += UserGroupBitExpression(currConn, "IsPayroll", null, "IsPayroll");
+                sqlText += UserGroupBitExpression(currConn, "IsTAX", null, "IsTAX");
+                sqlText += UserGroupBitExpression(currConn, "IsPF", null, "IsPF");
+                sqlText += UserGroupBitExpression(currConn, "IsWPPF", "IsGF", "IsGF");
+                sqlText += @"
+,isnull(ug.GroupName,'')GroupName
 ,isnull([User].IsApprove,0)IsApprove
 
 
@@ -245,6 +279,25 @@ where  [User].LogId=@LogId and [User].Password=@Password and [User].IsActive=@Is
                     userLogsVM.IsTAX = Convert.ToBoolean(dr["IsTAX"]);
                     userLogsVM.IsPF = Convert.ToBoolean(dr["IsPF"]);
                     userLogsVM.IsGF = Convert.ToBoolean(dr["IsGF"]);
+                    userLogsVM.GroupName = dr["GroupName"].ToString();
+                    if (string.Equals(userLogsVM.GroupName, "WPPF", StringComparison.OrdinalIgnoreCase))
+                    {
+                        userLogsVM.IsAdmin = false;
+                        userLogsVM.IsPF = false;
+                        userLogsVM.IsHRM = false;
+                        userLogsVM.IsGF = true;
+                    }
+                    else if (string.Equals(userLogsVM.GroupName, "PF", StringComparison.OrdinalIgnoreCase))
+                    {
+                        userLogsVM.IsGF = false;
+                        userLogsVM.IsPF = true;
+                    }
+                    else if (string.Equals(userLogsVM.GroupName, "GL", StringComparison.OrdinalIgnoreCase))
+                    {
+                        userLogsVM.IsPF = false;
+                        userLogsVM.IsGF = false;
+                        userLogsVM.IsHRM = true;
+                    }
                     userLogsVM.IsApprove = Convert.ToBoolean(dr["IsApprove"]);
                     
                     isLogin = true;

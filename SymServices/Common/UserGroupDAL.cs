@@ -13,6 +13,62 @@ namespace SymServices.Common
         private DBSQLConnection _dbsqlConnection = new DBSQLConnection();
 
         #endregion
+
+        private static bool UserGroupColumnExists(SqlConnection currConn, SqlTransaction transaction, string columnName)
+        {
+            string sql = @"
+SELECT COUNT(1)
+FROM sys.columns c
+INNER JOIN sys.objects o ON c.object_id = o.object_id
+WHERE o.name = 'UserGroup' AND c.name = @ColumnName";
+
+            using (SqlCommand command = new SqlCommand(sql, currConn, transaction))
+            {
+                command.Parameters.AddWithValue("@ColumnName", columnName);
+                return Convert.ToInt32(command.ExecuteScalar()) > 0;
+            }
+        }
+
+        private static string UserGroupBitExpression(SqlConnection currConn, SqlTransaction transaction, string preferredColumn, string fallbackColumn, string alias)
+        {
+            if (!string.IsNullOrWhiteSpace(preferredColumn) && UserGroupColumnExists(currConn, transaction, preferredColumn))
+            {
+                return ",ISNULL(" + preferredColumn + ",0)" + alias + Environment.NewLine;
+            }
+
+            if (!string.IsNullOrWhiteSpace(fallbackColumn) && UserGroupColumnExists(currConn, transaction, fallbackColumn))
+            {
+                return ",ISNULL(" + fallbackColumn + ",0)" + alias + Environment.NewLine;
+            }
+
+            return ",CAST(0 AS bit)" + alias + Environment.NewLine;
+        }
+
+        private static bool AddOptionalInsertColumn(List<string> columns, List<string> values, SqlCommand command, SqlConnection currConn, SqlTransaction transaction, string dbColumn, string parameter, object value)
+        {
+            if (!UserGroupColumnExists(currConn, transaction, dbColumn))
+            {
+                return false;
+            }
+
+            columns.Add(dbColumn);
+            values.Add(parameter);
+            command.Parameters.AddWithValue(parameter, value);
+            return true;
+        }
+
+        private static bool AddOptionalUpdateColumn(List<string> setClauses, SqlCommand command, SqlConnection currConn, SqlTransaction transaction, string dbColumn, string parameter, object value)
+        {
+            if (!UserGroupColumnExists(currConn, transaction, dbColumn))
+            {
+                return false;
+            }
+
+            setClauses.Add(dbColumn + "=" + parameter);
+            command.Parameters.AddWithValue(parameter, value);
+            return true;
+        }
+
         public List<UserGroupVM> SelectAll()
         {
             #region Variables
@@ -38,15 +94,17 @@ namespace SymServices.Common
                 sqlText = @"SELECT
 Id
 ,GroupName
-,ISNULL(IsSuper,0)IsSuper
-,ISNULL(IsAdmin,0)IsAdmin
-,ISNULL(IsHRM,0)IsHRM
-,ISNULL(IsAttendance,0)IsAttendance
-,ISNULL(IsPayroll,0)IsPayroll
-,ISNULL(IsTAX,0)IsTAX
-,ISNULL(IsPF,0)IsPF
-,ISNULL(IsGF,0)IsGF
-,ISNULL(IsESS,0)IsESS
+";
+                sqlText += UserGroupBitExpression(currConn, null, null, "IsSuper", "IsSuper");
+                sqlText += UserGroupBitExpression(currConn, null, null, "IsAdmin", "IsAdmin");
+                sqlText += UserGroupBitExpression(currConn, null, "IsGL", "IsHRM", "IsHRM");
+                sqlText += UserGroupBitExpression(currConn, null, null, "IsAttendance", "IsAttendance");
+                sqlText += UserGroupBitExpression(currConn, null, null, "IsPayroll", "IsPayroll");
+                sqlText += UserGroupBitExpression(currConn, null, null, "IsTAX", "IsTAX");
+                sqlText += UserGroupBitExpression(currConn, null, null, "IsPF", "IsPF");
+                sqlText += UserGroupBitExpression(currConn, null, "IsWPPF", "IsGF", "IsGF");
+                sqlText += UserGroupBitExpression(currConn, null, null, "IsESS", "IsESS");
+                sqlText += @"
 ,Remarks
 ,IsActive
 ,IsArchive
@@ -151,15 +209,17 @@ Where IsArchive=0
 SELECT
 Id
 ,GroupName
-,ISNULL(IsSuper,0)IsSuper
-,ISNULL(IsAdmin,0)IsAdmin
-,ISNULL(IsHRM,0)IsHRM
-,ISNULL(IsAttendance,0)IsAttendance
-,ISNULL(IsPayroll,0)IsPayroll
-,ISNULL(IsTAX,0)IsTAX
-,ISNULL(IsPF,0)IsPF
-,ISNULL(IsGF,0)IsGF
-,ISNULL(IsESS,0)IsESS
+";
+                sqlText += UserGroupBitExpression(currConn, null, null, "IsSuper", "IsSuper");
+                sqlText += UserGroupBitExpression(currConn, null, null, "IsAdmin", "IsAdmin");
+                sqlText += UserGroupBitExpression(currConn, null, "IsGL", "IsHRM", "IsHRM");
+                sqlText += UserGroupBitExpression(currConn, null, null, "IsAttendance", "IsAttendance");
+                sqlText += UserGroupBitExpression(currConn, null, null, "IsPayroll", "IsPayroll");
+                sqlText += UserGroupBitExpression(currConn, null, null, "IsTAX", "IsTAX");
+                sqlText += UserGroupBitExpression(currConn, null, null, "IsPF", "IsPF");
+                sqlText += UserGroupBitExpression(currConn, null, "IsWPPF", "IsGF", "IsGF");
+                sqlText += UserGroupBitExpression(currConn, null, null, "IsESS", "IsESS");
+                sqlText += @"
 ,Remarks
 ,IsActive
 ,IsArchive
@@ -330,46 +390,38 @@ Where  Id=@Id  and IsArchive=0
                 if (vm != null)
                 {
 
-                    sqlText = "  ";
-                    sqlText += @" INSERT INTO UserGroup(GroupName
-,IsAdmin
-,IsHRM
-,IsAttendance
-,IsPayroll
-,IsTAX
-,IsPF
-,IsGF
-,IsESS
-,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom) 
-                                VALUES (@GroupName
-,@IsAdmin
-,@IsHRM
-,@IsAttendance
-,@IsPayroll
-,@IsTAX
-,@IsPF
-,@IsGF
-,@IsESS
-,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom) 
-                                        SELECT SCOPE_IDENTITY()";
+                    SqlCommand cmdInsert = new SqlCommand();
+                    cmdInsert.Connection = currConn;
+                    cmdInsert.Transaction = transaction;
 
-                    SqlCommand cmdInsert = new SqlCommand(sqlText, currConn);
+                    List<string> insertColumns = new List<string> { "GroupName" };
+                    List<string> insertValues = new List<string> { "@GroupName" };
                     cmdInsert.Parameters.AddWithValue("@GroupName", vm.GroupName.Trim());
-                    cmdInsert.Parameters.AddWithValue("@IsAdmin", vm.IsAdmin);
-                    cmdInsert.Parameters.AddWithValue("@IsHRM", vm.IsHRM);
-                    cmdInsert.Parameters.AddWithValue("@IsAttendance", vm.IsAttendance);
-                    cmdInsert.Parameters.AddWithValue("@IsPayroll", vm.IsPayroll);
-                    cmdInsert.Parameters.AddWithValue("@IsTAX", vm.IsTAX);
-                    cmdInsert.Parameters.AddWithValue("@IsPF", vm.IsPF);
-                    cmdInsert.Parameters.AddWithValue("@IsGF", vm.IsGF);
-                    cmdInsert.Parameters.AddWithValue("@IsESS", vm.IsESS);
+
+                    AddOptionalInsertColumn(insertColumns, insertValues, cmdInsert, currConn, transaction, "IsAdmin", "@IsAdmin", vm.IsAdmin);
+                    AddOptionalInsertColumn(insertColumns, insertValues, cmdInsert, currConn, transaction, "IsPF", "@IsPF", vm.IsPF);
+                    if (!AddOptionalInsertColumn(insertColumns, insertValues, cmdInsert, currConn, transaction, "IsGL", "@IsGL", vm.IsHRM))
+                    {
+                        AddOptionalInsertColumn(insertColumns, insertValues, cmdInsert, currConn, transaction, "IsHRM", "@IsHRM", vm.IsHRM);
+                    }
+                    if (!AddOptionalInsertColumn(insertColumns, insertValues, cmdInsert, currConn, transaction, "IsWPPF", "@IsWPPF", vm.IsGF))
+                    {
+                        AddOptionalInsertColumn(insertColumns, insertValues, cmdInsert, currConn, transaction, "IsGF", "@IsGF", vm.IsGF);
+                    }
+
+                    insertColumns.AddRange(new[] { "Remarks", "IsActive", "IsArchive", "CreatedBy", "CreatedAt", "CreatedFrom" });
+                    insertValues.AddRange(new[] { "@Remarks", "@IsActive", "@IsArchive", "@CreatedBy", "@CreatedAt", "@CreatedFrom" });
                     cmdInsert.Parameters.AddWithValue("@Remarks", vm.Remarks ?? Convert.DBNull);
                     cmdInsert.Parameters.AddWithValue("@IsActive", true);
                     cmdInsert.Parameters.AddWithValue("@IsArchive", false);
                     cmdInsert.Parameters.AddWithValue("@CreatedBy", vm.CreatedBy);
                     cmdInsert.Parameters.AddWithValue("@CreatedAt", vm.CreatedAt);
                     cmdInsert.Parameters.AddWithValue("@CreatedFrom", vm.CreatedFrom);
-                    cmdInsert.Transaction = transaction;
+
+                    sqlText = @" INSERT INTO UserGroup(" + string.Join(",", insertColumns) + @") 
+                                VALUES (" + string.Join(",", insertValues) + @") 
+                                SELECT SCOPE_IDENTITY()";
+                    cmdInsert.CommandText = sqlText;
                     cmdInsert.ExecuteNonQuery();
                 }
                 else
@@ -517,43 +569,36 @@ Where  Id=@Id  and IsArchive=0
                 {
                     #region Update Settings
 
-                    sqlText = "";
-                    sqlText = "update UserGroup set";
-                    sqlText += " GroupName=@GroupName,";
+                    SqlCommand cmdUpdate = new SqlCommand();
+                    cmdUpdate.Connection = currConn;
+                    cmdUpdate.Transaction = transaction;
 
-                    sqlText += " IsAdmin=@IsAdmin,";
-                    sqlText += " IsHRM=@IsHRM,";
-                    sqlText += " IsAttendance=@IsAttendance,";
-                    sqlText += " IsPayroll=@IsPayroll,";
-                    sqlText += " IsTAX=@IsTAX,";
-                    sqlText += " IsPF=@IsPF,";
-                    sqlText += " IsGF=@IsGF,";
-                    sqlText += " IsESS=@IsESS,";
-                    sqlText += " IsActive=@IsActive,";
-                    sqlText += " LastUpdateBy=@LastUpdateBy,";
-                    sqlText += " LastUpdateAt=@LastUpdateAt,";
-                    sqlText += " LastUpdateFrom=@LastUpdateFrom";
-                    sqlText += " where Id=@Id";
-
-                    SqlCommand cmdUpdate = new SqlCommand(sqlText, currConn);
+                    List<string> setClauses = new List<string> { "GroupName=@GroupName" };
                     cmdUpdate.Parameters.AddWithValue("@Id", vm.Id);
                     cmdUpdate.Parameters.AddWithValue("@GroupName", vm.GroupName.Trim());
-                    cmdUpdate.Parameters.AddWithValue("@IsAdmin", vm.IsAdmin);
-                    cmdUpdate.Parameters.AddWithValue("@IsHRM", vm.IsHRM);
-                    cmdUpdate.Parameters.AddWithValue("@IsAttendance", vm.IsAttendance);
-                    cmdUpdate.Parameters.AddWithValue("@IsPayroll", vm.IsPayroll);
-                    cmdUpdate.Parameters.AddWithValue("@IsTAX", vm.IsTAX);
-                    cmdUpdate.Parameters.AddWithValue("@IsPF", vm.IsPF);
-                    cmdUpdate.Parameters.AddWithValue("@IsGF", vm.IsGF);
-                    cmdUpdate.Parameters.AddWithValue("@IsESS", vm.IsESS);
 
-                    cmdUpdate.Parameters.AddWithValue("@Remarks", vm.Remarks ?? Convert.DBNull);
+                    AddOptionalUpdateColumn(setClauses, cmdUpdate, currConn, transaction, "IsAdmin", "@IsAdmin", vm.IsAdmin);
+                    AddOptionalUpdateColumn(setClauses, cmdUpdate, currConn, transaction, "IsPF", "@IsPF", vm.IsPF);
+                    if (!AddOptionalUpdateColumn(setClauses, cmdUpdate, currConn, transaction, "IsGL", "@IsGL", vm.IsHRM))
+                    {
+                        AddOptionalUpdateColumn(setClauses, cmdUpdate, currConn, transaction, "IsHRM", "@IsHRM", vm.IsHRM);
+                    }
+                    if (!AddOptionalUpdateColumn(setClauses, cmdUpdate, currConn, transaction, "IsWPPF", "@IsWPPF", vm.IsGF))
+                    {
+                        AddOptionalUpdateColumn(setClauses, cmdUpdate, currConn, transaction, "IsGF", "@IsGF", vm.IsGF);
+                    }
+
+                    setClauses.Add("IsActive=@IsActive");
+                    setClauses.Add("LastUpdateBy=@LastUpdateBy");
+                    setClauses.Add("LastUpdateAt=@LastUpdateAt");
+                    setClauses.Add("LastUpdateFrom=@LastUpdateFrom");
                     cmdUpdate.Parameters.AddWithValue("@IsActive", vm.IsActive);
                     cmdUpdate.Parameters.AddWithValue("@LastUpdateBy", vm.LastUpdateBy);
                     cmdUpdate.Parameters.AddWithValue("@LastUpdateAt", vm.LastUpdateAt);
                     cmdUpdate.Parameters.AddWithValue("@LastUpdateFrom", vm.LastUpdateFrom);
 
-                    cmdUpdate.Transaction = transaction;
+                    sqlText = "update UserGroup set " + string.Join(",", setClauses) + " where Id=@Id";
+                    cmdUpdate.CommandText = sqlText;
                     var exeRes = cmdUpdate.ExecuteNonQuery();
                     transResult = Convert.ToInt32(exeRes);
 

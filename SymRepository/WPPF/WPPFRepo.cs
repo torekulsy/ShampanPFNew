@@ -15,12 +15,12 @@ namespace SymRepository.WPPF
 {
     public class WPPFRepo
     {
-       
-        public List<PFHeaderVM> SelectFiscalPeriodHeader(string[] conditionFields = null, string[] conditionValues = null)
+
+        public List<PFHeaderVM> SelectFiscalPeriodHeader(string TransType, string[] conditionFields = null, string[] conditionValues = null )
         {
             try
             {
-                return new WPPFDAL().SelectFiscalPeriodHeader(conditionFields, conditionValues);
+                return new WPPFDAL().SelectFiscalPeriodHeader(TransType, conditionFields, conditionValues);
             }
             catch (Exception ex)
             {
@@ -28,11 +28,11 @@ namespace SymRepository.WPPF
             }
         }
 
-        public List<PFHeaderVM> SelectProfitDistribution(string[] conditionFields = null, string[] conditionValues = null)
+        public List<PFHeaderVM> SelectProfitDistribution(string TransType, string[] conditionFields = null, string[] conditionValues = null)
         {
             try
             {
-                return new WPPFDAL().SelectProfitDistribution(conditionFields, conditionValues);
+                return new WPPFDAL().SelectProfitDistribution(TransType, conditionFields, conditionValues);
             }
             catch (Exception ex)
             {
@@ -40,11 +40,11 @@ namespace SymRepository.WPPF
             }
         }
 
-        public string[] Insert(decimal? TotalProfit, string FiscalYearDetailId, int? FiscalYear, ShampanIdentityVM auditvm)
+        public string[] Insert(decimal? TotalProfit, string FiscalYearDetailId, int? FiscalYear,string TransType, ShampanIdentityVM auditvm)
         {
             try
             {
-                return new WPPFDAL().Insert(TotalProfit, FiscalYearDetailId, FiscalYear, auditvm);
+                return new WPPFDAL().Insert(TotalProfit, FiscalYearDetailId, FiscalYear,TransType, auditvm);
             }
             catch (Exception ex)
             {
@@ -52,11 +52,11 @@ namespace SymRepository.WPPF
             }
         }
 
-        public string[] PostHeader(PFHeaderVM vm)
+        public string[] PostHeader(string TransType, PFHeaderVM vm)
         {
             try
             {
-                return new WPPFDAL().PostHeader(vm);
+                return new WPPFDAL().PostHeader(TransType, vm);
             }
             catch (Exception ex)
             {
@@ -64,11 +64,11 @@ namespace SymRepository.WPPF
             }
         }
 
-        public List<PFHeaderVM> SelectAll()
+        public List<PFHeaderVM> SelectAll(string TransType)
         {
             try
             {
-                return new WPPFDAL().SelectAll();
+                return new WPPFDAL().SelectAll(TransType);
             }
             catch (Exception ex)
             {

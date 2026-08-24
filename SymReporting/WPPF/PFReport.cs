@@ -16,6 +16,53 @@ namespace SymReporting.WPPF
 {
     public class PFReport
     {
+        public PFReportVM ROI_GLTransactionReport(string id)
+        {
+            PFReportVM vm = new PFReportVM();
+
+            try
+            {
+                string ReportHead = "";
+                string rptLocation = "";
+                ReportDocument doc = new ReportDocument();
+                DataTable dt = new DataTable();
+
+                ReturnOnInvestmentDAL _ROIDAL = new ReturnOnInvestmentDAL();
+                var ROIVM = _ROIDAL.SelectAll(Convert.ToInt32(id));
+                dt = JsonConvert.DeserializeObject<DataTable>(JsonConvert.SerializeObject(ROIVM));
+
+                ReportHead = "There are no data to Preview for GL Transaction for Return on Investment";
+                if (dt.Rows.Count > 0)
+                {
+                    ReportHead = "Return on Investment GL Transactions";
+                }
+                dt.TableName = "dtReturnOnInvestment";
+                rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\WPPF\\rptReturnOnInvestment.rpt";
+
+                doc.Load(rptLocation);
+                doc.SetDataSource(dt);
+                string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
+
+                doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text = "'" + companyLogo + "'";
+                doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + ReportHead + "'";
+
+                Stream stream = doc.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+                vm.MemStream = new MemoryStream();
+                stream.CopyTo(vm.MemStream);
+
+                byte[] byteInfo = vm.MemStream.ToArray();
+                vm.MemStream.Write(byteInfo, 0, byteInfo.Length);
+                vm.MemStream.Position = 0;
+
+                vm.FileName = "GL Transaction for Return on Investment";
+            }
+            catch (Exception)
+            {
+            }
+
+            return vm;
+        }
+
         //public PFReportVM ROI_GLTransactionReport(string id)
         //{
         //    PFReportVM vm = new PFReportVM();

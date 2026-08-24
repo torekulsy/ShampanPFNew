@@ -18,6 +18,127 @@ namespace SymServices.Common
         private DBSQLConnection _dbsqlConnection = new DBSQLConnection();
         #endregion
 
+        private static void EnsureDynamicRoleColumns(SqlConnection currConn, SqlTransaction transaction)
+        {
+            CommonDAL commonDal = new CommonDAL();
+            commonDal.TableFieldAdd("SymUserRoll", "symArea", "varchar(200)", currConn, transaction);
+            commonDal.TableFieldAdd("SymUserRoll", "symController", "varchar(500)", currConn, transaction);
+        }
+
+        private List<DynamicMenuDefinition> GetDynamicDefaultRollDefinitions()
+        {
+            List<DynamicMenuDefinition> definitions = new DynamicMenuService().GetDefinitions();
+            List<DynamicMenuDefinition> filteredDefinitions = new List<DynamicMenuDefinition>();
+            HashSet<string> uniqueKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (DynamicMenuDefinition definition in definitions)
+            {
+                if (definition == null
+                    || string.IsNullOrWhiteSpace(definition.renderArea)
+                    || string.IsNullOrWhiteSpace(definition.permissionKey))
+                {
+                    continue;
+                }
+
+                string key = definition.renderArea.Trim() + "|" + definition.permissionKey.Trim();
+                if (uniqueKeys.Add(key))
+                {
+                    filteredDefinitions.Add(definition);
+                }
+            }
+
+            return filteredDefinitions;
+        }
+
+        private static string BuildDynamicDefaultRollId(DynamicMenuDefinition definition)
+        {
+            string source = (definition.renderArea ?? "") + "|" + (definition.permissionKey ?? "") + "|" + definition.sortOrder.ToString();
+            uint checksum = 2166136261;
+            foreach (char item in source)
+            {
+                checksum ^= item;
+                checksum *= 16777619;
+            }
+
+            return "D" + checksum.ToString("X8");
+        }
+
+        private static string SanitizeDynamicRollToken(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return "NA";
+            }
+
+            StringBuilder builder = new StringBuilder();
+            foreach (char item in value.Trim())
+            {
+                if (char.IsLetterOrDigit(item))
+                {
+                    builder.Append(item);
+                }
+                else if (builder.Length == 0 || builder[builder.Length - 1] != '_')
+                {
+                    builder.Append('_');
+                }
+            }
+
+            string token = builder.ToString().Trim('_');
+            return string.IsNullOrWhiteSpace(token) ? "NA" : token;
+        }
+
+        private void AddDynamicRoleRows(List<SymUserRollVM> roles, string groupId, string symArea)
+        {
+            if (roles == null || string.IsNullOrWhiteSpace(symArea))
+            {
+                return;
+            }
+
+            int parsedGroupId = 0;
+            int.TryParse(groupId, out parsedGroupId);
+
+            HashSet<string> existingKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (SymUserRollVM role in roles)
+            {
+                if (role == null)
+                {
+                    continue;
+                }
+
+                existingKeys.Add((role.symArea ?? "").Trim() + "|" + (role.symController ?? "").Trim());
+            }
+
+            foreach (DynamicMenuDefinition definition in GetDynamicDefaultRollDefinitions())
+            {
+                if (!string.Equals((definition.renderArea ?? "").Trim(), symArea.Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                string key = definition.renderArea.Trim() + "|" + definition.permissionKey.Trim();
+                if (!existingKeys.Add(key))
+                {
+                    continue;
+                }
+
+                roles.Add(new SymUserRollVM
+                {
+                    Id = "",
+                    GroupId = parsedGroupId,
+                    symArea = definition.renderArea.Trim(),
+                    symController = definition.permissionKey.Trim(),
+                    IsIndex = false,
+                    IsAdd = false,
+                    IsEdit = false,
+                    IsDelete = false,
+                    IsReport = false,
+                    IsProcess = false,
+                    IsActive = true,
+                    IsArchive = false
+                });
+            }
+        }
+
         #region Methods
         //==================SelectAll=================
         public List<SymUserRollVM> SelectAll()
@@ -39,6 +160,7 @@ namespace SymServices.Common
                 {
                     currConn.Open();
                 }
+                EnsureDynamicRoleColumns(currConn, null);
 
                 #endregion open connection and transaction
 
@@ -103,7 +225,6 @@ ORDER BY symArea
                 }
                 dr.Close();
 
-
                 #endregion
             }
             #region catch
@@ -156,6 +277,7 @@ ORDER BY symArea
                 {
                     currConn.Open();
                 }
+                EnsureDynamicRoleColumns(currConn, null);
 
                 #endregion open connection and transaction
 
@@ -165,8 +287,8 @@ ORDER BY symArea
 SymUserRoll.Id
 ,SymUserRoll.BranchId
 ,SymUserRoll.GroupId
-,sd.symArea
-,sd.symController
+,ISNULL(sd.symArea, CONVERT(varchar(200), SymUserRoll.symArea)) symArea
+,ISNULL(sd.symController, CONVERT(varchar(500), SymUserRoll.symController)) symController
 ,SymUserRoll.IsIndex
 ,SymUserRoll.IsAdd
 ,SymUserRoll.IsEdit
@@ -190,7 +312,7 @@ and SymUserRoll.GroupId=@GroupId
 ";
                 if (!string.IsNullOrWhiteSpace(SymArea))
                 {
-                    sqlText += " and symArea=@symArea ";
+                    sqlText += " and ISNULL(sd.symArea, CONVERT(varchar(200), SymUserRoll.symArea))=@symArea ";
                 }
                 SqlCommand objComm = new SqlCommand();
                 objComm.Connection = currConn;
@@ -229,6 +351,7 @@ and SymUserRoll.GroupId=@GroupId
                 }
                 dr.Close();
 
+                AddDynamicRoleRows(VMs, GroupId, SymArea);
 
                 #endregion
             }
@@ -1147,6 +1270,7 @@ from SymUserDefaultRoll where 1=1";
                 {
                     transaction = currConn.BeginTransaction("");
                 }
+                EnsureDynamicRoleColumns(currConn, transaction);
                 #endregion open connection and transaction
                 #region Save
                 sqlText1 = "Select isnull(max(convert(int,  SUBSTRING(CONVERT(varchar(10), id),CHARINDEX('_', CONVERT(varchar(10), id))+1,10))),0) from SymUserRoll where BranchId=@BranchId";
@@ -1184,6 +1308,47 @@ from SymUserDefaultRoll where 1=1";
                     cmdInsert.ExecuteNonQuery();
                     count++;
 
+                }
+
+                foreach (DynamicMenuDefinition definition in GetDynamicDefaultRollDefinitions())
+                {
+                    sqlText = @"IF NOT EXISTS (
+    SELECT 1
+    FROM SymUserRoll sur
+    LEFT OUTER JOIN SymUserDefaultRoll sd ON sd.Id=sur.DefaultRollId
+    WHERE sur.GroupId=@GroupId
+    AND sur.IsArchive=0
+    AND ISNULL(sd.symArea, CONVERT(varchar(200), sur.symArea))=@symArea
+    AND ISNULL(sd.symController, CONVERT(varchar(500), sur.symController))=@symController
+)
+BEGIN
+    INSERT INTO SymUserRoll(Id,BranchId,DefaultRollId,GroupId,symArea,symController,IsIndex,IsAdd,IsEdit,IsDelete,IsReport,IsProcess,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom)
+    VALUES (@Id,@BranchId,@DefaultRollId,@GroupId,@symArea,@symController,@IsIndex,@IsAdd,@IsEdit,@IsDelete,@IsReport,@IsProcess,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom)
+END";
+
+                    SqlCommand cmdInsertDynamic = new SqlCommand(sqlText, currConn);
+                    var symId = vm.BranchId.ToString() + "_" + (count + 1);
+                    cmdInsertDynamic.Parameters.AddWithValue("@Id", symId);
+                    cmdInsertDynamic.Parameters.AddWithValue("@GroupId", vm.GroupId);
+                    cmdInsertDynamic.Parameters.AddWithValue("@BranchId", vm.BranchId);
+                    cmdInsertDynamic.Parameters.AddWithValue("@DefaultRollId", BuildDynamicDefaultRollId(definition));
+                    cmdInsertDynamic.Parameters.AddWithValue("@symArea", definition.renderArea.Trim());
+                    cmdInsertDynamic.Parameters.AddWithValue("@symController", definition.permissionKey.Trim());
+                    cmdInsertDynamic.Parameters.AddWithValue("@IsIndex", false);
+                    cmdInsertDynamic.Parameters.AddWithValue("@IsAdd", false);
+                    cmdInsertDynamic.Parameters.AddWithValue("@IsEdit", false);
+                    cmdInsertDynamic.Parameters.AddWithValue("@IsDelete", false);
+                    cmdInsertDynamic.Parameters.AddWithValue("@IsReport", false);
+                    cmdInsertDynamic.Parameters.AddWithValue("@IsProcess", false);
+                    cmdInsertDynamic.Parameters.AddWithValue("@Remarks", Convert.DBNull);
+                    cmdInsertDynamic.Parameters.AddWithValue("@IsActive", true);
+                    cmdInsertDynamic.Parameters.AddWithValue("@IsArchive", false);
+                    cmdInsertDynamic.Parameters.AddWithValue("@CreatedBy", vm.CreatedBy);
+                    cmdInsertDynamic.Parameters.AddWithValue("@CreatedAt", vm.CreatedAt);
+                    cmdInsertDynamic.Parameters.AddWithValue("@CreatedFrom", vm.CreatedFrom);
+                    cmdInsertDynamic.Transaction = transaction;
+                    cmdInsertDynamic.ExecuteNonQuery();
+                    count++;
                 }
 
                 #endregion Save
@@ -1466,6 +1631,7 @@ from SymUserDefaultRoll where 1=1";
                 }
 
                 if (transaction == null) { transaction = currConn.BeginTransaction("UpdateToSymUserRoll"); }
+                EnsureDynamicRoleColumns(currConn, transaction);
 
                 #endregion open connection and transaction
 
@@ -1516,7 +1682,40 @@ from SymUserDefaultRoll where 1=1";
 
                         if (transResult <= 0)
                         {
-                            // throw new ArgumentNullException("Education Update", SymUserRollVM.BranchId + " could not updated.");
+                            if (!string.IsNullOrWhiteSpace(item.symArea) && !string.IsNullOrWhiteSpace(item.symController))
+                            {
+                                sqlText = @"DECLARE @BranchId int
+SELECT TOP 1 @BranchId=BranchId FROM SymUserRoll WHERE GroupId=@GroupId
+IF @BranchId IS NULL SET @BranchId=1
+
+DECLARE @NextId int
+SELECT @NextId=isnull(max(convert(int, SUBSTRING(CONVERT(varchar(20), id), CHARINDEX('_', CONVERT(varchar(20), id))+1, 20))),0)
+FROM SymUserRoll
+WHERE BranchId=@BranchId
+
+INSERT INTO SymUserRoll(Id,BranchId,DefaultRollId,GroupId,symArea,symController,IsIndex,IsAdd,IsEdit,IsDelete,IsReport,IsProcess,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom)
+VALUES (CONVERT(varchar(20), @BranchId) + '_' + CONVERT(varchar(20), @NextId + 1),@BranchId,@DefaultRollId,@GroupId,@symArea,@symController,@IsIndex,@IsAdd,@IsEdit,@IsDelete,@IsReport,@IsProcess,@Remarks,@IsActive,@IsArchive,@LastUpdateBy,@LastUpdateAt,@LastUpdateFrom)";
+
+                                SqlCommand cmdInsert = new SqlCommand(sqlText, currConn);
+                                cmdInsert.Parameters.AddWithValue("@GroupId", item.GroupId.ToString().Trim());
+                                cmdInsert.Parameters.AddWithValue("@DefaultRollId", BuildDynamicDefaultRollId(new DynamicMenuDefinition { renderArea = item.symArea, permissionKey = item.symController, sortOrder = 0 }));
+                                cmdInsert.Parameters.AddWithValue("@symArea", item.symArea.Trim());
+                                cmdInsert.Parameters.AddWithValue("@symController", item.symController.Trim());
+                                cmdInsert.Parameters.AddWithValue("@IsIndex", item.IsIndex);
+                                cmdInsert.Parameters.AddWithValue("@IsAdd", item.IsAdd);
+                                cmdInsert.Parameters.AddWithValue("@IsEdit", item.IsEdit);
+                                cmdInsert.Parameters.AddWithValue("@IsDelete", item.IsDelete);
+                                cmdInsert.Parameters.AddWithValue("@IsReport", item.IsReport);
+                                cmdInsert.Parameters.AddWithValue("@IsProcess", item.IsProcess);
+                                cmdInsert.Parameters.AddWithValue("@Remarks", item.Remarks ?? Convert.DBNull);
+                                cmdInsert.Parameters.AddWithValue("@IsActive", true);
+                                cmdInsert.Parameters.AddWithValue("@IsArchive", false);
+                                cmdInsert.Parameters.AddWithValue("@LastUpdateBy", vm.LastUpdateBy);
+                                cmdInsert.Parameters.AddWithValue("@LastUpdateAt", vm.LastUpdateAt);
+                                cmdInsert.Parameters.AddWithValue("@LastUpdateFrom", vm.LastUpdateFrom);
+                                cmdInsert.Transaction = transaction;
+                                transResult = Convert.ToInt32(cmdInsert.ExecuteNonQuery());
+                            }
                         }
 
                         #endregion Commit
@@ -1745,23 +1944,20 @@ from SymUserDefaultRoll where 1=1";
                 {
                     currConn.Open();
                 }
+                EnsureDynamicRoleColumns(currConn, null);
 
                 #endregion open connection and transaction
 
                 #region sql statement
 
-                sqlText = @"SELECT DISTINCT
-symArea
-FROM SymUserDefaultRoll
-WHERE IsArchive=0 and IsActive=1
-UNION
-SELECT 'ESS' symArea
-WHERE EXISTS (
-    SELECT 1
-    FROM UserGroup
-    WHERE IsArchive=0 and IsActive=1 and IsESS=1
-)
-ORDER BY symArea
+                sqlText = @"SELECT 'Admin' symArea, 1 SortOrder
+UNION ALL
+SELECT 'PF' symArea, 2 SortOrder
+UNION ALL
+SELECT 'GL' symArea, 3 SortOrder
+UNION ALL
+SELECT 'WPPF' symArea, 4 SortOrder
+ORDER BY SortOrder
 ";
 
                 SqlCommand _objComm = new SqlCommand();
@@ -1913,6 +2109,7 @@ WHERE IsArchive=0 and IsActive=1
                 {
                     currConn.Open();
                 }
+                EnsureDynamicRoleColumns(currConn, null);
 
                 #endregion open connection and transaction
 
@@ -1923,8 +2120,8 @@ SymUserRoll.Id
 ,SymUserRoll.DefaultRollId
 ,SymUserRoll.BranchId
 ,SymUserRoll.GroupId
-,r.symArea
-,r.symController
+,ISNULL(r.symArea, CONVERT(varchar(200), SymUserRoll.symArea)) symArea
+,ISNULL(r.symController, CONVERT(varchar(500), SymUserRoll.symController)) symController
 ,SymUserRoll.IsIndex
 ,SymUserRoll.IsAdd
 ,SymUserRoll.IsEdit

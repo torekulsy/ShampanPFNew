@@ -62,14 +62,10 @@ namespace SymWebUI.Areas.Common.Controllers
                 filteredData = getAllData.Where(c => 
                        isSearchable1 && c.GroupName.ToLower().Contains(param.sSearch.ToLower())
                     || isSearchable2 && c.IsAdmin.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable3 && c.IsHRM.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable4 && c.IsAttendance.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable5 && c.IsPayroll.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable6 && c.IsTAX.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable7 && c.IsPF.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable8 && c.IsGF.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable9 && c.IsESS.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable10 && c.IsActive.ToString().ToLower().Contains(param.sSearch.ToLower())
+                    || isSearchable3 && c.IsPF.ToString().ToLower().Contains(param.sSearch.ToLower())
+                    || isSearchable4 && c.IsHRM.ToString().ToLower().Contains(param.sSearch.ToLower())
+                    || isSearchable5 && c.IsGF.ToString().ToLower().Contains(param.sSearch.ToLower())
+                    || isSearchable6 && c.IsActive.ToString().ToLower().Contains(param.sSearch.ToLower())
                     );
             }
             else
@@ -93,22 +89,14 @@ namespace SymWebUI.Areas.Common.Controllers
             var isSortable_4 = Convert.ToBoolean(Request["bSortable_4"]);
             var isSortable_5 = Convert.ToBoolean(Request["bSortable_5"]);
             var isSortable_6 = Convert.ToBoolean(Request["bSortable_6"]);
-            var isSortable_7 = Convert.ToBoolean(Request["bSortable_7"]);
-            var isSortable_8 = Convert.ToBoolean(Request["bSortable_8"]);
-            var isSortable_9 = Convert.ToBoolean(Request["bSortable_9"]);
-            var isSortable_10 = Convert.ToBoolean(Request["bSortable_10"]);
             var sortColumnIndex = Convert.ToInt32(Request["iSortCol_0"]);
             Func<UserGroupVM, string> orderingFunction = (c =>
                 sortColumnIndex == 1 && isSortable_1 ? c.GroupName :
                 sortColumnIndex == 2 && isSortable_2 ? c.IsAdmin.ToString() :
-                sortColumnIndex == 3 && isSortable_3 ? c.IsHRM.ToString() :
-                sortColumnIndex == 4 && isSortable_4 ? c.IsAttendance.ToString() :
-                sortColumnIndex == 5 && isSortable_5 ? c.IsPayroll.ToString() :
-                sortColumnIndex == 6 && isSortable_6 ? c.IsTAX.ToString() :
-                sortColumnIndex == 7 && isSortable_7 ? c.IsPF.ToString() :
-                sortColumnIndex == 8 && isSortable_8 ? c.IsGF.ToString() :
-                sortColumnIndex == 9 && isSortable_9 ? c.IsESS.ToString() :
-                sortColumnIndex == 10 && isSortable_10 ? c.IsActive.ToString() :
+                sortColumnIndex == 3 && isSortable_3 ? c.IsPF.ToString() :
+                sortColumnIndex == 4 && isSortable_4 ? c.IsHRM.ToString() :
+                sortColumnIndex == 5 && isSortable_5 ? c.IsGF.ToString() :
+                sortColumnIndex == 6 && isSortable_6 ? c.IsActive.ToString() :
                 "");
             var sortDirection = Request["sSortDir_0"]; // asc or desc
             if (sortDirection == "asc")
@@ -120,12 +108,8 @@ namespace SymWebUI.Areas.Common.Controllers
                 Convert.ToString(c.Id)
                 , c.GroupName
                 , Convert.ToString(c.IsAdmin == true ? "Yes" : "No") 
-                , Convert.ToString(c.IsESS == true ? "Yes" : "No") 
-                , Convert.ToString(c.IsHRM == true ? "Yes" : "No") 
-                , Convert.ToString(c.IsAttendance == true ? "Yes" : "No") 
-                , Convert.ToString(c.IsPayroll == true ? "Yes" : "No") 
-                , Convert.ToString(c.IsTAX == true ? "Yes" : "No") 
                 , Convert.ToString(c.IsPF == true ? "Yes" : "No") 
+                , Convert.ToString(c.IsHRM == true ? "Yes" : "No") 
                 , Convert.ToString(c.IsGF == true ? "Yes" : "No") 
                 , Convert.ToString(c.IsActive == true ? "Active" : "Inactive") 
             };
@@ -172,6 +156,7 @@ namespace SymWebUI.Areas.Common.Controllers
             vm.CreatedAt = DateTime.Now.ToString("yyyyMMddHHmmss");
             vm.CreatedBy = identity.Name;
             vm.CreatedFrom = identity.WorkStationIP;
+            NormalizeVisibleModules(vm);
             try
             {
                 result = _repo.Insert(vm);
@@ -210,6 +195,7 @@ namespace SymWebUI.Areas.Common.Controllers
             vm.LastUpdateAt = DateTime.Now.ToString("yyyyMMddHHmmss");
             vm.LastUpdateBy = identity.Name;
             vm.LastUpdateFrom = identity.WorkStationIP;
+            NormalizeVisibleModules(vm);
             try
             {
                 result = _repo.Update(vm);
@@ -282,7 +268,7 @@ namespace SymWebUI.Areas.Common.Controllers
          }
 
          [HttpPost]
-         public ActionResult EditRoll(UserGroupVM vm)
+        public ActionResult EditRoll(UserGroupVM vm)
          {
              string[] result = new string[6];
              ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
@@ -302,5 +288,18 @@ namespace SymWebUI.Areas.Common.Controllers
                  return RedirectToAction("Index");
              }
          }
+
+        private static void NormalizeVisibleModules(UserGroupVM vm)
+        {
+            if (vm == null)
+            {
+                return;
+            }
+
+            vm.IsESS = false;
+            vm.IsAttendance = false;
+            vm.IsPayroll = false;
+            vm.IsTAX = false;
+        }
     }
 }

@@ -499,7 +499,14 @@ namespace SymWebUI.Controllers
                     DataTable sessiondt = new DataTable();
 
                     SymUserRoleRepo _repo = new SymUserRoleRepo();
-                    sessiondt = _repo.RollByUserId(result.Item2.Id.ToString().Trim());
+                    try
+                    {
+                        sessiondt = _repo.RollByUserId(result.Item2.Id.ToString().Trim());
+                    }
+                    catch (Exception)
+                    {
+                        sessiondt = new DataTable();
+                    }
                     if (Session[result.Item2.Id.ToString().Trim() + "-SymRoll"] != null)
                     {
                         Session.Remove(result.Item2.Id.ToString().Trim() + "-SymRoll");
@@ -511,22 +518,39 @@ namespace SymWebUI.Controllers
                     #region Redirect
 
                     var appPath = HttpContext.Request.ApplicationPath.ToString();
+                    Session["BranchId"] = vm.BranchId;
+                    string defaultRedirect = "/PF/Home";
+                    if (result.Item2.IsGF && !result.Item2.IsPF)
+                    {
+                        defaultRedirect = "/WPPF/Home";
+                    }
+                    else if (result.Item2.IsHRM && !result.Item2.IsPF)
+                    {
+                        defaultRedirect = "/PF/Journal?JournalType=1";
+                    }
+
                     if (!string.IsNullOrWhiteSpace(vm.ReturnUrl) && vm.ReturnUrl != "/")
                     {
+                        string requestedReturnUrl = vm.ReturnUrl.Trim();
+                        if (result.Item2.IsGF && !result.Item2.IsPF && requestedReturnUrl.StartsWith("/PF", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return Redirect(defaultRedirect);
+                        }
+                        if (result.Item2.IsPF == false && requestedReturnUrl.StartsWith("/PF/Home", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return Redirect(defaultRedirect);
+                        }
                         return Redirect(vm.ReturnUrl);
                     }
                     else if (result.Item2.IsAdmin)
                     {
-                        Session["BranchId"] = vm.BranchId;
                        // return Redirect("/Company");
                         return Redirect("/Common/Home");
                     }
                   
                     else
                     {
-                        Session["BranchId"] = vm.BranchId;
-                        // return Redirect("/Company");
-                        return Redirect("/PF/Home");
+                        return Redirect(defaultRedirect);
 
                         //return Redirect("/");
                     }

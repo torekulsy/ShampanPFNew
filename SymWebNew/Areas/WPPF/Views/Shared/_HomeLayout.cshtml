@@ -1,13 +1,16 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8" />
-    <title>ShampanERP-@ViewBag.Title</title>
+    <title>ShampanWPPF-@ViewBag.Title</title>
     <link href="~/Images/LOGO_Sym.png" rel="shortcut icon" type="image/x-icon" />
     <meta name="viewport" content="width=device-width" />
-
     <script src="~/assets/javascripts/jQuery2.1.4.js"></script>
+    <link rel="stylesheet" href="~/Content/AdminLte/dist/css/adminlte.min.css">
+    <link href="~/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+
     <link href="~/assets/NewFolder1/dataTables/demo_table.css" rel="stylesheet" />
     <link href="@Url.Content("~/assets/css/demo_table.css")" rel="stylesheet" type="text/css" />
 
@@ -17,28 +20,48 @@
     <link href="~/assets/css/menu.css" rel="stylesheet" />
 
     <link href="~/assets/css/jquery-ui.css" rel="stylesheet" />
-    <link href="~/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+
     <link href="~/assets/plugins/font-awesome/css/font-awesome.css" rel="stylesheet" />
     <link href="~/assets/css/toastr.css" rel="stylesheet" />
     <link href="~/assets/stylesheets/common.css" rel="stylesheet" />
-     <link href="~/assets/stylesheets/font-awesome.css" rel="stylesheet" />
+    <link href="~/assets/stylesheets/font-awesome.css" rel="stylesheet" />
 
     <link href="~/assets/css/jquery.ptTimeSelect.css" rel="stylesheet" />
     <link href="~/assets/css/SymphonyBtn.css" rel="stylesheet" />
     <link href="~/assets/css/dataTables.colVis.css" rel="stylesheet" />
     <link href="~/assets/css/select2.css" rel="stylesheet" />
+    @* Admin Lt menu *@
+    <link rel="stylesheet" href="~/Content/AdminLte/plugins/fontawesome-free/css/all.min.css">
+
+
+
+
+    @*<script src="~/Content/AdminLte/plugins/jquery/jquery.min.js"></script>*@
+
+
+    <script src="~/Content/AdminLte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+
+    <script src="~/Content/AdminLte/dist/js/adminlte.js"></script>
+
+    <script src="~/Content/js/app/custom.js"></script>
+
+    @{
+        string CompanyName = System.Configuration.ConfigurationManager.AppSettings["CompanyName"];
+        string BranchName = Session["BranchName"] != null ? Session["BranchName"].ToString() : "No Branch Selected";
+    }
+
     @Styles.Render("~/Content/css")
     @*   @Scripts.Render("~/bundles/modernizr")*@
     @*    @{
-        try
-        {
-            SymOrdinary.ShampanIdentity Identit = (SymOrdinary.ShampanIdentity)System.Threading.Thread.CurrentPrincipal.Identity;
-        }
-        catch (Exception)
-        {
-            
-        }
-    }*@
+            try
+            {
+                SymOrdinary.ShampanIdentity Identit = (SymOrdinary.ShampanIdentity)System.Threading.Thread.CurrentPrincipal.Identity;
+            }
+            catch (Exception)
+            {
+
+            }
+        }*@
     <style>
         .LogoutButton {
             width: 24px;
@@ -50,8 +73,136 @@
         .wth {
             width: 15%;
         }
+        /* Layout Wrapper */
+        .layout-wrapper {
+            min-height: 100vh;
+            background: #f4f6f9;
+        }
+
+        /* Header */
+        .layout-top .main-header {
+            height: 60px;
+            background: linear-gradient(90deg, #1d3557, #457b9d);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            width: 90%;
+            margin: 0 auto !important;
+        }
+
+        .layout-left .main-header {
+            height: 60px;
+            background: linear-gradient(90deg, #1d3557, #457b9d);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+        }
+        /* Container */
+        .main-container {
+            display: flex;
+            transition: all 0.3s ease;
+        }
+
+        /* Left Sidebar */
+        .left-sidebar {
+            width: 250px;
+            background: #1d3557;
+            color: white;
+            min-height: calc(100vh - 60px);
+            transition: 0.3s;
+        }
+
+        /* Content */
+        .layout-left .content-area {
+            flex: 1;
+            padding: 20px;
+            background: #ffffff;
+        }
+
+        /* Top Menu */
+        .top-menu {
+            display: none;
+        }
+
+        /* ===== Layout Modes ===== */
+
+        /* Left Menu Mode */
+        .layout-left .left-sidebar {
+            display: block;
+        }
+
+        .layout-left .top-menu {
+            display: none;
+        }
+
+        /* Top Menu Mode */
+        .layout-top .left-sidebar {
+            display: none;
+        }
+
+        .layout-top .top-menu {
+            display: block;
+        }
     </style>
+
+    @*@{
+            if (Session["User"] == null)
+            {
+                Response.Redirect(Url.Action("Index", "Home"));
+            }
+        }*@
+
     <script>
+
+        $(document).ready(function () {
+
+            $("#btnLeftMenu").click(function () {
+
+                $("body")
+                    .removeClass("layout-top")
+                    .addClass("layout-left");
+
+                // AdminLTE content mode
+                $(".content-area")
+                    .addClass("content-wrapper");
+
+                localStorage.setItem("layoutMode", "left");
+            });
+
+            $("#btnTopMenu").click(function () {
+
+                $("body")
+                    .removeClass("layout-left sidebar-collapse")
+                    .addClass("layout-top");
+
+                // REMOVE adminlte wrapper
+                $(".content-area")
+                    .removeClass("content-wrapper");
+
+                localStorage.setItem("layoutMode", "top");
+            });
+
+            // Load Saved Mode
+            var savedMode = localStorage.getItem("layoutMode");
+
+            if (savedMode === "top") {
+
+                $("body").removeClass("layout-left").addClass("layout-top");
+                $(".content-area").removeClass("content-wrapper");
+
+            } else {
+
+                $("body").addClass("layout-left");
+                $(".content-area").addClass("content-wrapper");
+
+            }
+
+        });
+
         $(document).ready(function () {
             toastr.options.positionClass = 'toast-top-center';
             var permission = '@Session["permission"]';
@@ -65,10 +216,10 @@
             result = result.split("~");
             if (result[0] == "Success") {
                 toastr.success(result[1], 'Shampan ERP')
-                   @{ Session["result"] = null; }
+                @{ Session["result"] = null; }
             }
             else if (result[0] == "Fail") {
-               
+
                 toastr.error(result[1], 'Shampan ERP')
                 @{ Session["result"] = null; };
             }
@@ -129,7 +280,6 @@
                 //  $(".dialog-alert").dialog('open');
                 var msg = '@Session["result"]';
 
-                TempData.Remove("msg");
                 msg = msg.split("~");
                 ShowResult(msg[0], msg[1]);
             }
@@ -323,7 +473,7 @@
             });
 
             $(".btnCreatebig").live("click", function (e) {
-               
+
                 url = $(this).attr('data-url');
                 $(".dialog-create-big").dialog('open');
 
@@ -379,87 +529,601 @@
                 $(".dialog-report").dialog('open');
                 return false;
             });
-            $(".loading").fadeOut(200).hide("slow")
+            $(".loading").fadeOut(500).hide("slow")
+
         });
 
+        //Animation on hide
 
     </script>
+
+
+    @*<script type="text/javascript">
+
+            $(function () {
+
+                // Hide all submenus initially
+                $(".nav-treeview").hide();
+
+                // Restore menu state
+                var expandedMenu = localStorage.getItem("expandedMenu");
+                var expandedSubMenu = localStorage.getItem("expandedSubMenu");
+
+                if (expandedMenu) {
+                    var $menu = $('[data-menu-id="' + expandedMenu + '"]');
+
+                    $menu.next(".nav-treeview").show();
+                    $menu.find(".fa-angle-left")
+                         .removeClass("fa-angle-left")
+                         .addClass("fa-angle-down");
+                }
+
+                if (expandedSubMenu) {
+                    var $submenu = $('[data-menu-id="' + expandedSubMenu + '"]');
+
+                    $submenu.next(".nav-treeview").show();
+                    $submenu.find(".fa-angle-left")
+                            .removeClass("fa-angle-left")
+                            .addClass("fa-angle-down");
+                }
+
+                // =========================
+                // Parent Menu
+                // =========================
+                $("body").delegate(".has-treeview", "click", function (e) {
+                    debugger
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    var $this = $(this);
+                    var $target = $this.next(".nav-treeview");
+
+                    if ($target.is(":animated"))
+                        return false;
+
+                    $(".has-treeview").not($this).each(function () {
+
+                        var $other = $(this);
+                        var $otherMenu = $other.next(".nav-treeview");
+
+                        $otherMenu.stop(true, true).slideUp(200);
+
+                        $other.find(".fa-angle-down")
+                              .removeClass("fa-angle-down")
+                              .addClass("fa-angle-left");
+                    });
+
+                    if ($target.is(":visible")) {
+
+                        $target.stop(true, true).slideUp(200);
+
+                        $this.find(".fa-angle-down")
+                             .removeClass("fa-angle-down")
+                             .addClass("fa-angle-left");
+
+                        localStorage.removeItem("expandedMenu");
+
+                    } else {
+
+                        $target.stop(true, true).slideDown(200);
+
+                        $this.find(".fa-angle-left")
+                             .removeClass("fa-angle-left")
+                             .addClass("fa-angle-down");
+
+                        localStorage.setItem(
+                            "expandedMenu",
+                            $this.attr("data-menu-id")
+                        );
+                    }
+
+                    return false;
+                });
+
+                // =========================
+                // Sub Menu
+                // =========================
+                $("body").delegate(".has-treeview-a", "click", function (e) {
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    var $this = $(this);
+                    var $target = $this.next(".nav-treeview");
+
+                    if ($target.is(":animated"))
+                        return false;
+
+                    $this.closest(".nav-treeview")
+                         .find("> li > .has-treeview-a")
+                         .not($this)
+                         .each(function () {
+
+                             var $other = $(this);
+
+                             $other.next(".nav-treeview")
+                                   .stop(true, true)
+                                   .slideUp(200);
+
+                             $other.find(".fa-angle-down")
+                                   .removeClass("fa-angle-down")
+                                   .addClass("fa-angle-left");
+                         });
+
+                    if ($target.is(":visible")) {
+
+                        $target.stop(true, true).slideUp(200);
+
+                        $this.find(".fa-angle-down")
+                             .removeClass("fa-angle-down")
+                             .addClass("fa-angle-left");
+
+                        localStorage.removeItem("expandedSubMenu");
+
+                    } else {
+
+                        $target.stop(true, true).slideDown(200);
+
+                        $this.find(".fa-angle-left")
+                             .removeClass("fa-angle-left")
+                             .addClass("fa-angle-down");
+
+                        localStorage.setItem(
+                            "expandedSubMenu",
+                            $this.attr("data-menu-id")
+                        );
+                    }
+
+                    return false;
+                });
+
+                // Active Menu Save
+                $("body").delegate(".nav-link:not(.has-treeview):not(.has-treeview-a)", "click", function () {
+
+                    localStorage.setItem(
+                        "activeMenu",
+                        $(this).attr("data-menu-id")
+                    );
+                });
+
+            });
+        </script>*@
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".nav-treeview").hide();
+
+            var expandedMenu = localStorage.getItem("expandedMenu");
+            var expandedSubMenu = localStorage.getItem("expandedSubMenu");
+            var activeMenu = localStorage.getItem("activeMenu");
+
+            function openMenu($el) {
+                $el.addClass("treeview-expanded");
+                $el.next(".nav-treeview").show();
+
+                $el.find("i.fas.fa-angle-left")
+                    .removeClass("fa-angle-left")
+                    .addClass("fa-angle-down");
+            }
+
+            // =========================
+            // RESTORE MENU STATE
+            // =========================
+            if (expandedMenu) {
+                openMenu($('[data-menu-id="' + expandedMenu + '"]'));
+            }
+
+            if (expandedSubMenu) {
+                openMenu($('[data-menu-id="' + expandedSubMenu + '"]'));
+            }
+
+            // =========================
+            // RESTORE ACTIVE STATE
+            // =========================
+            if (activeMenu) {
+
+                var $active = $('[data-menu-id="' + activeMenu + '"]');
+
+                $(".nav-link").removeClass("active-menu");
+                $(".has-treeview-a").removeClass("last-parent-active");
+
+                $active.addClass("active-menu");
+
+                $active.parents(".nav-treeview").show();
+
+                $active.parents("li")
+                    .children(".has-treeview, .has-treeview-a")
+                    .each(function () {
+
+                        $(this).addClass("treeview-expanded");
+
+                        $(this).find("i.fas.fa-angle-left")
+                            .removeClass("fa-angle-left")
+                            .addClass("fa-angle-down");
+                    });
+
+                // Last Parent Highlight
+                var $lastParent = $active
+                    .closest(".nav-treeview")
+                    .prev(".has-treeview-a");
+
+                if ($lastParent.length) {
+                    $lastParent.addClass("last-parent-active");
+                }
+            }
+
+            // =========================
+            // PARENT MENU
+            // =========================
+            $("body").on("click", ".has-treeview", function (e) {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                var $this = $(this);
+                var $target = $this.next(".nav-treeview");
+                var menuId = $this.data("menu-id");
+
+                if ($this.hasClass("treeview-expanded")) {
+
+                    $this.removeClass("treeview-expanded");
+
+                    $target.slideUp(200);
+
+                    $this.find("i.fa-angle-down")
+                        .removeClass("fa-angle-down")
+                        .addClass("fa-angle-left");
+
+                    localStorage.removeItem("expandedMenu");
+                }
+                else {
+
+                    $(".has-treeview").not($this).each(function () {
+
+                        $(this)
+                            .removeClass("treeview-expanded")
+                            .next(".nav-treeview")
+                            .slideUp(200);
+
+                        $(this).find("i.fa-angle-down")
+                            .removeClass("fa-angle-down")
+                            .addClass("fa-angle-left");
+                    });
+
+                    $this.addClass("treeview-expanded");
+
+                    $target.slideDown(200);
+
+                    $this.find("i.fa-angle-left")
+                        .removeClass("fa-angle-left")
+                        .addClass("fa-angle-down");
+
+                    localStorage.setItem("expandedMenu", menuId);
+                }
+            });
+
+            // =========================
+            // SUB MENU
+            // =========================
+            $("body").on("click", ".has-treeview-a", function (e) {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                var $this = $(this);
+                var $target = $this.next(".nav-treeview");
+                var menuId = $this.data("menu-id");
+
+                if ($this.hasClass("treeview-expanded")) {
+
+                    $this.removeClass("treeview-expanded");
+
+                    $target.slideUp(200);
+
+                    $this.find("i.fa-angle-down")
+                        .removeClass("fa-angle-down")
+                        .addClass("fa-angle-left");
+
+                    localStorage.removeItem("expandedSubMenu");
+                }
+                else {
+
+                    $this.closest(".nav-treeview")
+                        .find("> li > .has-treeview-a")
+                        .not($this)
+                        .each(function () {
+
+                            $(this)
+                                .removeClass("treeview-expanded")
+                                .next(".nav-treeview")
+                                .slideUp(200);
+
+                            $(this).find("i.fa-angle-down")
+                                .removeClass("fa-angle-down")
+                                .addClass("fa-angle-left");
+                        });
+
+                    $this.addClass("treeview-expanded");
+
+                    $target.slideDown(200);
+
+                    $this.find("i.fa-angle-left")
+                        .removeClass("fa-angle-left")
+                        .addClass("fa-angle-down");
+
+                    localStorage.setItem("expandedSubMenu", menuId);
+                }
+            });
+
+            // =========================
+            // ACTIVE MENU CLICK
+            // =========================
+            // =========================
+            // ACTIVE MENU CLICK
+            // =========================
+            $("body").on("click", ".nav-link", function () {
+
+                var menuId = $(this).data("menu-id");
+
+                if (
+                    !$(this).hasClass("has-treeview") &&
+                    !$(this).hasClass("has-treeview-a")
+                ) {
+
+                    $(".nav-link").removeClass("active-menu");
+                    $(".has-treeview-a").removeClass("last-parent-active");
+
+                    $(this).addClass("active-menu");
+
+                    // Last Parent Highlight
+                    var $lastParent = $(this)
+                        .closest(".nav-treeview")
+                        .prev(".has-treeview-a");
+
+                    if ($lastParent.length) {
+                        $lastParent.addClass("last-parent-active");
+                    }
+
+                    // =========================
+                    // CLOSE SIBLING SUBMENUS
+                    // =========================
+                    var $currentLi = $(this).closest("li");
+
+                    $currentLi.siblings("li").each(function () {
+
+                        var $submenu = $(this).children(".has-treeview-a");
+                        var $submenuTree = $(this).children(".nav-treeview");
+
+                        if ($submenu.length > 0) {
+
+                            $submenu.removeClass("treeview-expanded");
+
+                            $submenu.find("i.fa-angle-down")
+                                .removeClass("fa-angle-down")
+                                .addClass("fa-angle-left");
+
+                            $submenuTree.slideUp(200);
+                        }
+                    });
+
+                    // expanded submenu remove
+                    localStorage.removeItem("expandedSubMenu");
+
+                    localStorage.setItem("activeMenu", menuId);
+                }
+            });
+
+        });
+        $(document).ready(function () {
+            $(".customDatePicker").datepicker({
+                dateFormat: "dd-M-yy",
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "1900:2500"
+            });
+            $(".noFutureDate").datepicker("option", {
+                maxDate: 0,
+                yearRange: "1900:+0"
+            });
+
+            $(".noBeforeDate").datepicker("option", {
+                minDate: 0,
+                yearRange: "1900:+0"
+            });
+
+            $(".FromDate").on("change", function () {
+                var fromDate = $(this).datepicker("getDate");
+
+                if (fromDate) {
+
+                    $(".ToDate").datepicker("option", "minDate", fromDate);
+                    var toDate = $(".ToDate").datepicker("getDate");
+                    if (toDate && toDate < fromDate) {
+                        $(".ToDate").val('');
+                    }
+                }
+            });
+
+
+            $(".ToDate").on("change", function () {
+                var fromDate = $(this).datepicker("getDate");
+
+                if (fromDate) {
+
+                    $(".MaturityDate").datepicker("option", "minDate", fromDate);
+                    var toDate = $(".MaturityDate").datepicker("getDate");
+                    if (toDate && toDate < fromDate) {
+                        $(".MaturityDate").val('');
+                    }
+                }
+            });
+
+        });
+
+        $(document).ready(function () {
+            $('.isPositiveNumeric').on('keypress', function (e) {
+                var charCode = e.which;
+                if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                    e.preventDefault();
+                }
+            });
+            $('.isPositiveNumeric').on('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
+    </script>
+
+    <style>
+        .active-menu {
+            background: #007bff !important;
+            color: #fff !important;
+        }
+
+        .last-parent-active {
+            background: #0056b3 !important;
+            color: #fff !important;
+            font-weight: 600;
+        }
+
+        .treeview-expanded {
+            background: rgba(0,123,255,.12);
+        }
+    </style>
+
+
+
+
+
+
 </head>
-<body onload="window.scroll(0, 150)">
+<body onload="window.scroll(0, 150)" class="layout-left hold-transition sidebar-mini">
     @{
         string mySettingValue = System.Configuration.ConfigurationManager.AppSettings["Logo"];
     }
     <div class="loading">
         <img src="~/Images/squares.gif" />
     </div>
-    <div id="hrcss1">
-        <div class="content title">
-            <div class="row">
-                <div class="col-sm-6 ">
-                    <img src="~/Images/@mySettingValue" width="150" />
-                </div>
-                @*<div class="col-sm-6 log-top">
-                    <img style="float: right;" src="~/Images/BUYERCOMPANYLOGO.png" />
+
+
+    @*@Html.Partial("_leftnav")*@
+    @Html.Partial("_rightNav")
+
+
+    <div class="layout-wrapper wrapper">
+
+        <!-- Header -->
+        <header class="main-header">
+            <a class="toggleBtnMenu" data-widget="pushmenu" href="#" role="button">
+                <i class="fas fa-bars"></i>
+            </a>
+            @*<div class="logo">
+                    <img src="~/Images/@mySettingValue" width="140" />
                 </div>*@
-            </div>
-        </div>
-        <!--/.content-->
-        @Html.Partial("_navbar")
-        @Html.Partial("_leftnav")
-        @Html.Partial("_rightNav")
-        <!--/.content-->
-        <div class="contentBody" style="min-height: 400px">
 
-            @RenderBody()
-            @Scripts.Render("~/bundles/jquery")
-            @RenderSection("scripts", required: false)
-        </div>
-        <style>
-            .back-to-top {
-                cursor: pointer;
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                display: none;
-            }
-        </style>
+            @*<div class="menu-switch">
+                    <button id="btnLeftMenu" class="btn btn-sm btn-primary">Left Menu</button>
+                    <button id="btnTopMenu" class="btn btn-sm btn-success">Top Menu</button>
+                </div>*@
 
-        <a id="back-to-top" href="#" class=" back-to-top" role="button" title="Click to return on the top page" data-toggle="tooltip" data-placement="left">
-            <img src="~/Images/gotop.png" style="width: 40px; height: 40px;" /></a>
-        <div>
-            <div class="dialog-alert" style="display: none">
-                <div class="msgg">jj</div>
-            </div>
-            <div class="dialog-confirm" style="display: none">
-                <p>
-                    <span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>
-                    Are you sure you want to delete this data?
-                </p>
-            </div>
-            <div class="dialog-create" style="display: none">
-            </div>
-            <div class="dialog-create-big" style="display: none">
-            </div>
-            <div class="dialog-edit" style="display: none">
-            </div>
-            <div class="dialog-Report-new" style="display: none">
-            </div>
-            <div class="dialog-detail" style="display: none">
-            </div>
+
+            @*<div class="heder-right">
+
+                    <ul class="headeRight">
+                        <li class="">
+                            <a href="#" class="sym-btn-back" title="Go Back" onclick="goBack()" role="button" aria-haspopup="true">&nbsp;Back</a>
+                        </li>
+                        <li class="">
+                            <span>Provident Fund</span>
+
+                        </li>
+                    </ul>
+                </div>*@
+        </header>
+
+        <!-- Top Menu -->
+        <nav class="top-menu">
+            @Html.Partial("_navbar")
+        </nav>
+
+        <div class="main-container">
+
+            <!-- Left Sidebar -->
+            <aside class="left-sidebar main-sidebar sidebar-dark-primary elevation-4">
+                @Html.Partial("_leftnavbar")
+            </aside>
+
+            <!-- Content Area -->
+            <main class="content-area contentBody">
+                @RenderBody()
+                @Scripts.Render("~/bundles/jquery")
+                @RenderSection("scripts", required: false)
+
+
+            </main>
+
         </div>
-        <br />
-        <div class="clearfix"></div>
-        <div class="content black">
-            <p><i class="fa fa-asterisk"></i>Powered By <a href="http://symphonysoftt.com/" target="_blank">Symphony</a>.</p>
+
+    </div>
+
+
+
+
+
+    <style>
+        .back-to-top {
+            cursor: pointer;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+        }
+    </style>
+
+    <a id="back-to-top" href="#" class=" back-to-top" role="button" title="Click to return on the top page" data-toggle="tooltip" data-placement="left">
+        <img src="~/Images/gotop.png" style="width: 40px; height: 40px;" />
+    </a>
+    <div>
+        <div class="dialog-alert" style="display: none">
+            <div class="msgg">jj</div>
+        </div>
+        <div class="dialog-confirm" style="display: none">
+            <p>
+                <span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>
+                Are you sure you want to delete this data?
+            </p>
+        </div>
+        <div class="dialog-create" style="display: none">
+        </div>
+        <div class="dialog-create-big" style="display: none">
+        </div>
+        <div class="dialog-edit" style="display: none">
+        </div>
+        <div class="dialog-Report-new" style="display: none">
+        </div>
+        <div class="dialog-detail" style="display: none">
         </div>
     </div>
+    <br />
+    <div class="clearfix"></div>
+    <div class="content black text-center">
+        <div class="branchNamecls">
+            <span>Branch Name: <strong>(@BranchName)</strong> </span>
+        </div>
+        <p><i class="fa fa-asterisk"></i>Copyright © 2024 - 2026 <a href="http://symphonysoftt.com/" target="_blank">Symphony Softtech Ltd.</a> <span>| All rights reserved.</span></p>
+    </div>
+
+
     <script src="~/assets/javascripts/toastr.js"></script>
     <script src="~/assets/javascripts/custom.js"></script>
     <script src="~/assets/javascripts/jquery.min.js"></script>
+    <script src="~/assets/javascripts/jquery-1.8.2.min.js"></script>
     <script src="~/assets/javascripts/jquery.validate.js"></script>
     <script src="~/assets/javascripts/jquery.validate.min.js"></script>
     <script src="~/assets/javascripts/jquery.validate.unobtrusive.min.js"></script>
-    <script src="~/assets/javascripts/jquery-1.8.2.min.js"></script>
+
     <script src="~/assets/javascripts/jquery-ui-1.8.24.min.js"></script>
     <script src="~/assets/javascripts/default.js"></script>
 
@@ -471,5 +1135,9 @@
     <script src="~/assets/javascripts/select2.js"></script>
     <script src="~/assets/plugins/chartjs/moment.js"></script>
     <script src="~/assets/javascripts/chart.min.js"></script>
+
+    <!-- AdminLTE -->
+    @*<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>*@
+
 </body>
 </html>
