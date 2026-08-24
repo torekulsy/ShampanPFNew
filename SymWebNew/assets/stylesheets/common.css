@@ -157,8 +157,29 @@ body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .content-w
 }
 
 }*/
-
-
+@media (min-width: 992px) {
+    body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .brandLogo {
+        width: 44px;
+        height: 50px;
+        margin: 8px auto 10px;
+        padding: 5px;
+        overflow: hidden;
+        min-height: 50px;
+    }
+}
+@media (min-width: 992px) {
+    body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px !important;
+    height: 32px;
+    margin: 0 auto;
+    padding: 0 !important;
+    border-radius: 2px;
+    transition: background-color .22s ease, color .22s ease, box-shadow .22s ease;
+}
+}
 .main-container .sidebar a.nav-link.has-treeview-a.treeview-expanded.last-parent-active {
     background: #bcefff !important;
     color: #000000 !important;
@@ -766,7 +787,7 @@ a {
 .nav-sidebar li a {
     position: relative;
     display: block;
-    padding: 0.5rem 1rem;
+    padding: 0.7rem 1rem;
 }
 
 .nav-sidebar > .nav-item .nav-icon {
