@@ -7,10 +7,17 @@
     }
 </style>
 <div class="EditPlace">
-    <div id="EmployeeInfo">
-    </div>
-    <div id="LeftInfo">
-    </div>
+    @if (!ViewData.ModelState.IsValid)
+    {
+        @Html.Partial("_left", (SymViewModel.HRM.EmployeeInfoVM)Model)
+    }
+    else
+    {
+        <div id="EmployeeInfo">
+        </div>
+        <div id="LeftInfo">
+        </div>
+    }
 </div>
 
 
@@ -76,7 +83,16 @@
 </div>
 <script>
     $(function () {
-        $(".EditPlace").hide();
+        var leftInformationId = @Convert.ToInt32(ViewBag.LeftInformationId ?? 0);
+
+        if ('@ViewData.ModelState.IsValid' === 'True') {
+            $(".EditPlace").hide();
+        }
+
+        if (leftInformationId > 0) {
+            $("#detailsDiv").load('@Url.Action("leftdetailEdit", "left")' + '?id=' + leftInformationId);
+        }
+
         customToollip();
         valiDation("frmLeft");
         InitDateTimePickers();

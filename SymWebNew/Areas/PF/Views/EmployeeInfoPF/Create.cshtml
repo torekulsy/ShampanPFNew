@@ -160,7 +160,7 @@
                         @Html.LabelFor(model => model.BasicSalary)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.BasicSalary, new { @class = "required NumberCheck form-control", @required = "" })
+                        @Html.TextBoxFor(model => model.BasicSalary, new { @class = "required isPositiveNumeric form-control", @required = "", @Style = "text-align: right" })
                         @Html.ValidationMessageFor(model => model.BasicSalary)
                     </div>
                 </div>
@@ -169,8 +169,8 @@
                         @Html.LabelFor(model => model.GrossSalary)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.GrossSalary, new { @class = "required NumberCheck form-control", @required = "" })
-                        @Html.ValidationMessageFor(model => model.GrossSalary)
+                        @Html.TextBoxFor(model => model.GrossSalary, new { @class = "required isPositiveNumeric form-control", @required = "", @Style = "text-align: right" })
+                      
                     </div>
                 </div>
 

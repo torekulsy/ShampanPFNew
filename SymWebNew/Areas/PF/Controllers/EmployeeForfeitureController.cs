@@ -196,7 +196,45 @@ namespace SymWebUI.Areas.PF.Controllers
 
             EmployeeInfoVM vm = new EmployeeInfoVM();
             vm.TransType = AreaTypePFVM.TransType;
-            if (!string.IsNullOrEmpty(Session["PFOpeinigId"] as string) && Session["PFOpeinigId"] as string != "0")
+            bool isEmployeeNavigation = !string.IsNullOrWhiteSpace(empcode)
+                || !string.Equals(btn, "current", StringComparison.OrdinalIgnoreCase);
+            if (isEmployeeNavigation)
+            {
+                string branchId = Session["BranchId"] == null ? "" : Session["BranchId"].ToString();
+                vm = repo.SelectEmpForSearch(empcode, btn, branchId);
+                if (string.IsNullOrWhiteSpace(vm.Code)
+                    && !string.IsNullOrWhiteSpace(empcode)
+                    && (string.Equals(btn, "next", StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(btn, "previous", StringComparison.OrdinalIgnoreCase)))
+                {
+                    vm = repo.SelectEmpForSearch(empcode, "current", branchId);
+                }
+
+                if (!string.IsNullOrWhiteSpace(vm.EmployeeId))
+                {
+                    EmployeeId = vm.EmployeeId;
+                    PFOpeinigVM = _eaRepo.SelectByIdAll("", vm.EmployeeId);
+                }
+                if (string.IsNullOrWhiteSpace(vm.EmpName))
+                {
+                    vm.EmpName = "Employee Name";
+                }
+                vm.empPFForfeitureVM = PFOpeinigVM;
+                vm.empPFForfeitureVM.EmployeeId = EmployeeId;
+                vm.Operation = Operation;
+                if (string.Equals(vm.Operation, "add", StringComparison.OrdinalIgnoreCase))
+                {
+                    vm.Id = null;
+                    vm.empPFForfeitureVM.Id = null;
+                    vm.empPFForfeitureVM.EmployeeContribution = 0;
+                    vm.empPFForfeitureVM.EmployerContribution = 0;
+                    vm.empPFForfeitureVM.EmployeeProfit = 0;
+                    vm.empPFForfeitureVM.EmployerProfit = 0;
+                    vm.empPFForfeitureVM.OpeningDate = null;
+                    vm.empPFForfeitureVM.Post = false;
+                }
+            }
+            else if (!string.IsNullOrEmpty(Session["PFOpeinigId"] as string) && Session["PFOpeinigId"] as string != "0")
             {
                 string PFOpeinigId = Session["PFOpeinigId"] as string;
                 PFOpeinigVM = _eaRepo.SelectByIdAll(PFOpeinigId);//find emp code
@@ -214,40 +252,11 @@ namespace SymWebUI.Areas.PF.Controllers
             }
             else
             {
-                vm = repo.SelectEmpForSearchAll(empcode, btn);
-
-                if (!string.IsNullOrWhiteSpace(vm.EmployeeId))
-                {
-                    PFOpeinigVM = _eaRepo.SelectByIdAll("", vm.EmployeeId);
-                }
-
-                if (vm.EmpName == null)
-                {
-                    vm.EmpName = "Employee Name";
-                }
-                else
-                {
-                    EmployeeId = vm.EmployeeId;
-                }
-
-                //svms = arerepo.SingleEmployeeEntry(EmployeeId, FiscalYearDetailId);
+                vm.EmpName = "Employee Name";
                 vm.empPFForfeitureVM = PFOpeinigVM;
-                vm.empPFForfeitureVM.EmployeeId = EmployeeId;
                 vm.Operation = Operation;
-                if (vm.Operation.ToLower() == "add")
-                {
-                    vm.Id = null;
-                    vm.empPFForfeitureVM.Id = null;
-                    vm.empPFForfeitureVM.EmployeeContribution = 0;
-                    vm.empPFForfeitureVM.EmployerContribution = 0;
-                    vm.empPFForfeitureVM.EmployeeProfit = 0;
-                    vm.empPFForfeitureVM.EmployerProfit = 0;
-                    vm.empPFForfeitureVM.OpeningDate = null;
-                    vm.empPFForfeitureVM.Post = false;
-
-
-                }
             }
+            vm.TransType = AreaTypePFVM.TransType;
             return PartialView("_detailCreate", vm);
         }
 

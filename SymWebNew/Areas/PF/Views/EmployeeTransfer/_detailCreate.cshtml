@@ -14,7 +14,7 @@
         <div class="col-sm-5 col-md-5 col-lg-5 col-xl-4">
             <div class="thinbox">
                 <div class="th_thinbox">
-                    <p>@Model.EmpName</p>
+                    <p>Employee Info</p>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -88,16 +88,16 @@
                         <div class="col-md-6 col-lg-6 col-xl-3">
                             <div class="editor-label">@Html.LabelFor(model => model.empPFForTransferVM.ToBranch)</div>
                             <div class="editor-field">
-                                @Html.SimpleDropDownFor(model => model.empPFForTransferVM.ToBranch, "/Config/DropDown/Branch", new { @placeholder = "To Branch", @class = " form-control " })
-
+                                @Html.SimpleDropDownFor(model => model.empPFForTransferVM.ToBranch, "/Config/DropDown/Branch", new { @placeholder = "To Branch", @class = " form-control required" })
+                                @Html.ValidationMessageFor(model => model.empPFForTransferVM.ToBranch)
                             </div>
                         </div>
 
                         <div class="col-md-6 col-lg-6 col-xl-3">
                             <div class="editor-label">@Html.LabelFor(model => model.empPFForTransferVM.TransferDate)</div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.empPFForTransferVM.TransferDate, new { @placeholder = "Transfer Date", @class = "dpDate cOpeningDate customDatePicker  form-control" })
-
+                                @Html.TextBoxFor(model => model.empPFForTransferVM.TransferDate, new { @placeholder = "Transfer Date", @class = "dpDate cOpeningDate customDatePicker  form-control required" })
+                                @Html.ValidationMessageFor(model => model.empPFForTransferVM.TransferDate)
                             </div>
                         </div>
 
@@ -124,7 +124,26 @@
     </div>
 }
 <script>
+    function excludeFromBranchFromToBranch() {
+        var fromBranch = $("input[name='empPFForTransferVM.FromBranch']").val();
+        var $toBranch = $("select[name='empPFForTransferVM.ToBranch']");
 
+        if (!fromBranch || !$toBranch.hasClass("DropdownInited")) {
+            return;
+        }
+
+        $toBranch.find("option").filter(function () {
+            return String(this.value) === String(fromBranch);
+        }).remove();
+    }
+
+    $(function () {
+        valiDation("afrmEmployeeEdit");
+
+        $("select[name='empPFForTransferVM.ToBranch']")
+            .off("change.excludeFromBranch")
+            .on("change.excludeFromBranch", excludeFromBranchFromToBranch);
+    });
     $(function () {
         InitDateTimePickers();
     });
@@ -146,9 +165,7 @@
         submit(url, myData);
         $('.EarningAmount').val('0');
     });
-    $(function () {
-        valiDation("afrmEmployeeEdit");
-    });
+
   
 
     function checkbtn() {
@@ -160,9 +177,13 @@
     $('#SaveJSON').click(function () {
         debugger;
 
+        if (!validateRequiredFields("#afrmEmployeeEdit")) {
+            return;
+        }
+
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Code!");
+            ShowResult("Fail", "Please Select Employee Code!");
             return;
         }
     
@@ -202,7 +223,7 @@
 
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Code!");
+            ShowResult("Fail", "Please Select Employee Code!");
             return;
         }
         if (PFOpeningValue == "" || PFOpeningValue == "0" || PFOpeningValue == "0.0" || PFOpeningValue == "0.00") {
@@ -231,7 +252,7 @@
 
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Code!");
+            ShowResult("Fail", "Please Select Employee Code!");
             return;
         }
 

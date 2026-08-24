@@ -188,7 +188,33 @@ namespace SymWebUI.Areas.PF.Controllers
             //EmployeeOtherEarningRepo arerepo = new EmployeeOtherEarningRepo();
             EmployeePFOpeinigVM PFOpeinigVM = new EmployeePFOpeinigVM();
             EmployeeInfoVM vm = new EmployeeInfoVM();
-            if (!string.IsNullOrEmpty(Session["PFOpeinigId"] as string) && Session["PFOpeinigId"] as string != "0")
+            bool isEmployeeNavigation = !string.IsNullOrWhiteSpace(empcode)
+                || !string.Equals(btn, "current", StringComparison.OrdinalIgnoreCase);
+            if (isEmployeeNavigation)
+            {
+                string branchId = Session["BranchId"] == null ? "" : Session["BranchId"].ToString();
+                vm = repo.SelectEmpForSearch(empcode, btn, branchId);
+                if (string.IsNullOrWhiteSpace(vm.Code)
+                    && !string.IsNullOrWhiteSpace(empcode)
+                    && (string.Equals(btn, "next", StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(btn, "previous", StringComparison.OrdinalIgnoreCase)))
+                {
+                    vm = repo.SelectEmpForSearch(empcode, "current", branchId);
+                }
+
+                if (!string.IsNullOrWhiteSpace(vm.EmployeeId))
+                {
+                    EmployeeId = vm.EmployeeId;
+                    PFOpeinigVM = _eaRepo.SelectById("", vm.EmployeeId);
+                }
+                if (string.IsNullOrWhiteSpace(vm.EmpName))
+                {
+                    vm.EmpName = "Employee Name";
+                }
+                vm.empPFOpeinigVM = PFOpeinigVM;
+                vm.empPFOpeinigVM.EmployeeId = EmployeeId;
+            }
+            else if (!string.IsNullOrEmpty(Session["PFOpeinigId"] as string) && Session["PFOpeinigId"] as string != "0")
             {
                 string PFOpeinigId = Session["PFOpeinigId"] as string;
                 PFOpeinigVM = _eaRepo.SelectById(PFOpeinigId);//find emp code
@@ -206,25 +232,8 @@ namespace SymWebUI.Areas.PF.Controllers
             }
             else
             {
-                vm = repo.SelectEmpForSearch(empcode, btn);
-
-                if (!string.IsNullOrWhiteSpace(vm.EmployeeId))
-                {
-                    PFOpeinigVM = _eaRepo.SelectById("", vm.EmployeeId);
-                }
-
-                if (vm.EmpName == null)
-                {
-                    vm.EmpName = "Employee Name";
-                }
-                else
-                {
-                    EmployeeId = vm.Id;
-                }
-
-                //svms = arerepo.SingleEmployeeEntry(EmployeeId, FiscalYearDetailId);
+                vm.EmpName = "Employee Name";
                 vm.empPFOpeinigVM = PFOpeinigVM;
-                vm.empPFOpeinigVM.EmployeeId = EmployeeId;
             }
             return PartialView("_detailCreate", vm);
         }

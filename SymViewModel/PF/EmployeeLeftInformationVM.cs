@@ -20,6 +20,7 @@ namespace SymViewModel.PF
         public string LeftType_E { get; set; }
 
         [Display(Name = "Left/Last Working Date")]
+        [Required]
         public string LeftDate { get; set; }
         [Required]
         [Display(Name = "Issue/Resign Date")]

@@ -46,7 +46,9 @@
                 <div class="editor-field">
                     @*@Html.TextBoxFor(model => model.nomineeVM.DateofBirth, new { @onchange = "DateOfBirth(this)", @placeholder = "Date of Birth", @class = "customDatePicker required  form-control" }*@   
                     
-                    @Html.TextBoxFor(model => model.nomineeVM.DateofBirth, new { @placeholder = "Date Of Birth", @class = " customDatePicker noFutureDate required  form-control" })
+                    @Html.TextBoxFor(model => model.nomineeVM.DateofBirth, new { @placeholder = "Date Of Birth", @class = "customDatePicker noFutureDate required form-control" })
+
+
                 </div>
             </div>
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
@@ -174,16 +176,14 @@
                {
 
 
-                   <button type="button" title="Save Data" id="saveJSOND" class="sym-btn-save">&nbsp;Save </button>
+                   <button type="button" title="Save Data" id="saveJSOND" onclick="return pageSubmit('frmNominee');" class="sym-btn-save">&nbsp;Save </button>
 
                    <button type="button" title="Click for Edit" onclick="Editnominee();" class="Edit sym-btn-edit">&nbsp;Edit</button>
 
                }
+               <button type="button" title="Click for Cancel" onclick="Canclenominee();" class="Cancle  sym-btn-cancel" style="display: inline-flex!important">&nbsp;Close</button>
            </div>
-           <div class="col-md-6">
-               <button type="button" title="Click for Cancel" onclick="Canclenominee();" class="Cancle  sym-btn-cancel">&nbsp;Cancel</button>
-           </div>
-           
+          
        </div>
       
     </div>
@@ -192,6 +192,7 @@
 
 }
 <script>
+
     var url = "";
     var urlDivision = "";
     var urlDistrict = "";
@@ -220,16 +221,6 @@
         isChange = true;
     });
 
-    $('#saveJSOND').click(function () {
-        var url = "/PF/EmployeeInfoPF/Nominee";
-
-        $form = $('#frmNominee');
-
-        $form.attr("action", url);
-        $form.submit();
-
-    });
-
     function Canclenominee() {
         if (isChange == true) {
             Ask("<h6>You have some changes in this form.</br>Click No for Ignore</h6>", null, function () {
@@ -246,17 +237,18 @@
 </script>
 <script>
     $(document).ready(function () {
-        $(".customDatePicker").datepicker({
-            dateFormat: "dd-M-yy",
-            changeMonth: true,
-            changeYear: true,
-            yearRange: "1900:2500"
-        });
-        $(".noFutureDate").datepicker("option", {
-            maxDate: 0,
-            yearRange: "1900:+0"
-        });
+        $(function () {
+            $(".customDatePicker").datepicker({
+                dateFormat: "dd/mm/yy",
+                changeMonth: true,
+                changeYear: true,
 
+                onSelect: function (dateText, inst) {
+
+                    $(this).datepicker("hide");
+                }
+            });
+        });
         $(".FromDate").on("change", function () {
 
             var fromDate = $(this).datepicker("getDate");

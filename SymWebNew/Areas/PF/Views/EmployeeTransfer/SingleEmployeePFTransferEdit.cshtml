@@ -170,7 +170,7 @@
                     </a>
 
                     @Html.SimpleDropDownFor(model => model.Code, "/Config/DropDown/EmployeeCodeName",
-                new { @id = "FiscalYearDetailId", @class = "selectDropdown empId modern-dropdown"})
+                        new { @id = "FiscalYearDetailId", @class = "selectDropdown empId modern-dropdown required", data_placeholder = "Select Employee Code" })
 
 
                     <a class="pager-btn search-btn" data-pager-action='next' id="current">
@@ -233,13 +233,7 @@
     });
 
     $('#current').click(function () {
-        var empId = $('#empId').val();
-        if (empId == "") {
-            ShowResult("Fail", "Please Input Code!");
-            return;
-        }
-        var btn = 'current';
-        Searching(btn);
+        Searching('current');
     });
 
     $('#nextcode').click(function () {
@@ -261,10 +255,29 @@
 
 
     function Searching(btn) {
-        var empid = $('.selectDropdown  :selected').text();
-        empid = empid.split('~')[0];
+        var $selectedEmployee = $('.selectDropdown option:selected').first();
+        var selectedText = $.trim($selectedEmployee.text() || '');
+        var empid = $.trim(selectedText.split('~')[0]);
 
-        url = "/@ViewBag.TransType/EmployeeTransfer/DetailCreate?empcode=" + empid + '&btn=' + btn + '&id=' + '@Model.empPFForTransferVM.Id';
+        if (empid === '' || empid.toLowerCase().indexOf('select') === 0) {
+            empid = $.trim($selectedEmployee.val() || '');
+        }
+
+        if (empid === '') {
+            if (btn === 'next') {
+                btn = 'first';
+            }
+            else if (btn === 'previous') {
+                btn = 'last';
+            }
+            else if (btn === 'current') {
+                ShowResult("Fail", "Please Select Employee Code!");
+                return;
+            }
+        }
+
+        var url = "/@ViewBag.TransType/EmployeeTransfer/DetailCreate?empcode="
+            + encodeURIComponent(empid) + '&btn=' + encodeURIComponent(btn) + '&id=0';
         $.ajax({
             url: url,
             type: 'GET',

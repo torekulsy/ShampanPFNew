@@ -174,7 +174,40 @@ namespace SymWebUI.Areas.PF.Controllers
             //EmployeeOtherEarningRepo arerepo = new EmployeeOtherEarningRepo();
             EmployeeTransferVM empPFForTransferVM = new EmployeeTransferVM();
             EmployeeInfoVM vm = new EmployeeInfoVM();
-            if (!string.IsNullOrEmpty(Session["PFOpeinigId"] as string) && Session["PFOpeinigId"] as string != "0")
+            bool isEmployeeNavigation = !string.IsNullOrWhiteSpace(empcode)
+                || !string.Equals(btn, "current", StringComparison.OrdinalIgnoreCase);
+
+            if (isEmployeeNavigation)
+            {
+                string branchId = Session["BranchId"] == null ? "" : Session["BranchId"].ToString();
+                vm = repo.SelectEmpForSearch(empcode, btn, branchId);
+
+                if (string.IsNullOrWhiteSpace(vm.Code)
+                    && !string.IsNullOrWhiteSpace(empcode)
+                    && (string.Equals(btn, "next", StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(btn, "previous", StringComparison.OrdinalIgnoreCase)))
+                {
+                    vm = repo.SelectEmpForSearch(empcode, "current", branchId);
+                }
+
+                if (!string.IsNullOrWhiteSpace(vm.Code))
+                {
+                    empPFForTransferVM = _eaRepo.SelectById("", vm.Code);
+                }
+
+                if (vm.EmpName == null)
+                {
+                    vm.EmpName = "Employee Name";
+                }
+                else
+                {
+                    EmployeeId = vm.Code;
+                }
+
+                vm.empPFForTransferVM = empPFForTransferVM;
+                vm.empPFForTransferVM.EmployeeId = EmployeeId;
+            }
+            else if (!string.IsNullOrEmpty(Session["PFOpeinigId"] as string) && Session["PFOpeinigId"] as string != "0")
             {
                 string PFOpeinigId = Session["PFOpeinigId"] as string;
                 empPFForTransferVM = _eaRepo.SelectById(PFOpeinigId);//find emp code
@@ -192,25 +225,8 @@ namespace SymWebUI.Areas.PF.Controllers
             }
             else
             {
-                vm = repo.SelectEmpForSearch(empcode, btn);
-
-                if (!string.IsNullOrWhiteSpace(vm.Code))
-                {
-                    empPFForTransferVM = _eaRepo.SelectById("", vm.Code);
-                }
-
-                if (vm.EmpName == null)
-                {
-                    vm.EmpName = "Employee Name";
-                }
-                else
-                {
-                    EmployeeId = vm.Code;
-                }
-
-                //svms = arerepo.SingleEmployeeEntry(EmployeeId, FiscalYearDetailId);
+                vm.EmpName = "Employee Name";
                 vm.empPFForTransferVM = empPFForTransferVM;
-                vm.empPFForTransferVM.EmployeeId = EmployeeId;
             }
             return PartialView("_detailCreate", vm);
         }
@@ -223,7 +239,20 @@ namespace SymWebUI.Areas.PF.Controllers
             try
             {
                 //ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
-                vm = empVM.empPFForTransferVM;
+                vm = empVM == null ? null : empVM.empPFForTransferVM;
+                if (vm == null || string.IsNullOrWhiteSpace(vm.ToBranch))
+                {
+                    return Json("Fail~To Branch is required.", JsonRequestBehavior.AllowGet);
+                }
+                if (string.IsNullOrWhiteSpace(vm.TransferDate))
+                {
+                    return Json("Fail~Transfer Date is required.", JsonRequestBehavior.AllowGet);
+                }
+                if (string.Equals(vm.FromBranch, vm.ToBranch, StringComparison.OrdinalIgnoreCase))
+                {
+                    return Json("Fail~To Branch must be different from From Branch.", JsonRequestBehavior.AllowGet);
+                }
+
                 vm.CreatedAt = DateTime.Now.ToString("yyyyMMddHHmmss");
                 vm.CreatedBy = identity.Name;
                 vm.CreatedFrom = identity.WorkStationIP;
