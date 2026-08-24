@@ -140,7 +140,7 @@ namespace SymServices.Common
             {
                 CurrentArea = normalizedArea,
                 CurrentAreaLabel = GetAreaLabel(normalizedArea),
-                HomeUrl = GetHomeUrl(normalizedArea),
+                HomeUrl = "/Common/Home/",
                 Modules = modules == null
                     ? new List<DynamicMenuModule>()
                     : modules.Where(m => m != null && m.IsVisible).ToList()

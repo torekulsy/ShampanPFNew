@@ -37,7 +37,7 @@
 
                                 <div class="editor-field">
                                     @*<div>@Html.TextBox("fYear", @Session["SessionYear"].ToString(), new { @class = "fiscalyearCom form-control" }) </div>*@
-                                    @Html.SimpleDropDown("FiscalYear", "/Config/DropDown/DropDownYear", new { @class = "fiscalyearCom required importRequired exportRequired form-control selectDropdown" })
+                                    @Html.SimpleDropDown("FiscalYear", "/Config/DropDown/DropDownYear", new { @class = "required fiscalyearCom importRequired exportRequired form-control " })
                                 </div>
                             </div>
                             <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">

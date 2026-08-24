@@ -377,6 +377,15 @@ namespace SymWebUI.Areas.PF.Controllers
                 return Json(new[] { "Fail", "Select data to post." });
             }
 
+            foreach (string postId in postIds)
+            {
+                int paymentId;
+                if (!int.TryParse(postId, out paymentId) || paymentId <= 0)
+                {
+                    return Json(new[] { "Fail", "Invalid employee payment selected. Please refresh and try again." });
+                }
+            }
+
             EmployeePFPaymentVM EarningVM = new EmployeePFPaymentVM();
 
             EarningVM.LastUpdateAt = DateTime.Now.ToString("yyyyMMddHHmmss");
