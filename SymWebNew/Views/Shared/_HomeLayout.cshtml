@@ -73,7 +73,12 @@
         })
         function InitDateTimePickers() {
             $(".customDatePicker").datepicker({
-                changeYear: true, changeMonth: true, dateFormat: 'dd-M-yy', yearRange: '-90:+9', maxYear: '100'
+                changeYear: true,
+                changeMonth: true,
+                dateFormat: 'dd-M-yy',
+                yearRange: '-90:+9',
+                maxYear: '100',
+
             });
             $('.customTimePicker').prop("readonly", "readonly");
             $('.customDatePicker').prop("readonly", "readonly");

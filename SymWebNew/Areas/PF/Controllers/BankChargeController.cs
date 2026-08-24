@@ -342,73 +342,162 @@ namespace SymWebUI.Areas.PF.Controllers
             }
         }
 
-        [HttpGet]
-        public ActionResult reportVeiw(int id)
-        {
-            try
-            {
+        //[HttpGet]
+        //public ActionResult reportVeiw(int id)
+        //{
+        //    try
+        //    {
 
-                PFReportVM vm = new PFReportVM();
-                BankChargeVM BankChargevm = new BankChargeVM();
-                BankChargevm.TransType = AreaTypePFVM.TransType;
+        //        PFReportVM vm = new PFReportVM();
+        //        BankChargeVM BankChargevm = new BankChargeVM();
+        //        BankChargevm.TransType = AreaTypePFVM.TransType;
 
 
-                PFReport report = new PFReport();
-                BankChargevm = _repo.SelectAll(Session["BranchId"].ToString(), Convert.ToInt32(id)).FirstOrDefault();
-                vm.Id = id;
-                vm.Code = BankChargevm.Code;
-                return PartialView("~/Areas/PF/Views/BankCharge/reportVeiw.cshtml", vm);
+        //        PFReport report = new PFReport();
+        //        BankChargevm = _repo.SelectAll(Session["BranchId"].ToString(), Convert.ToInt32(id)).FirstOrDefault();
+        //        vm.Id = id;
+        //        vm.Code = BankChargevm.Code;
+        //        return PartialView("~/Areas/PF/Views/BankCharge/reportVeiw.cshtml", vm);
 
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-        [HttpPost]
-        public ActionResult BankChargeReport(PFReportVM vm)
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
+        //[HttpPost]
+        //public ActionResult BankChargeReport(PFReportVM vm)
+        //{
+        //    try
+        //    {
+        //        string ReportHead = "";
+        //        string rptLocation = "";
+        //        ReportDocument doc = new ReportDocument();
+        //        DataTable dt = new DataTable();
+
+        //        //string[] cFields = { "robi.Code", "robi.Id", "robi.ROBIDate>", "robi.ROBIDate<" };
+        //        string[] cFields = {  "robi.Id" };
+        //        string[] cValues = {  vm.Id.ToString() == "0" ? "" : vm.Id.ToString() };
+
+
+
+        //        BankChargeVM BankChargevm = new BankChargeVM();
+
+        //        var Result = _repo.SelectAll(Session["BranchId"].ToString(), 0, cFields, cValues);
+          
+
+        //        dt = JsonConvert.DeserializeObject<DataTable>(JsonConvert.SerializeObject(Result));
+
+        //        ReportHead = "There are no data to Preview for GL Transaction for Bank Deposit";
+        //        if (dt.Rows.Count > 0)
+        //        {
+        //            ReportHead = "Bank Deposit GL Transactions";
+        //        }
+        //        dt.TableName = "dtWithdraw";
+        //        rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptBankCharge.rpt";
+
+        //        doc.Load(rptLocation);
+        //        doc.SetDataSource(dt);
+        //        string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
+        //        FormulaFieldDefinitions ffds = doc.DataDefinition.FormulaFields;
+
+
+        //        doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text = "'" + companyLogo + "'";
+        //        doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + ReportHead + "'";
+        //        doc.DataDefinition.FormulaFields["TransType"].Text = "'" + AreaTypePFVM.TransType + "'";
+        //        doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
+        //        //doc.DataDefinition.FormulaFields["frmGroupBy"].Text = "'" + groupBy + "'";
+        //        var rpt = RenderReportAsPDF(doc);
+        //        doc.Close();
+        //        return rpt;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+
+
+        public ActionResult BankChargeReport(int id = 0)
         {
             try
             {
                 string ReportHead = "";
                 string rptLocation = "";
+
                 ReportDocument doc = new ReportDocument();
                 DataTable dt = new DataTable();
 
-                //string[] cFields = { "robi.Code", "robi.Id", "robi.ROBIDate>", "robi.ROBIDate<" };
-                string[] cFields = {  "robi.Id" };
-                string[] cValues = {  vm.Id.ToString() == "0" ? "" : vm.Id.ToString() };
+
+                string[] cFields = 
+        { 
+            "robi.Id" 
+        };
+
+                string[] cValues = 
+        { 
+            id == 0 ? "" : id.ToString() 
+        };
 
 
+                var Result = _repo.SelectAll(
+                    Session["BranchId"].ToString(),
+                    0,
+                    cFields,
+                    cValues
+                );
 
-                BankChargeVM BankChargevm = new BankChargeVM();
 
-                var Result = _repo.SelectAll(Session["BranchId"].ToString(), 0, cFields, cValues);
-          
+                dt = JsonConvert.DeserializeObject<DataTable>(
+                        JsonConvert.SerializeObject(Result)
+                     );
 
-                dt = JsonConvert.DeserializeObject<DataTable>(JsonConvert.SerializeObject(Result));
 
-                ReportHead = "There are no data to Preview for GL Transaction for Bank Deposit";
+                ReportHead = "There are no data to Preview for GL Transaction for Bank Charge";
+
                 if (dt.Rows.Count > 0)
                 {
-                    ReportHead = "Bank Deposit GL Transactions";
+                    ReportHead = "Bank Charge GL Transactions";
                 }
-                dt.TableName = "dtWithdraw";
-                rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptBankCharge.rpt";
+
+
+                dt.TableName = "dtBankCharge";
+
+
+                rptLocation = AppDomain.CurrentDomain.BaseDirectory
+                            + @"Files\ReportFiles\PF\\rptBankCharge.rpt";
+
 
                 doc.Load(rptLocation);
+
                 doc.SetDataSource(dt);
-                string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
-                FormulaFieldDefinitions ffds = doc.DataDefinition.FormulaFields;
 
 
-                doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text = "'" + companyLogo + "'";
-                doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + ReportHead + "'";
-                doc.DataDefinition.FormulaFields["TransType"].Text = "'" + AreaTypePFVM.TransType + "'";
-                doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
-                //doc.DataDefinition.FormulaFields["frmGroupBy"].Text = "'" + groupBy + "'";
+                string companyLogo = AppDomain.CurrentDomain.BaseDirectory
+                                    + "Images\\COMPANYLOGO.png";
+
+
+                doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text
+                    = "'" + companyLogo + "'";
+
+
+                doc.DataDefinition.FormulaFields["ReportHead"].Text
+                    = "'" + ReportHead + "'";
+
+
+                doc.DataDefinition.FormulaFields["TransType"].Text
+                    = "'" + AreaTypePFVM.TransType + "'";
+
+
+                doc.DataDefinition.FormulaFields["BranchName"].Text
+                    = "'" + Session["BranchName"].ToString() + "'";
+
+
                 var rpt = RenderReportAsPDF(doc);
+
                 doc.Close();
+
                 return rpt;
             }
             catch (Exception)
@@ -416,7 +505,6 @@ namespace SymWebUI.Areas.PF.Controllers
                 throw;
             }
         }
-
 
         
         private FileStreamResult RenderReportAsPDF(ReportDocument rptDoc)

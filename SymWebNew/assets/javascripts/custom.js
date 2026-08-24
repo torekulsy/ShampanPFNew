@@ -39,7 +39,14 @@ function goBack() {
 //////    o.style.height = "1px";
 //////    o.style.height = (25 + o.scrollHeight) + "px";
 //////}
-
+$(document).on("mousedown", function (e) {
+    if (
+        !$(e.target).closest(".select2-container").length &&
+        !$(e.target).closest(".selectDropdown").length
+    ) {
+        $(".selectDropdown").select2("close");
+    }
+});
 $(function () {
     $(".hasDatepicker").datepicker({
         changeMonth: true,
@@ -431,7 +438,19 @@ function validateRequiredFields(container, fieldSelector) {
         var value = $field.val();
         var isEmpty = value === null || $.trim(String(value)) === "";
         var $parent = $field.parent();
-        var $message = $parent.children(".RequiredField").first();
+        var fieldName = $field.attr("name");
+        var $mvcMessages = $parent.children("[data-valmsg-for]").filter(function () {
+            return $(this).attr("data-valmsg-for") === fieldName;
+        });
+        var $customMessages = $parent.children(".RequiredField");
+        var $message = $customMessages.first();
+
+        $mvcMessages
+            .empty()
+            .removeClass("field-validation-error")
+            .addClass("field-validation-valid")
+            .hide();
+        $customMessages.slice(1).remove();
 
         if ($message.length === 0) {
             $parent.append('<p class="RequiredField" style="color:red; font-size: 13px">This Field is Required</p>');
@@ -448,6 +467,31 @@ function validateRequiredFields(container, fieldSelector) {
     });
 
     return isValid;
+}
+
+function initializeBlankPFNumberFields(formSelector) {
+    var $form = $(formSelector);
+    var $numberFields = $form.find('.NumberCheck');
+
+    $numberFields.each(function () {
+        var value = $.trim($(this).val() || '');
+        if (value !== '' && !isNaN(value) && parseFloat(value) === 0) {
+            $(this).val('');
+        }
+    });
+
+    $form.find('#SaveJSON, #UpdateJSON, #PostJSON')
+        .off('click.blankPFNumbers')
+        .on('click.blankPFNumbers', function () {
+            var $emptyFields = $numberFields.filter(function () {
+                return $.trim($(this).val() || '') === '';
+            });
+
+            $emptyFields.val('0');
+            window.setTimeout(function () {
+                $emptyFields.val('');
+            }, 0);
+        });
 }
 
 function valiDation(sender) {
@@ -777,6 +821,9 @@ function InitDropDowns() {
 
         var dataCache =
             dropdownEl.attr("data-cache") === "true";
+        var placeholderText =
+            dropdownEl.attr("data-placeholder") ||
+            "Select";
         var placeholderSetting =
             dropdownEl.attr(
                 "data-disable-placeholder"
@@ -820,21 +867,27 @@ function InitDropDowns() {
                             '<option value="" ' +
                             'selected="selected" ' +
                             'disabled="disabled">' +
-                            'Select' +
+                            htmlEncodeDropdownValue(
+                                placeholderText
+                            ) +
                             "</option>";
 
                     } else {
                         listItems =
                             '<option value="" ' +
                             'disabled="disabled">' +
-                            'Select' +
+                            htmlEncodeDropdownValue(
+                                placeholderText
+                            ) +
                             "</option>";
                     }
 
                 } else {
                     listItems =
                         '<option value="">' +
-                        "Select" +
+                        htmlEncodeDropdownValue(
+                            placeholderText
+                        ) +
                         "</option>";
                 }
 

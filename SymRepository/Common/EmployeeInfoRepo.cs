@@ -212,12 +212,12 @@ namespace SymRepository.Common
 
 
         }
-        public EmployeeInfoVM SelectEmpForSearch(string empcode, string btn)
+        public EmployeeInfoVM SelectEmpForSearch(string empcode, string btn, string branchId = "")
         {
             try
             {
 
-                return new EmployeeInfoDAL().SelectEmpForSearch(empcode, btn);
+                return new EmployeeInfoDAL().SelectEmpForSearch(empcode, btn, branchId);
             }
             catch (Exception ex)
             {
@@ -225,12 +225,12 @@ namespace SymRepository.Common
             }
         }
 
-        public EmployeeInfoVM SelectEmpForSearchAll(string empcode, string btn)
+        public EmployeeInfoVM SelectEmpForSearchAll(string empcode, string btn, string branchId = "")
         {
             try
             {
 
-                return new EmployeeInfoDAL().SelectEmpForSearchAll(empcode, btn);
+                return new EmployeeInfoDAL().SelectEmpForSearchAll(empcode, btn, branchId);
             }
             catch (Exception ex)
             {

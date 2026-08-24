@@ -95,16 +95,18 @@ SELECT
 ,e.EmpName
 ,e.Code
 ,e.Designation
-,e.Department, e.JoinDate, e.Section, e.Project, e.GrossSalary, e.BasicSalary
+,e.Department, e.JoinDate, e.Section, e.Project
+,isnull(e.GrossSalary,0) GrossSalary
+,isnull(e.BasicSalary,0) BasicSalary
 ,isnull(pfo.EmployeeContribution,0)       EmployeeContribution
 ,isnull(pfo.EmployerContribution,0)       EmployerContribution
 ,isnull(pfo.EmployeeProfit      ,0)       EmployeeProfit
 ,isnull(pfo.EmployerProfit      ,0)       EmployerProfit
 
 ,pfo.OpeningDate
-,pfo.Post
+,isnull(pfo.Post,0) Post
 ,pfo.Remarks
-,pfo.IsActive
+,isnull(pfo.IsActive,0) IsActive
 ,pfo.IsArchive
 ,pfo.CreatedBy
 ,pfo.CreatedAt

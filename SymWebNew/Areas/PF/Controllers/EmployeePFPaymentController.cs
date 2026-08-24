@@ -189,7 +189,45 @@ namespace SymWebUI.Areas.PF.Controllers
             //EmployeeOtherEarningRepo arerepo = new EmployeeOtherEarningRepo();
             EmployeePFPaymentVM PFPaymentVM = new EmployeePFPaymentVM();
             EmployeeInfoVM vm = new EmployeeInfoVM();
-            if (!string.IsNullOrEmpty(Session["PFPaymentId"] as string) && Session["PFPaymentId"] as string != "0")
+            bool isEmployeeNavigation = !string.IsNullOrWhiteSpace(empcode)
+                || !string.Equals(btn, "current", StringComparison.OrdinalIgnoreCase);
+            if (isEmployeeNavigation)
+            {
+                string branchId = Session["BranchId"] == null ? "" : Session["BranchId"].ToString();
+                vm = repo.SelectEmpForSearchAll(empcode, btn, branchId);
+                if (string.IsNullOrWhiteSpace(vm.Code)
+                    && !string.IsNullOrWhiteSpace(empcode)
+                    && (string.Equals(btn, "next", StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(btn, "previous", StringComparison.OrdinalIgnoreCase)))
+                {
+                    vm = repo.SelectEmpForSearchAll(empcode, "current", branchId);
+                }
+
+                if (!string.IsNullOrWhiteSpace(vm.EmployeeId))
+                {
+                    EmployeeId = vm.EmployeeId;
+                    PFPaymentVM = _eaRepo.SelectByIdAll("", vm.EmployeeId);
+                }
+                if (string.IsNullOrWhiteSpace(vm.EmpName))
+                {
+                    vm.EmpName = "Employee Name";
+                }
+                vm.empPFPaymentVM = PFPaymentVM;
+                vm.empPFPaymentVM.EmployeeId = EmployeeId;
+                vm.Operation = Operation;
+                if (string.Equals(vm.Operation, "add", StringComparison.OrdinalIgnoreCase))
+                {
+                    vm.Id = null;
+                    vm.empPFPaymentVM.Id = null;
+                    vm.empPFPaymentVM.EmployeeContribution = 0;
+                    vm.empPFPaymentVM.EmployerContribution = 0;
+                    vm.empPFPaymentVM.EmployeeProfit = 0;
+                    vm.empPFPaymentVM.EmployerProfit = 0;
+                    vm.empPFPaymentVM.PaymentDate = null;
+                    vm.empPFPaymentVM.Post = false;
+                }
+            }
+            else if (!string.IsNullOrEmpty(Session["PFPaymentId"] as string) && Session["PFPaymentId"] as string != "0")
             {
                 string PFPaymentId = Session["PFPaymentId"] as string;
                 PFPaymentVM = _eaRepo.SelectByIdAll(PFPaymentId);//find emp code
@@ -207,39 +245,9 @@ namespace SymWebUI.Areas.PF.Controllers
             }
             else
             {
-                vm = repo.SelectEmpForSearchAll(empcode, btn);
-
-                if (!string.IsNullOrWhiteSpace(vm.EmployeeId))
-                {
-                    PFPaymentVM = _eaRepo.SelectByIdAll("", vm.EmployeeId);
-                }
-
-                if (vm.EmpName == null)
-                {
-                    vm.EmpName = "Employee Name";
-                }
-                else
-                {
-                    EmployeeId = vm.EmployeeId;
-                }
-
-                //svms = arerepo.SingleEmployeeEntry(EmployeeId, FiscalYearDetailId);
+                vm.EmpName = "Employee Name";
                 vm.empPFPaymentVM = PFPaymentVM;
-                vm.empPFPaymentVM.EmployeeId = EmployeeId;
                 vm.Operation = Operation;
-                if (vm.Operation.ToLower() == "add")
-                {
-                    vm.Id = null;
-                    vm.empPFPaymentVM.Id = null;
-                    vm.empPFPaymentVM.EmployeeContribution = 0;
-                    vm.empPFPaymentVM.EmployerContribution = 0;
-                    vm.empPFPaymentVM.EmployeeProfit = 0;
-                    vm.empPFPaymentVM.EmployerProfit = 0;
-                    vm.empPFPaymentVM.PaymentDate = null;
-                    vm.empPFPaymentVM.Post = false;
-
-
-                }
             }
             return PartialView("_detailCreate", vm);
         }

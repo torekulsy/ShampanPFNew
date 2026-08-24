@@ -367,55 +367,158 @@ namespace SymWebUI.Areas.PF.Controllers
             }
         }
 
-        [HttpPost]
-        public ActionResult Withdraw_GLTransactionReport(PFReportVM vm)
-        {
+        //[HttpPost]
+        //public ActionResult Withdraw_GLTransactionReport(PFReportVM vm)
+        //{
            
 
+        //    try
+        //    {
+        //        string ReportHead = "";
+        //        string rptLocation = "";
+        //        PFReport report = new PFReport();
+
+
+        //        string[] cFields = { "w.Code", "w.Id", "w.WithdrawDate>", "w.WithdrawDate<", "w.TransType" };
+        //        string[] cValues = { vm.Code, vm.Id.ToString() == "0" ? "" : vm.Id.ToString(), Ordinary.DateToString(vm.DateFrom), Ordinary.DateToString(vm.DateTo), AreaTypePFVM.TransType };
+
+        //        ReportDocument doc = new ReportDocument();
+        //        DataTable dt = new DataTable();
+
+        //        WithdrawVM Withdrawvm = new WithdrawVM();
+
+        //        var Result = _repo.SelectAll(Session["BranchId"].ToString(), 0, cFields, cValues);
+
+        //        dt = JsonConvert.DeserializeObject<DataTable>(JsonConvert.SerializeObject(Result));
+
+                
+        //        ReportHead = "There are no data to Preview for GL Transaction for Bank Deposit";
+        //        if (dt.Rows.Count > 0)
+        //        {
+        //            ReportHead = "Bank Deposit GL Transactions";
+        //        }
+        //        dt.TableName = "dtWithdraw";
+        //        rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptWithdraw.rpt";
+
+        //        doc.Load(rptLocation);
+        //        doc.SetDataSource(dt);
+        //        string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
+        //        FormulaFieldDefinitions ffds = doc.DataDefinition.FormulaFields;
+        //        CompanyRepo _CompanyRepo = new CompanyRepo();
+        //        CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
+
+        //        doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text = "'" + companyLogo + "'";
+        //        doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + ReportHead + "'";
+        //        doc.DataDefinition.FormulaFields["TransType"].Text = "'" + AreaTypePFVM.TransType + "'";
+        //        doc.DataDefinition.FormulaFields["Address"].Text = "'" + cvm.Address + "'";
+        //        doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
+        //        doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
+        //        //doc.DataDefinition.FormulaFields["frmGroupBy"].Text = "'" + groupBy + "'";
+        //        var rpt = RenderReportAsPDF(doc);
+        //        doc.Close();
+        //        return rpt;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+        [HttpGet]
+        public ActionResult Withdraw_GLTransactionReport(int id = 0)
+        {
             try
             {
                 string ReportHead = "";
                 string rptLocation = "";
+
                 PFReport report = new PFReport();
 
+                string[] cFields = 
+        { 
+            "w.Code", 
+            "w.Id", 
+            "w.WithdrawDate>", 
+            "w.WithdrawDate<", 
+            "w.TransType" 
+        };
 
-                string[] cFields = { "w.Code", "w.Id", "w.WithdrawDate>", "w.WithdrawDate<", "w.TransType" };
-                string[] cValues = { vm.Code, vm.Id.ToString() == "0" ? "" : vm.Id.ToString(), Ordinary.DateToString(vm.DateFrom), Ordinary.DateToString(vm.DateTo), AreaTypePFVM.TransType };
+                string[] cValues = 
+        { 
+            "", 
+            id == 0 ? "" : id.ToString(), 
+            "", 
+            "", 
+            AreaTypePFVM.TransType 
+        };
+
 
                 ReportDocument doc = new ReportDocument();
                 DataTable dt = new DataTable();
 
-                WithdrawVM Withdrawvm = new WithdrawVM();
 
-                var Result = _repo.SelectAll(Session["BranchId"].ToString(), 0, cFields, cValues);
+                var Result = _repo.SelectAll(
+                    Session["BranchId"].ToString(),
+                    0,
+                    cFields,
+                    cValues
+                );
 
-                dt = JsonConvert.DeserializeObject<DataTable>(JsonConvert.SerializeObject(Result));
 
-                
-                ReportHead = "There are no data to Preview for GL Transaction for Bank Deposit";
+                dt = JsonConvert.DeserializeObject<DataTable>(
+                        JsonConvert.SerializeObject(Result)
+                     );
+
+
+                ReportHead = "There are no data to Preview for GL Transaction for Withdraw";
+
                 if (dt.Rows.Count > 0)
                 {
-                    ReportHead = "Bank Deposit GL Transactions";
+                    ReportHead = "Withdraw GL Transactions";
                 }
+
+
                 dt.TableName = "dtWithdraw";
-                rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptWithdraw.rpt";
+
+                rptLocation = AppDomain.CurrentDomain.BaseDirectory
+                            + @"Files\ReportFiles\PF\\rptWithdraw.rpt";
+
 
                 doc.Load(rptLocation);
                 doc.SetDataSource(dt);
-                string companyLogo = AppDomain.CurrentDomain.BaseDirectory + "Images\\COMPANYLOGO.png";
-                FormulaFieldDefinitions ffds = doc.DataDefinition.FormulaFields;
+
+
+                string companyLogo = AppDomain.CurrentDomain.BaseDirectory
+                                    + "Images\\COMPANYLOGO.png";
+
+
                 CompanyRepo _CompanyRepo = new CompanyRepo();
                 CompanyVM cvm = _CompanyRepo.SelectAll().FirstOrDefault();
 
-                doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text = "'" + companyLogo + "'";
-                doc.DataDefinition.FormulaFields["ReportHead"].Text = "'" + ReportHead + "'";
-                doc.DataDefinition.FormulaFields["TransType"].Text = "'" + AreaTypePFVM.TransType + "'";
-                doc.DataDefinition.FormulaFields["Address"].Text = "'" + cvm.Address + "'";
-                doc.DataDefinition.FormulaFields["CompanyName"].Text = "'" + cvm.Name + "'";
-                doc.DataDefinition.FormulaFields["BranchName"].Text = "'" + Session["BranchName"].ToString() + "'";
-                //doc.DataDefinition.FormulaFields["frmGroupBy"].Text = "'" + groupBy + "'";
+
+                doc.DataDefinition.FormulaFields["ReportHeaderA4"].Text
+                    = "'" + companyLogo + "'";
+
+                doc.DataDefinition.FormulaFields["ReportHead"].Text
+                    = "'" + ReportHead + "'";
+
+                doc.DataDefinition.FormulaFields["TransType"].Text
+                    = "'" + AreaTypePFVM.TransType + "'";
+
+                doc.DataDefinition.FormulaFields["Address"].Text
+                    = "'" + cvm.Address + "'";
+
+                doc.DataDefinition.FormulaFields["CompanyName"].Text
+                    = "'" + cvm.Name + "'";
+
+                doc.DataDefinition.FormulaFields["BranchName"].Text
+                    = "'" + Session["BranchName"].ToString() + "'";
+
+
                 var rpt = RenderReportAsPDF(doc);
+
                 doc.Close();
+
                 return rpt;
             }
             catch (Exception)

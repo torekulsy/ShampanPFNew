@@ -323,19 +323,32 @@ namespace SymWebUI.Areas.PF.Controllers
 
 
         [HttpGet]
-        public ActionResult Left()
+        public ActionResult Left(int id = 0)
         {
             EmployeeInfoVM empVM = new EmployeeInfoVM();
             empVM.leftInformation = new EmployeeLeftInformationVM();
+            ViewBag.LeftInformationId = id;
             return View(empVM);
         }
         [Authorize(Roles = "Master,Admin,Account")]
         [HttpPost]
-        public ActionResult Left(EmployeeInfoVM evm, HttpPostedFileBase LeftInformationF)
+        public ActionResult Left([Bind(Prefix = "leftInformation")] EmployeeLeftInformationVM vm, HttpPostedFileBase LeftInformationF)
         {
             Session["permission"] = _reposur.SymRoleSession(identity.UserId, "1_21", "process").ToString();
-            EmployeeLeftInformationVM vm = new EmployeeLeftInformationVM();
-            vm = evm.leftInformation;
+
+            if (!ModelState.IsValid)
+            {
+                EmployeeInfoVM empVM = new EmployeeInfoVM();
+                if (!string.IsNullOrWhiteSpace(vm.EmployeeId))
+                {
+                    EmployeeInfoRepo employeeRepo = new EmployeeInfoRepo();
+                    empVM = employeeRepo.SelectByIdAll2(vm.EmployeeId) ?? new EmployeeInfoVM();
+                }
+
+                empVM.leftInformation = vm;
+                return View("Left", empVM);
+            }
+
             if (LeftInformationF != null && LeftInformationF.ContentLength > 0)
             {
                 vm.FileName = LeftInformationF.FileName;
@@ -371,16 +384,13 @@ namespace SymWebUI.Areas.PF.Controllers
             //return Json(retResults[0] + "~" + retResults[1], JsonRequestBehavior.AllowGet);
             Session["result"] = retResults[0] + "~" + retResults[1];
 
-            if (vm.Id > 0)
+            int savedId;
+            if (!int.TryParse(retResults[2], out savedId) || savedId <= 0)
             {
-                //return RedirectToAction("Left", "Left");
-                return RedirectToAction("Index", "Left");
+                savedId = vm.Id;
             }
-            else
-            {
-                return RedirectToAction("Left", "Left");
-                //return RedirectToAction("Index", "Left");
-            }
+
+            return RedirectToAction("Left", "Left", new { id = savedId });
         }
 
         public ActionResult leftdetailCreate(string id, string employeeId = "", string empcode = "", string btn = "current")

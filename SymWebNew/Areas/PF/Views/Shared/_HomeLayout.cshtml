@@ -922,7 +922,7 @@
                 dateFormat: "dd-M-yy",
                 changeMonth: true,
                 changeYear: true,
-                yearRange: "1900:2500"
+                yearRange: "1900:2500",
             });
             $(".noFutureDate").datepicker("option", {
                 maxDate: 0,
@@ -935,6 +935,7 @@
             });
 
             $(".FromDate").on("change", function () {
+                
                 var fromDate = $(this).datepicker("getDate");
 
                 if (fromDate) {
@@ -964,13 +965,13 @@
         });
 
         $(document).ready(function () {
-            $('.isPositiveNumeric').on('keypress', function (e) {
+            $(document).on('keypress', '.isPositiveNumeric', function (e) {
                 var charCode = e.which;
                 if (charCode > 31 && (charCode < 48 || charCode > 57)) {
                     e.preventDefault();
                 }
             });
-            $('.isPositiveNumeric').on('input', function () {
+            $(document).on('input', '.isPositiveNumeric', function () {
                 this.value = this.value.replace(/[^0-9]/g, '');
             });
         });

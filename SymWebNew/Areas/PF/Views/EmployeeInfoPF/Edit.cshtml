@@ -214,7 +214,7 @@
                                 @Html.LabelFor(model => model.DateOfBirth)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.DateOfBirth, new { @placeholder = "From Date", @class = " customDatePicker  required  form-control" })
+                                @Html.TextBoxFor(model => model.DateOfBirth, new { @placeholder = "From Date", @class = " customDatePicker noFutureDate  required  form-control" })
                                 @Html.ValidationMessageFor(model => model.DateOfBirth)
                             </div>
                         </div>
@@ -234,7 +234,7 @@
                                 @Html.LabelFor(model => model.BasicSalary)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.BasicSalary, new { @class = "required isPositiveNumeric form-control", @required = "" })
+                                @Html.TextBoxFor(model => model.BasicSalary, new { @class = "required isPositiveNumeric form-control", @required = "", @Style = "text-align: right" })
                                 @Html.ValidationMessageFor(model => model.BasicSalary)
                             </div>
                         </div>
@@ -243,7 +243,7 @@
                                 @Html.LabelFor(model => model.GrossSalary)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.GrossSalary, new { @class = "required isPositiveNumeric form-control", @required = "" })
+                                @Html.TextBoxFor(model => model.GrossSalary, new { @class = "required isPositiveNumeric form-control", @required = "", @Style = "text-align: right" })
                                 @Html.ValidationMessageFor(model => model.GrossSalary)
                             </div>
                         </div>
@@ -263,7 +263,7 @@
                                 @Html.LabelFor(model => model.EmployeeNID)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.EmployeeNID, new { @placeholder = "NID  ", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.EmployeeNID, new { @placeholder = "NID  ", @class = "form-control isPositiveNumeric" })
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
@@ -271,7 +271,7 @@
                                 @Html.LabelFor(model => model.EmployeeTIN)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.EmployeeTIN, new { @placeholder = "TIN", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.EmployeeTIN, new { @placeholder = "TIN", @class = "form-control isPositiveNumeric" })
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
@@ -313,7 +313,8 @@
                                 @Html.LabelFor(model => model.EmployeeBankAccountNumber)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.EmployeeBankAccountNumber, new { @placeholder = "Bank Account Number", @class = "form-control" })
+                                @Html.TextBoxFor(model => model.EmployeeBankAccountNumber, new { @placeholder = "Bank Account Number", @class = "required form-control isPositiveNumeric" })
+                                @Html.ValidationMessageFor(model => model.EmployeeBankAccountNumber)
                             </div>
                         </div>
                         <div class="col-12 col-sm-6 col-md-4 col-lg-3">
@@ -444,8 +445,9 @@
                 <button type="submit" title="Save Data" class="sym-btn-update">&nbsp;Update</button>
             </p>*@
     </div>
+}
 
-    <div class="thinbox">
+<div class="thinbox">
         <div class="th_thinbox">
             <p>Nominee</p>
         </div>
@@ -502,17 +504,72 @@
             InitDropDowns();
             SelectAllForDelete();
         });
+
+        function initNomineeDateOfBirthPicker() {
+            var $dateOfBirth = $("#myNominee #nomineeVM_DateofBirth");
+
+            if (!$dateOfBirth.length || !$.fn.datepicker) {
+                return;
+            }
+
+            if ($dateOfBirth.hasClass("hasDatepicker")) {
+                $dateOfBirth.datepicker("destroy");
+            }
+
+            $dateOfBirth
+                .prop("readonly", true)
+                .attr("autocomplete", "off")
+                .datepicker({
+                    dateFormat: "dd-M-yy",
+                    changeMonth: true,
+                    changeYear: true,
+                    maxDate: 0,
+                    yearRange: "1900:+0",
+                    onSelect: function () {
+                        var input = this;
+
+                        window.setTimeout(function () {
+                            $(input).datepicker("hide");
+                            input.blur();
+                        }, 0);
+                    }
+                });
+
+            $(document)
+                .off("mousedown.nomineeDatePicker")
+                .on("mousedown.nomineeDatePicker", function (event) {
+                    var $target = $(event.target);
+
+                    if (!$target.closest("#ui-datepicker-div").length
+                        && !$target.is($dateOfBirth)) {
+                        $dateOfBirth.datepicker("hide");
+                    }
+                });
+        }
+
+        function loadNomineeForm(employeeId, nomineeId) {
+            var nomineeUrl = '@Url.Action("Nominee", "EmployeeInfoPF")'
+                + '?EmployeeId=' + encodeURIComponent(employeeId)
+                + '&Id=' + encodeURIComponent(nomineeId);
+
+            $("#myNominee").load(nomineeUrl, function (response, status) {
+                if (status === "success" || status === "notmodified") {
+                    initNomineeDateOfBirthPicker();
+                }
+            });
+        }
+
         $('#btnDialogNO').click(function () {
             debugger;
             // var code = 1;// $('#Id').val();
-            $("#myNominee").load('@Url.Action("Nominee", "EmployeeInfoPF")' + '?EmployeeId=' + '@Model.Id' + '&Id=0');
+            loadNomineeForm('@Model.Id', 0);
             @*$("#myNominee").load('@Url.Action("Nominee", "EmployeeInfoPF")' + '?Id=' + '@Model.Id');*@
         });
         function NomineeEdit(sender) {
             debugger;
             var EmployeeId = $(sender).attr('data-employeeId');
             var Id = $(sender).attr('data-Id');
-            $("#myNominee").load('@Url.Action("Nominee", "EmployeeInfoPF")' + '?EmployeeId=' + EmployeeId + '&Id=' + Id);
+            loadNomineeForm(EmployeeId, Id);
         }
         function Editnominee() {
             debugger;
@@ -593,5 +650,4 @@
             $("#fileInfo").addClass("d-none");
         }
     </script>
-}
 

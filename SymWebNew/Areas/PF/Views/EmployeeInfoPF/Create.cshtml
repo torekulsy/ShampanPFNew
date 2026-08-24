@@ -60,6 +60,7 @@
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.Code, new { @placeholder = "Enter your Code", @class = "required form-control" })
+                        @Html.ValidationMessageFor(model => model.Code)
                     </div>
                 </div>
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
@@ -159,7 +160,7 @@
                         @Html.LabelFor(model => model.BasicSalary)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.BasicSalary, new { @class = "required NumberCheck form-control", @required = "" })
+                        @Html.TextBoxFor(model => model.BasicSalary, new { @class = "required isPositiveNumeric form-control", @required = "", @Style = "text-align: right" })
                         @Html.ValidationMessageFor(model => model.BasicSalary)
                     </div>
                 </div>
@@ -168,8 +169,8 @@
                         @Html.LabelFor(model => model.GrossSalary)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.GrossSalary, new { @class = "required NumberCheck form-control", @required = "" })
-                        @Html.ValidationMessageFor(model => model.GrossSalary)
+                        @Html.TextBoxFor(model => model.GrossSalary, new { @class = "required isPositiveNumeric form-control", @required = "", @Style = "text-align: right" })
+                      
                     </div>
                 </div>
 
@@ -221,7 +222,7 @@
                         @Html.LabelFor(model => model.EmployeeBankNameId)
                     </div>
                     <div class="editor-field">
-                        @Html.SimpleDropDownFor(model => model.EmployeeBankNameId, "/Config/DropDown/PF_BankName", new { @class = "  form-control" })
+                        @Html.SimpleDropDownFor(model => model.EmployeeBankNameId, "/Config/DropDown/PF_BankName", new { @class = " required form-control" })
                         @Html.ValidationMessageFor(model => model.EmployeeBankNameId)
                     </div>
                 </div>

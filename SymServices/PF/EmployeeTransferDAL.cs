@@ -558,8 +558,8 @@ EmployeeCode
 
                     cmdInsert.Parameters.AddWithValue("@EmployeeCode", vm.Code);
                     cmdInsert.Parameters.AddWithValue("@FromBranch", vm.FromBranch);
-                    cmdInsert.Parameters.AddWithValue("@ToBranch", vm.ToBranch);
-                    cmdInsert.Parameters.AddWithValue("@TransferDate", Ordinary.DateToString(vm.TransferDate));
+                    cmdInsert.Parameters.AddWithValue("@ToBranch", (object)vm.ToBranch ?? DBNull.Value);
+                    cmdInsert.Parameters.AddWithValue("@TransferDate", (object)Ordinary.DateToString(vm.TransferDate) ?? DBNull.Value);
                     cmdInsert.Parameters.AddWithValue("@Remarks", vm.Remarks ?? Convert.DBNull);
                     cmdInsert.Parameters.AddWithValue("@CreatedBy", vm.CreatedBy);
                     cmdInsert.Parameters.AddWithValue("@CreatedAt", vm.CreatedAt);

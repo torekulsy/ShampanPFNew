@@ -61,8 +61,10 @@ namespace SymViewModel.PF
         //mine
         [Display(Name = "From Branch")]
         public string FromBranch { get; set; }
+        [Required(ErrorMessage = "To Branch is required.")]
         [Display(Name = "To Branch")]
         public string ToBranch { get; set; }
+        [Required(ErrorMessage = "Transfer Date is required.")]
         [Display(Name = "Transfer Date")]
         public string TransferDate { get; set; }
         [Display(Name = "Transfer Reason")]

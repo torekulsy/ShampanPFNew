@@ -99,22 +99,23 @@
                         </div>
                         <div class="col-md-6">
                             <div class="editor-label">
-                                @Html.LabelFor(model => model.leftInformation.EntryLeftDate)
+                                @Html.LabelFor(model => model.leftInformation.LeftDate)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.leftInformation.EntryLeftDate, new { @placeholder = "Issue Date", @class = " customDatePicker form-control" })
-                                @Html.ValidationMessageFor(model => model.leftInformation.EntryLeftDate)
+                                @Html.TextBoxFor(model => model.leftInformation.LeftDate, new { @placeholder = "Left Date", @class = "required customDatePicker form-control FromDate" })
+                                @Html.ValidationMessageFor(model => model.leftInformation.LeftDate)
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="editor-label">
-                                @Html.LabelFor(model => model.leftInformation.LeftDate)
+                                @Html.LabelFor(model => model.leftInformation.EntryLeftDate)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.leftInformation.LeftDate, new { @placeholder = "Left Date", @class = "required customDatePicker form-control" })
-                                @Html.ValidationMessageFor(model => model.leftInformation.LeftDate)
+                                @Html.TextBoxFor(model => model.leftInformation.EntryLeftDate, new { @placeholder = "Issue Date", @class = "required customDatePicker form-control ToDate" })
+                                @Html.ValidationMessageFor(model => model.leftInformation.EntryLeftDate)
                             </div>
                         </div>
+
                         <div class="col-md-6">
                             <div class="editor-label">
                                 @Html.LabelFor(model => model.leftInformation.Remarks)
@@ -147,7 +148,14 @@
                            
                             <div class="row">
                                 <div class="col-6 col-md-6">
-                                    <button type="button" title="Save Data" id="saveJSOND" class="sym-btn-save">&nbsp;Save </button>
+                                    @if (Model.leftInformation != null && Model.leftInformation.Id > 0)
+                                    {
+                                        <button type="button" title="Update Data" id="saveJSOND" class="sym-btn-update">&nbsp;Update</button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" title="Save Data" id="saveJSOND" class="sym-btn-save">&nbsp;Save</button>
+                                    }
                                     @*<button type="button" title="Save Data"  onclick="pageSubmit('frmLeft');"  class="sym-btn-save">&nbsp;Save</button>*@
                                 </div>
                                 <div class="col-6 col-md-6">
@@ -213,13 +221,20 @@
     //});
 
     $('#saveJSOND').click(function () {
-        var url = "/PF/Left/Left";
+        pageSubmit('frmLeft');
+    });
 
-        $form = $('#frmLeft');
-
-        $form.attr("action", url);
-        $form.submit();
-
+    $(".FromDate").on("change", function () {
+        var fromDate = $(this).datepicker("getDate");
+        if (fromDate) {
+            $(".ToDate").datepicker("option", "maxDate", fromDate);
+            var toDate = $(".ToDate").datepicker("getDate");
+            if (toDate && toDate > fromDate) {
+                $(".ToDate").val('');
+            }
+        } else {
+            $(".ToDate").datepicker("option", "maxDate", null);
+        }
     });
 </script>
 

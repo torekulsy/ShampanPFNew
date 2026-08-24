@@ -1728,6 +1728,10 @@ Where IsArchive=0 AND IsActive=1 and BranchId=@BranchId
                     vm.Code = dr["Code"].ToString();
                     vm.EmpName = dr["EmpName"].ToString();                
                     vm.JoinDate = Ordinary.StringToDate(dr["JoinDate"].ToString());
+                    vm.Designation = dr["Designation"].ToString();
+                    vm.Department = dr["Department"].ToString();
+                    vm.Section = dr["Section"].ToString();
+                    vm.Project = dr["Project"].ToString();
                     vm.Remarks = dr["Remarks"].ToString();
                     vm.IsActive = Convert.ToBoolean(dr["IsActive"]);    
                     vm.CreatedAt = Ordinary.StringToDate(dr["CreatedAt"].ToString());
@@ -2245,7 +2249,7 @@ ORDER BY e.Department, e.EmpName desc
             return vm;
         }
 
-        public EmployeeInfoVM SelectEmpForSearch(string empcode, string btn, SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
+        public EmployeeInfoVM SelectEmpForSearch(string empcode, string btn, string branchId = "", SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
         {
             #region Variables
             SqlConnection currConn = null;
@@ -2286,6 +2290,11 @@ From  ViewEmployeeInformation
 Where 1=1 and IsArchive=0 And IsActive=1
 ";
                 SqlCommand objComm = new SqlCommand();
+                if (!string.IsNullOrWhiteSpace(branchId))
+                {
+                    sqlText += @" AND BranchId=@BranchId ";
+                    objComm.Parameters.AddWithValue("@BranchId", branchId);
+                }
                 if (btn.ToLower() == "current")
                 {
                     sqlText += @" AND Code=@Code ORDER BY Code desc ";
@@ -2379,7 +2388,7 @@ Where 1=1 and IsArchive=0 And IsActive=1
             #endregion
             return gmployeeInfoVM;
         }
-        public EmployeeInfoVM SelectEmpForSearchAll(string empcode, string btn, SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
+        public EmployeeInfoVM SelectEmpForSearchAll(string empcode, string btn, string branchId = "", SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
         {
             #region Variables
             SqlConnection currConn = null;
@@ -2420,6 +2429,11 @@ From  ViewEmployeeInformation
 Where 1=1 
 ";
                 SqlCommand objComm = new SqlCommand();
+                if (!string.IsNullOrWhiteSpace(branchId))
+                {
+                    sqlText += @" AND BranchId=@BranchId ";
+                    objComm.Parameters.AddWithValue("@BranchId", branchId);
+                }
                 if (btn.ToLower() == "current")
                 {
                     sqlText += @" AND Code=@Code ORDER BY Code desc ";
@@ -2454,6 +2468,7 @@ Where 1=1
                 while (dr.Read())
                 {
                     gmployeeInfoVM = new EmployeeInfoVM();
+                    gmployeeInfoVM.Id = dr["EmployeeId"].ToString();
                     gmployeeInfoVM.EmployeeId = dr["EmployeeId"].ToString();
                     gmployeeInfoVM.Code = dr["Code"].ToString();
                     gmployeeInfoVM.Department = dr["Department"].ToString();

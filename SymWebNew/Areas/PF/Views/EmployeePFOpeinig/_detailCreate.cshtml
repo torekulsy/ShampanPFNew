@@ -14,7 +14,7 @@
         <div class="col-sm-5 col-md-5 col-lg-5 col-xl-4">
             <div class="thinbox">
                 <div class="th_thinbox">
-                    <p>@Model.EmpName</p>
+                    <p>Employee Info</p>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -79,7 +79,7 @@
                                 @Html.LabelFor(model => model.empPFOpeinigVM.EmployeeContribution)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.empPFOpeinigVM.EmployeeContribution, new { @placeholder = "Employee Contribution", @class = "cEmployeeContribution NumberCheck  form-control" })
+                                @Html.TextBoxFor(model => model.empPFOpeinigVM.EmployeeContribution, new { @placeholder = "Employee Contribution", @class = "cEmployeeContribution NumberCheck isPositiveNumeric text-right form-control" })
                                 @Html.ValidationMessageFor(model => model.empPFOpeinigVM.EmployeeContribution)
                             </div>
                         </div>
@@ -89,7 +89,7 @@
                                 @Html.LabelFor(model => model.empPFOpeinigVM.EmployerContribution)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.empPFOpeinigVM.EmployerContribution, new { @placeholder = "Employer Contribution", @class = "cEmployerContribution NumberCheck form-control" })
+                                @Html.TextBoxFor(model => model.empPFOpeinigVM.EmployerContribution, new { @placeholder = "Employer Contribution", @class = "cEmployerContribution NumberCheck isPositiveNumeric text-right form-control" })
                                 @Html.ValidationMessageFor(model => model.empPFOpeinigVM.EmployerContribution)
                             </div>
                         </div>
@@ -99,7 +99,7 @@
                                 @Html.LabelFor(model => model.empPFOpeinigVM.EmployeeProfit)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.empPFOpeinigVM.EmployeeProfit, new { @placeholder = "Employee Profit", @class = "cEmployeeProfit NumberCheck form-control" })
+                                @Html.TextBoxFor(model => model.empPFOpeinigVM.EmployeeProfit, new { @placeholder = "Employee Profit", @class = "cEmployeeProfit NumberCheck isPositiveNumeric text-right form-control" })
                                 @Html.ValidationMessageFor(model => model.empPFOpeinigVM.EmployeeProfit)
                             </div>
                         </div>
@@ -109,7 +109,7 @@
                                 @Html.LabelFor(model => model.empPFOpeinigVM.EmployerProfit)
                             </div>
                             <div class="editor-field">
-                                @Html.TextBoxFor(model => model.empPFOpeinigVM.EmployerProfit, new { @placeholder = "Employer Profit", @class = "cEmployerProfit NumberCheck form-control" })
+                                @Html.TextBoxFor(model => model.empPFOpeinigVM.EmployerProfit, new { @placeholder = "Employer Profit", @class = "cEmployerProfit NumberCheck isPositiveNumeric text-right form-control" })
                                 @Html.ValidationMessageFor(model => model.empPFOpeinigVM.EmployerProfit)
                             </div>
                         </div>
@@ -168,6 +168,8 @@
         }
         $('.selectDropdown').val('@Model.Code').change();
     });
+    initializeBlankPFNumberFields('#afrmEmployeeEdit');
+
     $('#DeleteJSON').click(function () {
         var myData = $('#afrmEmployeeEdit').serialize();
         var url = "/@ViewBag.TransType/EmployeeOtherEarning/Create?btn=delete";
@@ -197,22 +199,25 @@
         $("#PostJSON").show();
     }
 
+    function validateOpeningDate() {
+        var isValid = validateRequiredFields("#afrmEmployeeEdit", ".cOpeningDate.required");
+        $('.cOpeningDate').parent().find('.RequiredField').text('This field is required');
+        return isValid;
+    }
+
     $('#SaveJSON').click(function () {
         
         var PFOpeningValue = $('.cPFOpeningValue').val();
-        var OpeningDate = $('.cOpeningDate').val();
-
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Code!");
+            ShowResult("Fail", "Please Select Employee Code!");
             return;
         }
         if (PFOpeningValue == "" || PFOpeningValue == "0" || PFOpeningValue == "0.0" || PFOpeningValue == "0.00") {
             ShowResult("Fail", "Please Enter PF Opening Value!");
             return;
         }
-        if (OpeningDate == "") {
-            ShowResult("Fail", "Please Select Opening Date!");
+        if (!validateOpeningDate()) {
             return;
         }
         var myData = $('#afrmEmployeeEdit').serialize();
@@ -246,20 +251,18 @@
     $('#UpdateJSON').click(function () {
 
         var PFOpeningValue = $('.cPFOpeningValue').val();
-        var OpeningDate = $('.cOpeningDate').val();
         var Post = $('.cPost').val();
 
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Code!");
+            ShowResult("Fail", "Please Select Employee Code!");
             return;
         }
         if (PFOpeningValue == "" || PFOpeningValue == "0" || PFOpeningValue == "0.0" || PFOpeningValue == "0.00") {
             ShowResult("Fail", "Please Enter PF Opening Value!");
             return;
         }
-        if (OpeningDate == "") {
-            ShowResult("Fail", "Please Select Opening Date!");
+        if (!validateOpeningDate()) {
             return;
         }
 
@@ -280,7 +283,7 @@
 
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Code!");
+            ShowResult("Fail", "Please Select Employee Code!");
             return;
         }
         

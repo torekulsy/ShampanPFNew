@@ -153,7 +153,7 @@
                         <span>Previous</span>
                     </a>
 
-                    @Html.SimpleDropDownFor(model => model.Code, "/Config/DropDown/EmployeeCodeName", new { @id = "FiscalYearDetailId", @class = "form-control selectDropdown empId" })
+                    @Html.SimpleDropDownFor(model => model.Code, "/Config/DropDown/EmployeeCodeName", new { @id = "FiscalYearDetailId", @class = "form-control selectDropdown empId", data_placeholder = "Select Employee Code" })
 
                     <a class="pager-btn search-btn" data-pager-action='next' id="current">
                         <i class="fa fa-search"></i>
@@ -216,13 +216,7 @@
     //});
 
     $('#current').click(function () {
-        var empId = $('#empId').val();
-        if (empId == "") {
-            ShowResult("Fail", "Please Input Code!");
-            return;
-        }
-        var btn = 'current';
-        Searching(btn);
+        Searching('current');
     });
 
     $('#nextcode').click(function () {
@@ -244,8 +238,22 @@
 
 
     function Searching(btn) {
-        var empid = $('.selectDropdown  :selected').text();
-        empid = empid.split('~')[0];
+        var $selectedEmployee = $('.selectDropdown option:selected').first();
+        var selectedText = $.trim($selectedEmployee.text() || '');
+        var empid = $.trim(selectedText.split('~')[0]);
+
+        if (empid === '' || empid.toLowerCase().indexOf('select employee') === 0) {
+            empid = $.trim($selectedEmployee.val() || '');
+        }
+
+        if (empid === '') {
+            if (btn === 'next') btn = 'first';
+            else if (btn === 'previous') btn = 'last';
+            else if (btn === 'current') {
+                ShowResult("Fail", "Please Select Employee Code!");
+                return;
+            }
+        }
 
         //alert(empid);
         //var eTypeName = $('.eType').val();
@@ -263,7 +271,8 @@
         //    return;
         //}
 
-        url = "/@ViewBag.TransType/EmployeePFOpeinig/DetailCreate?empcode=" + empid + '&btn=' + btn + '&id=' + '@Model.empPFOpeinigVM.Id';
+        url = "/@ViewBag.TransType/EmployeePFOpeinig/DetailCreate?empcode="
+            + encodeURIComponent(empid) + '&btn=' + encodeURIComponent(btn) + '&id=0';
         $.ajax({
             url: url,
             type: 'GET',
