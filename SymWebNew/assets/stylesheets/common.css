@@ -157,6 +157,16 @@ body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .content-w
 }
 
 }*/
+.nav-sidebar .nav-link>.right:nth-child(2), .nav-sidebar .nav-link>p>.right:nth-child(2) {
+    right: 1rem!important;
+}
+.nav-sidebar>.nav-item .nav-icon {
+    margin-left: .05rem;
+    font-size: 1.2rem;
+    margin-right: .8rem;
+    text-align: center;
+    width: 1.6rem;
+}
 @media (min-width: 992px) {
     body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .brandLogo {
         width: 44px;
@@ -759,8 +769,9 @@ ul.nav-sidebar .nav-treeview .nav-treeview .nav.nav-treeview {
 }
 
     ul.nav-sidebar .nav-treeview .nav-treeview .nav.nav-treeview .nav-item a {
-        padding: 0.5rem 5px !important;
-    }
+    padding: 0.5rem 5px !important;
+    margin: 5px 0;
+}
 
 .has-treeview-a.treeview-expanded {
     background: #17A2ED !important;
