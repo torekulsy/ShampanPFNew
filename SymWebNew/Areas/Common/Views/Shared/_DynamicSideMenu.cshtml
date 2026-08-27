@@ -152,11 +152,17 @@
     else
     {
         var openClass = node.IsCurrent ? " treeview-expanded last-parent-active" : "";
+        var childCount = (node.Items == null ? 0 : node.Items.Count)
+            + (node.SubGroups == null ? 0 : node.SubGroups.Count);
         <li class="nav-item">
             <a class="nav-link has-treeview-a@openClass" href="#" data-menu-id="@parentKey-@node.CssClass">
                 <i class="nav-icon @GetMenuIcon(node.Title)"></i>
                 <p>
                     @node.Title
+                    @if (childCount > 0)
+                    {
+                        <span class="menu-child-count" aria-label="@childCount child menus">@childCount</span>
+                    }
                     <i class="fas fa-angle-left right"></i>
                 </p>
             </a>
@@ -173,11 +179,16 @@
                     foreach (var subGroup in node.SubGroups)
                     {
                         var subGroupActive = subGroup.Items != null && subGroup.Items.Any(i => i.IsCurrent);
+                        var subGroupCount = subGroup.Items == null ? 0 : subGroup.Items.Count;
                         <li class="nav-item">
                             <a class="nav-link has-treeview-a@(subGroupActive ? " treeview-expanded last-parent-active" : "")" href="#" data-menu-id="@parentKey-@node.CssClass-@subGroup.Title">
                                 <i class="nav-icon @GetMenuIcon(subGroup.Title)"></i>
                                 <p>
                                     @subGroup.Title
+                                    @if (subGroupCount > 0)
+                                    {
+                                        <span class="menu-child-count" aria-label="@subGroupCount child menus">@subGroupCount</span>
+                                    }
                                     <i class="fas fa-angle-left right"></i>
                                 </p>
                             </a>
@@ -205,6 +216,22 @@
         color: #fff !important;
     }
 
+    .nav-sidebar .menu-child-count {
+        position: absolute;
+        top: 50%;
+        right: 33px;
+        min-width: 13px;
+        height: 16px;
+        padding: 0 5px;
+        border-radius: 4px;
+        background-color: #17a2b8;
+        color: #fff;
+        font-size: 9px;
+        font-weight: 700;
+        line-height: 16px;
+        text-align: center;
+        transform: translateY(-50%);
+    }
     .sidebar {
         height: calc(100vh - 118px) !important;
         width: 247px !important;
@@ -258,6 +285,131 @@
     .nav-treeview > .nav-item:last-child::after {
         height: 20px !important;
     }
+
+    /* Desktop mini-sidebar: keep the existing expanded menu as the hover view. */
+    @@media (min-width: 992px) {
+        body.layout-left.sidebar-mini .main-sidebar,
+        body.layout-left.sidebar-mini .main-sidebar::before {
+            transition: width .28s ease, box-shadow .28s ease;
+        }
+
+        body.layout-left.sidebar-mini .main-sidebar .sidebar {
+            transition: width .28s ease;
+        }
+
+        body.layout-left.sidebar-mini .main-sidebar .brandLogo {
+            transition: height .28s ease, margin .28s ease, padding .28s ease;
+        }
+
+        body.layout-left.sidebar-mini .main-sidebar .nav-sidebar .nav-link p {
+            transition: opacity .2s ease;
+        }
+
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar,
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar::before {
+            width: 60px !important;
+        }
+
+        body.layout-left.sidebar-mini.sidebar-collapse .main-header,
+        body.layout-left.sidebar-mini.sidebar-collapse .content-wrapper,
+        body.layout-left.sidebar-mini.sidebar-collapse .main-footer {
+            margin-left: 60px !important;
+        }
+
+        /* AdminLTE expands this same element over the page; the content margin
+           deliberately stays at 60px so hovering never shifts the page. */
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(.sidebar-no-expand):hover,
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar.sidebar-focused {
+            width: 250px !important;
+            box-shadow: 4px 0 14px rgba(12, 37, 65, .22);
+        }
+
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .brandLogo {
+            width: 44px;
+            height: 52px;
+            margin: 8px auto 10px;
+            padding: 5px;
+            overflow: hidden;
+        }
+
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .brandLogo img {
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .sidebar {
+            width: 60px !important;
+            padding: 4px 0 8px;
+            overflow-x: hidden !important;
+            scrollbar-width: thin;
+        }
+
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar {
+            width: 60px;
+            padding: 0;
+        }
+
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item {
+            width: 60px;
+            margin: 5px 0;
+        }
+
+       
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link > .nav-icon {
+            width: 21px !important;
+            min-width: 21px;
+            margin: 0 !important;
+            font-size: 17px !important;
+            line-height: 1;
+            text-align: center;
+        }
+
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-treeview {
+            display: none !important;
+        }
+
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link > p {
+            width: 0 !important;
+            margin-left: 0 !important;
+            opacity: 0;
+            visibility: visible !important;
+            white-space: nowrap;
+            pointer-events: none;
+            display: none
+        }
+
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link.active-menu,
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link.last-parent-active,
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link.treeview-expanded {
+            color: #fff !important;
+            background: #007bff !important;
+            box-shadow: inset 3px 0 0 rgba(255, 255, 255, .78);
+        }
+
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .25);
+            border-radius: 6px;
+        }
+    }
+
+    @@media (prefers-reduced-motion: reduce) {
+        .main-sidebar,
+        .main-sidebar::before,
+        .main-sidebar .sidebar,
+        .main-sidebar .nav-link {
+            transition: none !important;
+        }
+    }
 </style>
 
 <section>
@@ -277,11 +429,16 @@
             {
                 DynamicNavbarViewModel moduleModel = service.BuildNavbarViewModel(module.Title);
                 var moduleActive = module.IsCurrent || (moduleModel.Nodes != null && moduleModel.Nodes.Any(n => n.IsCurrent));
+                var submenuCount = moduleModel.Nodes == null ? 0 : moduleModel.Nodes.Count;
                 <li class="nav-item">
                     <a class="nav-link has-treeview@(moduleActive ? " treeview-expanded" : "")" href="#" data-menu-id="module-@module.Title">
                         <i class="nav-icon @GetMenuIcon(module.Title)"></i>
                         <p>
                             @module.Title
+                            @if (submenuCount > 0)
+                            {
+                                <span class="menu-child-count" aria-label="@submenuCount submenus">@submenuCount</span>
+                            }
                             <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>
