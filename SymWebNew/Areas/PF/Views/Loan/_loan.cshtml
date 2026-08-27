@@ -102,7 +102,14 @@
             {
                 if (!Model.IsPaid)
                 {
-                    <button type="button" title="Make Duplicate" class=" holdbtn sym-btn-duplicate" value="Duplicate" onclick="LoanEdit(this,false,true);">Duplicate</button>
+                    if (Model.IsHold)
+                    {
+                        <button type="button" title="Make Duplicate" class=" holdbtn sym-btn-duplicate" value="Duplicate" onclick="LoanEdit(this,false,true);">Duplicate</button>
+                    }
+                    else
+                    {
+                        <button type="button" title="Hold the schedule before making a duplicate" class=" holdbtn sym-btn-duplicate" value="Duplicate" disabled="disabled">Duplicate</button>
+                    }
                 }
             }
 

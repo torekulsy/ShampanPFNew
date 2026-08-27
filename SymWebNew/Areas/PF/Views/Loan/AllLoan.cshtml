@@ -265,12 +265,7 @@
     }
 
     $('.sendRpt').click(function (e) {
-        debugger;
-        var fid = '@ViewBag.Id';
-        var sdate = $('#myDataTable_range_from_9').val();
-        var eDate = $('#myDataTable_range_to_9').val();
         var url = $(this).attr("data-url");
-        url += '?StartDate=' + sdate + '&EndDate=' + eDate;
         var win = window.open(url, '_blank');
 
     });

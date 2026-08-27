@@ -54,7 +54,8 @@ namespace SymWebUI.Areas.PF.Controllers
             EnumJournalTypeRepo _JournalTypeRepo = new EnumJournalTypeRepo();
 
             SettingDAL _settingDal = new SettingDAL();
-            string CashCOAId = _settingDal.settingValue("PF", "CashCOAId").Trim();
+            string cashCOASetting = _settingDal.settingValue("PF", "CashCOAId");
+            string CashCOAId = string.IsNullOrWhiteSpace(cashCOASetting) ? string.Empty : cashCOASetting.Trim();
 
 
             var getAllData = _JournalTypeRepo.SelectAllJournalTransactionType(0, new[] { "NameTrim", "TransType" }, new[] { TransactionForm, AreaTypePFVM.TransType });
@@ -64,13 +65,26 @@ namespace SymWebUI.Areas.PF.Controllers
             }
 
 
+            int journalTypeId;
+            if (!int.TryParse(JournalType, out journalTypeId))
+            {
+                journalTypeId = 1;
+            }
+
+            int sourceId;
+            int.TryParse(TransactionId, out sourceId);
+
             GLJournalVM vm = new GLJournalVM
             {
                 Operation = "add",
-                JournalType = Convert.ToInt32(JournalType),
+                JournalType = journalTypeId,
                 TransactionType = TransactionType,
                 TransType = AreaTypePFVM.TransType,
-                CashCOAId = CashCOAId
+                CashCOAId = CashCOAId,
+                SourceId = sourceId,
+                Source = sourceId > 0 && !string.IsNullOrWhiteSpace(TransactionForm)
+                    ? TransactionForm + "-" + sourceId
+                    : string.Empty
             };
 
             return View("~/Areas/PF/Views/Journal/Create.cshtml", vm);

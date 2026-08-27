@@ -130,8 +130,9 @@ namespace SymWebUI.Areas.PF.Controllers
 
             PreDistributionFundVM vm = new PreDistributionFundVM();
             vm.TransType = AreaTypePFVM.TransType;
-
             vm.Operation = "add";
+            vm.TransactionDate = DateTime.Now.ToString("dd-MMM-yyyy");
+            vm.Code = _repo.GenerateCode(vm.TransType, vm.TransactionDate);
 
             return View("~/Areas/PF/Views/PreDistributionFund/Create.cshtml",vm);
         }
@@ -182,6 +183,17 @@ namespace SymWebUI.Areas.PF.Controllers
 
                 if (vm.Operation.ToLower() == "update")
                 {
+                    PreDistributionFundVM existing = _repo.SelectAll(vm.Id).FirstOrDefault();
+                    if (existing == null)
+                    {
+                        return HttpNotFound();
+                    }
+                    if (existing.Post)
+                    {
+                        Session["result"] = "Fail~Data Already Posted. Can't Update!";
+                        return RedirectToAction("Edit", new { id = vm.Id });
+                    }
+
                     vm.LastUpdateAt = DateTime.Now.ToString("yyyyMMddHHmmss");
                     vm.LastUpdateBy = identity.Name;
                     vm.LastUpdateFrom = identity.WorkStationIP;

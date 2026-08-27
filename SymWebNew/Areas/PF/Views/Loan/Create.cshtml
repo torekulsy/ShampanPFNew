@@ -118,7 +118,7 @@
                         <label>Loan No</label>
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.LoanNo, new { @placeholder = "Loan No", @class = " cLoanNo required right form-control" })
+                        @Html.TextBoxFor(model => model.LoanNo, new { @placeholder = "Loan No", @class = "cLoanNo required right isPositiveNumeric form-control" })
                         @Html.ValidationMessage("LoanNo")
                     </div>
                 </div>
@@ -130,7 +130,7 @@
                         @Html.LabelFor(model => model.PrincipalAmount)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.PrincipalAmount, new { @onchange = "LoanSchudele();", @placeholder = "Principal Amount", @class = " right required NumberCheck form-control" })
+                        @Html.TextBoxFor(model => model.PrincipalAmount, new { @onchange = "LoanSchudele();", @placeholder = "Principal Amount", @class = "right required NumberCheck isPositiveNumeric form-control" })
                         @Html.ValidationMessageFor(model => model.PrincipalAmount)
                     </div>
                 </div>
@@ -139,7 +139,7 @@
                         <label>No. of Installment</label>
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.NumberOfInstallment, new { @onchange = "LoanSchudele()", @placeholder = "Number Of Installment", @class = " right required  NumberCheck form-control" })
+                        @Html.TextBoxFor(model => model.NumberOfInstallment, new { @onchange = "LoanSchudele()", @placeholder = "Number Of Installment", @class = "right required NumberCheck isPositiveNumeric form-control" })
                         @Html.ValidationMessageFor(model => model.NumberOfInstallment)
                     </div>
                 </div>
@@ -208,7 +208,7 @@
                         @Html.LabelFor(model => model.InterestRate)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.InterestRate, new { @onchange = "LoanSchudele()", @placeholder = "Interest Rate", @class = "intRate right NumberCheck form-control" })
+                        @Html.TextBoxFor(model => model.InterestRate, new { @onchange = "LoanSchudele()", @placeholder = "Interest Rate", @class = "intRate right NumberCheck isPositiveNumeric form-control" })
                         @Html.ValidationMessageFor(model => model.InterestRate)
                     </div>
 
@@ -228,7 +228,7 @@
                         @Html.LabelFor(model => model.InterestAmount)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.InterestAmount, new { @onchange = "LoanSchudele()", @placeholder = "Interest Amount", @class = " right NumberCheck form-control" })
+                        @Html.TextBoxFor(model => model.InterestAmount, new { @onchange = "LoanSchudele()", @placeholder = "Interest Amount", @class = "right NumberCheck isPositiveNumeric form-control" })
                         @Html.ValidationMessageFor(model => model.InterestAmount)
                     </div>
                 </div>
@@ -237,7 +237,7 @@
                         @Html.LabelFor(model => model.TotalAmount)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.TotalAmount, new { @placeholder = "Total Amount", @class = " right form-control NumberCheck", @readonly = "readonly" })
+                        @Html.TextBoxFor(model => model.TotalAmount, new { @placeholder = "Total Amount", @class = "right NumberCheck isPositiveNumeric form-control", @readonly = "readonly" })
                         @Html.ValidationMessageFor(model => model.TotalAmount)
                     </div>
                 </div>
@@ -395,7 +395,7 @@
         var PFPrincipalAmount = $('#PrincipalAmount').val();
 
         if (PFPrincipalAmount == 0) {
-            ShowResult("Fail", "Principal Amount is Required ");
+            ShowLoanInlineValidation('#PrincipalAmount', 'Principal Amount is Required');
             return
         }
 
@@ -450,8 +450,7 @@
         var PFPrincipalAmount = $.trim($('#PrincipalAmount').val());
 
         if (PFPrincipalAmount == "" || parseFloat(PFPrincipalAmount) <= 0) {
-            ShowResult("Fail", "Principal Amount is Required");
-            $('#PrincipalAmount').focus();
+            ShowLoanInlineValidation('#PrincipalAmount', 'Principal Amount is Required');
             return false;
         }
 
@@ -480,6 +479,21 @@
 
         return true;
     });
+
+    function ShowLoanInlineValidation(fieldSelector, message) {
+
+        var $field = $(fieldSelector);
+        var $container = $field.parent();
+        var $message = $container.children('.RequiredField').first();
+
+        if ($message.length === 0) {
+            $container.append('<p class="RequiredField" style="color:red; font-size:13px"></p>');
+            $message = $container.children('.RequiredField').last();
+        }
+
+        $field.addClass('input-validation-error').focus();
+        $message.text(message).show();
+    }
 
     function ApprovedCheck(isUserAction) {
 
@@ -659,7 +673,7 @@
             error: function (xhr, status, error) {
             },
             success: function (response) {
-                html += "<table border='3' border-collapse: collapse; class='table table-striped  table-responsive'><thead><caption><h1>Payment Schedule</h1></caption><tr><th>No.</th><th>Date</th><th>Amount</th><th>Interest</th><th>Total</th></tr></thead><tbody>"
+                html += "<table border='3' border-collapse: collapse; class='table table-striped table-responsive'><caption style='caption-side:top; text-align:left; padding:8px 0;font-size: 25px; color: #000'><strong>Payment Schedule</strong></caption><thead><tr><th>No.</th><th>Date</th><th>Amount</th><th>Interest</th><th>Total</th></tr></thead><tbody>"
                 $.each(response, function (i, item)
                 {
 

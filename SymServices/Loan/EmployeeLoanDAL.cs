@@ -1275,7 +1275,7 @@ where id=@id
                 //else if (loanDetail.HaveDuplicate)
                 {
                     EmployeeLoanDetailVM loanDetailOld = new EmployeeLoanDetailVM();
-                    sqlText = "select  * from EmployeeLoanDetail where id=@id ";
+                    sqlText = "select * from EmployeeLoanDetail WITH (UPDLOCK, HOLDLOCK) where id=@id ";
                     SqlCommand detailSelect = new SqlCommand(sqlText, currConn, transaction);
                     detailSelect.Parameters.AddWithValue("@id", loanDetail.Id);
                     using (SqlDataReader dr = detailSelect.ExecuteReader())
@@ -1299,7 +1299,39 @@ where id=@id
                         }
                         dr.Close();
                     }
-                    string PaymentScheduleDate = new DateTime(Convert.ToInt32(loanDetailOld.PaymentScheduleDate.Substring(0, 4)), Convert.ToInt32(loanDetailOld.PaymentScheduleDate.Substring(4, 2)), Convert.ToInt32(loanDetailOld.PaymentScheduleDate.Substring(6, 2))).AddMonths(1).ToString("yyyyMMdd");
+
+                    if (string.IsNullOrWhiteSpace(loanDetailOld.EmployeeLoanId))
+                    {
+                        throw new InvalidOperationException("Loan schedule was not found.");
+                    }
+                    if (!loanDetailOld.IsHold)
+                    {
+                        throw new InvalidOperationException("Please hold this loan schedule before duplicate.");
+                    }
+                    if (loanDetailOld.HaveDuplicate)
+                    {
+                        throw new InvalidOperationException("This loan schedule is already duplicated.");
+                    }
+
+                    string lastScheduleSql = @"
+SELECT MAX(PaymentScheduleDate)
+FROM EmployeeLoanDetail WITH (UPDLOCK, HOLDLOCK)
+WHERE EmployeeLoanId = @EmployeeLoanId
+  AND ISNULL(IsArchive, 0) = 0";
+                    SqlCommand lastScheduleCommand = new SqlCommand(lastScheduleSql, currConn, transaction);
+                    lastScheduleCommand.Parameters.AddWithValue("@EmployeeLoanId", loanDetailOld.EmployeeLoanId);
+                    string lastScheduleDate = Convert.ToString(lastScheduleCommand.ExecuteScalar());
+                    if (string.IsNullOrWhiteSpace(lastScheduleDate))
+                    {
+                        lastScheduleDate = loanDetailOld.PaymentScheduleDate;
+                    }
+
+                    string PaymentScheduleDate = new DateTime(
+                        Convert.ToInt32(lastScheduleDate.Substring(0, 4)),
+                        Convert.ToInt32(lastScheduleDate.Substring(4, 2)),
+                        Convert.ToInt32(lastScheduleDate.Substring(6, 2)))
+                        .AddMonths(1)
+                        .ToString("yyyyMMdd");
                     sqlText = @"   INSERT INTO EmployeeLoanDetail(
                         EmployeeLoanId,EmployeeId,InstallmentAmount,InstallmentPaidAmount,PaymentScheduleDate
                         ,PaymentDate,IsHold,IsPaid,Remarks,IsActive,IsArchive

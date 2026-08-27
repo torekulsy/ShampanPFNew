@@ -537,11 +537,11 @@ namespace SymRepository.PF
           }
 
 
-          public DataTable ProfitDistributionSummery()
+          public DataTable ProfitDistributionSummery(int PreDistributionFundId)
           {
               try
               {
-                  return new PFReportDAL().ProfitDistributionSummery();
+                  return new PFReportDAL().ProfitDistributionSummery(PreDistributionFundId);
               }
               catch (Exception ex)
               {

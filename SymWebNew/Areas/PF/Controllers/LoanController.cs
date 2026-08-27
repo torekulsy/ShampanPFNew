@@ -1750,7 +1750,7 @@ namespace SymWebUI.Areas.PF.Controllers
 
                 string CompanyName = new AppSettingsReader().GetValue("CompanyName", typeof(string)).ToString();
 
-                var permission = _reposur.SymRoleSession(identity.UserId, "1_55", "report").ToString();
+                var permission = _reposur.SymRoleSession(identity.UserId, "1_51", "report").ToString();
                 Session["permission"] = permission;
                 if (permission == "False")
                 {
@@ -1816,7 +1816,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 Session["result"] = result[0] + "~" + result[1];
                 FileLogger.Log("LoanReport", this.GetType().Name, ex.Message + Environment.NewLine + ex.StackTrace);
 
-                return View();
+                return RedirectToAction("AllLoan");
             }
         }
 
@@ -1844,7 +1844,7 @@ namespace SymWebUI.Areas.PF.Controllers
 
                 string CompanyName = new AppSettingsReader().GetValue("CompanyName", typeof(string)).ToString();
 
-                var permission = _reposur.SymRoleSession(identity.UserId, "1_42", "add").ToString();
+                var permission = _reposur.SymRoleSession(identity.UserId, "1_51", "report").ToString();
                 Session["permission"] = permission;
                 if (permission == "False")
                 {

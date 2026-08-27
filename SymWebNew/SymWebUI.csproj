@@ -4554,6 +4554,7 @@
     <Content Include="Areas\PF\Views\COASubCategory\Index.cshtml" />
     <Content Include="Areas\PF\Views\COASubCategory\Create.cshtml" />
     <Content Include="Areas\PF\Views\ProfitDistributionNew\Index.cshtml" />
+    <Content Include="Areas\PF\Views\ProfitDistributionNew\Edit.cshtml" />
     <Content Include="Areas\PF\Views\left\Index.cshtml" />
     <Content Include="Areas\PF\Views\left\Left.cshtml" />
     <Content Include="Areas\PF\Views\left\_left.cshtml" />

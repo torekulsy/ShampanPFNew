@@ -152,6 +152,7 @@
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.Source, new { @placeholder = "", @class = "form-control", @readonly = "readonly" })
+                        @Html.HiddenFor(model => model.SourceId)
                         @Html.ValidationMessageFor(model => model.Source)
                     </div>
                 </div>

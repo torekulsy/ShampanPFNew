@@ -118,6 +118,13 @@ END Designation
 
 ,pfo.OpeningDate
 ,pfo.Post
+,CAST(CASE WHEN EXISTS
+    (
+        SELECT 1
+        FROM GLJournals gj
+        WHERE gj.SourceId = pfo.Id
+          AND gj.Source = 'BreakMonthContribution-' + CONVERT(varchar(20), pfo.Id)
+    ) THEN 1 ELSE 0 END AS bit) JournalCreated
 ,isnull(pfo.Remarks,'')Remarks
 ,pfo.IsActive
 ,pfo.IsArchive
@@ -168,6 +175,7 @@ From EmployeeBreakMonthPF pfo
                     vm.EmployerProfit = Convert.ToDecimal(dr["EmployerProfit"]);
                     vm.OpeningDate = Ordinary.StringToDate(dr["OpeningDate"].ToString());
                     vm.Post = Convert.ToBoolean(dr["Post"]);
+                    vm.JournalCreated = Convert.ToBoolean(dr["JournalCreated"]);
                     vm.IsActive = Convert.ToBoolean(dr["IsActive"]);
                     vm.Remarks = dr["Remarks"].ToString();
                     vm.CreatedAt = Ordinary.StringToDate(dr["CreatedAt"].ToString());

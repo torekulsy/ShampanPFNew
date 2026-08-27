@@ -35,7 +35,14 @@
                     }
                     else
                     {
-                        <button type="button" name="btnName" value="Update" title="Update Data" onclick="UpdateData()" class="sym-btn-update">&nbsp;Update</button>
+                        if (Model.Post == false)
+                        {
+                            <button type="button" name="btnName" value="Update" title="Update Data" onclick="UpdateData()" class="sym-btn-update">&nbsp;Update</button>
+                        }
+                        else
+                        {
+                            <span style="color: green; font-weight: 600;">Data Already Posted</span>
+                        }
                         if (@identity.IsAdmin == true)
                         {
                             if (@Model.Post == false)
@@ -105,7 +112,7 @@
                         @Html.LabelFor(model => model.TotalValue)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.TotalValue, new { @placeholder = "Total Value ", @class = "  required NumberCheck form-control" })
+                        @Html.TextBoxFor(model => model.TotalValue, new { @placeholder = "Total Value ", @class = "required right isPositiveNumeric form-control" })
                         @Html.ValidationMessageFor(model => model.TotalValue)
                     </div>
                 </div>
@@ -131,7 +138,14 @@
                 }
                 else
                 {
-                    <button type="button" name="btnName" value="Update" title="Update Data" onclick="UpdateData()" class="sym-btn-update">&nbsp;Update</button>
+                    if (Model.Post == false)
+                    {
+                        <button type="button" name="btnName" value="Update" title="Update Data" onclick="UpdateData()" class="sym-btn-update">&nbsp;Update</button>
+                    }
+                    else
+                    {
+                        <span style="color: green; font-weight: 600;">Data Already Posted</span>
+                    }
                     if (@identity.IsAdmin == true)
                     {
                         if (@Model.Post == false)
