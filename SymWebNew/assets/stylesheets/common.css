@@ -518,7 +518,7 @@ body:not(.sidebar-mini-md):not(.sidebar-mini-xs):not(.layout-top-nav) .content-w
 
 .nav-sidebar > .nav-item {
     margin-bottom: 0;
-    margin: 2px 0;
+    margin: 4px 0;
 }
 
     .nav-sidebar > .nav-item > a.treeview-expanded {
@@ -769,7 +769,7 @@ ul.nav-sidebar .nav-treeview .nav-treeview .nav.nav-treeview {
 }
 
     ul.nav-sidebar .nav-treeview .nav-treeview .nav.nav-treeview .nav-item a {
-    padding: 0.5rem 5px !important;
+    padding: 0.5rem 10px !important;
     margin: 5px 0;
 }
 
@@ -794,7 +794,13 @@ ul.nav-sidebar .nav-treeview .nav-treeview a:hover {
 a {
     cursor: pointer !important;
 }
-
+.nav-pills>li {
+    float: none;
+}
+.nav {
+    
+    display: inherit;
+}
 .nav-sidebar li a {
     position: relative;
     display: block;
