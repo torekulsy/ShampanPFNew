@@ -1548,7 +1548,7 @@ WHERE 1 = 1
                 #region sql statement
                 sqlText = @"
 select Code EmpCode,EmpName, 
-ISNULL(Grade+'-'+StepName,'NA') Grade,
+ISNULL(Grade+'-','NA') Grade,
 (case when Designation is null and Designation='=NA=' then 'NA' else Designation end) Designation,
 (case when Department is null and Department='=NA=' then 'NA' else Department end) Department ,
 (case when Section is null and Section='=NA=' then 'NA' else Section end) Section,
@@ -1559,7 +1559,7 @@ ISNULL(Grade+'-'+StepName,'NA') Grade,
 ,'0.00' EmployerProfit
 , @PaymentDate PaymentDate,'' Remarks
 
-from ViewEmployeeInformation where 1=1
+from ViewEmployeeInformation where 1=1 and BranchId = @BranchId
 ";
 
                 if (vm.ProjectId != "0_0" && vm.ProjectId != "0" && vm.ProjectId != "" && vm.ProjectId != "null" && vm.ProjectId != null)
@@ -1574,6 +1574,8 @@ from ViewEmployeeInformation where 1=1
                     sqlText += @" and Code >=@Code";
                 if (vm.CodeT != "0_0" && vm.CodeT != "0" && vm.CodeT != "" && vm.CodeT != "null" && vm.CodeT != null)
                     sqlText += @" and Code<=@CodeT";
+
+                
 
 
                 if (vm.Orderby == "DCG")
@@ -1617,6 +1619,7 @@ from ViewEmployeeInformation where 1=1
                     da.SelectCommand.Parameters.AddWithValue("@CodeT", vm.CodeT);
 
                 da.SelectCommand.Parameters.AddWithValue("@PaymentDate", DateTime.Now.ToString("dd-MMM-yyyy"));
+                da.SelectCommand.Parameters.AddWithValue("@BranchId", vm.BranchId);
 
 
                 da.Fill(dt);
@@ -1690,7 +1693,7 @@ SELECT
  emp.Code EmpCode
 ,emp.EmpName
 ,emp.JoinDate
-,ISNULL(emp.Grade+'-'+emp.StepName,'NA') Grade
+,ISNULL(emp.Grade+'-','NA') Grade
 ,(case when emp.Designation is null and emp.Designation='=NA=' then 'NA' else emp.Designation end) Designation
 ,(case when emp.Department is null and emp.Department='=NA=' then 'NA' else emp.Department end) Department 
 ,(case when emp.Section is null and emp.Section='=NA=' then 'NA' else emp.Section end) Section
@@ -1700,13 +1703,11 @@ SELECT
 ,ISNULL(EmployeeProfit,0) EmployeeProfit
 ,ISNULL(EmployerProfit,0) EmployerProfit
 ,PaymentDate
-,Remarks
-  FROM EmployeePFPayment pfo
 
-";
+  FROM EmployeePFPayment pfo";
 
                 sqlText += " left outer join ViewEmployeeInformation emp on pfo.EmployeeId=emp.EmployeeId";
-                sqlText += " Where 1=1 ";
+                sqlText += " Where 1=1 and emp.BranchId = @BranchId ";
 
 
                 if (vm.ProjectId != "0_0" && vm.ProjectId != "0" && vm.ProjectId != "" && vm.ProjectId != "null" && vm.ProjectId != null)
@@ -1762,6 +1763,8 @@ SELECT
 
                 if (vm.CodeT != "0_0" && vm.CodeT != "0" && vm.CodeT != "" && vm.CodeT != "null" && vm.CodeT != null)
                     da.SelectCommand.Parameters.AddWithValue("@CodeT", vm.CodeT);
+
+                da.SelectCommand.Parameters.AddWithValue("@BranchId", vm.BranchId);
 
                 da.Fill(dt);
 

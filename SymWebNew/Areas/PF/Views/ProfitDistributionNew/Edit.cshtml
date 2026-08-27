@@ -1,0 +1,79 @@
+@model SymViewModel.PF.ProfitDistributionNewVM
+
+@using (Html.BeginForm("Update", "ProfitDistributionNew", FormMethod.Post, new { @Id = "frmProfitDistributionNew" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+
+    <div class="card">
+        <div class="card-header p-3">
+            <div class="th_thinbox_top">
+                <div>
+                    <button type="button" title="Update Data" onclick="pageSubmit('frmProfitDistributionNew')" class="sym-btn-update">&nbsp;Update</button>
+                    <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/ProfitDistributionNew?PreDistributionFundId=@Model.PreDistributionFundId" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>
+                </div>
+                <div class="breadcrumb-container">
+                    <ol class="breadcrumb" id="dynamicBreadcrumb"></ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="thinbox">
+        <div class="th_thinbox">
+            <p>Profit Distribution New</p>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">@Html.LabelFor(model => model.EmployeeCode)</div>
+                    <div class="editor-field">@Html.TextBoxFor(model => model.EmployeeCode, new { @class = "form-control", @readonly = "readonly" })</div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">@Html.LabelFor(model => model.EmployeeName)</div>
+                    <div class="editor-field">@Html.TextBoxFor(model => model.EmployeeName, new { @class = "form-control", @readonly = "readonly" })</div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">@Html.LabelFor(model => model.DistributionDate)</div>
+                    <div class="editor-field">@Html.TextBoxFor(model => model.DistributionDate, new { @class = "form-control", @readonly = "readonly" })</div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">@Html.LabelFor(model => model.EmployeeContribution)</div>
+                    <div class="editor-field">@Html.TextBoxFor(model => model.EmployeeContribution, new { @class = "right form-control", @readonly = "readonly" })</div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">@Html.LabelFor(model => model.EmployerContribution)</div>
+                    <div class="editor-field">@Html.TextBoxFor(model => model.EmployerContribution, new { @class = "right form-control", @readonly = "readonly" })</div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">@Html.LabelFor(model => model.EmployeeProfit)</div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.EmployeeProfit, new { @class = "required right isPositiveNumeric form-control" })
+                        @Html.ValidationMessageFor(model => model.EmployeeProfit)
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                    <div class="editor-label">@Html.LabelFor(model => model.EmployerProfit)</div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.EmployerProfit, new { @class = "required right isPositiveNumeric form-control" })
+                        @Html.ValidationMessageFor(model => model.EmployerProfit)
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-8 col-lg-6 col-xl-6">
+                    <div class="editor-label">@Html.LabelFor(model => model.Remarks)</div>
+                    <div class="editor-field">
+                        @Html.TextAreaFor(model => model.Remarks, new { @class = "form-control", @placeholder = "Remarks" })
+                        @Html.ValidationMessageFor(model => model.Remarks)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header p-3">
+            <button type="button" title="Update Data" onclick="pageSubmit('frmProfitDistributionNew')" class="sym-btn-update">&nbsp;Update</button>
+            <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/ProfitDistributionNew?PreDistributionFundId=@Model.PreDistributionFundId" onclick="GoTo(this)" class="sym-btn-detail">&nbsp;Index</button>
+        </div>
+    </div>
+}

@@ -19,6 +19,110 @@ namespace SymServices.PF
         #endregion
         #region Methods
         //==================DropDown=================
+        public string GenerateCode(string transType, string transactionDate, SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
+        {
+            DateTime codeDate;
+            if (!DateTime.TryParse(transactionDate, out codeDate))
+            {
+                throw new ArgumentException("A valid transaction date is required to generate the code.");
+            }
+
+            SqlConnection currConn = VcurrConn;
+            SqlTransaction transaction = Vtransaction;
+            bool ownsConnection = currConn == null;
+            bool ownsTransaction = transaction == null;
+
+            try
+            {
+                if (currConn == null)
+                {
+                    currConn = _dbsqlConnection.GetConnection();
+                }
+                if (currConn.State != ConnectionState.Open)
+                {
+                    currConn.Open();
+                }
+                if (transaction == null)
+                {
+                    transaction = currConn.BeginTransaction("GeneratePreDistributionFundCode");
+                }
+
+                const string codeSql = @"
+DECLARE @CodeGenerationId int,
+        @NextNumber int,
+        @Prefix nvarchar(50);
+
+SELECT TOP 1
+       @CodeGenerationId = Id,
+       @NextNumber = ISNULL(LastNumber, 0) + 1,
+       @Prefix = ISNULL(NULLIF(Prefix, ''), 'PDF')
+FROM CodeGenerations WITH (UPDLOCK, HOLDLOCK)
+WHERE CYear = @CYear
+  AND TransactionTypeGroup = @TransactionTypeGroup
+  AND TransactionType = 'PreDistributionFund'
+ORDER BY Id;
+
+IF @CodeGenerationId IS NULL
+BEGIN
+    SET @NextNumber = 1;
+    SET @Prefix = 'PDF';
+
+    INSERT INTO CodeGenerations
+        (CYear, TransactionTypeGroup, TransactionType, Prefix, LastNumber, TransType)
+    VALUES
+        (@CYear, @TransactionTypeGroup, 'PreDistributionFund', @Prefix, @NextNumber, @TransactionTypeGroup);
+END
+ELSE
+BEGIN
+    UPDATE CodeGenerations
+    SET LastNumber = @NextNumber
+    WHERE Id = @CodeGenerationId;
+END
+
+SELECT @Prefix AS Prefix, @NextNumber AS NextNumber;";
+
+                string prefix;
+                int nextNumber;
+                using (SqlCommand command = new SqlCommand(codeSql, currConn, transaction))
+                {
+                    command.Parameters.AddWithValue("@CYear", codeDate.Year);
+                    command.Parameters.AddWithValue("@TransactionTypeGroup", string.IsNullOrWhiteSpace(transType) ? "PF" : transType);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (!reader.Read())
+                        {
+                            throw new InvalidOperationException("Could not generate Pre Distribution Fund code.");
+                        }
+                        prefix = reader["Prefix"].ToString();
+                        nextNumber = Convert.ToInt32(reader["NextNumber"]);
+                    }
+                }
+
+                if (ownsTransaction)
+                {
+                    transaction.Commit();
+                }
+
+                return prefix + "-" + nextNumber.ToString().PadLeft(4, '0') + "/" + codeDate.ToString("MMyyyy");
+            }
+            catch
+            {
+                if (ownsTransaction && transaction != null)
+                {
+                    transaction.Rollback();
+                }
+                throw;
+            }
+            finally
+            {
+                if (ownsConnection && currConn != null)
+                {
+                    currConn.Close();
+                }
+            }
+        }
+
         //==================SelectAll=================
         /// <summary>
         /// Retrieves a list of Pre Distribution Fund from the database, optionally filtered by ID or additional conditions.
@@ -272,8 +376,26 @@ WHERE  1=1 AND pdf.IsArchive = 0
 
                 int nextId = _cDal.NextId("PreDistributionFunds", currConn, transaction);
                 vm.Id = nextId;
-                string NewCode = new CommonDAL().CodeGenerationPF(vm.TransType, "PreDistributionFund", vm.TransactionDate, currConn, transaction);
-                vm.Code = NewCode;
+                int existingCodeCount = 0;
+                if (!string.IsNullOrWhiteSpace(vm.Code) && vm.Code != "0")
+                {
+                    using (SqlCommand codeCheckCommand = new SqlCommand(
+                        "SELECT COUNT(Id) FROM PreDistributionFunds WHERE Code=@Code", currConn, transaction))
+                    {
+                        codeCheckCommand.Parameters.AddWithValue("@Code", vm.Code);
+                        existingCodeCount = Convert.ToInt32(codeCheckCommand.ExecuteScalar());
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(vm.Code) || vm.Code == "0" || existingCodeCount > 0)
+                {
+                    vm.Code = GenerateCode(vm.TransType, vm.TransactionDate, currConn, transaction);
+                }
+
+                if (string.IsNullOrWhiteSpace(vm.Code) || vm.Code == "0")
+                {
+                    throw new InvalidOperationException("Could not generate Pre Distribution Fund code.");
+                }
 
 
 

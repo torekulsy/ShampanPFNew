@@ -2862,7 +2862,8 @@ namespace SymOrdinary
             foreach (PropertyInfo prop in Props)
             {
                 //Setting column names as Property names
-                dataTable.Columns.Add(prop.Name, prop.PropertyType);
+                Type columnType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+                dataTable.Columns.Add(prop.Name, columnType);
             }
 
 
@@ -2873,7 +2874,7 @@ namespace SymOrdinary
                 for (int i = 0; i < Props.Length; i++)
                 {
                     //inserting property values to datatable rows
-                    values[i] = Props[i].GetValue(item, null);
+                    values[i] = Props[i].GetValue(item, null) ?? DBNull.Value;
                 }
                 dataTable.Rows.Add(values);
             }

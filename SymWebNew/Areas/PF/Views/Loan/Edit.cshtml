@@ -1003,7 +1003,11 @@
                     data: val,
                     success: function (response) {
                         ShowResult(response[0], response[1], "refreshparent");
-
+                        if (response[0].toLowerCase() == "success") {
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 700);
+                        }
                     }
                 });
             });
@@ -1046,7 +1050,11 @@
                     data: val,
                     success: function (response) {
                         ShowResult(response[0], response[1], "refreshparent");
-
+                        if (response[0].toLowerCase() == "success") {
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 700);
+                        }
                     }
                 });
             });

@@ -468,3 +468,74 @@ sqlText
 PFProcess , Method : PFDetailController
 ex
 sqlText
+
+2026-08-24 14:28:46 +06:00
+ Source : Fail
+Employee PF Payment export , Method : EmployeePFPaymentController
+System.Data.SqlClient.SqlException (0x80131904): Invalid column name 'StepName'.
+   at SymServices.PF.EmployeePFPaymentDAL.ExportExcelFileFormEmployee(EmployeePFPaymentVM vm, String Filepath, String FileName) in d:\ShampanPFNew\SymServices\PF\EmployeePFPaymentDAL.cs:line 1643
+   at SymRepository.PF.EmployeePFPaymentRepo.ExportExcelFileFormEmployee(EmployeePFPaymentVM vm, String Filepath, String FileName) in d:\ShampanPFNew\SymRepository\PF\EmployeePFPaymentRepo.cs:line 103
+   at SymWebUI.Areas.PF.Controllers.EmployeePFPaymentController.DownloadExcel_Employee(String ProjectId, String DepartmentId, String SectionId, String DesignationId, String CodeF, String CodeT, String Orderby) in D:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\EmployeePFPaymentController.cs:line 471
+ClientConnectionId:4b9d81a7-fb6d-4439-82a8-c8af3d5aa044
+Error Number:207,State:1,Class:16
+
+2026-08-24 14:29:00 +06:00
+ Source : Fail
+Employee PF Payment opening export , Method : EmployeePFPaymentController
+System.Data.SqlClient.SqlException (0x80131904): Invalid column name 'StepName'.
+Ambiguous column name 'Remarks'.
+   at SymServices.PF.EmployeePFPaymentDAL.ExportExcelFileFormPFOpening(EmployeePFPaymentVM vm, String Filepath, String FileName) in d:\ShampanPFNew\SymServices\PF\EmployeePFPaymentDAL.cs:line 1796
+   at SymRepository.PF.EmployeePFPaymentRepo.ExportExcelFileFormPFOpening(EmployeePFPaymentVM vm, String Filepath, String FileName) in d:\ShampanPFNew\SymRepository\PF\EmployeePFPaymentRepo.cs:line 108
+   at SymWebUI.Areas.PF.Controllers.EmployeePFPaymentController.DownloadExcel_Opening(String ProjectId, String DepartmentId, String SectionId, String DesignationId, String CodeF, String CodeT, String Orderby) in D:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\EmployeePFPaymentController.cs:line 519
+ClientConnectionId:675843ef-a6f4-47f7-a88c-0ae002b96705
+Error Number:207,State:1,Class:16
+
+2026-08-24 14:44:22 +06:00
+ Source : Fail
+Employee PF Payment export , Method : EmployeePFPaymentController
+System.Data.SqlClient.SqlException (0x80131904): The variable name '@PaymentDate' has already been declared. Variable names must be unique within a query batch or stored procedure.
+   at SymServices.PF.EmployeePFPaymentDAL.ExportExcelFileFormEmployee(EmployeePFPaymentVM vm, String Filepath, String FileName) in d:\ShampanPFNew\SymServices\PF\EmployeePFPaymentDAL.cs:line 1643
+   at SymRepository.PF.EmployeePFPaymentRepo.ExportExcelFileFormEmployee(EmployeePFPaymentVM vm, String Filepath, String FileName) in d:\ShampanPFNew\SymRepository\PF\EmployeePFPaymentRepo.cs:line 103
+   at SymWebUI.Areas.PF.Controllers.EmployeePFPaymentController.DownloadExcel_Employee(String ProjectId, String DepartmentId, String SectionId, String DesignationId, String CodeF, String CodeT, String Orderby) in D:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\EmployeePFPaymentController.cs:line 471
+ClientConnectionId:2619d91b-e1ed-4362-ba40-f26beefb4884
+Error Number:134,State:1,Class:15
+
+2026-08-24 15:15:32 +06:00
+ Source : Fail
+Employee PF Payment opening export , Method : EmployeePFPaymentController
+System.Data.SqlClient.SqlException (0x80131904): Ambiguous column name 'BranchId'.
+   at SymServices.PF.EmployeePFPaymentDAL.ExportExcelFileFormPFOpening(EmployeePFPaymentVM vm, String Filepath, String FileName) in d:\ShampanPFNew\SymServices\PF\EmployeePFPaymentDAL.cs:line 1799
+   at SymRepository.PF.EmployeePFPaymentRepo.ExportExcelFileFormPFOpening(EmployeePFPaymentVM vm, String Filepath, String FileName) in d:\ShampanPFNew\SymRepository\PF\EmployeePFPaymentRepo.cs:line 108
+   at SymWebUI.Areas.PF.Controllers.EmployeePFPaymentController.DownloadExcel_Opening(String ProjectId, String DepartmentId, String SectionId, String DesignationId, String CodeF, String CodeT, String Orderby) in d:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\EmployeePFPaymentController.cs:line 521
+ClientConnectionId:ed40defa-3c68-4319-b1d6-9bdd7b952951
+Error Number:209,State:1,Class:16
+
+2026-08-25 17:17:46 +06:00
+ Source : DataSet does not support System.Nullable<>. , Method : LoanController
+   at System.Data.DataColumn..ctor(String columnName, Type dataType, String expr, MappingType type)
+   at System.Data.DataColumnCollection.Add(String columnName, Type type)
+   at SymOrdinary.Ordinary.ListToDataTable[T](List`1 items) in D:\ShampanPFNew\SymOrdinary\Ordinary.cs:line 2865
+   at SymWebUI.Areas.PF.Controllers.LoanController.DownloadAllLoanReport(String StartDate, String EndDate) in D:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\LoanController.cs:line 1870
+
+2026-08-25 17:18:06 +06:00
+ Source : LoanReport , Method : LoanController
+DataSet does not support System.Nullable<>.
+   at System.Data.DataColumn..ctor(String columnName, Type dataType, String expr, MappingType type)
+   at System.Data.DataColumnCollection.Add(String columnName, Type type)
+   at SymOrdinary.Ordinary.ListToDataTable[T](List`1 items) in D:\ShampanPFNew\SymOrdinary\Ordinary.cs:line 2865
+   at SymWebUI.Areas.PF.Controllers.LoanController.AllLoanReport(EmployeeLoanVM vm) in D:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\LoanController.cs:line 1769
+
+2026-08-25 17:24:17 +06:00
+ Source : LoanReport , Method : LoanController
+DataSet does not support System.Nullable<>.
+   at System.Data.DataColumn..ctor(String columnName, Type dataType, String expr, MappingType type)
+   at System.Data.DataColumnCollection.Add(String columnName, Type type)
+   at SymOrdinary.Ordinary.ListToDataTable[T](List`1 items) in D:\ShampanPFNew\SymOrdinary\Ordinary.cs:line 2865
+   at SymWebUI.Areas.PF.Controllers.LoanController.AllLoanReport(EmployeeLoanVM vm) in D:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\LoanController.cs:line 1769
+
+2026-08-25 17:24:23 +06:00
+ Source : DataSet does not support System.Nullable<>. , Method : LoanController
+   at System.Data.DataColumn..ctor(String columnName, Type dataType, String expr, MappingType type)
+   at System.Data.DataColumnCollection.Add(String columnName, Type type)
+   at SymOrdinary.Ordinary.ListToDataTable[T](List`1 items) in D:\ShampanPFNew\SymOrdinary\Ordinary.cs:line 2865
+   at SymWebUI.Areas.PF.Controllers.LoanController.DownloadAllLoanReport(String StartDate, String EndDate) in D:\ShampanPFNew\SymWebNew\Areas\PF\Controllers\LoanController.cs:line 1870

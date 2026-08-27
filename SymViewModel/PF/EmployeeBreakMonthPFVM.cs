@@ -24,6 +24,7 @@ namespace SymViewModel.PF
         public string Remarks { get; set; }
         public bool IsActive { get; set; }
         public bool Post { get; set; }
+        public bool JournalCreated { get; set; }
         public bool IsArchive { get; set; }
         public string CreatedBy { get; set; }
         public string CreatedAt { get; set; }

@@ -144,6 +144,7 @@ namespace SymWebUI.Areas.PF.Controllers
                              , c.EmployerProfit.ToString() 
                              , c.OpeningDate.ToString()
                              , c.Post==true ? "Posted" : "Not Posted"
+                             , c.JournalCreated ? "Created" : "Not Created"
                          };
             return Json(new
             {

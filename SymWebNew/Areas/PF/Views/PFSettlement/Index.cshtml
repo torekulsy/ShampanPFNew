@@ -104,7 +104,7 @@
                                 "sClass": "center",
                             "fnRender": function (oObj) {
     var Code = encodeURIComponent(oObj.aData[1]);
-    var result = '<input onclick="CheckAll(this)" type="checkbox" data-Id="' + oObj.aData[0] + '">';
+    var result = '';
 
     result += '&nbsp; <a title="Click on for Report" target="_blank" href="/@ViewBag.TransType/PFSettlement/ReportView?Id=' + oObj.aData[0] + '" class="sym-btn-report-row"></a>';
 

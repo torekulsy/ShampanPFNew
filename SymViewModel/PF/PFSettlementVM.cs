@@ -10,7 +10,9 @@ namespace SymViewModel.PF
     public class PFSettlementVM
     {
         public int Id { get; set; }
+        [Display(Name = "Transaction Code")]
         public string TransactionCode { get; set; }
+        [Display(Name = "Transaction Type")]
         public string TransactionType { get; set; }
 
 
@@ -53,7 +55,7 @@ namespace SymViewModel.PF
         public decimal Loan { get; set; }
         [Display(Name = "Employee Total Contribution")]
         public decimal EmployeeTotalContribution { get; set; }
-        [Display(Name = "Employer TotalContribution")]
+        [Display(Name = "Employer Total Contribution")]
         public decimal EmployerTotalContribution { get; set; }
         [Display(Name = "Employee Date of Join")]
         public string EmpDOJ { get; set; }
@@ -110,6 +112,7 @@ namespace SymViewModel.PF
         public decimal EmployeeProfitForfeitValue { get; set; }
         public decimal EmployerContributionForfeitValue { get; set; }
         public decimal EmployerProfitForfeitValue { get; set; }
+        [Display(Name = "Total Forfeit Value")]
         public decimal TotalForfeitValue { get; set; }
 
 

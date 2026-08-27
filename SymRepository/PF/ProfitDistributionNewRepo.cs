@@ -22,6 +22,18 @@ namespace SymRepository.PF
             }
         }
 
+        public string[] Update(ProfitDistributionNewVM vm)
+        {
+            try
+            {
+                return new ProfitDistributionNewDAL().Update(vm);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
 
 
         public ResultVM Process(ProfitDistributionNewVM vm)
