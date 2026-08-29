@@ -226,6 +226,7 @@ SELECT
 ,bb.BranchName
 ,bb.BranchAddress
 ,bb.BankAccountType
+,ISNULL(bat.Name, bb.BankAccountType) BankAccountTypeName
 ,bb.BankAccountNo
 ,bb.Remarks
 ,bb.IsActive
@@ -239,6 +240,7 @@ SELECT
 
 FROM BankBranchs bb
 LEFT OUTER JOIN BankNames b ON bb.BankId = b.Id
+LEFT OUTER JOIN EnumBankAccountType bat ON bb.BankAccountType = CONVERT(nvarchar(50), bat.Id)
 WHERE  1=1  AND bb.IsArchive = 0
 
 ";
@@ -295,6 +297,7 @@ WHERE  1=1  AND bb.IsArchive = 0
                     vm.BranchName = dr["BranchName"].ToString();
                     vm.BranchAddress = dr["BranchAddress"].ToString();
                     vm.BankAccountType = dr["BankAccountType"].ToString();
+                    vm.BankAccountTypeName = dr["BankAccountTypeName"].ToString();
                     vm.BankAccountNo = dr["BankAccountNo"].ToString();
                     vm.Remarks = dr["Remarks"].ToString();
                     vm.IsActive = Convert.ToBoolean(dr["IsActive"]);

@@ -146,14 +146,10 @@
                      "fnRender": function (oObj) {
                          var loanId = oObj.aData[0];
                          var isApproved = oObj.aData[11];
+                         var isSettled = oObj.aData[9] == "Yes" || oObj.aData[9] === true;
 
                          var checkbox = '<input onclick="CheckAll(this)" type="checkbox" data-Id="' + loanId + '">';
-                         if (oObj.aData[9] == "Yes" || oObj.aData[9] == true) {
-                             var editBtn = '<a title="Edit" class="sym-btn-edit-row" style="opacity:0.45;pointer-events:none;cursor:default;" href="/PF/Loan/Edit?loanId=' + loanId + '"></a>';
-                         }
-                         else {
-                             var editBtn = '<a title="Edit" class="sym-btn-edit-row" href="/PF/Loan/Edit?loanId=' + loanId + '"></a>';
-                         }
+                         var editBtn = '<a title="Edit" class="sym-btn-edit-row" href="/PF/Loan/Edit?loanId=' + loanId + '"></a>';
 
                          var reportBtn = '<a title="Report" data-url="/PF/Loan/ReportView" onclick="reportData(this);" data-Id="' + loanId + '" class="sym-btn-report-row"></a>';
                          var deleteBtn = '<a title="Delete" data-url="/PF/Loan/Delete" onclick="deletedData(this, myDataTable, \'' + loanId + '\');" class="sym-btn-remove-row"></a>';
@@ -173,15 +169,16 @@
                          if (isApproved == "Not Approved") {
                              settlementBtn = '<a title="settlement" target="_blank" href="#" class="sym-btn-add-row" style="pointer-events: none; opacity: 0.5;"></a>';  // Disabled state
                              reportBtn = '<a title="settlement" target="_blank" href="#" class="sym-btn-report-row" style="pointer-events: none; opacity: 0.5;"></a>';  // Disabled state
-                             editBtn = '<a title="settlement" target="_blank" href="/PF/Loan/Edit?loanId=' + loanId + '" class="sym-btn-edit-row" ></a>';  // Disabled state
-                         } else {
+                             editBtn = '<a title="Edit" href="/PF/Loan/Edit?loanId=' + loanId + '" class="sym-btn-edit-row"></a>';
+                         }
+                         else if (isSettled) {
+                             settlementBtn = '<a title="Settlement Completed" href="#" class="sym-btn-add-row" style="pointer-events:none;opacity:0.5;cursor:default;"></a>';
+                             editBtn = '<a title="View Settlement" class="sym-btn-edit-row" href="/PF/Loan/Settlement?loanId=' + loanId + '"></a>';
+                             reportBtn = '<a title="Report" data-url="/PF/Loan/ReportView" onclick="reportData(this);" data-Id="' + loanId + '" class="sym-btn-report-row"></a>';
+                         }
+                         else {
                              settlementBtn = '<a title="settlement" target="_blank" href="/PF/Loan/Settlement?loanId=' + loanId + '" class="sym-btn-add-row"></a>';  // Enabled state
-                             if (oObj.aData[9] == "Yes" || oObj.aData[9] == true) {
-                                 editBtn = '<a title="Edit" class="sym-btn-edit-row" style="opacity:0.45;pointer-events:none;cursor:default;" href="/PF/Loan/Edit?loanId=' + loanId + '"></a>';
-                             }
-                             else {
-                                 editBtn = '<a title="Edit" class="sym-btn-edit-row" href="/PF/Loan/Edit?loanId=' + loanId + '"></a>';
-                             }
+                             editBtn = '<a title="Edit" class="sym-btn-edit-row" href="/PF/Loan/Edit?loanId=' + loanId + '"></a>';
                              reportBtn = '<a title="Report" data-url="/PF/Loan/ReportView" onclick="reportData(this);" data-Id="' + loanId + '" class="sym-btn-report-row"></a>';
                          }
                              if ('@identity.IsAdmin'.toLowerCase() == "true") {

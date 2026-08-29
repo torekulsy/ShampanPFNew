@@ -872,6 +872,11 @@ namespace SymWebUI.Areas.PF.Controllers
         [HttpGet]
         public ActionResult UpdateSettelment(string loanId, decimal TotalDuePrincipalAmount, decimal TotalDueInterestAmount, string EarlySellteDate)
         {
+            if (string.IsNullOrWhiteSpace(EarlySellteDate))
+            {
+                return Json(new[] { "Fail", "Settelment Date is Required." }, JsonRequestBehavior.AllowGet);
+            }
+
             var permission = _reposur.SymRoleSession(identity.UserId, "1_51", "edit").ToString();
             Session["permission"] = permission;
             if (permission == "False")
@@ -888,6 +893,11 @@ namespace SymWebUI.Areas.PF.Controllers
         [HttpGet]
         public ActionResult ApproveSettelment(string loanId, string EarlySellteDate)
         {
+            if (string.IsNullOrWhiteSpace(EarlySellteDate))
+            {
+                return Json(new[] { "Fail", "Settelment Date is Required." }, JsonRequestBehavior.AllowGet);
+            }
+
             var permission = _reposur.SymRoleSession(identity.UserId, "1_51", "edit").ToString();
             Session["permission"] = permission;
             if (permission == "False")
@@ -921,6 +931,7 @@ namespace SymWebUI.Areas.PF.Controllers
             EmployeeLoanRepo loanRepo = new EmployeeLoanRepo();
             EmployeeLoanVM vm = new EmployeeLoanVM();
             vm = loanRepo.SelectLoanForSettelment(loanId);
+            ViewBag.IsSettlementCompleted = vm.IsEarlySellte;
 
             foreach (var item in vm.employeeLoanDetails.Take(1))
             {

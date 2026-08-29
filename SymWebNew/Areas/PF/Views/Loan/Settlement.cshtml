@@ -368,7 +368,14 @@
                     @Html.LabelFor(model => model.TotalDueInterestAmount)
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.TotalDueInterestAmount, new { @onchange = "Calculation(this);", @class = " right form-control" })
+                    @if (Model.IsEarlySellte)
+                    {
+                        @Html.TextBoxFor(model => model.TotalDueInterestAmount, new { @class = "right form-control", @readonly = "readonly" })
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(model => model.TotalDueInterestAmount, new { @onchange = "Calculation(this);", @class = "right form-control" })
+                    }
                 </div>
             </div>    
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
@@ -385,10 +392,20 @@
                     @Html.LabelFor(model => model.EarlySellteDate)
                 </div>
                 <div class="editor-field">
-                    @Html.TextBoxFor(model => model.EarlySellteDate, new { @class = "customDatePicker required form-control" })
+                    @if (Model.IsEarlySellte)
+                    {
+                        @Html.TextBoxFor(model => model.EarlySellteDate, new { @class = "form-control", @readonly = "readonly" })
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(model => model.EarlySellteDate, new { @class = "customDatePicker required form-control" })
+                    }
+                    @Html.ValidationMessageFor(model => model.EarlySellteDate, "", new { @class = "text-danger" })
                 </div>
             </div>
                  
+            @if (!Model.IsEarlySellte)
+            {
             <div class="col-12 col-sm-12 col-md-8 col-lg-12 col-xl-4 mt-auto">
                 <div style="display: flex; gap:5px; align-items: center; justify-content: end; margin-top: 5px">
                     <div class="editor-field">
@@ -399,7 +416,8 @@
                     </div>
                 </div>
 
-            </div>                        
+            </div>
+            }
           
         </div>
         <hr />
@@ -459,6 +477,34 @@
 
 <script>
 
+    function validateSettlementDate() {
+        var settlementDate = $.trim($("#EarlySellteDate").val());
+        var validationMessage = $('[data-valmsg-for="EarlySellteDate"]');
+
+        if (settlementDate === "") {
+            $("#EarlySellteDate")
+                .addClass("input-validation-error")
+                .focus();
+
+            validationMessage
+                .removeClass("field-validation-valid")
+                .addClass("field-validation-error text-danger")
+                .text("Settelment Date is Required");
+
+            return false;
+        }
+
+        $("#EarlySellteDate").removeClass("input-validation-error");
+        validationMessage
+            .removeClass("field-validation-error")
+            .addClass("field-validation-valid")
+            .text("");
+
+        return true;
+    }
+
+    $("#EarlySellteDate").on("change", validateSettlementDate);
+
     function Calculation(sender) {
       
         var TotalDuePrincipalAmount = parseFloat($("#TotalDuePrincipalAmount").val());
@@ -469,60 +515,69 @@
     }
 
     $('#btnUpdate').click(function () {
+        if (!validateSettlementDate()) {
+            return;
+        }
+
         Ask("Are you sure want to Settelment the Loan?", function () {
 
             var urlParams = new URLSearchParams(window.location.search);
             var loanId = urlParams.get('loanId');
             var TotalDuePrincipalAmount = $("#TotalDuePrincipalAmount").val();
             var TotalDueInterestAmount = $("#TotalDueInterestAmount").val();
-            var SettlementAmount = $("#SettlementAmount").val();
             var EarlySellteDate = $("#EarlySellteDate").val();
-            
 
-            var url = "/PF/Loan/UpdateSettelment?loanId=" + loanId
-                + "&TotalDuePrincipalAmount=" + TotalDuePrincipalAmount 
-                + "&TotalDueInterestAmount=" + TotalDueInterestAmount
-                + "&EarlySellteDate=" + EarlySellteDate
-              
-
-            submitNew(url, null);
+            submitNew('@Url.Action("UpdateSettelment", "Loan", new { area = "PF" })', {
+                loanId: loanId,
+                TotalDuePrincipalAmount: TotalDuePrincipalAmount,
+                TotalDueInterestAmount: TotalDueInterestAmount,
+                EarlySellteDate: EarlySellteDate
+            });
         });
     });
+
     $('#btnapprove').click(function () {
+        if (!validateSettlementDate()) {
+            return;
+        }
+
         Ask("Are you sure want to Approve the Loan Settelment?", function () {
 
-            debugger;
             var urlParams = new URLSearchParams(window.location.search);
             var loanId = urlParams.get('loanId');
-            var TotalDuePrincipalAmount = $("#TotalDuePrincipalAmount").val();
             var EarlySellteDate = $("#EarlySellteDate").val();
-         
-            var url = "/Payroll/Loan/ApproveSettelment?loanId=" + loanId
-                 + "&EarlySellteDate=" + EarlySellteDate
-             
-            submitNew(url, null);
+
+            submitNew('@Url.Action("ApproveSettelment", "Loan", new { area = "PF" })', {
+                loanId: loanId,
+                EarlySellteDate: EarlySellteDate
+            }, true);
         });
     });
-    var submitNew = function (url, mydata) {
-        ////alert((url);
+
+    var submitNew = function (url, mydata, redirectAfterSuccess) {
         $.ajax({
-            //type: 'POST',
-            //data: mydata, // #2
+            type: 'GET',
             url: url,
+            data: mydata,
             beforeSend: function () { $(".loading").show(); },
             complete: function () { $(".loading").fadeOut(200).hide("slow") },
-
             success: function (result) {
-                ////alert((result);
-                debugger;
                 var msg1 = result[0];
                 var msg2 = result[1];
                 if (msg1 != "Fail") {
-                    ShowResultProcess("Success", msg2);
+                    if (redirectAfterSuccess) {
+                        ShowResultProcess("Success", msg2, "redirect", '@Url.Action("AllLoan", "Loan", new { area = "PF" })');
+                    }
+                    else {
+                        ShowResultProcess("Success", msg2);
+                    }
                 }
                 else {
                     ShowResultProcess("Fail", msg2);
                 }
+            },
+            error: function () {
+                ShowResultProcess("Fail", "Unable to process the loan settlement. Please try again.");
             }
         });
     }

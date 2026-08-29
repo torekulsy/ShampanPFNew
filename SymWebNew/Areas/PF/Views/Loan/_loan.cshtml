@@ -2,6 +2,8 @@
 @using UIHelper.MVC
 @{
     Layout = null;
+    var isSettlementCompleted = ViewBag.IsSettlementCompleted != null
+        && Convert.ToBoolean(ViewBag.IsSettlementCompleted);
 }
 
 @using (Html.BeginCollectionItem("employeeLoanDetails"))
@@ -47,9 +49,14 @@
         <td>
             @if (!Model.IsPaid)
             {
-                @*<a title="Click on for Edit" style="text-decoration:none;"   href="Payroll/Loan/PaidEdit?Id=@Model.Id&emploanId=@Model.EmployeeLoanId" class="lnkEdit sym-btn-save">Paid</a>*@
-                <a title="Paid" class="lnkEdit sym-btn-update sym-min" href="/PF/loan/PaidEdit?Id=@Model.Id&emploanId=@Model.EmployeeLoanId">UnPaid</a>
-                @*<label>Paid</label>*@
+                if (isSettlementCompleted)
+                {
+                    <a title="Settlement Completed" class="lnkEdit sym-btn-update sym-min" href="#" aria-disabled="true" style="pointer-events:none;opacity:0.5;cursor:default;">UnPaid</a>
+                }
+                else
+                {
+                    <a title="Paid" class="lnkEdit sym-btn-update sym-min" href="/PF/loan/PaidEdit?Id=@Model.Id&emploanId=@Model.EmployeeLoanId">UnPaid</a>
+                }
             }
             else
             {
@@ -87,11 +94,25 @@
                 {
                     if (!Model.IsHold)
                     {
-                        <button type="button" title="Hold Data" class=" holdbtn sym-btn-save" value="Hold" onclick="LoanEdit(this,true,false);">Hold</button>
+                        if (isSettlementCompleted)
+                        {
+                            <button type="button" title="Settlement Completed" class="holdbtn sym-btn-save" value="Hold" disabled="disabled" style="opacity:0.5;cursor:default;">Hold</button>
+                        }
+                        else
+                        {
+                            <button type="button" title="Hold Data" class="holdbtn sym-btn-save" value="Hold" onclick="LoanEdit(this,true,false);">Hold</button>
+                        }
                     }
                     else
                     {
-                        <button type="button" title="Un Hold Data" class=" holdbtn sym-btn-save" value="Un Hold" onclick="LoanEdit(this,false,false);">Un Hold</button>
+                        if (isSettlementCompleted)
+                        {
+                            <button type="button" title="Settlement Completed" class="holdbtn sym-btn-save" value="Un Hold" disabled="disabled" style="opacity:0.5;cursor:default;">Un Hold</button>
+                        }
+                        else
+                        {
+                            <button type="button" title="Un Hold Data" class="holdbtn sym-btn-save" value="Un Hold" onclick="LoanEdit(this,false,false);">Un Hold</button>
+                        }
 
                     }
                 }

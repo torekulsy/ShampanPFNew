@@ -62,7 +62,7 @@ namespace SymWebUI.Areas.PF.Controllers
                        isSearchable1 && c.BankName.ToString().ToLower().Contains(param.sSearch.ToLower())
                     || isSearchable2 && c.BranchName.ToString().ToLower().Contains(param.sSearch.ToLower())
                     || isSearchable3 && c.BranchAddress.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable4 && c.BankAccountType.ToString().ToLower().Contains(param.sSearch.ToLower())
+                    || isSearchable4 && c.BankAccountTypeName.ToString().ToLower().Contains(param.sSearch.ToLower())
                     || isSearchable5 && c.BankAccountNo.ToString().ToLower().Contains(param.sSearch.ToLower())
                     );
             }
@@ -81,7 +81,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 sortColumnIndex == 1 && isSortable_1 ? c.BankName       :
                 sortColumnIndex == 2 && isSortable_2 ? c.BranchName     :
                 sortColumnIndex == 3 && isSortable_3 ? c.BranchAddress  :
-                sortColumnIndex == 4 && isSortable_4 ? c.BankAccountType:
+                sortColumnIndex == 4 && isSortable_4 ? c.BankAccountTypeName:
                 sortColumnIndex == 5 && isSortable_5 ? c.BankAccountNo  :
                 "");
             var sortDirection = Request["sSortDir_0"]; // asc or desc
@@ -96,7 +96,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 , c.BankName      
                 , c.BranchName
                 , c.BranchAddress 
-                , c.BankAccountType
+                , c.BankAccountTypeName
                 , c.BankAccountNo  
      
             };

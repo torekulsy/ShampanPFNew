@@ -366,10 +366,12 @@ SELECT
 ,l.Remarks
 ,t.Name LoanType
 ,isnull(l.EarlySellteInterestAmount,0) EarlySellteInterestAmount
+,isnull(l.IsEarlySellte,0) IsEarlySellte
+,isnull(l.EarlySellteDate,'') EarlySellteDate
  from EmployeeLoan l
 left outer join ViewEmployeeInformation ve on l.EmployeeId=ve.EmployeeId
 left outer join EnumLoanType t on t.Id=l.LoanType_E
-WHERE l.IsArchive=0 and l.Id=@loanID
+WHERE (l.IsArchive=0 OR ISNULL(l.IsEarlySellte,0)=1) and l.Id=@loanID
 ";
                 SqlCommand _objComm = new SqlCommand();
                 _objComm.Connection = currConn;
@@ -407,6 +409,8 @@ WHERE l.IsArchive=0 and l.Id=@loanID
                     vm.Department = dr["Department"].ToString();
                     vm.Section = dr["Section"].ToString();
                     vm.TotalDueInterestAmount = Convert.ToDecimal(dr["EarlySellteInterestAmount"].ToString());
+                    vm.IsEarlySellte = Convert.ToBoolean(dr["IsEarlySellte"]);
+                    vm.EarlySellteDate = Ordinary.StringToDate(dr["EarlySellteDate"].ToString());
                     //vm.Employee = dr["Salutation_E"].ToString() + " " + dr["MiddleName"].ToString() +" " +dr["LastName"].ToString();
                 }
                 dr.Close();

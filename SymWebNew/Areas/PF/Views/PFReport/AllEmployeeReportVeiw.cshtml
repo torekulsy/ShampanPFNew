@@ -22,7 +22,8 @@
                         <label>Employee Code</label>
                     </div>
                     <div class="editor-field">
-                        @Html.SimpleDropDownFor(model => model.EmployeeId, "/Config/DropDown/EmployeeCodeNameAll", new { @class = "  form-control selectDropdown" })
+                        @Html.SimpleDropDownFor(model => model.EmployeeId, "/Config/DropDown/EmployeeCodeNameAll", new { @class = " required form-control selectDropdown" })
+                        @Html.ValidationMessageFor(model => model.EmployeeId)
                     </div>
 
                 </div>
@@ -58,6 +59,12 @@
     });
 
     function reportData(sender) {
+        var isValid = $("#frmStatement").valid();
+        if (isValid) {
+            $("#frmStatement").submit();
+        } else {
+            console.log("Form validation failed. Prevention active.");
+        }
         $("#ReportType").val("");
 
         $("#frmStatement").attr('target', '_blank').submit();

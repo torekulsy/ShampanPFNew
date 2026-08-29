@@ -131,7 +131,7 @@
                     </div>
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.PrincipalAmount, new { @onchange = "LoanSchudele();", @placeholder = "Principal Amount", @class = "right required NumberCheck isPositiveNumeric form-control" })
-                        @Html.ValidationMessageFor(model => model.PrincipalAmount)
+                      
                     </div>
                 </div>
                 <div class="col-12 col-sm-6 col-md-2 col-lg-3 col-xl-2">
@@ -153,25 +153,7 @@
                     </div>
                 </div>
 
-                <div class="col-12 col-sm-6 col-md-2 col-lg-2 col-xl-2">
-                    <div class="editor-label">
-                        @Html.LabelFor(model => model.IsApproved)
-                    </div>
-                    <div class="editor-field">
-                        @Html.CheckBoxFor(model => model.IsApproved, new { @class = "ApprovedCheck form-control" })
-                        @Html.ValidationMessageFor(model => model.IsApproved)
-                    </div>
-                </div>
 
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 approvedDate">
-                    <div class="editor-label">
-                        @Html.LabelFor(model => model.ApprovedDate)
-                    </div>
-                    <div class="editor-field">
-                       @Html.TextBoxFor(model => model.ApprovedDate, new{@onchange = "LoanSchudele(); LoanDate(this); ClearApprovedDateValidation();",@placeholder = "Approved Date",@class = "customDatePicker form-control",autocomplete = "off"})
-                       @Html.ValidationMessageFor(model => model.ApprovedDate, "", new { @class = "text-danger" })
-                    </div>
-                </div>
 
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                     <div class="editor-label">
@@ -187,8 +169,8 @@
                         @Html.LabelFor(model => model.EndDate)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.EndDate, new { @disabled = "disabled", @placeholder = "End Date", @class = "customDatePicker required form-control" })
-                        @Html.ValidationMessageFor(model => model.EndDate)
+                        @Html.TextBoxFor(model => model.EndDate, new { @disabled = "disabled", @placeholder = "End Date", @class = "customDatePicker  form-control" })
+                        
                     </div>
                 </div>
 
@@ -208,7 +190,7 @@
                         @Html.LabelFor(model => model.InterestRate)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.InterestRate, new { @onchange = "LoanSchudele()", @placeholder = "Interest Rate", @class = "intRate right NumberCheck isPositiveNumeric form-control" })
+                        @Html.TextBoxFor(model => model.InterestRate, new { @onchange = "LoanSchudele()", @placeholder = "Interest Rate", @class = "required intRate right NumberCheck isPositiveNumeric form-control" })
                         @Html.ValidationMessageFor(model => model.InterestRate)
                     </div>
 
@@ -239,6 +221,25 @@
                     <div class="editor-field">
                         @Html.TextBoxFor(model => model.TotalAmount, new { @placeholder = "Total Amount", @class = "right NumberCheck isPositiveNumeric form-control", @readonly = "readonly" })
                         @Html.ValidationMessageFor(model => model.TotalAmount)
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-2 col-lg-2 col-xl-2">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.IsApproved)
+                    </div>
+                    <div class="editor-field">
+                        @Html.CheckBoxFor(model => model.IsApproved, new { @class = "ApprovedCheck form-control" })
+                        @Html.ValidationMessageFor(model => model.IsApproved)
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 approvedDate">
+                    <div class="editor-label">
+                        @Html.LabelFor(model => model.ApprovedDate)
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.ApprovedDate, new { @onchange = "LoanSchudele(); LoanDate(this); ClearApprovedDateValidation();", @placeholder = "Approved Date", @class = "customDatePicker form-control", autocomplete = "off" })
+                        @Html.ValidationMessageFor(model => model.ApprovedDate, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-6 col-xl-4">

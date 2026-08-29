@@ -33,7 +33,7 @@ public string COAGroupTypeId { get; set; }
         public bool IsActive { get; set; }
         [Display(Name = "Serial")]
 
-        public int GroupSL { get; set; }
+        public int? GroupSL { get; set; }
         public bool IsArchive { get; set; }
         public string CreatedBy { get; set; }
         public string CreatedAt { get; set; }
