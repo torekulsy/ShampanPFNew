@@ -30,7 +30,7 @@
 
         // Modules / Areas
         if (t == "admin") return new MenuIconInfo { IconClass = "fas fa-shield-alt", Color = "#A78BFA" };
-        if (t == "pf") return new MenuIconInfo { IconClass = "fas fa-piggy-bank", Color = "#34D399" };
+        if (t == "pf") return new MenuIconInfo { IconClass = "fas fa-briefcase", Color = "#34D399" };
         if (t == "gl") return new MenuIconInfo { IconClass = "fas fa-balance-scale", Color = "#FBBF24" };
         if (t == "wppf") return new MenuIconInfo { IconClass = "fas fa-hand-holding-usd", Color = "#22D3EE" };
         if (t == "hrm") return new MenuIconInfo { IconClass = "fas fa-user-tie", Color = "#F472B6" };
@@ -362,17 +362,17 @@
             transition: width .28s ease, box-shadow .28s ease;
         }
 
-        body.layout-left.sidebar-mini .main-sidebar .sidebar {
-            transition: width .28s ease;
-        }
+            body.layout-left.sidebar-mini .main-sidebar .sidebar {
+                transition: width .28s ease;
+            }
 
-        body.layout-left.sidebar-mini .main-sidebar .brandLogo {
-            transition: height .28s ease, margin .28s ease, padding .28s ease;
-        }
+            body.layout-left.sidebar-mini .main-sidebar .brandLogo {
+                transition: height .28s ease, margin .28s ease, padding .28s ease;
+            }
 
-        body.layout-left.sidebar-mini .main-sidebar .nav-sidebar .nav-link p {
-            transition: opacity .2s ease;
-        }
+            body.layout-left.sidebar-mini .main-sidebar .nav-sidebar .nav-link p {
+                transition: opacity .2s ease;
+            }
 
         body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar,
         body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar::before {
@@ -384,13 +384,16 @@
         body.layout-left.sidebar-mini.sidebar-collapse .main-footer {
             margin-left: 60px !important;
         }
-
         /* AdminLTE expands this same element over the page; the content margin
            deliberately stays at 60px so hovering never shifts the page. */
         body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(.sidebar-no-expand):hover,
         body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar.sidebar-focused {
             width: 250px !important;
             box-shadow: 4px 0 14px rgba(12, 37, 65, .22);
+        }
+
+        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(.sidebar-no-expand):hover ul li a p{
+            width: auto !important;
         }
 
         body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .brandLogo {
@@ -401,12 +404,12 @@
             overflow: hidden;
         }
 
-        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .brandLogo img {
-            width: 100%;
-            max-width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
+            body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .brandLogo img {
+                width: 100%;
+                max-width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
 
         body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .sidebar {
             width: 60px !important;
@@ -420,42 +423,42 @@
             padding: 0;
         }
 
-        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item {
-            width: 60px;
-            margin: 5px 0;
-        }
+            body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item {
+                width: 60px;
+                margin: 5px 0;
+            }
 
-       
-        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link > .nav-icon {
-            width: 21px !important;
-            min-width: 21px;
-            margin: 0 !important;
-            font-size: 17px !important;
-            line-height: 1;
-            text-align: center;
-        }
 
-        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-treeview {
-            display: none !important;
-        }
+                body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link > .nav-icon {
+                    width: 21px !important;
+                    min-width: 21px;
+                    margin: 0 !important;
+                    font-size: 17px !important;
+                    line-height: 1;
+                    text-align: center;
+                }
 
-        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link > p {
-            width: 0 !important;
-            margin-left: 0 !important;
-            opacity: 0;
-            visibility: visible !important;
-            white-space: nowrap;
-            pointer-events: none;
-            display: none
-        }
+                body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-treeview {
+                    display: none !important;
+                }
 
-        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link.active-menu,
-        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link.last-parent-active,
-        body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link.treeview-expanded {
-            color: #fff !important;
-            background: #007bff !important;
-            box-shadow: inset 3px 0 0 rgba(255, 255, 255, .78);
-        }
+                body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link > p {
+                    width: 0 !important;
+                    margin-left: 0 !important;
+                    opacity: 0;
+                    visibility: visible !important;
+                    white-space: nowrap;
+                    pointer-events: none;
+                    display: none;
+                }
+
+                body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link.active-menu,
+                body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link.last-parent-active,
+                body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .nav-sidebar > .nav-item > .nav-link.treeview-expanded {
+                    color: #fff !important;
+                    background: #007bff !important;
+                    box-shadow: inset 3px 0 0 rgba(255, 255, 255, .78);
+                }
 
         body.layout-left.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .sidebar::-webkit-scrollbar {
             width: 5px;
