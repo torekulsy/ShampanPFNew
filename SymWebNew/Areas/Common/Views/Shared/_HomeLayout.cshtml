@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -739,6 +739,13 @@
     <script type="text/javascript">
         $(document).ready(function () {
 
+            // ===== Neutralize AdminLTE Treeview =====
+            // Remove any AdminLTE Treeview data/handlers so only our code controls the sidebar
+            $(document).off("click", '[data-widget="treeview"] .nav-link');
+            $('[data-widget="treeview"]').removeAttr("data-widget").removeData("lte.treeview");
+            $(".nav-item").removeClass("menu-open menu-is-opening");
+
+            // Initialize all treeviews hidden by default
             $(".nav-treeview").hide();
 
             var expandedMenu = localStorage.getItem("expandedMenu");
@@ -746,207 +753,207 @@
             var activeMenu = localStorage.getItem("activeMenu");
 
             function setMenuArrow($el, isOpen) {
-                $el.children("p")
-                    .children("i.right")
-                    .removeClass(isOpen ? "fa-angle-left" : "fa-angle-down")
-                    .addClass(isOpen ? "fa-angle-down" : "fa-angle-left");
+                if (!$el || !$el.length) return;
+                var $arrow = $el.find("> p > i.right, > i.right, i.fa-angle-left, i.fa-angle-down").first();
+                if ($arrow.length) {
+                    $arrow.removeClass(isOpen ? "fa-angle-left" : "fa-angle-down")
+                          .addClass(isOpen ? "fa-angle-down" : "fa-angle-left");
+                }
             }
 
-            function openMenu($el) {
-                $el.addClass("treeview-expanded");
-                $el.next(".nav-treeview").show();
+            function closeTreeBranch($li) {
+                var $trigger = $li.children(".has-treeview, .has-treeview-a");
+                var $targetTree = $li.children(".nav-treeview");
 
-                setMenuArrow($el, true);
+                $trigger.removeClass("treeview-expanded");
+                setMenuArrow($trigger, false);
+                $targetTree.stop(true, true).slideUp(150, function () {
+                    $(this).css({ height: "", overflow: "" });
+                });
+
+                // Recursively reset and hide all descendant submenus
+                $targetTree.find(".has-treeview-a, .has-treeview").each(function () {
+                    $(this).removeClass("treeview-expanded");
+                    setMenuArrow($(this), false);
+                });
+                $targetTree.find(".nav-treeview").stop(true, true).hide().css({ height: "", overflow: "" });
+            }
+
+            function openTreeBranch($trigger) {
+                if (!$trigger || !$trigger.length) return;
+                $trigger.addClass("treeview-expanded");
+                setMenuArrow($trigger, true);
+                var $target = $trigger.next(".nav-treeview");
+                if ($target.length) {
+                    $target.stop(true, true).show().css({ height: "", overflow: "" });
+                }
+                // Ensure all ancestor branches are visible and marked expanded
+                $trigger.parents(".nav-treeview").stop(true, true).show().css({ height: "", overflow: "" });
+                $trigger.parents("li").children(".has-treeview, .has-treeview-a").each(function () {
+                    $(this).addClass("treeview-expanded");
+                    setMenuArrow($(this), true);
+                });
             }
 
             // =========================
             // RESTORE MENU STATE
             // =========================
             if (expandedMenu) {
-                openMenu($('[data-menu-id="' + expandedMenu + '"]'));
+                openTreeBranch($('[data-menu-id="' + expandedMenu + '"]'));
             }
 
             if (expandedSubMenu) {
-                openMenu($('[data-menu-id="' + expandedSubMenu + '"]'));
+                openTreeBranch($('[data-menu-id="' + expandedSubMenu + '"]'));
             }
 
             // =========================
             // RESTORE ACTIVE STATE
             // =========================
             if (activeMenu) {
-
                 var $active = $('[data-menu-id="' + activeMenu + '"]');
+                if ($active.length) {
+                    $(".nav-link").removeClass("active-menu");
+                    $(".has-treeview, .has-treeview-a").removeClass("last-parent-active");
 
-                $(".nav-link").removeClass("active-menu");
-                $(".has-treeview-a").removeClass("last-parent-active");
+                    $active.addClass("active-menu");
+                    $active.parents(".nav-treeview").stop(true, true).show().css({ height: "", overflow: "" });
 
-                $active.addClass("active-menu");
+                    $active.parents("li")
+                        .children(".has-treeview, .has-treeview-a")
+                        .each(function () {
+                            $(this).addClass("treeview-expanded");
+                            setMenuArrow($(this), true);
+                        });
 
-                $active.parents(".nav-treeview").show();
+                    var $lastParent = $active
+                        .closest(".nav-treeview")
+                        .prev(".has-treeview-a, .has-treeview");
 
-                $active.parents("li")
-                    .children(".has-treeview, .has-treeview-a")
-                    .each(function () {
-
-                        $(this).addClass("treeview-expanded");
-
-                        setMenuArrow($(this), true);
-                    });
-
-                // Last Parent Highlight
-                var $lastParent = $active
-                    .closest(".nav-treeview")
-                    .prev(".has-treeview-a");
-
-                if ($lastParent.length) {
-                    $lastParent.addClass("last-parent-active");
+                    if ($lastParent.length) {
+                        $lastParent.addClass("last-parent-active");
+                    }
                 }
+            } else {
+                // If no localStorage, restore from server-rendered active classes
+                $(".nav-link.active-menu").each(function () {
+                    var $act = $(this);
+                    $act.parents(".nav-treeview").stop(true, true).show().css({ height: "", overflow: "" });
+                    $act.parents("li")
+                        .children(".has-treeview, .has-treeview-a")
+                        .each(function () {
+                            $(this).addClass("treeview-expanded");
+                            setMenuArrow($(this), true);
+                        });
+                });
             }
 
             // =========================
-            // PARENT MENU
+            // SINGLE TREEVIEW CONTROLLER
             // =========================
-            $("body").on("click", ".has-treeview", function (e) {
+            $("body")
+                .off("click.sidebarTree", ".has-treeview, .has-treeview-a")
+                .on("click.sidebarTree", ".has-treeview, .has-treeview-a", function (e) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
 
-                e.preventDefault();
-                e.stopPropagation();
+                    var $this = $(this);
+                    var $target = $this.next(".nav-treeview");
 
-                var $this = $(this);
-                var $target = $this.next(".nav-treeview");
-                var menuId = $this.data("menu-id");
+                    if (!$target.length) {
+                        return;
+                    }
 
-                if ($this.hasClass("treeview-expanded")) {
+                    // If currently animating from rapid clicking, finish immediately
+                    if ($target.is(":animated")) {
+                        $target.stop(true, true).css({ height: "", overflow: "" });
+                    }
 
-                    $this.removeClass("treeview-expanded");
+                    var isExpanded = $this.hasClass("treeview-expanded");
+                    var menuId = $this.attr("data-menu-id");
+                    var storageKey = $this.hasClass("has-treeview")
+                        ? "expandedMenu"
+                        : "expandedSubMenu";
 
-                    $target.slideUp(200);
-
-                    setMenuArrow($this, false);
-
-                    localStorage.removeItem("expandedMenu");
-                }
-                else {
-
-                    $(".has-treeview").not($this).each(function () {
-
-                        $(this)
-                            .removeClass("treeview-expanded")
-                            .next(".nav-treeview")
-                            .slideUp(200);
-
-                        setMenuArrow($(this), false);
-                    });
-
-                    $this.addClass("treeview-expanded");
-
-                    $target.slideDown(200);
-
-                    setMenuArrow($this, true);
-
-                    localStorage.setItem("expandedMenu", menuId);
-                }
-            });
-
-            // =========================
-            // SUB MENU
-            // =========================
-            $("body").on("click", ".has-treeview-a", function (e) {
-
-                e.preventDefault();
-                e.stopPropagation();
-
-                var $this = $(this);
-                var $target = $this.next(".nav-treeview");
-                var menuId = $this.data("menu-id");
-
-                if ($this.hasClass("treeview-expanded")) {
-
-                    $this.removeClass("treeview-expanded");
-
-                    $target.slideUp(200);
-
-                    setMenuArrow($this, false);
-
-                    localStorage.removeItem("expandedSubMenu");
-                }
-                else {
-
-                    $this.closest(".nav-treeview")
-                        .find("> li > .has-treeview-a")
-                        .not($this)
-                        .each(function () {
-
-                            $(this)
-                                .removeClass("treeview-expanded")
-                                .next(".nav-treeview")
-                                .slideUp(200);
-
-                            setMenuArrow($(this), false);
+                    if (isExpanded) {
+                        // Collapse this branch
+                        $this.removeClass("treeview-expanded");
+                        setMenuArrow($this, false);
+                        $target.stop(true, true).slideUp(150, function () {
+                            $(this).css({ height: "", overflow: "" });
                         });
 
-                    $this.addClass("treeview-expanded");
+                        // Recursively clean all descendant submenus so unfolding never requires double-click
+                        $target.find(".has-treeview-a, .has-treeview").each(function () {
+                            $(this).removeClass("treeview-expanded");
+                            setMenuArrow($(this), false);
+                        });
+                        $target.find(".nav-treeview").stop(true, true).hide().css({ height: "", overflow: "" });
 
-                    $target.slideDown(200);
+                        if (localStorage.getItem(storageKey) === menuId) {
+                            localStorage.removeItem(storageKey);
+                        }
+                    } else {
+                        // Accordion: close sibling branches at the SAME level
+                        $this.parent("li").siblings("li").each(function () {
+                            closeTreeBranch($(this));
+                        });
 
-                    setMenuArrow($this, true);
+                        // Expand this branch
+                        $this.addClass("treeview-expanded");
+                        setMenuArrow($this, true);
+                        $target.stop(true, true).slideDown(150, function () {
+                            $(this).css({ height: "", overflow: "" });
+                        });
 
-                    localStorage.setItem("expandedSubMenu", menuId);
-                }
-            });
+                        localStorage.setItem(storageKey, menuId);
+                    }
+                });
 
-            // =========================
-            // ACTIVE MENU CLICK
-            // =========================
             // =========================
             // ACTIVE MENU CLICK
             // =========================
             $("body").on("click", ".nav-link", function () {
-
-                var menuId = $(this).data("menu-id");
+                var $this = $(this);
+                var menuId = $this.data("menu-id");
 
                 if (
-                    !$(this).hasClass("has-treeview") &&
-                    !$(this).hasClass("has-treeview-a")
+                    !$this.hasClass("has-treeview") &&
+                    !$this.hasClass("has-treeview-a")
                 ) {
+                    // When Home is clicked, do not collapse any open modules
+                    if ($this.hasClass("homeColor")) {
+                        $(".nav-link").removeClass("active-menu");
+                        $(".has-treeview, .has-treeview-a").removeClass("last-parent-active");
+                        $this.addClass("active-menu");
+                        localStorage.removeItem("activeMenu");
+                        return;
+                    }
 
                     $(".nav-link").removeClass("active-menu");
-                    $(".has-treeview-a").removeClass("last-parent-active");
+                    $(".has-treeview, .has-treeview-a").removeClass("last-parent-active");
 
-                    $(this).addClass("active-menu");
+                    $this.addClass("active-menu");
 
                     // Last Parent Highlight
-                    var $lastParent = $(this)
+                    var $lastParent = $this
                         .closest(".nav-treeview")
-                        .prev(".has-treeview-a");
+                        .prev(".has-treeview-a, .has-treeview");
 
                     if ($lastParent.length) {
                         $lastParent.addClass("last-parent-active");
                     }
 
-                    // =========================
-                    // CLOSE SIBLING SUBMENUS
-                    // =========================
-                    var $currentLi = $(this).closest("li");
+                    // Only close sibling submenus inside nested treeviews, never top-level modules
+                    var $currentLi = $this.closest("li");
+                    if ($currentLi.parent().hasClass("nav-treeview")) {
+                        $currentLi.siblings("li").each(function () {
+                            closeTreeBranch($(this));
+                        });
+                    }
 
-                    $currentLi.siblings("li").each(function () {
-
-                        var $submenu = $(this).children(".has-treeview-a");
-                        var $submenuTree = $(this).children(".nav-treeview");
-
-                        if ($submenu.length > 0) {
-
-                            $submenu.removeClass("treeview-expanded");
-
-                            setMenuArrow($submenu, false);
-
-                            $submenuTree.slideUp(200);
-                        }
-                    });
-
-                    // expanded submenu remove
-                    localStorage.removeItem("expandedSubMenu");
-
-                    localStorage.setItem("activeMenu", menuId);
+                    if (menuId) {
+                        localStorage.setItem("activeMenu", menuId);
+                    }
                 }
             });
 
@@ -967,6 +974,19 @@
 
         .treeview-expanded {
             background: rgba(0,123,255,.12);
+        }
+
+        /* Fix footer overlaying left sidebar */
+        body.layout-left:not(.sidebar-collapse) .content.black {
+            margin-left: 250px;
+            transition: margin-left .3s ease;
+        }
+        body.layout-left.sidebar-collapse .content.black {
+            margin-left: 60px;
+            transition: margin-left .3s ease;
+        }
+        body.layout-top .content.black {
+            margin-left: 0;
         }
     </style>
 

@@ -152,10 +152,11 @@
     else
     {
         var openClass = node.IsCurrent ? " treeview-expanded last-parent-active" : "";
+        var aClass = "nav-link has-treeview-a" + openClass;
         var childCount = (node.Items == null ? 0 : node.Items.Count)
             + (node.SubGroups == null ? 0 : node.SubGroups.Count);
         <li class="nav-item">
-            <a class="nav-link has-treeview-a@openClass" href="#" data-menu-id="@parentKey-@node.CssClass">
+            <a class="@aClass" href="#" data-menu-id="@parentKey-@node.CssClass">
                 <i class="nav-icon @GetMenuIcon(node.Title)"></i>
                 <p>
                     @node.Title
@@ -179,9 +180,10 @@
                     foreach (var subGroup in node.SubGroups)
                     {
                         var subGroupActive = subGroup.Items != null && subGroup.Items.Any(i => i.IsCurrent);
+                        var subGroupClass = "nav-link has-treeview-a" + (subGroupActive ? " treeview-expanded last-parent-active" : "");
                         var subGroupCount = subGroup.Items == null ? 0 : subGroup.Items.Count;
                         <li class="nav-item">
-                            <a class="nav-link has-treeview-a@(subGroupActive ? " treeview-expanded last-parent-active" : "")" href="#" data-menu-id="@parentKey-@node.CssClass-@subGroup.Title">
+                            <a class="@subGroupClass" href="#" data-menu-id="@parentKey-@node.CssClass-@subGroup.Title">
                                 <i class="nav-icon @GetMenuIcon(subGroup.Title)"></i>
                                 <p>
                                     @subGroup.Title
@@ -211,6 +213,22 @@
         font-size: 14px;
     }
 
+    .nav-sidebar .nav-link {
+        position: relative;
+        white-space: normal;
+    }
+
+        .nav-sidebar .nav-link p {
+            margin: 0;
+             padding-right: 0; 
+            display: inline-block;
+             width: auto; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
     .nav-sidebar .nav-link:hover {
         background-color: #17A2ED !important;
         color: #fff !important;
@@ -219,21 +237,32 @@
     .nav-sidebar .menu-child-count {
         position: absolute;
         top: 50%;
-        right: 33px;
-        min-width: 13px;
+        right: 28px;
+        min-width: 16px;
         height: 16px;
-        padding: 0 5px;
+        padding: 0 4px;
         border-radius: 4px;
         background-color: #17a2b8;
         color: #fff;
-        font-size: 9px;
+        font-size: 10px;
         font-weight: 700;
         line-height: 16px;
         text-align: center;
         transform: translateY(-50%);
+        z-index: 2;
+    }
+
+    .nav-sidebar .nav-link > p > i.right, .nav-sidebar .nav-link > i.right {
+        position: absolute;
+        right: 10px !important;
+        top: 50% !important;
+        transform: translateY(-50%);
+        font-size: 12px;
+        line-height: 1;
+        transition: transform .2s ease;
     }
     .sidebar {
-        height: calc(100vh - 118px) !important;
+        height: calc(100vh - 80px) !important;
         width: 247px !important;
         overflow-x: hidden !important;
         overflow-y: auto !important;
@@ -258,6 +287,7 @@
 
     .nav-treeview {
         padding-left: 16px !important;
+        display: none;
     }
 
     .nav-treeview > .nav-item {
@@ -417,7 +447,7 @@
         <img src="@Url.Content("~/Images/" + moduleLogo)" alt="Company Logo">
     </a>
     <nav class="sidebar">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <ul class="nav nav-pills nav-sidebar flex-column" role="menu" data-accordion="false">
             <li class="nav-item">
                 <a href="@currentModel.HomeUrl" class="nav-link homeColor">
                     <i class="nav-icon fas fa-home"></i>
@@ -429,9 +459,10 @@
             {
                 DynamicNavbarViewModel moduleModel = service.BuildNavbarViewModel(module.Title);
                 var moduleActive = module.IsCurrent || (moduleModel.Nodes != null && moduleModel.Nodes.Any(n => n.IsCurrent));
+                var moduleClass = "nav-link has-treeview" + (moduleActive ? " treeview-expanded" : "");
                 var submenuCount = moduleModel.Nodes == null ? 0 : moduleModel.Nodes.Count;
                 <li class="nav-item">
-                    <a class="nav-link has-treeview@(moduleActive ? " treeview-expanded" : "")" href="#" data-menu-id="module-@module.Title">
+                    <a class="@moduleClass" href="#" data-menu-id="module-@module.Title">
                         <i class="nav-icon @GetMenuIcon(module.Title)"></i>
                         <p>
                             @module.Title

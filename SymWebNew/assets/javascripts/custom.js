@@ -1,4 +1,4 @@
-﻿$(function () {
+$(function () {
     //valiDation();
     //InitDatePickers();
     //FormatDate();
@@ -44,7 +44,15 @@ $(document).on("mousedown", function (e) {
         !$(e.target).closest(".select2-container").length &&
         !$(e.target).closest(".selectDropdown").length
     ) {
-        $(".selectDropdown").select2("close");
+        if (typeof $.fn.select2 === "function") {
+            try {
+                $(".selectDropdown").each(function () {
+                    if ($(this).data("select2")) {
+                        $(this).select2("close");
+                    }
+                });
+            } catch (err) { }
+        }
     }
 });
 $(function () {
