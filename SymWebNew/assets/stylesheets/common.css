@@ -1,4 +1,4 @@
-﻿
+
 /*2026 New Css*/
 
 :root {
@@ -313,12 +313,345 @@ body.layout-top .content-area {
 }
 
 .ui-widget-overlay {
-    z-index: 9999 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    min-width: 100% !important;
+    min-height: 100% !important;
+    background: rgba(0, 0, 0, 0.25) !important;
+    background-image: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    z-index: 1000000 !important;
+    pointer-events: auto !important;
+    cursor: default !important;
 }
 
-.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
-    z-index: 999999 !important;
+.ui-dialog,
+.ui-dialog.ui-widget,
+.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable,
+div.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
+    z-index: 1000005 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+    min-width: 440px !important;
+    max-width: 90vw !important;
+    width: max-content !important;
+    width: -moz-max-content !important;
+    height: auto !important;
+    box-sizing: border-box !important;
 }
+
+.ui-dialog .ui-dialog-content {
+    width: 100% !important;
+    min-width: 100% !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+}
+
+.reportModalbtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #eef2f5;
+}
+
+.reportModalbtn button,
+.reportModalbtn .sym-btn-Excel-Export,
+.reportModalbtn .sym-btn-clear,
+.reportModalbtn .sym-btn-cancel,
+.reportModalbtn .sym-btn-save {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border-radius: 4px !important;
+    padding: 6px 14px !important;
+    height: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Ensure Select2 Dropdown, Datepicker & Pickers are above Modal Dialog */
+.select2-drop,
+.select2-drop-mask,
+.select2-drop-active,
+.select2-container-active,
+.select2-dropdown-open,
+.select2-drop.select2-drop-active {
+    z-index: 1000020 !important;
+}
+
+/* ========================================================
+   Modern jQuery UI Datepicker Styling (Compact 230px)
+======================================================== */
+#ui-datepicker-div,
+.ui-datepicker,
+div#ui-datepicker-div.ui-datepicker {
+    z-index: 1000030 !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 6px 10px -6px rgba(0, 0, 0, 0.1) !important;
+    padding: 6px !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    width: 230px !important;
+    min-width: 230px !important;
+    max-width: 230px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+#ui-datepicker-div .ui-datepicker-header,
+.ui-datepicker .ui-datepicker-header {
+    position: relative !important;
+    padding: 4px 6px !important;
+    background: linear-gradient(135deg, #1d3557, #457b9d) !important;
+    color: #ffffff !important;
+    border-radius: 4px !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+#ui-datepicker-div .ui-datepicker-prev,
+#ui-datepicker-div .ui-datepicker-next,
+.ui-datepicker .ui-datepicker-prev,
+.ui-datepicker .ui-datepicker-next {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 20px !important;
+    height: 20px !important;
+    cursor: pointer !important;
+    border-radius: 3px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    transition: background 0.2s ease !important;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
+}
+
+#ui-datepicker-div .ui-datepicker-prev,
+.ui-datepicker .ui-datepicker-prev {
+    left: 4px !important;
+}
+
+#ui-datepicker-div .ui-datepicker-next,
+.ui-datepicker .ui-datepicker-next {
+    right: 4px !important;
+}
+
+#ui-datepicker-div .ui-datepicker-prev:hover,
+#ui-datepicker-div .ui-datepicker-next:hover,
+.ui-datepicker .ui-datepicker-prev:hover,
+.ui-datepicker .ui-datepicker-next:hover {
+    background: rgba(255, 255, 255, 0.4) !important;
+}
+
+#ui-datepicker-div .ui-datepicker-prev span,
+#ui-datepicker-div .ui-datepicker-next span,
+.ui-datepicker .ui-datepicker-prev span,
+.ui-datepicker .ui-datepicker-next span {
+    display: none !important;
+}
+
+#ui-datepicker-div .ui-datepicker-prev:before,
+.ui-datepicker .ui-datepicker-prev:before {
+    content: "‹" !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    color: #ffffff !important;
+    line-height: 1 !important;
+    display: block !important;
+}
+
+#ui-datepicker-div .ui-datepicker-next:before,
+.ui-datepicker .ui-datepicker-next:before {
+    content: "›" !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    color: #ffffff !important;
+    line-height: 1 !important;
+    display: block !important;
+}
+
+#ui-datepicker-div .ui-datepicker-title,
+.ui-datepicker .ui-datepicker-title {
+    margin: 0 auto !important;
+    line-height: 1.4 !important;
+    text-align: center !important;
+    display: flex !important;
+    gap: 3px !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+#ui-datepicker-div .ui-datepicker-title select,
+.ui-datepicker .ui-datepicker-title select {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    padding: 1px 3px !important;
+    margin: 0 !important;
+    border-radius: 3px !important;
+    border: 1px solid #cbd5e1 !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    outline: none !important;
+    height: 22px !important;
+    line-height: 18px !important;
+    cursor: pointer !important;
+}
+
+#ui-datepicker-div table,
+.ui-datepicker table,
+#ui-datepicker-div table.ui-datepicker-calendar,
+.ui-datepicker table.ui-datepicker-calendar {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    font-size: 11px !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
+    margin: 5px 0 0 0 !important;
+    box-sizing: border-box !important;
+    background: transparent !important;
+}
+
+#ui-datepicker-div th,
+.ui-datepicker th {
+    width: 14.28% !important;
+    max-width: 14.28% !important;
+    padding: 3px 0 !important;
+    margin: 0 !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+    font-size: 10px !important;
+    color: #64748b !important;
+    border: none !important;
+    text-transform: uppercase !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    box-sizing: border-box !important;
+}
+
+#ui-datepicker-div td,
+.ui-datepicker td {
+    width: 14.28% !important;
+    max-width: 14.28% !important;
+    border: none !important;
+    padding: 1px 0 !important;
+    margin: 0 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
+}
+
+#ui-datepicker-div td span,
+#ui-datepicker-div td a,
+.ui-datepicker td span,
+.ui-datepicker td a {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 22px !important;
+    height: 22px !important;
+    max-width: 22px !important;
+    max-height: 22px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    color: #1e293b !important;
+    border-radius: 3px !important;
+    border: 1px solid transparent !important;
+    background: transparent !important;
+    transition: all 0.15s ease !important;
+    box-sizing: border-box !important;
+}
+
+#ui-datepicker-div td a:hover,
+#ui-datepicker-div td .ui-state-hover,
+.ui-datepicker td a:hover,
+.ui-datepicker td .ui-state-hover {
+    background: #e0f2fe !important;
+    color: #0284c7 !important;
+    font-weight: 600 !important;
+    border-color: #bae6fd !important;
+}
+
+#ui-datepicker-div td.ui-datepicker-today a,
+#ui-datepicker-div td.ui-datepicker-today span,
+.ui-datepicker td.ui-datepicker-today a,
+.ui-datepicker td.ui-datepicker-today span {
+    border: 1px solid #0284c7 !important;
+    color: #0284c7 !important;
+    font-weight: 700 !important;
+    background: #f0f9ff !important;
+}
+
+#ui-datepicker-div td.ui-datepicker-current-day a,
+#ui-datepicker-div .ui-state-active,
+.ui-datepicker td.ui-datepicker-current-day a,
+.ui-datepicker .ui-state-active {
+    background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 5px rgba(2, 132, 199, 0.35) !important;
+}
+
+#ui-datepicker-div .ui-state-disabled span,
+.ui-datepicker .ui-state-disabled span {
+    color: #cbd5e1 !important;
+}
+
+#ptTimeSelectCntr {
+    z-index: 1000030 !important;
+}
+
+#toast-container {
+    z-index: 1000040 !important;
+}
+
+@keyframes modalShakeZoom {
+    0% {
+        transform: scale(1);
+    }
+    35% {
+        transform: scale(1.035);
+    }
+    70% {
+        transform: scale(0.985);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.ui-dialog.modal-pulse-animate,
+.modal-dialog.modal-pulse-animate {
+    animation: modalShakeZoom 0.25s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    transform-origin: center center !important;
+}
+
 
 .layout-wrapper.wrapper .main-header {
     left: 0;
@@ -1120,13 +1453,17 @@ ul.headeRight {
     border-top-right-radius: 0.25rem;
     color: #fff;
 }
-
+label {
+    display: block;
+    font-size: 13px!important;
+    font-weight: 600;
+}
 
 .custom-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
+    padding: 5px;
 }
 
 .custom-footer {
@@ -2010,14 +2347,8 @@ td {
 
 div.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
     display: block;
-    z-index: 1002;
     outline: 0px;
     height: auto;
-    max-width: 450px !important;
-    top: 296px;
-    left: 665px;
-    min-width: 400px;
-    /* width: 450px!important; */
 }
 /*div.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
     display: block;

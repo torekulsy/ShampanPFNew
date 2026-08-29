@@ -1,4 +1,4 @@
-﻿
+
 @font-face {
     font-family: 'FontAwesome';
     src: url('../css/sym-fonts/fontawesome-webfont.eot?v=4.1.0');
@@ -13,15 +13,53 @@
     src: url('../css/sym-fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../css/sym-fonts/glyphicons-halflings-regular.woff') format('woff'), url('../css/sym-fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../css/sym-fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
 
+[class*="sym-btn-"] {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+[class*="sym-btn-"]:before {
+    font-family: FontAwesome !important;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    display: inline-block;
+    speak: none;
+}
+
+button[class*="sym-btn-"]:before,
+.sym-btn-add:before,
+.sym-btn-save:before,
+.sym-btn-cancel:before,
+.sym-btn-clear:before,
+.sym-btn-update:before,
+.sym-btn-Excel-Export:before,
+.sym-btn-Excel-import:before,
+.sym-btn-back:before,
+.sym-btn-post:before,
+.sym-btn-detail:before,
+.sym-btn-report:before,
+.sym-btn-remove:before,
+.sym-btn-search:before {
+    margin-right: 5px;
+}
+
+[class*="-row"]:before {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline-block !important;
+    line-height: 1 !important;
+    text-align: center !important;
+}
+
 .sym-btn-add, .sym-btn-add-row
 , .sym-btn-download-row
 , .sym-btn-investment-row
 , .sym-btn-payment-row
 , .sym-btn-bank-row
 , .sym-btn-post, .sym-btn-post-row, .sym-btn-detail, .sym-btn-detail-row, .sym-btn-remove, .sym-btn-remove-row, .sym-btn-remove-row-minus, .sym-btn-edit, .sym-btn-edit-row, .sym-btn-audit, .sym-btn-audit-row, .sym-btn-password, .sym-btn-password-row, .sym-btn-save, .sym-btn-save-row, .sym-btn-cancel, .sym-btn-cancel-row, .sym-btn-update, .sym-btn-update-row, .sym-btn-back, .sym-btn-add-upload, .sym-btn-report, .sym-btn-report-row, .sym-btn-approve, .sym-btn-approve-row, .sym-btn-reject, .sym-btn-reject-row, .sym-btn-search, .sym-btn-mail, .sym-btn-mail-row, .sym-btn-Excel-import, .sym-btn-Excel-Export, .sym-btn-ExportImport, .sym-btn-ExportImport-row, .sym-btn-print, .sym-btn-clear, .sym-btn-duplicate, .sym-btn-duplicate-row, .sym-btn-file-upload, .sym-btn-search, .sym-btn-refresh {
-    font-family: FontAwesome !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
     margin-bottom: 0;
-    font-weight: normal;
+    font-weight: 500;
     text-align: center;
     white-space: nowrap;
     vertical-align: middle;
@@ -43,14 +81,52 @@
     padding: 6px 12px;
 }
 
-.sym-btn-remove-row, .sym-btn-add-row, .sym-btn-download-row, .sym-btn-investment-row, .sym-btn-payment-row, .sym-btn-back-row, .sym-btn-bank-row, .sym-btn-post-row, .sym-btn-detail-row, .sym-btn-update-row, .sym-btn-cancel-row, .sym-btn-save-row, .sym-btn-edit-row, .sym-btn-audit-row, .sym-btn-password-row .sym-btn-remove-row, .sym-btn-report-row, .sym-btn-approve-row, .sym-btn-reject-row, .sym-btn-mail-row, .sym-btn-Excel-import-row, .sym-btn-Excel-Export-row, .sym-btn-ExportImport-row, .sym-btn-remove-row-minus, .sym-btn-duplicate-row {
-    font-size: 1.3em !important;
+.sym-btn-remove-row, .sym-btn-download-row, .sym-btn-investment-row, .sym-btn-payment-row, .sym-btn-back-row, .sym-btn-bank-row, .sym-btn-post-row, .sym-btn-detail-row, .sym-btn-cancel-row, .sym-btn-edit-row, .sym-btn-audit-row, .sym-btn-password-row, .sym-btn-report-row, .sym-btn-approve-row, .sym-btn-reject-row, .sym-btn-mail-row, .sym-btn-Excel-import-row, .sym-btn-Excel-Export-row, .sym-btn-ExportImport-row, .sym-btn-remove-row-minus, .sym-btn-duplicate-row {
+    font-size: 13px !important;
     font-weight: bold;
-    min-height: 26px;
-    display: inline-flex;
-    min-width: 26px;
-    justify-content: center;
-    align-items: center;
+    min-height: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    width: 24px !important;
+    max-width: 24px !important;
+    max-height: 24px !important;
+    display: inline-flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    padding: 0 !important;
+    margin: 1px 2px !important;
+    border-radius: 4px !important;
+    box-sizing: border-box !important;
+}
+
+.sym-btn-add-row {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    width: auto !important;
+    min-width: max-content !important;
+    max-width: none !important;
+    padding: 4px 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    color: white !important;
+    background-color: #337ab7 !important;
+    border: 1px solid #237ab7 !important;
+}
+
+.sym-btn-add-row:before {
+    font-family: FontAwesome !important;
+    content: "\f067" !important;
+    margin-right: 5px !important;
+    line-height: 1 !important;
 }
 
 .sym-btn-add:hover, .sym-btn-add:focus, .sym-btn-add:active, .sym-btn-add.active, .open > .dropdown-toggle.sym-btn-add {
@@ -415,17 +491,18 @@ tbody tr td #lnkEdit1 {
 
 
 
-.sym-btn-edit-row{
-    font-family: 'Glyphicons Halflings' !important;
-    padding: 0px 5px !important;
-    /*padding: 2px 7px!important;*/
+.sym-btn-edit-row {
+    font-family: FontAwesome !important;
     color: white !important;
-    background-color: #ed8d3b;
-    border-color: #e47c3f;
+    background-color: #00b4ff;
+    border-radius: 4px !important;
+    text-align: center !important;
 }
 
     .sym-btn-edit-row:before {
-        content: "\e065";
+        font-family: FontAwesome !important;
+        content: "\f040" !important;
+        line-height: 1 !important;
     }
 
     .sym-btn-edit-row:hover,
@@ -433,8 +510,7 @@ tbody tr td #lnkEdit1 {
     .sym-btn-edit-row:active,
     .sym-btn-edit-row.active,
     .open > .dropdown-toggle.sym-btn-edit-row {
-        background-color: #ed8d3b;
-        border-color: #e47c3f;
+        background-color: #0482b7;
         color: black !important;
         text-decoration: none !important;
     }

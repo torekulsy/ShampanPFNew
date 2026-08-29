@@ -22,11 +22,11 @@
 
     <link href="~/assets/plugins/font-awesome/css/font-awesome.css" rel="stylesheet" />
     <link href="~/assets/css/toastr.css" rel="stylesheet" />
-    <link href="~/assets/stylesheets/common.css" rel="stylesheet" />
+    <link href="~/assets/stylesheets/common.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
     <link href="~/assets/stylesheets/font-awesome.css" rel="stylesheet" />
 
     <link href="~/assets/css/jquery.ptTimeSelect.css" rel="stylesheet" />
-    <link href="~/assets/css/SymphonyBtn.css" rel="stylesheet" />
+    <link href="~/assets/css/SymphonyBtn.css?v=@DateTime.Now.Ticks" rel="stylesheet" />
     <link href="~/assets/css/dataTables.colVis.css" rel="stylesheet" />
     <link href="~/assets/css/select2.css" rel="stylesheet" />
     @* Admin Lt menu *@
@@ -752,6 +752,16 @@
             var expandedSubMenu = localStorage.getItem("expandedSubMenu");
             var activeMenu = localStorage.getItem("activeMenu");
 
+            var isHomeActive = $(".homeColor").hasClass("active-menu");
+            if (isHomeActive) {
+                localStorage.removeItem("activeMenu");
+                localStorage.removeItem("expandedMenu");
+                localStorage.removeItem("expandedSubMenu");
+                activeMenu = null;
+                expandedMenu = null;
+                expandedSubMenu = null;
+            }
+
             function setMenuArrow($el, isOpen) {
                 if (!$el || !$el.length) return;
                 var $arrow = $el.find("> p > i.right, > i.right, i.fa-angle-left, i.fa-angle-down").first();
@@ -926,6 +936,8 @@
                         $(".has-treeview, .has-treeview-a").removeClass("last-parent-active");
                         $this.addClass("active-menu");
                         localStorage.removeItem("activeMenu");
+                        localStorage.removeItem("expandedMenu");
+                        localStorage.removeItem("expandedSubMenu");
                         return;
                     }
 

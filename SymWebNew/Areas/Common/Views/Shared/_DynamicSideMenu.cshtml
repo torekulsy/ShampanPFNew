@@ -3,96 +3,127 @@
 @using SymServices.Common
 
 @functions {
+    public class MenuIconInfo
+    {
+        public string IconClass { get; set; }
+        public string Color { get; set; }
+    }
+
+    private static readonly string[] Palette = new string[]
+    {
+        "#38BDF8", "#34D399", "#FBBF24", "#F87171", "#A78BFA",
+        "#2DD4BF", "#FB923C", "#F472B6", "#818CF8", "#22D3EE",
+        "#A3E635", "#E879F9", "#60A5FA", "#F59E0B", "#10B981"
+    };
+
+    public static MenuIconInfo GetMenuIconInfo(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            return new MenuIconInfo { IconClass = "fas fa-circle", Color = "#38BDF8" };
+        }
+
+        string t = title.Trim().ToLowerInvariant();
+
+        // Home
+        if (t == "home") return new MenuIconInfo { IconClass = "fas fa-home", Color = "#FF6B6B" };
+
+        // Modules / Areas
+        if (t == "admin") return new MenuIconInfo { IconClass = "fas fa-shield-alt", Color = "#A78BFA" };
+        if (t == "pf") return new MenuIconInfo { IconClass = "fas fa-piggy-bank", Color = "#34D399" };
+        if (t == "gl") return new MenuIconInfo { IconClass = "fas fa-balance-scale", Color = "#FBBF24" };
+        if (t == "wppf") return new MenuIconInfo { IconClass = "fas fa-hand-holding-usd", Color = "#22D3EE" };
+        if (t == "hrm") return new MenuIconInfo { IconClass = "fas fa-user-tie", Color = "#F472B6" };
+        if (t == "payroll") return new MenuIconInfo { IconClass = "fas fa-money-check-alt", Color = "#10B981" };
+        if (t == "attendance") return new MenuIconInfo { IconClass = "fas fa-clock", Color = "#FB923C" };
+        if (t == "recruitment") return new MenuIconInfo { IconClass = "fas fa-user-plus", Color = "#60A5FA" };
+        if (t == "appraisal") return new MenuIconInfo { IconClass = "fas fa-award", Color = "#FACC15" };
+        if (t == "ess") return new MenuIconInfo { IconClass = "fas fa-id-badge", Color = "#A855F7" };
+
+        // Groups
+        if (t == "setup") return new MenuIconInfo { IconClass = "fas fa-sliders-h", Color = "#FB923C" };
+        if (t == "transaction") return new MenuIconInfo { IconClass = "fas fa-exchange-alt", Color = "#38BDF8" };
+        if (t == "reports") return new MenuIconInfo { IconClass = "fas fa-chart-line", Color = "#C084FC" };
+
+        // Subgroups
+        if (t == "master data") return new MenuIconInfo { IconClass = "fas fa-database", Color = "#60A5FA" };
+        if (t == "user") return new MenuIconInfo { IconClass = "fas fa-users-cog", Color = "#A78BFA" };
+        if (t == "bank") return new MenuIconInfo { IconClass = "fas fa-landmark", Color = "#FACC15" };
+        if (t == "coa") return new MenuIconInfo { IconClass = "fas fa-sitemap", Color = "#2DD4BF" };
+        if (t == "voucher entry" || t == "voucher") return new MenuIconInfo { IconClass = "fas fa-file-invoice-dollar", Color = "#F59E0B" };
+        if (t == "employee") return new MenuIconInfo { IconClass = "fas fa-users", Color = "#38BDF8" };
+        if (t == "financial reports") return new MenuIconInfo { IconClass = "fas fa-chart-pie", Color = "#E879F9" };
+        if (t == "loan") return new MenuIconInfo { IconClass = "fas fa-hand-holding-usd", Color = "#34D399" };
+
+        // Leaves / Specific Titles
+        if (t == "designation group") return new MenuIconInfo { IconClass = "fas fa-layer-group", Color = "#F472B6" };
+        if (t == "branch") return new MenuIconInfo { IconClass = "fas fa-map-marked-alt", Color = "#2DD4BF" };
+        if (t == "section") return new MenuIconInfo { IconClass = "fas fa-th-list", Color = "#A78BFA" };
+        if (t == "department") return new MenuIconInfo { IconClass = "fas fa-sitemap", Color = "#FBBF24" };
+        if (t == "designation") return new MenuIconInfo { IconClass = "fas fa-id-card-alt", Color = "#FB7185" };
+        if (t == "project") return new MenuIconInfo { IconClass = "fas fa-project-diagram", Color = "#818CF8" };
+        if (t == "company") return new MenuIconInfo { IconClass = "fas fa-city", Color = "#60A5FA" };
+        if (t == "fiscal year") return new MenuIconInfo { IconClass = "fas fa-calendar-alt", Color = "#FB923C" };
+        if (t == "settings") return new MenuIconInfo { IconClass = "fas fa-sliders-h", Color = "#22D3EE" };
+        if (t == "db update") return new MenuIconInfo { IconClass = "fas fa-database", Color = "#F43F5E" };
+        if (t == "sym user roll" || t == "sym user role") return new MenuIconInfo { IconClass = "fas fa-user-shield", Color = "#F59E0B" };
+        if (t == "user group") return new MenuIconInfo { IconClass = "fas fa-users", Color = "#A855F7" };
+        if (t == "investment register") return new MenuIconInfo { IconClass = "fas fa-folder-open", Color = "#34D399" };
+        if (t == "bank name") return new MenuIconInfo { IconClass = "fas fa-landmark", Color = "#FACC15" };
+        if (t == "bank branch") return new MenuIconInfo { IconClass = "fas fa-map-marker-alt", Color = "#FB923C" };
+        if (t == "coa group") return new MenuIconInfo { IconClass = "fas fa-folder", Color = "#60A5FA" };
+        if (t == "coa sub group") return new MenuIconInfo { IconClass = "fas fa-folder-open", Color = "#818CF8" };
+        if (t == "coa category") return new MenuIconInfo { IconClass = "fas fa-tags", Color = "#A78BFA" };
+        if (t == "investment type") return new MenuIconInfo { IconClass = "fas fa-tag", Color = "#22D3EE" };
+        if (t == "transaction media") return new MenuIconInfo { IconClass = "fas fa-credit-card", Color = "#E879F9" };
+        if (t == "settlement policy") return new MenuIconInfo { IconClass = "fas fa-gavel", Color = "#C084FC" };
+        if (t == "auto journal setup") return new MenuIconInfo { IconClass = "fas fa-magic", Color = "#F472B6" };
+        if (t == "contribution") return new MenuIconInfo { IconClass = "fas fa-hand-holding-usd", Color = "#10B981" };
+        if (t == "investment") return new MenuIconInfo { IconClass = "fas fa-chart-line", Color = "#06B6D4" };
+        if (t == "journal voucher") return new MenuIconInfo { IconClass = "fas fa-file-alt", Color = "#60A5FA" };
+        if (t == "payment voucher") return new MenuIconInfo { IconClass = "fas fa-receipt", Color = "#F87171" };
+        if (t == "receipt voucher") return new MenuIconInfo { IconClass = "fas fa-file-invoice-dollar", Color = "#34D399" };
+        if (t == "bank deposit" || t == "bank deposits") return new MenuIconInfo { IconClass = "fas fa-arrow-alt-circle-down", Color = "#A3E635" };
+        if (t == "withdraw" || t == "withdraws") return new MenuIconInfo { IconClass = "fas fa-arrow-alt-circle-up", Color = "#FB7185" };
+        if (t == "return on bank interest" || t == "return on bank interests") return new MenuIconInfo { IconClass = "fas fa-percentage", Color = "#FBBF24" };
+        if (t == "bank charge") return new MenuIconInfo { IconClass = "fas fa-credit-card", Color = "#F87171" };
+        if (t == "employee info") return new MenuIconInfo { IconClass = "fas fa-id-card", Color = "#38BDF8" };
+        if (t == "employee resign") return new MenuIconInfo { IconClass = "fas fa-user-slash", Color = "#EF4444" };
+        if (t == "employee transfer") return new MenuIconInfo { IconClass = "fas fa-people-arrows", Color = "#C084FC" };
+        if (t == "opening") return new MenuIconInfo { IconClass = "fas fa-door-open", Color = "#2DD4BF" };
+        if (t == "payment") return new MenuIconInfo { IconClass = "fas fa-wallet", Color = "#10B981" };
+        if (t == "break month") return new MenuIconInfo { IconClass = "fas fa-calendar-minus", Color = "#FBBF24" };
+        if (t == "forfeiture") return new MenuIconInfo { IconClass = "fas fa-ban", Color = "#EF4444" };
+        if (t == "profit distribution") return new MenuIconInfo { IconClass = "fas fa-chart-pie", Color = "#F59E0B" };
+        if (t == "settlement") return new MenuIconInfo { IconClass = "fas fa-check-double", Color = "#10B981" };
+        if (t == "year closing") return new MenuIconInfo { IconClass = "fas fa-calendar-check", Color = "#818CF8" };
+        if (t == "loan") return new MenuIconInfo { IconClass = "fas fa-hand-holding-usd", Color = "#FACC15" };
+        if (t == "loan collection") return new MenuIconInfo { IconClass = "fas fa-inbox", Color = "#06B6D4" };
+        if (t == "ledger") return new MenuIconInfo { IconClass = "fas fa-book-open", Color = "#38BDF8" };
+        if (t == "trial balance") return new MenuIconInfo { IconClass = "fas fa-balance-scale", Color = "#FBBF24" };
+        if (t == "income statement (p / l)" || t == "income statement (p/l)" || t == "income statement") return new MenuIconInfo { IconClass = "fas fa-file-invoice-dollar", Color = "#34D399" };
+        if (t == "balance sheet") return new MenuIconInfo { IconClass = "fas fa-file-contract", Color = "#818CF8" };
+        if (t == "net change") return new MenuIconInfo { IconClass = "fas fa-random", Color = "#22D3EE" };
+        if (t == "all employee") return new MenuIconInfo { IconClass = "fas fa-users", Color = "#38BDF8" };
+        if (t == "employee statement") return new MenuIconInfo { IconClass = "fas fa-file-alt", Color = "#A78BFA" };
+        if (t == "employee ledger") return new MenuIconInfo { IconClass = "fas fa-address-book", Color = "#60A5FA" };
+        if (t == "loan statement") return new MenuIconInfo { IconClass = "fas fa-file-invoice", Color = "#FBBF24" };
+        if (t == "schedule of loan member") return new MenuIconInfo { IconClass = "fas fa-table", Color = "#2DD4BF" };
+        if (t == "loan early settelment" || t == "loan early settlement") return new MenuIconInfo { IconClass = "fas fa-history", Color = "#34D399" };
+        if (t == "loan monthly payment") return new MenuIconInfo { IconClass = "fas fa-calendar-alt", Color = "#FB923C" };
+        if (t == "loan repayment to bank") return new MenuIconInfo { IconClass = "fas fa-university", Color = "#FACC15" };
+        if (t == "loan sattlement" || t == "loan settlement") return new MenuIconInfo { IconClass = "fas fa-check-circle", Color = "#10B981" };
+        if (t == "loan closed") return new MenuIconInfo { IconClass = "fas fa-lock", Color = "#F87171" };
+        if (t == "final settlement") return new MenuIconInfo { IconClass = "fas fa-flag-checkered", Color = "#E879F9" };
+
+        int hash = Math.Abs(t.GetHashCode());
+        string autoColor = Palette[hash % Palette.Length];
+        return new MenuIconInfo { IconClass = "fas fa-circle-notch", Color = autoColor };
+    }
+
     public static string GetMenuIcon(string title)
     {
-        if (string.IsNullOrWhiteSpace(title)) return "fas fa-circle";
-        
-        string t = title.Trim().ToLowerInvariant();
-        
-        // Modules/Areas
-        if (t == "admin") return "fas fa-cogs";
-        if (t == "pf") return "fas fa-briefcase";
-        if (t == "gl") return "fas fa-book";
-        if (t == "wppf") return "fas fa-users";
-        
-        // Groups
-        if (t == "setup") return "fas fa-wrench";
-        if (t == "transaction") return "fas fa-exchange-alt";
-        if (t == "reports") return "fas fa-chart-bar";
-        
-        // Subgroups
-        if (t == "master data") return "fas fa-database";
-        if (t == "user") return "fas fa-users";
-        if (t == "bank") return "fas fa-university";
-        if (t == "coa") return "fas fa-sitemap";
-        if (t == "voucher entry" || t == "voucher") return "fas fa-file-alt";
-        if (t == "employee") return "fas fa-user";
-        if (t == "financial reports") return "fas fa-chart-bar";
-        if (t == "loan") return "fas fa-money-bill";
-        
-        // Leaves / Specific Titles
-        if (t == "home") return "fas fa-home";
-        if (t == "user") return "fas fa-user";
-        if (t == "designation group") return "fas fa-folder-open";
-        if (t == "branch") return "fas fa-building";
-        if (t == "section") return "fas fa-list";
-        if (t == "department") return "fas fa-sitemap";
-        if (t == "designation") return "fas fa-briefcase";
-        if (t == "project") return "fas fa-tasks";
-        if (t == "company") return "fas fa-building";
-        if (t == "fiscal year") return "fas fa-calendar-alt";
-        if (t == "settings") return "fas fa-sliders-h";
-        if (t == "db update") return "fas fa-database";
-        if (t == "sym user roll" || t == "sym user role") return "fas fa-key";
-        if (t == "user group") return "fas fa-users";
-        if (t == "investment register") return "fas fa-list-alt";
-        if (t == "bank name") return "fas fa-university";
-        if (t == "bank branch") return "fas fa-map-marker-alt";
-        if (t == "coa group") return "fas fa-folder-open";
-        if (t == "coa sub group") return "fas fa-folder-open";
-        if (t == "coa category") return "fas fa-tags";
-        if (t == "investment type") return "fas fa-tag";
-        if (t == "transaction media") return "fas fa-credit-card";
-        if (t == "settlement policy") return "fas fa-gavel";
-        if (t == "auto journal setup") return "fas fa-magic";
-        if (t == "contribution") return "fas fa-gift";
-        if (t == "investment") return "fas fa-chart-bar";
-        if (t == "journal voucher") return "fas fa-file-alt";
-        if (t == "payment voucher") return "fas fa-minus-square";
-        if (t == "receipt voucher") return "fas fa-plus-square";
-        if (t == "bank deposit" || t == "bank deposits") return "fas fa-download";
-        if (t == "withdraw" || t == "withdraws") return "fas fa-upload";
-        if (t == "return on bank interest" || t == "return on bank interests") return "fas fa-money-bill";
-        if (t == "bank charge") return "fas fa-minus-circle";
-        if (t == "employee info") return "fas fa-user";
-        if (t == "employee resign") return "fas fa-times-circle";
-        if (t == "employee transfer") return "fas fa-exchange-alt";
-        if (t == "opening") return "fas fa-play";
-        if (t == "payment") return "fas fa-money-bill";
-        if (t == "break month") return "fas fa-pause";
-        if (t == "forfeiture") return "fas fa-ban";
-        if (t == "profit distribution") return "fas fa-chart-bar";
-        if (t == "settlement") return "fas fa-check-circle";
-        if (t == "year closing") return "fas fa-calendar-alt";
-        if (t == "loan collection") return "fas fa-inbox";
-        if (t == "ledger") return "fas fa-book";
-        if (t == "trial balance") return "fas fa-gavel";
-        if (t == "income statement (p / l)" || t == "income statement (p/l)") return "fas fa-chart-bar";
-        if (t == "balance sheet") return "fas fa-chart-bar";
-        if (t == "net change") return "fas fa-sync-alt";
-        if (t == "all employee") return "fas fa-users";
-        if (t == "employee statement") return "fas fa-file-alt";
-        if (t == "employee ledger") return "fas fa-book";
-        if (t == "loan statement") return "fas fa-file-pdf";
-        if (t == "schedule of loan member") return "fas fa-table";
-        if (t == "loan early settelment") return "fas fa-clock";
-        if (t == "loan monthly payment") return "fas fa-calendar-alt";
-        if (t == "loan repayment to bank") return "fas fa-university";
-        if (t == "loan sattlement") return "fas fa-check";
-        if (t == "loan closed") return "fas fa-lock";
-        if (t == "final settlement") return "fas fa-flag";
-        
-        return "fas fa-circle";
+        return GetMenuIconInfo(title).IconClass;
     }
 
     public static bool ShouldOpenAsDialogReport(string url, string parentKey)
@@ -105,6 +136,8 @@
 }
 @{
     var service = new DynamicMenuService();
+    string currentController = Convert.ToString(ViewContext.RouteData.Values["controller"]);
+    bool isHomePage = string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase);
     string currentAreaToken = Convert.ToString(ViewContext.RouteData.DataTokens["area"]);
     string currentArea = string.IsNullOrWhiteSpace(currentAreaToken) ? "Admin" : currentAreaToken.Trim();
     if (string.Equals(currentArea, "Common", StringComparison.OrdinalIgnoreCase))
@@ -124,9 +157,10 @@
     {
         linkClass += " linkReport";
     }
+    var iconInfo = GetMenuIconInfo(item.Title);
     <li class="nav-item">
         <a class="@linkClass" href="@item.Url" data-menu-id="@parentKey-@item.Title">
-            <i class="nav-icon @GetMenuIcon(item.Title)"></i>
+            <i class="nav-icon @iconInfo.IconClass" style="color: @iconInfo.Color !important;"></i>
             <p>@item.Title</p>
         </a>
     </li>
@@ -134,6 +168,7 @@
 
 @helper RenderNode(DynamicMenuNode node, string parentKey)
 {
+    var iconInfo = GetMenuIconInfo(node.Title);
     if (!node.IsDropdown)
     {
         var activeClass = node.IsCurrent ? " active-menu" : "";
@@ -144,7 +179,7 @@
         }
         <li class="nav-item">
             <a class="@linkClass" href="@node.Url" data-menu-id="@parentKey-@node.CssClass">
-                <i class="nav-icon @GetMenuIcon(node.Title)"></i>
+                <i class="nav-icon @iconInfo.IconClass" style="color: @iconInfo.Color !important;"></i>
                 <p>@node.Title</p>
             </a>
         </li>
@@ -157,7 +192,7 @@
             + (node.SubGroups == null ? 0 : node.SubGroups.Count);
         <li class="nav-item">
             <a class="@aClass" href="#" data-menu-id="@parentKey-@node.CssClass">
-                <i class="nav-icon @GetMenuIcon(node.Title)"></i>
+                <i class="nav-icon @iconInfo.IconClass" style="color: @iconInfo.Color !important;"></i>
                 <p>
                     @node.Title
                     @if (childCount > 0)
@@ -182,9 +217,10 @@
                         var subGroupActive = subGroup.Items != null && subGroup.Items.Any(i => i.IsCurrent);
                         var subGroupClass = "nav-link has-treeview-a" + (subGroupActive ? " treeview-expanded last-parent-active" : "");
                         var subGroupCount = subGroup.Items == null ? 0 : subGroup.Items.Count;
+                        var subGroupIconInfo = GetMenuIconInfo(subGroup.Title);
                         <li class="nav-item">
                             <a class="@subGroupClass" href="#" data-menu-id="@parentKey-@node.CssClass-@subGroup.Title">
-                                <i class="nav-icon @GetMenuIcon(subGroup.Title)"></i>
+                                <i class="nav-icon @subGroupIconInfo.IconClass" style="color: @subGroupIconInfo.Color !important;"></i>
                                 <p>
                                     @subGroup.Title
                                     @if (subGroupCount > 0)
@@ -262,7 +298,7 @@
         transition: transform .2s ease;
     }
     .sidebar {
-        height: calc(100vh - 80px) !important;
+        height: calc(100vh - 120px) !important;
         width: 247px !important;
         overflow-x: hidden !important;
         overflow-y: auto !important;
@@ -440,6 +476,21 @@
             transition: none !important;
         }
     }
+
+    .nav-sidebar .nav-link .nav-icon {
+        font-size: 15px;
+        width: 22px;
+        text-align: center;
+        margin-right: 6px;
+        display: inline-block;
+        vertical-align: middle;
+        transition: transform .2s ease, filter .2s ease;
+    }
+
+    .nav-sidebar .nav-link:hover .nav-icon {
+        transform: scale(1.18);
+        filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
+    }
 </style>
 
 <section>
@@ -448,9 +499,12 @@
     </a>
     <nav class="sidebar">
         <ul class="nav nav-pills nav-sidebar flex-column" role="menu" data-accordion="false">
+            @{
+                var homeIcon = GetMenuIconInfo("home");
+            }
             <li class="nav-item">
-                <a href="@currentModel.HomeUrl" class="nav-link homeColor">
-                    <i class="nav-icon fas fa-home"></i>
+                <a href="@currentModel.HomeUrl" class="nav-link homeColor@(isHomePage ? " active-menu" : "")" data-menu-id="home-menu">
+                    <i class="nav-icon @homeIcon.IconClass" style="color: @homeIcon.Color !important;"></i>
                     <p>Home</p>
                 </a>
             </li>
@@ -458,12 +512,14 @@
             @foreach (var module in currentModel.Modules.Where(m => m != null && m.IsVisible))
             {
                 DynamicNavbarViewModel moduleModel = service.BuildNavbarViewModel(module.Title);
-                var moduleActive = module.IsCurrent || (moduleModel.Nodes != null && moduleModel.Nodes.Any(n => n.IsCurrent));
+                var hasActiveChild = moduleModel.Nodes != null && moduleModel.Nodes.Any(n => n.IsCurrent);
+                var moduleActive = !isHomePage && (module.IsCurrent || hasActiveChild);
                 var moduleClass = "nav-link has-treeview" + (moduleActive ? " treeview-expanded" : "");
                 var submenuCount = moduleModel.Nodes == null ? 0 : moduleModel.Nodes.Count;
+                var moduleIcon = GetMenuIconInfo(module.Title);
                 <li class="nav-item">
                     <a class="@moduleClass" href="#" data-menu-id="module-@module.Title">
-                        <i class="nav-icon @GetMenuIcon(module.Title)"></i>
+                        <i class="nav-icon @moduleIcon.IconClass" style="color: @moduleIcon.Color !important;"></i>
                         <p>
                             @module.Title
                             @if (submenuCount > 0)

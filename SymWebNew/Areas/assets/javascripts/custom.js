@@ -1,4 +1,18 @@
-﻿$(function () {
+$(function () {
+    if ($.datepicker && $.datepicker._checkOffset) {
+        var origCheckOffset = $.datepicker._checkOffset;
+        $.datepicker._checkOffset = function (inst, offset, isFixed) {
+            offset = origCheckOffset.call(this, inst, offset, isFixed);
+            var dpWidth = inst.dpDiv ? inst.dpDiv.outerWidth() : 280;
+            var inputWidth = inst.input ? inst.input.outerWidth() : 0;
+            var windowWidth = $(window).width();
+            if (offset && offset.left + dpWidth > windowWidth - 15) {
+                offset.left = Math.max(15, (offset.left + inputWidth) - dpWidth);
+            }
+            return offset;
+        };
+    }
+
     //valiDation();
     //InitDatePickers();
     //FormatDate();

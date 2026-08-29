@@ -707,6 +707,16 @@
             var expandedSubMenu = localStorage.getItem("expandedSubMenu");
             var activeMenu = localStorage.getItem("activeMenu");
 
+            var isHomeActive = $(".homeColor").hasClass("active-menu");
+            if (isHomeActive) {
+                localStorage.removeItem("activeMenu");
+                localStorage.removeItem("expandedMenu");
+                localStorage.removeItem("expandedSubMenu");
+                activeMenu = null;
+                expandedMenu = null;
+                expandedSubMenu = null;
+            }
+
             function setMenuArrow($el, isOpen) {
                 if (!$el || !$el.length) return;
                 var $arrow = $el.find("> p > i.right, > i.right, i.fa-angle-left, i.fa-angle-down").first();
@@ -881,6 +891,8 @@
                         $(".has-treeview, .has-treeview-a").removeClass("last-parent-active");
                         $this.addClass("active-menu");
                         localStorage.removeItem("activeMenu");
+                        localStorage.removeItem("expandedMenu");
+                        localStorage.removeItem("expandedSubMenu");
                         return;
                     }
 

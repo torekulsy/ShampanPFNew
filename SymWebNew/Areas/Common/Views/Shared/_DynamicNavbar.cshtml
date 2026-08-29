@@ -2,6 +2,9 @@
 @using System.Linq
 @model SymServices.Common.DynamicNavbarViewModel
 @{
+    string currentController = Convert.ToString(ViewContext.RouteData.Values["controller"]);
+    bool isHomePage = string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase);
+
     Func<string, string, bool> shouldOpenAsDialogReport = (url, groupTitle) =>
     {
         return !string.IsNullOrWhiteSpace(url)
@@ -39,7 +42,7 @@
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="Transfer"><a href="@Model.HomeUrl">Home</a></li>
+                <li class="Transfer @(isHomePage ? "active" : string.Empty)"><a href="@Model.HomeUrl">Home</a></li>
                 @if (Model.Modules != null && Model.Modules.Any())
                 {
                     <li class="Home dropdown">
