@@ -131,7 +131,10 @@
         return !string.IsNullOrWhiteSpace(url)
             && !string.IsNullOrWhiteSpace(parentKey)
             && parentKey.IndexOf("reports", StringComparison.OrdinalIgnoreCase) >= 0
-            && url.IndexOf("ReportVeiw", StringComparison.OrdinalIgnoreCase) >= 0;
+            && (
+                url.IndexOf("ReportVeiw", StringComparison.OrdinalIgnoreCase) >= 0
+                || url.IndexOf("LedgerVeiw", StringComparison.OrdinalIgnoreCase) >= 0
+            );
     }
 }
 @{
