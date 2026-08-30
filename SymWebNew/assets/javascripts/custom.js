@@ -1,4 +1,18 @@
-﻿$(function () {
+$(function () {
+    if ($.datepicker && $.datepicker._checkOffset) {
+        var origCheckOffset = $.datepicker._checkOffset;
+        $.datepicker._checkOffset = function (inst, offset, isFixed) {
+            offset = origCheckOffset.call(this, inst, offset, isFixed);
+            var dpWidth = inst.dpDiv ? inst.dpDiv.outerWidth() : 280;
+            var inputWidth = inst.input ? inst.input.outerWidth() : 0;
+            var windowWidth = $(window).width();
+            if (offset && offset.left + dpWidth > windowWidth - 15) {
+                offset.left = Math.max(15, (offset.left + inputWidth) - dpWidth);
+            }
+            return offset;
+        };
+    }
+
     //valiDation();
     //InitDatePickers();
     //FormatDate();
@@ -44,7 +58,15 @@ $(document).on("mousedown", function (e) {
         !$(e.target).closest(".select2-container").length &&
         !$(e.target).closest(".selectDropdown").length
     ) {
-        $(".selectDropdown").select2("close");
+        if (typeof $.fn.select2 === "function") {
+            try {
+                $(".selectDropdown").each(function () {
+                    if ($(this).data("select2")) {
+                        $(this).select2("close");
+                    }
+                });
+            } catch (err) { }
+        }
     }
 });
 $(function () {
@@ -2099,6 +2121,41 @@ $(document).ready(function () {
     $('form').on('click', 'input[value="0"], textarea.NumberCheck', function () {
         $(this).select();
     });
+
+    // =========================================================================
+    // Modal Overlay Interaction: Zoom In/Out Bounce effect on background click
+    // =========================================================================
+    $(document).on("dialogopen", function () {
+        $(".ui-dialog").removeClass("modal-pulse-animate");
+    });
+
+    $(document).on("click", ".ui-widget-overlay", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $dialog = $(".ui-dialog:visible");
+        if ($dialog.length) {
+            $dialog.removeClass("modal-pulse-animate");
+            // Force DOM reflow to allow re-triggering animation on multiple clicks
+            void $dialog[0].offsetWidth;
+            $dialog.addClass("modal-pulse-animate");
+        }
+    });
+
+    $(document).on("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", ".ui-dialog, .modal-dialog", function () {
+        $(this).removeClass("modal-pulse-animate");
+    });
+
+    $(document).on("click", ".modal.fade.in, .modal-backdrop", function (e) {
+        if ($(e.target).hasClass("modal") || $(e.target).hasClass("modal-backdrop")) {
+            var $modalDialog = $(this).find(".modal-dialog");
+            if ($modalDialog.length) {
+                $modalDialog.removeClass("modal-pulse-animate");
+                void $modalDialog[0].offsetWidth;
+                $modalDialog.addClass("modal-pulse-animate");
+            }
+        }
+    });
 });
+
 
 

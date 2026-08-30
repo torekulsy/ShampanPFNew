@@ -17,8 +17,8 @@
     <div class="custom-top">
         <div id="mainBtnAll">
             @*<button type="button" title="Profit Distribution Process" data-url="/@ViewBag.TransType/ProfitDistributionNew/Process" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;Distribution Process</button>*@
-<button type="button" data-url="/@ViewBag.TransType/ProfitDistributionNew/DownloadExcel" onclick="GoTo(this)" id="" title="Click to Download the Report" class="sym-btn-Excel-Export">&nbsp;Download</button>
-<button type="button" data-url="/@ViewBag.TransType/ProfitDistributionNew/ReportView" onclick="GoTo(this)" id="" title="Click for the Report" class=" sym-btn-report ">&nbsp;Report</button>
+<button type="button" data-url="/@ViewBag.TransType/ProfitDistributionNew/DownloadExcel?PreDistributionFundId=@ViewBag.PreDistributionFundId" onclick="GoTo(this)" id="" title="Click to Download the Report" class="sym-btn-Excel-Export">&nbsp;Download</button>
+<button type="button" data-url="/@ViewBag.TransType/ProfitDistributionNew/ReportView?PreDistributionFundId=@ViewBag.PreDistributionFundId" onclick="GoTo(this)" id="" title="Click for the Report" class=" sym-btn-report ">&nbsp;Report</button>
         </div>
         <div class="table-search">
             <div class="mobile-search-toggle">
@@ -66,8 +66,8 @@
 <div class="card mt-3">
     <div class="card-header p-3">
         <div class="">
-            <button type="button" data-url="/@ViewBag.TransType/ProfitDistributionNew/DownloadExcel" onclick="GoTo(this)" id="" title="Click to Download the Report" class="sym-btn-Excel-Export">&nbsp;Download</button>
-            <button type="button" data-url="/@ViewBag.TransType/ProfitDistributionNew/ReportView" onclick="GoTo(this)" id="" title="Click for the Report" class=" sym-btn-report ">&nbsp;Report</button>
+            <button type="button" data-url="/@ViewBag.TransType/ProfitDistributionNew/DownloadExcel?PreDistributionFundId=@ViewBag.PreDistributionFundId" onclick="GoTo(this)" id="" title="Click to Download the Report" class="sym-btn-Excel-Export">&nbsp;Download</button>
+            <button type="button" data-url="/@ViewBag.TransType/ProfitDistributionNew/ReportView?PreDistributionFundId=@ViewBag.PreDistributionFundId" onclick="GoTo(this)" id="" title="Click for the Report" class=" sym-btn-report ">&nbsp;Report</button>
         </div>
     </div>
 </div>

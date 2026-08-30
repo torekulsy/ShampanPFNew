@@ -2448,7 +2448,12 @@ namespace SymWebUI.Areas.PF.Controllers
                     rptLocation = AppDomain.CurrentDomain.BaseDirectory + @"Files\ReportFiles\PF\\rptIndividualEmployeeImageInfo.rpt";
                 }
 
-                string photoFileName = dt.Rows[0]["Code"] + ".jpg";
+                string photoFileName = Path.GetFileName(dt.Rows[0]["PhotoName"].ToString());
+                if (string.IsNullOrWhiteSpace(photoFileName))
+                {
+                    photoFileName = dt.Rows[0]["Code"] + ".jpg";
+                }
+
                 string imagePath = Server.MapPath("~/Files/EmployeeInfo/" + photoFileName);
 
                 CompanyRepo _CompanyRepo = new CompanyRepo();
@@ -2470,7 +2475,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 }
                 else if (dt.Rows[0]["Code"] != null && !string.IsNullOrEmpty(dt.Rows[0]["Code"].ToString()))
                 {
-                    string altImagePath = Server.MapPath("~/Files/EmployeeInfo/" + dt.Rows[0]["Code"]+".jpg");
+                    string altImagePath = Server.MapPath("~/Files/EmployeeInfo/" + dt.Rows[0]["Code"] + ".jpg");
                     if (System.IO.File.Exists(altImagePath))
                     {
                         empImagePath = altImagePath;

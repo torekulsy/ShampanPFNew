@@ -1,6 +1,4 @@
 ﻿using SymServices.PF;
-using SymServices.Common;
-
 using SymViewModel.Attendance;
 using SymViewModel.Common;
 using SymViewModel.PF;
@@ -15,6 +13,11 @@ namespace SymRepository.PF
 {
     public class PreDistributionFundRepo
     {
+        public string GenerateCode(string transType, string transactionDate)
+        {
+            return new PreDistributionFundDAL().GenerateCode(transType, transactionDate);
+        }
+
         
         public List<PreDistributionFundVM> SelectAll(int Id = 0, string[] conditionFields = null, string[] conditionValues = null)
         {

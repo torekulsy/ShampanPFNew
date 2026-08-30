@@ -531,7 +531,7 @@ VALUES (
                     //cmdInsert.Parameters.AddWithValue("@COATypeOfReportId", vm.COATypeOfReportId);
                     //cmdInsert.Parameters.AddWithValue("@COAGroupTypeId", vm.COAGroupTypeId);
                     cmdInsert.Parameters.AddWithValue("@Name", vm.Name);
-                    cmdInsert.Parameters.AddWithValue("@GroupSL", vm.GroupSL);
+                    cmdInsert.Parameters.AddWithValue("@GroupSL", vm.GroupSL.HasValue ? (object)vm.GroupSL.Value : DBNull.Value);
                     cmdInsert.Parameters.AddWithValue("@Remarks", vm.Remarks ?? Convert.DBNull);//, bankVM.Remarks);
                     cmdInsert.Parameters.AddWithValue("@IsActive", true);
                     cmdInsert.Parameters.AddWithValue("@IsArchive", false);
@@ -682,7 +682,7 @@ VALUES (
                     cmdUpdate.Parameters.AddWithValue("@Name", vm.Name);
                     cmdUpdate.Parameters.AddWithValue("@Remarks", vm.Remarks ?? Convert.DBNull);//, bankVM.Remarks);
                     cmdUpdate.Parameters.AddWithValue("@IsActive", vm.IsActive);
-                    cmdUpdate.Parameters.AddWithValue("@GroupSL", vm.GroupSL);
+                    cmdUpdate.Parameters.AddWithValue("@GroupSL", vm.GroupSL.HasValue ? (object)vm.GroupSL.Value : DBNull.Value);
                     cmdUpdate.Parameters.AddWithValue("@LastUpdateBy", vm.LastUpdateBy);
                     cmdUpdate.Parameters.AddWithValue("@LastUpdateAt", vm.LastUpdateAt);
                     cmdUpdate.Parameters.AddWithValue("@TransType", vm.TransType ?? "PF");

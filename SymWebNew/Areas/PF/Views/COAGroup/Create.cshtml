@@ -70,7 +70,7 @@
                         @Html.LabelFor(model => model.Name)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Name, new { @placeholder = "Name", @class = "  form-control" })
+                        @Html.TextBoxFor(model => model.Name, new { @placeholder = "Name", @class = " required form-control" })
                         @Html.ValidationMessageFor(model => model.Name)
                     </div>
                 </div>
@@ -79,7 +79,7 @@
                         @Html.LabelFor(model => model.GroupSL)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.GroupSL, new { @placeholder = "Serial", @class = "  form-control" })
+                        @Html.TextBoxFor(model => model.GroupSL, new { @placeholder = "Serial", @class = " required form-control" })
                         @Html.ValidationMessageFor(model => model.GroupSL)
                     </div>
                 </div>

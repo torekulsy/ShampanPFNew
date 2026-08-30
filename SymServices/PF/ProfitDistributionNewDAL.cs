@@ -178,7 +178,7 @@ FROM ProfitDistributionNew pd
                     vm.TotalProfit = Convert.ToDecimal(dr["TotalProfit"]);
 
                     vm.PreDistributionFundId = Convert.ToString(dr["PreDistributionFundId"]);
-                    vm.EmployeeId = Convert.ToString(dr["PreDistributionFundId"]);
+                    vm.EmployeeId = Convert.ToString(dr["EmployeeId"]);
                     vm.DistributionDate = Ordinary.StringToDate(dr["DistributionDate"].ToString());
                     vm.FiscalYearDetailId = Convert.ToInt32(dr["FiscalYearDetailId"]);
                     vm.EmployeeContribution = Convert.ToDecimal(dr["EmployeeContribution"]);
@@ -232,6 +232,111 @@ FROM ProfitDistributionNew pd
             }
             #endregion
             return VMs;
+        }
+
+        public string[] Update(ProfitDistributionNewVM vm, SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
+        {
+            string[] retResults = new string[6];
+            retResults[0] = "Fail";
+            retResults[1] = "Data could not be updated.";
+            retResults[2] = vm == null ? "0" : vm.Id.ToString();
+            retResults[3] = "";
+            retResults[4] = "";
+            retResults[5] = "ProfitDistributionNew Update";
+
+            SqlConnection currConn = VcurrConn;
+            SqlTransaction transaction = Vtransaction;
+            string sqlText = @"
+UPDATE ProfitDistributionNew SET
+ EmployeeProfit = @EmployeeProfit
+,EmployerProfit = @EmployerProfit
+,EmployeeProfitDistribution = @EmployeeProfit
+,EmployeerProfitDistribution = @EmployerProfit
+,TotalProfit = @TotalProfit
+,Remarks = @Remarks
+,LastUpdateBy = @LastUpdateBy
+,LastUpdateAt = @LastUpdateAt
+,LastUpdateFrom = @LastUpdateFrom
+WHERE Id = @Id AND IsArchive = 0";
+
+            try
+            {
+                if (vm == null || vm.Id <= 0)
+                {
+                    throw new ArgumentException("Invalid profit distribution record.");
+                }
+
+                if (currConn == null)
+                {
+                    currConn = _dbsqlConnection.GetConnection();
+                    if (currConn.State != ConnectionState.Open)
+                    {
+                        currConn.Open();
+                    }
+                }
+                if (transaction == null)
+                {
+                    transaction = currConn.BeginTransaction("UpdateProfitDistributionNew");
+                }
+
+                using (SqlCommand cmd = new SqlCommand(sqlText, currConn, transaction))
+                {
+                    cmd.Parameters.AddWithValue("@Id", vm.Id);
+
+                    SqlParameter employeeProfit = cmd.Parameters.Add("@EmployeeProfit", SqlDbType.Decimal);
+                    employeeProfit.Precision = 18;
+                    employeeProfit.Scale = 4;
+                    employeeProfit.Value = vm.EmployeeProfit;
+
+                    SqlParameter employerProfit = cmd.Parameters.Add("@EmployerProfit", SqlDbType.Decimal);
+                    employerProfit.Precision = 18;
+                    employerProfit.Scale = 4;
+                    employerProfit.Value = vm.EmployerProfit;
+
+                    SqlParameter totalProfit = cmd.Parameters.Add("@TotalProfit", SqlDbType.Decimal);
+                    totalProfit.Precision = 18;
+                    totalProfit.Scale = 4;
+                    totalProfit.Value = vm.EmployeeProfit + vm.EmployerProfit;
+
+                    cmd.Parameters.AddWithValue("@Remarks", (object)vm.Remarks ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@LastUpdateBy", (object)vm.LastUpdateBy ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@LastUpdateAt", (object)vm.LastUpdateAt ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@LastUpdateFrom", (object)vm.LastUpdateFrom ?? DBNull.Value);
+
+                    if (cmd.ExecuteNonQuery() <= 0)
+                    {
+                        throw new InvalidOperationException("Profit distribution record was not found.");
+                    }
+                }
+
+                if (Vtransaction == null)
+                {
+                    transaction.Commit();
+                }
+
+                retResults[0] = "Success";
+                retResults[1] = "Data Updated Successfully.";
+                retResults[3] = sqlText;
+            }
+            catch (Exception ex)
+            {
+                if (Vtransaction == null && transaction != null)
+                {
+                    transaction.Rollback();
+                }
+                retResults[1] = ex.Message;
+                retResults[3] = sqlText;
+                retResults[4] = ex.Message;
+            }
+            finally
+            {
+                if (VcurrConn == null && currConn != null && currConn.State == ConnectionState.Open)
+                {
+                    currConn.Close();
+                }
+            }
+
+            return retResults;
         }
 
         /// <summary>
@@ -333,7 +438,16 @@ FROM
         EmployeeId,
         FiscalYearDetailId,
         (EmployeePFValue + EmployeerPFValue) AS TotalPF
-        FROM PFDetails where EmployeeId in(Select Id from EmployeeInfo where IsProfit=1)
+        FROM PFDetails
+        WHERE EmployeeId IN
+        (
+            SELECT Id
+            FROM EmployeeInfo
+            WHERE IsProfit = 1
+              AND BranchId = @BranchId
+              AND IsActive = 1
+              AND ISNULL(IsArchive, 0) = 0
+        )
 ) AS SourceTable
 PIVOT
 (
@@ -382,6 +496,14 @@ FROM
         FiscalYearDetailId,
         (EmployeePFValue + EmployeerPFValue) AS TotalPF
     FROM PFDetails
+    WHERE EmployeeId IN
+    (
+        SELECT Id
+        FROM EmployeeInfo
+        WHERE BranchId = @BranchId
+          AND IsActive = 1
+          AND ISNULL(IsArchive, 0) = 0
+    )
 ) AS SourceTable
 PIVOT
 (
@@ -530,6 +652,14 @@ ORDER BY EmployeeId;
                                 EmployeerProfitDistribution AS EmployerProfit
                             FROM ProfitDistributionNew
                         ) EmployeeProfits
+                        WHERE EmployeeId IN
+                        (
+                            SELECT Id
+                            FROM EmployeeInfo
+                            WHERE BranchId = @BranchId
+                              AND IsActive = 1
+                              AND ISNULL(IsArchive, 0) = 0
+                        )
                         GROUP BY EmployeeId
                     )
 
@@ -618,6 +748,14 @@ ORDER BY EmployeeId;
                                 EmployeerProfitDistribution AS EmployerProfit
                             FROM ProfitDistributionNew
                         ) EmployeeProfits
+                        WHERE EmployeeId IN
+                        (
+                            SELECT Id
+                            FROM EmployeeInfo
+                            WHERE BranchId = @BranchId
+                              AND IsActive = 1
+                              AND ISNULL(IsArchive, 0) = 0
+                        )
                         GROUP BY EmployeeId
                     )
 

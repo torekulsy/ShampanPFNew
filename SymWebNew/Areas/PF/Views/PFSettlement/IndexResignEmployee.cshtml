@@ -28,7 +28,7 @@
                 @Html.LabelFor(model => model.SettlementDate)
             </div>
             <div class="editor-field">
-                @Html.TextBoxFor(model => model.SettlementDate, new { @placeholder = "Settlement Date", @class = " cSettlementDate required customDatePicker form-control" })
+                @Html.TextBoxFor(model => model.SettlementDate, new { @placeholder = "Settlement Date", @class = " cSettlementDate required customDatePicker form-control noFutureDate" })
             </div>
         </div>
     </div>

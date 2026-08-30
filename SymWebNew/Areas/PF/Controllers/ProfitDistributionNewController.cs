@@ -44,6 +44,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 return Redirect("/PF/Home");
             }
             Session["PreDistributionFundId"] = PreDistributionFundId;
+            ViewBag.PreDistributionFundId = PreDistributionFundId;
             return View();
         }
 
@@ -132,6 +133,53 @@ namespace SymWebUI.Areas.PF.Controllers
                 JsonRequestBehavior.AllowGet);
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public ActionResult Edit(int id)
+        {
+            string permission = _repoSUR.SymRoleSession(identity.UserId, "10003", "edit").ToString();
+            Session["permission"] = permission;
+            if (permission == "False")
+            {
+                return Redirect("/PF/Home");
+            }
+
+            string[] conditionFields = { "pd.Id" };
+            string[] conditionValues = { id.ToString() };
+            ProfitDistributionNewVM vm = _repo.SelectAll(0, conditionFields, conditionValues).FirstOrDefault();
+            if (vm == null)
+            {
+                return HttpNotFound();
+            }
+
+            vm.Operation = "update";
+            return View(vm);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public ActionResult Update(ProfitDistributionNewVM vm)
+        {
+            string[] conditionFields = { "pd.Id" };
+            string[] conditionValues = { vm.Id.ToString() };
+            ProfitDistributionNewVM existing = _repo.SelectAll(0, conditionFields, conditionValues).FirstOrDefault();
+            if (existing == null)
+            {
+                return HttpNotFound();
+            }
+
+            existing.EmployeeProfit = vm.EmployeeProfit;
+            existing.EmployerProfit = vm.EmployerProfit;
+            existing.Remarks = vm.Remarks;
+            existing.LastUpdateAt = DateTime.Now.ToString("yyyyMMddHHmmss");
+            existing.LastUpdateBy = identity.Name;
+            existing.LastUpdateFrom = identity.WorkStationIP;
+
+            string[] result = _repo.Update(existing);
+            Session["result"] = result[0] + "~" + result[1];
+            return RedirectToAction("Edit", new { id = existing.Id });
+        }
+
 
 
 
@@ -171,7 +219,7 @@ namespace SymWebUI.Areas.PF.Controllers
 
         }
 
-        public ActionResult DownloadExcel()
+        public ActionResult DownloadExcel(int PreDistributionFundId = 0)
         {
 
             string[] result = new string[6];
@@ -186,7 +234,14 @@ namespace SymWebUI.Areas.PF.Controllers
                     return Redirect("/Common/Home");
                 }
 
-                dt = new PFReportRepo().ProfitDistributionSummery();
+                PreDistributionFundId = ResolvePreDistributionFundId(PreDistributionFundId);
+                if (PreDistributionFundId <= 0)
+                {
+                    Session["result"] = "Fail~Profit Distribution Id was not found.";
+                    return RedirectToAction("Index");
+                }
+
+                dt = new PFReportRepo().ProfitDistributionSummery(PreDistributionFundId);
                 ExcelPackage excel = new ExcelPackage();
                 string FileName = "ProfitDistributionSummery";
                 var workSheet = excel.Workbook.Worksheets.Add("Profit Distribution Report");
@@ -302,7 +357,7 @@ namespace SymWebUI.Areas.PF.Controllers
             return File(stream, "application/PDF");
         }
 
-        public ActionResult ReportView()
+        public ActionResult ReportView(int PreDistributionFundId = 0)
         {
 
 
@@ -319,7 +374,13 @@ namespace SymWebUI.Areas.PF.Controllers
                 ReportDocument doc = new ReportDocument();
                 DataTable dt = new DataTable();
 
-                var Result = rep.ProfitDistributionSummery();
+                PreDistributionFundId = ResolvePreDistributionFundId(PreDistributionFundId);
+                if (PreDistributionFundId <= 0)
+                {
+                    return HttpNotFound("Profit Distribution Id was not found.");
+                }
+
+                var Result = rep.ProfitDistributionSummery(PreDistributionFundId);
 
                 dt = JsonConvert.DeserializeObject<DataTable>(JsonConvert.SerializeObject(Result));
 
@@ -354,6 +415,17 @@ namespace SymWebUI.Areas.PF.Controllers
             {
                 throw;
             }
+        }
+
+        private int ResolvePreDistributionFundId(int PreDistributionFundId)
+        {
+            if (PreDistributionFundId > 0)
+            {
+                return PreDistributionFundId;
+            }
+
+            int sessionId;
+            return int.TryParse(Convert.ToString(Session["PreDistributionFundId"]), out sessionId) ? sessionId : 0;
         }
 
     }

@@ -1,4 +1,4 @@
-﻿@model SymViewModel.PF.PFReportVM
+@model SymViewModel.PF.PFReportVM
 @using UIHelper.MVC
 @{
 
@@ -6,19 +6,7 @@
     ViewBag.Location = "Create";
 }
 
-<style>
-    div.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable {
-        display: block;
-        z-index: 1002;
-        outline: 0px;
-        height: auto;
-        max-width: 515px !important;
-        top: 296px;
-        left: 665px;
-        min-width: 400px;
-        /* width: 450px!important; */
-    }
-</style>
+
 
 @using (Html.BeginForm("EmployeeLedger", "PFReport", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmStatement" }))
 {

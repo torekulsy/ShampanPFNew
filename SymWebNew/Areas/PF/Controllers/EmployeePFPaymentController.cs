@@ -449,8 +449,6 @@ namespace SymWebUI.Areas.PF.Controllers
         public ActionResult DownloadExcel_Employee(string ProjectId, string DepartmentId, string SectionId , string DesignationId, string CodeF, string CodeT
             , string Orderby = null)
         {
-            DataTable dt = new DataTable();
-            string[] result = new string[6];
             try
             {
                 EmployeePFPaymentVM vm = new EmployeePFPaymentVM();
@@ -461,14 +459,6 @@ namespace SymWebUI.Areas.PF.Controllers
                 {
                     return Redirect("/PF/Home");
                 }
-                string FileName = "Download.xls";
-                string fullPath = AppDomain.CurrentDomain.BaseDirectory + "Files\\Export\\";
-                string contentType = MimeMapping.GetMimeMapping(fullPath);
-                //string fullPath = @"C:\";
-                if (System.IO.File.Exists(fullPath + FileName))
-                {
-                    System.IO.File.Delete(fullPath + FileName);
-                }
 
                 vm.DesignationId = DesignationId;
                 vm.DepartmentId = DepartmentId;
@@ -477,32 +467,29 @@ namespace SymWebUI.Areas.PF.Controllers
                 vm.Orderby = Orderby;
                 vm.Code = CodeF;
                 vm.CodeT = CodeT;
+                vm.BranchId = Session["BranchId"].ToString();
 
-                dt = _eaRepo.ExportExcelFileFormEmployee(vm, fullPath, FileName);
-                //exp(dt);
-                ExcelPackage excel = new ExcelPackage();
-                var workSheet = excel.Workbook.Worksheets.Add("Sheet1");
-                workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
-
-                string filename = "EmployeePFPayment" + "-" + DateTime.Now.ToString("yyyyMMdd");
-                using (var memoryStream = new MemoryStream())
+                DataTable dt = _eaRepo.ExportExcelFileFormEmployee(vm, null, null);
+                using (ExcelPackage excel = new ExcelPackage())
                 {
-                    Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                    Response.AddHeader("content-disposition", "attachment;  filename=" + filename + ".xlsx");
-                    excel.SaveAs(memoryStream);
-                    memoryStream.WriteTo(Response.OutputStream);
-                    Response.Flush();
-                    Response.End();
+                    var workSheet = excel.Workbook.Worksheets.Add("Employee Payment");
+                    workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
+                    if (workSheet.Dimension != null)
+                    {
+                        workSheet.Cells[workSheet.Dimension.Address].AutoFitColumns();
+                    }
+
+                    string fileName = "EmployeePFPayment-" + DateTime.Now.ToString("yyyyMMdd") + ".xlsx";
+                    return File(
+                        excel.GetAsByteArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        fileName);
                 }
-                result[0] = "Successfull";
-                result[1] = "Successful~Data Download";
-                Session["result"] = result[0] + "~" + result[1];
-                return RedirectToAction("ImportEmployeePFPayment");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Session["result"] = result[0] + "~" + result[1];
-                FileLogger.Log(result[0].ToString() + Environment.NewLine + result[2].ToString() + Environment.NewLine + result[5].ToString(), this.GetType().Name, result[4].ToString() + Environment.NewLine + result[3].ToString());
+                Session["result"] = "Fail~" + ex.Message;
+                FileLogger.Log("Fail" + Environment.NewLine + "Employee PF Payment export", this.GetType().Name, ex.ToString());
                 return RedirectToAction("ImportEmployeePFPayment");
             }
         }
@@ -511,8 +498,6 @@ namespace SymWebUI.Areas.PF.Controllers
         public ActionResult DownloadExcel_Opening(string ProjectId, string DepartmentId, string SectionId, string DesignationId, string CodeF, string CodeT
           , string Orderby = null)
         {
-            DataTable dt = new DataTable();
-            string[] result = new string[6];
             try
             {
                 EmployeePFPaymentVM vm = new EmployeePFPaymentVM();
@@ -523,14 +508,6 @@ namespace SymWebUI.Areas.PF.Controllers
                 {
                     return Redirect("/PF/Home");
                 }
-                string FileName = "Download.xls";
-                string fullPath = AppDomain.CurrentDomain.BaseDirectory + "Files\\Export\\";
-                string contentType = MimeMapping.GetMimeMapping(fullPath);
-                //string fullPath = @"C:\";
-                if (System.IO.File.Exists(fullPath + FileName))
-                {
-                    System.IO.File.Delete(fullPath + FileName);
-                }
 
                 vm.DesignationId = DesignationId;
                 vm.DepartmentId = DepartmentId;
@@ -539,32 +516,29 @@ namespace SymWebUI.Areas.PF.Controllers
                 vm.Orderby = Orderby;
                 vm.Code = CodeF;
                 vm.CodeT = CodeT;
+                vm.BranchId = Session["BranchId"].ToString();
 
-                dt = _eaRepo.ExportExcelFileFormPFOpening(vm, fullPath, FileName);
-                //exp(dt);
-                ExcelPackage excel = new ExcelPackage();
-                var workSheet = excel.Workbook.Worksheets.Add("Sheet1");
-                workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
-
-                string filename = "EmployeePFPayment" + "-" + DateTime.Now.ToString("yyyyMMdd");
-                using (var memoryStream = new MemoryStream())
+                DataTable dt = _eaRepo.ExportExcelFileFormPFOpening(vm, null, null);
+                using (ExcelPackage excel = new ExcelPackage())
                 {
-                    Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                    Response.AddHeader("content-disposition", "attachment;  filename=" + filename + ".xlsx");
-                    excel.SaveAs(memoryStream);
-                    memoryStream.WriteTo(Response.OutputStream);
-                    Response.Flush();
-                    Response.End();
+                    var workSheet = excel.Workbook.Worksheets.Add("Employee Payment");
+                    workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
+                    if (workSheet.Dimension != null)
+                    {
+                        workSheet.Cells[workSheet.Dimension.Address].AutoFitColumns();
+                    }
+
+                    string fileName = "EmployeePFPaymentOpening-" + DateTime.Now.ToString("yyyyMMdd") + ".xlsx";
+                    return File(
+                        excel.GetAsByteArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        fileName);
                 }
-                result[0] = "Successfull";
-                result[1] = "Successful~Data Download";
-                Session["result"] = result[0] + "~" + result[1];
-                return RedirectToAction("ImportEmployeePFPayment");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Session["result"] = result[0] + "~" + result[1];
-                FileLogger.Log(result[0].ToString() + Environment.NewLine + result[2].ToString() + Environment.NewLine + result[5].ToString(), this.GetType().Name, result[4].ToString() + Environment.NewLine + result[3].ToString());
+                Session["result"] = "Fail~" + ex.Message;
+                FileLogger.Log("Fail" + Environment.NewLine + "Employee PF Payment opening export", this.GetType().Name, ex.ToString());
                 return RedirectToAction("ImportEmployeePFPayment");
             }
         }

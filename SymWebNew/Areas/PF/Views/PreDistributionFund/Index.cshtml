@@ -109,7 +109,7 @@
 
                         // Always display these buttons
                         var result = '<a id="lnkEdit1" title="Click on for Edit" style="text-decoration:none;" href="/@ViewBag.TransType/PreDistributionFund/Edit/' + oObj.aData[0] + '" class="innerListLink sym-btn-edit-row"></a>'
-                            + '<a id="lnkEdit1" title="Click on for Report" style="text-decoration:none;" href="/@ViewBag.TransType/PreDistributionFund/reportVeiw/' + oObj.aData[0] + '" class="linkReport sym-btn-report-row"></a>'
+                            + '<a title="Click on for Report" style="text-decoration:none;" target="_blank" rel="noopener" href="/@ViewBag.TransType/PreDistributionFund/ReportView?id=' + encodeURIComponent(oObj.aData[0]) + '" class="sym-btn-report-row"></a>'
                           if (oObj.aData[7] == "Distributed") {
                               result += '<a title="Already Distributed" style="text-decoration:none;opacity:0.45;pointer-events:none;cursor:default;" target="_blank" href="/@ViewBag.TransType/ProfitDistributionNew/Process?PreDistributionFundId=' + oObj.aData[0] + '" class="innerListLink sym-btn-add-row"></a>';
 

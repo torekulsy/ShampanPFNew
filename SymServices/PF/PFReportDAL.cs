@@ -9657,7 +9657,7 @@ where a.IsActive =1
             return dt;
         }
 
-        public DataTable ProfitDistributionSummery()
+        public DataTable ProfitDistributionSummery(int PreDistributionFundId)
         {
             string[] retResults = new string[6];
             DataTable dt = new DataTable();
@@ -9688,11 +9688,13 @@ ve.Code
 FROM ProfitDistributionNew pd
 LEFT OUTER JOIN [dbo].FiscalYearDetail fydFrom ON pd.FiscalYearDetailId=fydFrom.Id
 LEFT OUTER JOIN [dbo].ViewEmployeeInformation ve ON ve.EmployeeId=pd.EmployeeId
-WHERE  1=1 AND pd.IsArchive = 0
+ WHERE  1=1 AND pd.IsArchive = 0
+ AND pd.PreDistributionFundId = @PreDistributionFundId
  ";
 
                 SqlDataAdapter da = new SqlDataAdapter(sqlText, currConn);
                 da.SelectCommand.Transaction = transaction;
+                da.SelectCommand.Parameters.AddWithValue("@PreDistributionFundId", PreDistributionFundId);
                 da.Fill(dt);
                 #endregion
 

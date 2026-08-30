@@ -46,7 +46,14 @@
             <div class="row mt-3">
                 <div class="col-sm-12">
                     <div class="reportModalbtn">
-                        <button type="button" title="Save Data" onclick="pageSubmit('frmTransactionMedia');" class="sym-btn-save">&nbsp;Save</button>
+                        @if (Model.Operation == "add")
+                        {
+                            <button type="button" title="Save Data" onmousedown="return confirmTransactionMediaSave(event);" class="sym-btn-save">&nbsp;Save</button>
+                        }
+                        else
+                        {
+                            <button type="button" title="Update Data" onmousedown="return confirmTransactionMediaSave(event);" class="sym-btn-update">&nbsp;Update</button>
+                        }
 
                         <button type="button" title="Cancel Data" class=" btncancel sym-btn-cancel">&nbsp;Cancel</button>
                     </div>
@@ -56,6 +63,39 @@
     </div>
 }
 <script>
+    function confirmTransactionMediaSave(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        if (!validateRequiredFields("#frmTransactionMedia")) {
+            return false;
+        }
+
+        var operation = ($("#Operation").val() || "add").toLowerCase();
+        var actionName = operation === "update" ? "Update" : "Save";
+        var dialogContent = $("#frmTransactionMedia").closest(".ui-dialog-content");
+        var dialogWrapper = dialogContent.closest(".ui-dialog");
+        var dialogOverlay = $(".ui-widget-overlay:visible").last();
+
+        $("#frmTransactionMedia :focus").trigger("change").blur();
+        dialogWrapper.hide();
+        dialogOverlay.hide();
+
+        setTimeout(function () {
+            Ask("Are you sure you want to " + actionName + " the Transaction Media?", function () {
+                pageSubmit("frmTransactionMedia");
+            }, function () {
+                dialogOverlay.show();
+                dialogWrapper.show();
+                dialogContent.dialog("moveToTop");
+            });
+        }, 50);
+
+        return false;
+    }
+
     $(function () {
         InitDropDowns();
         valiDation("frmTransactionMedia");

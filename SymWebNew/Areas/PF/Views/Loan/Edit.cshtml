@@ -375,8 +375,7 @@
                     </div>
                     @if (@Model.IsApproved == false)
                     {
-                        @*<button type="submit" title="Save Data" class="sym-btn-save " id="btnsave" onclick="SaveData()">&nbsp;Save</button>*@
-                        <button type="button" title="Save Data" class="sym-btn-save " id="btnsave" style="height: 27px">&nbsp;Save</button>
+                        <button type="button" title="Update Data" class="sym-btn-update" id="UpdateButton" style="height: 27px">&nbsp;Update</button>
                     }
                     else
                     {
@@ -851,15 +850,15 @@
 
                         var NewPrincipleAmount = Math.round(parseFloat(PrincipalAmount));
 
-                        var InterestAmount = parseFloat(NewPrincipleAmount) * parseFloat(annualInterestRate) / installment;
-                        var PrinciipleWithInterestAmount = parseFloat(PrincipalAmount) + parseFloat(InterestAmount);
+                        var reducingInterestAmount = parseFloat(NewPrincipleAmount) * parseFloat(annualInterestRate) / installment;
+                        var PrinciipleWithInterestAmount = parseFloat(PrincipalAmount) + parseFloat(reducingInterestAmount);
                         var Deposit = Math.round(parseFloat(installmentValue));
 
                         if (i == totalCount) {
                             Deposit = Math.round(parseFloat(PrinciipleWithInterestAmount));
                         }
 
-                        var InterestPart = parseFloat(InterestAmount).toFixed(4);
+                        var InterestPart = parseFloat(reducingInterestAmount).toFixed(4);
                         var PrinciplePart = parseFloat(Deposit - InterestPart).toFixed(4);
 
                         PrincipalAmount = Math.round(PrinciipleWithInterestAmount - installmentValue);
@@ -1003,7 +1002,11 @@
                     data: val,
                     success: function (response) {
                         ShowResult(response[0], response[1], "refreshparent");
-
+                        if (response[0].toLowerCase() == "success") {
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 700);
+                        }
                     }
                 });
             });
@@ -1046,7 +1049,11 @@
                     data: val,
                     success: function (response) {
                         ShowResult(response[0], response[1], "refreshparent");
-
+                        if (response[0].toLowerCase() == "success") {
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 700);
+                        }
                     }
                 });
             });

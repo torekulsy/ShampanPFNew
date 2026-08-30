@@ -872,6 +872,11 @@ namespace SymWebUI.Areas.PF.Controllers
         [HttpGet]
         public ActionResult UpdateSettelment(string loanId, decimal TotalDuePrincipalAmount, decimal TotalDueInterestAmount, string EarlySellteDate)
         {
+            if (string.IsNullOrWhiteSpace(EarlySellteDate))
+            {
+                return Json(new[] { "Fail", "Settelment Date is Required." }, JsonRequestBehavior.AllowGet);
+            }
+
             var permission = _reposur.SymRoleSession(identity.UserId, "1_51", "edit").ToString();
             Session["permission"] = permission;
             if (permission == "False")
@@ -888,6 +893,11 @@ namespace SymWebUI.Areas.PF.Controllers
         [HttpGet]
         public ActionResult ApproveSettelment(string loanId, string EarlySellteDate)
         {
+            if (string.IsNullOrWhiteSpace(EarlySellteDate))
+            {
+                return Json(new[] { "Fail", "Settelment Date is Required." }, JsonRequestBehavior.AllowGet);
+            }
+
             var permission = _reposur.SymRoleSession(identity.UserId, "1_51", "edit").ToString();
             Session["permission"] = permission;
             if (permission == "False")
@@ -921,6 +931,7 @@ namespace SymWebUI.Areas.PF.Controllers
             EmployeeLoanRepo loanRepo = new EmployeeLoanRepo();
             EmployeeLoanVM vm = new EmployeeLoanVM();
             vm = loanRepo.SelectLoanForSettelment(loanId);
+            ViewBag.IsSettlementCompleted = vm.IsEarlySellte;
 
             foreach (var item in vm.employeeLoanDetails.Take(1))
             {
@@ -1750,7 +1761,7 @@ namespace SymWebUI.Areas.PF.Controllers
 
                 string CompanyName = new AppSettingsReader().GetValue("CompanyName", typeof(string)).ToString();
 
-                var permission = _reposur.SymRoleSession(identity.UserId, "1_55", "report").ToString();
+                var permission = _reposur.SymRoleSession(identity.UserId, "1_51", "report").ToString();
                 Session["permission"] = permission;
                 if (permission == "False")
                 {
@@ -1816,7 +1827,7 @@ namespace SymWebUI.Areas.PF.Controllers
                 Session["result"] = result[0] + "~" + result[1];
                 FileLogger.Log("LoanReport", this.GetType().Name, ex.Message + Environment.NewLine + ex.StackTrace);
 
-                return View();
+                return RedirectToAction("AllLoan");
             }
         }
 
@@ -1844,7 +1855,7 @@ namespace SymWebUI.Areas.PF.Controllers
 
                 string CompanyName = new AppSettingsReader().GetValue("CompanyName", typeof(string)).ToString();
 
-                var permission = _reposur.SymRoleSession(identity.UserId, "1_42", "add").ToString();
+                var permission = _reposur.SymRoleSession(identity.UserId, "1_51", "report").ToString();
                 Session["permission"] = permission;
                 if (permission == "False")
                 {

@@ -228,16 +228,19 @@ namespace SymServices.Common
                 ? context.Request.RawUrl
                 : string.Empty;
 
-            DynamicMenuDefinition currentDefinition = ResolveDefinition(
+            string routeController = GetRouteValue(context, "controller");
+            bool isHomePage = string.Equals(routeController, "Home", StringComparison.OrdinalIgnoreCase);
+
+            DynamicMenuDefinition currentDefinition = isHomePage ? null : ResolveDefinition(
                 GetRouteValue(context, "area"),
-                GetRouteValue(context, "controller"),
+                routeController,
                 GetRouteValue(context, "action"),
                 currentUrl);
 
             return BuildNavbarViewModel(
                 currentArea,
                 permissions,
-                BuildModules(identity, permissions, currentArea),
+                BuildModules(identity, permissions, isHomePage ? string.Empty : currentArea),
                 currentUrl,
                 currentDefinition);
         }

@@ -65,7 +65,7 @@
                         @Html.LabelFor(model => model.Code)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.Code, new { @placeholder = "Code", @class = "  form-control" })
+                        @Html.TextBoxFor(model => model.Code, new { @placeholder = "Code", @class = " required form-control" })
                         @Html.ValidationMessageFor(model => model.Code)
                     </div>
                 </div>

@@ -18,6 +18,7 @@ namespace SymViewModel.PF
         public string BranchAddress { get; set; }
         [Display(Name = "Bank Account Type")]
         public string BankAccountType { get; set; }
+        public string BankAccountTypeName { get; set; }
         [Display(Name = "Bank Account No")]
         public string BankAccountNo { get; set; }
         [Display(Name = "Bank Name")]
