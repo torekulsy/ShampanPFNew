@@ -157,7 +157,7 @@ button[class*="sym-btn-"]:before,
     font-weight: 600;
 }
 
-.sym-btn-remove-row, .sym-btn-download-row, .sym-btn-investment-row, .sym-btn-payment-row, .sym-btn-back-row, .sym-btn-bank-row, .sym-btn-post-row, .sym-btn-detail-row, .sym-btn-cancel-row, .sym-btn-edit-row, .sym-btn-audit-row, .sym-btn-password-row, .sym-btn-report-row, .sym-btn-approve-row, .sym-btn-reject-row, .sym-btn-mail-row, .sym-btn-Excel-import-row, .sym-btn-Excel-Export-row, .sym-btn-ExportImport-row, .sym-btn-remove-row-minus, .sym-btn-duplicate-row {
+.sym-btn-remove-row, .sym-btn-download-row, .sym-btn-investment-row, .sym-btn-payment-row, .sym-btn-back-row, .sym-btn-bank-row, .sym-btn-post-row, .sym-btn-detail-row, .sym-btn-cancel-row, .sym-btn-edit-row, .sym-btn-audit-row, .sym-btn-password-row, .sym-btn-report-row, .sym-btn-approve-row, .sym-btn-reject-row, .sym-btn-mail-row, .sym-btn-Excel-import-row, .sym-btn-Excel-Export-row, .sym-btn-ExportImport-row, .sym-btn-remove-row-minus, .sym-btn-duplicate-row, #myDataTable .odd .left sorting_1 a {
     font-size: 13px !important;
     font-weight: bold;
     min-height: 24px !important;
@@ -177,7 +177,7 @@ button[class*="sym-btn-"]:before,
     box-sizing: border-box !important;
 }
 
-.sym-btn-add-row {
+.AddRow {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
     font-size: 13px !important;
     font-weight: 600 !important;
@@ -201,7 +201,7 @@ button[class*="sym-btn-"]:before,
 .sym-btn-add-row:before {
     font-family: FontAwesome !important;
     content: "\f067" !important;
-    margin-right: 5px !important;
+    
     line-height: 1 !important;
 }
 
