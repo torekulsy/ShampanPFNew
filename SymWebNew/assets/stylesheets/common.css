@@ -1839,7 +1839,7 @@ span.filter_column.filter_text input, .filterColumn.filter_select select {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 5px;
+    gap: 1px;
 }
 /*all buttton same size*/
 
