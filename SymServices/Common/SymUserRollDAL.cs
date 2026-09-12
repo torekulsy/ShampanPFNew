@@ -2244,6 +2244,12 @@ Where u.id=@userId
                     return false;
                 }
 
+                bool dynamicAllowed = false;
+                if (new DynamicMenuService().TryResolvePermission(dt, DefaultRollId, symAction, out dynamicAllowed))
+                {
+                    return dynamicAllowed;
+                }
+
                 string defaultRollId = (DefaultRollId ?? "").Replace("'", "''");
                 DataRow[] rows = dt.Select("DefaultRollId='" + defaultRollId + "'");
                 if (rows.Length == 0)
