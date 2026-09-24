@@ -158,7 +158,7 @@ Id
 ,LastUpdateFrom
 
 from InvestmentNames
-WHERE  1=1 AND IsArchive = 0
+WHERE  1=1 
 ";
                 
                 if (Id > 0)

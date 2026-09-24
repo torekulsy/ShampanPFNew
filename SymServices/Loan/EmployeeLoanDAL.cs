@@ -2640,7 +2640,14 @@ emp.Code
 
                 SqlCommand cmd = new SqlCommand(sqlText, currConn, transaction);
                 cmd.Parameters.AddWithValue("@emploanId", emploanId);
-                string JoinDate = cmd.ExecuteScalar().ToString();
+                object objJoinDate = cmd.ExecuteScalar();
+
+                if (objJoinDate == null || objJoinDate == DBNull.Value)
+                {
+                    return dt;
+                }
+
+                string JoinDate = objJoinDate.ToString();
 
                 DateTime doj = Convert.ToDateTime(Ordinary.StringToDate(JoinDate));
                 double JobDay = ((Convert.ToDateTime(date) - doj).TotalDays) / 365;// Ordinary.CalculateDayBetween(doj, Convert.ToDateTime(date));

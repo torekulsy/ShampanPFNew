@@ -279,9 +279,29 @@
 
     $(function () {
 
+        SetEmployeeIdFromQueryString();
         PFLoanTypeCheck();
+        PFBalanceLoad();
 
     });
+
+    function getQueryStringValue(name) {
+
+        var match = new RegExp('[?&]' + name + '=([^&#]*)', 'i').exec(window.location.search);
+        return match ? decodeURIComponent(match[1].replace(/\+/g, ' ')) : '';
+    }
+
+    function SetEmployeeIdFromQueryString() {
+
+        var EmployeeId = $('.cEmployeeId').val();
+
+        if (!EmployeeId) {
+            EmployeeId = getQueryStringValue('employeeId');
+            $('.cEmployeeId').val(EmployeeId);
+        }
+
+        return EmployeeId;
+    }
 
 
     $('#LoanType_E').change(function () {
@@ -308,13 +328,13 @@
     function PFBalanceLoad() {
 
         var ApplicationDate = $('#ApplicationDate').val();
-        var EmployeeId = $('.cEmployeeId').val();
+        var EmployeeId = SetEmployeeIdFromQueryString();
 
         var PFloanType = $('#LoanType_E :selected').text();
 
-        if (PFloanType == "PF Loan") {
+        if (PFloanType == "PF Loan" && EmployeeId) {
 
-            var url = "/PF/Loan/PFBalance?ApplicationDate=" + ApplicationDate + '&emploanId=' + EmployeeId;
+            var url = "/PF/Loan/PFBalance?ApplicationDate=" + encodeURIComponent(ApplicationDate) + '&emploanId=' + encodeURIComponent(EmployeeId);
             $.getJSON(url, function (vm) {
 
                 $('.cBalance').val(vm.PFBalance);
