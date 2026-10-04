@@ -8329,7 +8329,7 @@ SELECT
       ,SUM([DrAmount]) Dr
       ,SUM([CrAmount]) Cr
    
-  FROM [PF_Dekko_DB].[dbo].[GLJournalDetails] jd
+  FROM GLJournalDetails jd
   Left join GLJournals j on j.Id=jd.GLJournalId
   Left Join COAs c on c.Id=jd.COAId
   Left Join COAGroups cg on cg.Id=c.COAGroupId
@@ -8647,7 +8647,7 @@ SELECT
       ,SUM([CrAmount]) Cr
       ,SUM([DrAmount])-SUM([CrAmount]) ClosingAmount
 
-  FROM [PF_Dekko_DB].[dbo].[GLJournalDetails] jd
+  FROM GLJournalDetails jd
   Left join GLJournals j on j.Id=jd.GLJournalId
   Left Join COAs c on c.Id=jd.COAId
   Left Join COAGroups cg on cg.Id=c.COAGroupId

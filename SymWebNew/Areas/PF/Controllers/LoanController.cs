@@ -1635,7 +1635,8 @@ namespace SymWebUI.Areas.PF.Controllers
         /// </summary>
         /// <param name="ApplicationDate">The date for which the PF balance should be calculated. If null or empty, the current date is used.</param>
         /// <param name="emploanId">The unique identifier of the employee loan.</param>
-        /// <returns>A JSON object containing PF balance, interest rate details, and rate settings.</returns>        [HttpGet]
+        /// <returns>A JSON object containing PF balance, interest rate details, and rate settings.</returns>
+        [HttpGet]
         public JsonResult PFBalance(string ApplicationDate, string emploanId)
         {
 
