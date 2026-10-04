@@ -442,19 +442,19 @@ FROM PFHeader pfd
                         string insertDetailSql = @"
                     INSERT INTO PFDetails
                     (
-                        PFHeaderId, EmployeeId,  EmployeePFValue, Post,  Remarks, IsActive, IsArchive,
+                        PFHeaderId, EmployeeId, FiscalYearDetailId, EmployeePFValue, Post,  Remarks, IsActive, IsArchive,
                         CreatedBy, CreatedAt, CreatedFrom
                     )
                     VALUES
                     (
-                        @PFHeaderId, @EmployeeId,  @EmployeePFValue, 0,  '', 1, 0, 
+                        @PFHeaderId, @EmployeeId, @FiscalYearDetailId, @EmployeePFValue, 0,  '', 1, 0, 
                         @CreatedBy, GETDATE(), @CreatedFrom
                     );";
 
                         SqlCommand detailCmd = new SqlCommand(insertDetailSql, currConn, transaction);
                         detailCmd.Parameters.AddWithValue("@PFHeaderId", newId);
                         detailCmd.Parameters.AddWithValue("@EmployeeId", empId);
-                        //detailCmd.Parameters.AddWithValue("@DistributionDate", distributionDate);
+                        detailCmd.Parameters.AddWithValue("@FiscalYearDetailId", FiscalYearDetailId);
                         detailCmd.Parameters.AddWithValue("@EmployeePFValue", disEmpValue);
                         detailCmd.Parameters.AddWithValue("@CreatedBy", auditvm.CreatedBy);
                         detailCmd.Parameters.AddWithValue("@CreatedFrom", auditvm.CreatedFrom);
