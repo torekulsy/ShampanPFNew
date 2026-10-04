@@ -2619,6 +2619,8 @@ emp.Code
             {
                 HRMHRMDB = new AppSettingsReader().GetValue("PFDB", typeof(string)).ToString();
                 string pfDb = new AppSettingsReader().GetValue("PFDB", typeof(string)).ToString();
+                string CompanyName = new AppSettingsReader().GetValue("CompanyName", typeof(string)).ToString();
+
 
                 #region open connection and transaction
                 currConn = _dbsqlConnection.GetConnection();
@@ -2653,23 +2655,77 @@ emp.Code
                 double JobDay = ((Convert.ToDateTime(date) - doj).TotalDays) / 365;// Ordinary.CalculateDayBetween(doj, Convert.ToDateTime(date));
                 JobDay = Math.Round(JobDay, MidpointRounding.AwayFromZero);
 
-                sqlText = @"
+                if (CompanyName=="Arbab")
+                {
+                    sqlText = @"
 ----declare @EmployeeId varchar(100) = '1_1'
 ----declare @ToDate varchar(14) = 20200318
 ";
-                if (JobDay >= bothContributionJobAge)
-                {
-                    sqlText += @" select EmployeeId, ((EmployeeContribution)-LoanAmount+PaymentAmount) Balance";
+                    if (JobDay >= bothContributionJobAge)
+                    {
+                        sqlText += @" select EmployeeId, ((EmployeeContribution)-LoanAmount+PaymentAmount) Balance";
 
+                    }
+                    else
+                    {
+                        sqlText += @" select EmployeeId, (EmployeeContribution-LoanAmount+PaymentAmount) Balance";
+
+                    }
+
+
+                    sqlText += @" 
+
+from
+(
+select EmployeeId, Sum(EmployeeContribution)EmployeeContribution, Sum(LoanAmount)LoanAmount, Sum(PaymentAmount)PaymentAmount
+from
+(
+SELECT
+    TransactionDate,
+    EmployeeId,
+    EmployeeContribution EmployeeContribution,
+    0 AS LoanAmount,
+    0 AS PaymentAmount,
+    'PreviousBalance' AS TransactionType
+FROM ViewEmployeeStatementPF
+WHERE TransactionDate < @ToDate
+AND EmployeeId = @EmployeeId
+
+union all
+select StartDate, EmployeeId, 0 EmployeeContribution
+,TotalAmount LoanAmount, 0 PaymentAmount, 'Loan' TransactionType 
+from EmployeeLoan loan
+left outer join EnumLoanType elt on elt.id=loan.LoanType_E
+where 1=1 and loan.EmployeeId=@EmployeeId and loan.IsApproved=1
+and elt.Name = 'PF Loan' and loan.StartDate <= @ToDate
+
+) as a
+group by EmployeeId
+) as bal
+
+
+
+";
                 }
                 else
                 {
-                    sqlText += @" select EmployeeId, (EmployeeContribution-LoanAmount+PaymentAmount) Balance";
+                    sqlText = @"
+----declare @EmployeeId varchar(100) = '1_1'
+----declare @ToDate varchar(14) = 20200318
+";
+                    if (JobDay >= bothContributionJobAge)
+                    {
+                        sqlText += @" select EmployeeId, ((EmployeeContribution)-LoanAmount+PaymentAmount) Balance";
 
-                }
+                    }
+                    else
+                    {
+                        sqlText += @" select EmployeeId, (EmployeeContribution-LoanAmount+PaymentAmount) Balance";
+
+                    }
 
 
-                sqlText += @" 
+                    sqlText += @" 
 
 from
 (
@@ -2702,6 +2758,10 @@ group by EmployeeId
 
 
 ";
+                }
+
+
+                
                 SqlDataAdapter da = new SqlDataAdapter(sqlText, currConn);
                 da.SelectCommand.Transaction = transaction;
 

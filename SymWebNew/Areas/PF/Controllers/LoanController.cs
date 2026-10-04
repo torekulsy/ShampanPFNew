@@ -1646,10 +1646,11 @@ namespace SymWebUI.Areas.PF.Controllers
             {
                 date = DateTime.Now.ToString("dd-MMM-yyyy");
             }
-
+           
             EmployeeLoanVM vm = new EmployeeLoanVM();
             SettingRepo sRepo = new SettingRepo();
             EmployeeLoanRepo loanRepo = new EmployeeLoanRepo();
+          
             dt = loanRepo.getBalance(date, emploanId);
 
             if (dt.Rows.Count > 0)
