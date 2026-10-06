@@ -1,4 +1,4 @@
-﻿using JQueryDataTables.Models;
+using JQueryDataTables.Models;
 using SymOrdinary;
 using SymRepository.Common;
 using SymViewModel.HRM;
@@ -163,7 +163,16 @@ namespace SymWebUI.Areas.Common.Controllers
             vm.CreatedAt = DateTime.Now.ToString("yyyyMMddHHmmss");
             vm.CreatedBy = identity.Name;
             vm.CreatedFrom = identity.WorkStationIP;
-            vm.BranchId = Convert.ToInt32(identity.BranchId);
+            int branchId = 0;
+            if (Session["BranchId"] != null)
+            {
+                branchId = Convert.ToInt32(Session["BranchId"]);
+            }
+            if (branchId == 0 && identity.BranchId != null)
+            {
+                branchId = Convert.ToInt32(identity.BranchId);
+            }
+            vm.BranchId = branchId;
             try
             {
 
@@ -221,6 +230,20 @@ namespace SymWebUI.Areas.Common.Controllers
             vm.LastUpdateAt = DateTime.Now.ToString("yyyyMMddHHmmss");
             vm.LastUpdateBy = identity.Name;
             vm.LastUpdateFrom = identity.WorkStationIP;
+            int branchId = 0;
+            if (vm.BranchId > 0)
+            {
+                branchId = vm.BranchId;
+            }
+            else if (Session["BranchId"] != null)
+            {
+                branchId = Convert.ToInt32(Session["BranchId"]);
+            }
+            else if (identity.BranchId != null)
+            {
+                branchId = Convert.ToInt32(identity.BranchId);
+            }
+            vm.BranchId = branchId;
             try
             {
 

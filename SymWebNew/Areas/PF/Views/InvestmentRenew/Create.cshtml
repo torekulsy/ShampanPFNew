@@ -1,4 +1,4 @@
-﻿@*
+@*
     InvestmentType
     InvestmentAddress
     InvestmentDate
@@ -83,7 +83,8 @@
                         @Html.LabelFor(model => model.InvestmentVm.InvestmentName)
                     </div>
                     <div class="editor-field">
-                        @Html.SimpleDropDownFor(model => model.InvestmentVm.InvestmentNameId, "/Config/DropDown/PF_InvestmentName", new { @class = "   form-control", @readonly = "readonly" })
+                        @Html.TextBoxFor(model => model.InvestmentVm.InvestmentName, new { @placeholder = "Investment Name", @class = "   form-control", @readonly = "readonly" })
+                        @Html.HiddenFor(model => model.InvestmentVm.InvestmentNameId)
                         @Html.ValidationMessageFor(model => model.InvestmentVm.InvestmentNameId)
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-﻿using SymOrdinary;
+using SymOrdinary;
 using SymServices.Common;
 using SymViewModel.HRM;
 using System;
@@ -576,7 +576,15 @@ Where  ep.EmployeeId=@EmployeeId
 
                 for (int i = 0; i < fieldName.Length; i++)
                 {
-                    check = cdal.CheckDuplicateInInsertWithBranch(tableName, fieldName[i], fieldValue[i], vm.BranchId, currConn, transaction);
+                    if (vm.BranchId > 0)
+                    {
+                        check = cdal.CheckDuplicateInInsertWithBranch(tableName, fieldName[i], fieldValue[i], vm.BranchId, currConn, transaction);
+                    }
+                    else
+                    {
+                        check = cdal.CheckDuplicateInInsert(tableName, fieldName[i], fieldValue[i], currConn, transaction);
+                    }
+
                     if (check == true)
                     {
                         retResults[1] = "This " + fieldName[i] + ": \"" + fieldValue[i] + "\" already used!";
@@ -925,7 +933,15 @@ Id,
 
                 for (int i = 0; i < fieldName.Length; i++)
                 {
-                    check = cdal.CheckDuplicateInUpdateWithBranch(vm.Id, tableName, fieldName[i], fieldValue[i], vm.BranchId, currConn, transaction);
+                    if (vm.BranchId > 0)
+                    {
+                        check = cdal.CheckDuplicateInUpdateWithBranch(vm.Id, tableName, fieldName[i], fieldValue[i], vm.BranchId, currConn, transaction);
+                    }
+                    else
+                    {
+                        check = cdal.CheckDuplicateInUpdate(vm.Id, tableName, fieldName[i], fieldValue[i], currConn, transaction);
+                    }
+
                     if (check == true)
                     {
                         retResults[1] = "This " + fieldName[i] + ": \"" + fieldValue[i] + "\" already used!";
@@ -964,7 +980,7 @@ Id,
                     sqlText += " , LastUpdateAt=@LastUpdateAt";
                     sqlText += " , LastUpdateFrom=@LastUpdateFrom";
 
-                    //sqlText += ",DesignationGroupId=@DesignationGroupId";
+                    sqlText += " , DesignationGroupId=@DesignationGroupId";
                     sqlText += " , GradeId=@GradeId";
                     sqlText += " , OrderNo=@OrderNo ";
 
@@ -1030,7 +1046,7 @@ Id,
                     cmdUpdate.Parameters.AddWithValue("@LastUpdateAt", vm.LastUpdateAt);
                     cmdUpdate.Parameters.AddWithValue("@LastUpdateFrom", vm.LastUpdateFrom);
 
-                    //cmdUpdate.Parameters.AddWithValue("@DesignationGroupId", vm.DesignationGroupId);
+                    cmdUpdate.Parameters.AddWithValue("@DesignationGroupId", vm.DesignationGroupId ?? Convert.DBNull);
                     cmdUpdate.Parameters.AddWithValue("@GradeId", vm.GradeId);
                     cmdUpdate.Parameters.AddWithValue("@OrderNo", vm.OrderNo);
 

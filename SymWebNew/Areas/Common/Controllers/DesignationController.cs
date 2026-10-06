@@ -1,4 +1,4 @@
-﻿using JQueryDataTables.Models;
+using JQueryDataTables.Models;
 using OfficeOpenXml;
 using SymOrdinary;
 using SymRepository.Common;
@@ -47,81 +47,10 @@ namespace SymWebUI.Areas.Common.Controllers
         {
 
             #region Column Search
-            var idFilter = Convert.ToString(Request["sSearch_0"]);
             var codeFilter = Convert.ToString(Request["sSearch_1"]);
             var nameFilter = Convert.ToString(Request["sSearch_2"]);
-            var AttendenceBonusFilter = Convert.ToString(Request["sSearch_3"]);
-            var EPZFilter = Convert.ToString(Request["sSearch_4"]);
-            var OtherFilter = Convert.ToString(Request["sSearch_5"]);
-            var IfterAmountFilter = Convert.ToString(Request["sSearch_6"]);
-            var DinnerAmountFilter = Convert.ToString(Request["sSearch_7"]);
-            var TiffinAmountFilter = Convert.ToString(Request["sSearch_8"]);
-            var ETiffinAmountFilter = Convert.ToString(Request["sSearch_9"]);
-
-            var OTAlloawanceFilter = Convert.ToString(Request["sSearch_10"]);
-            var OTOrginalFilter = Convert.ToString(Request["sSearch_11"]);
-            var OTBayerFilter = Convert.ToString(Request["sSearch_12"]);
-            var ExtraOTFilter = Convert.ToString(Request["sSearch_13"]);
-            var isActiveFilter = Convert.ToString(Request["sSearch_14"]);
-            var OrderNoFilter = Convert.ToString(Request["sSearch_15"]);
-            var remarksFilter = Convert.ToString(Request["sSearch_16"]);
-            #region From-To
-            var AttendenceBonusFrom = 0;
-            var AttendenceBonusTo = 0;
-            if (AttendenceBonusFilter.Contains('~'))
-            {
-                AttendenceBonusFrom = AttendenceBonusFilter.Split('~')[0] == "" ? 0 : Ordinary.IsInteger(AttendenceBonusFilter.Split('~')[0]) == true ? Convert.ToInt32(AttendenceBonusFilter.Split('~')[0]) : 0;
-                AttendenceBonusTo = AttendenceBonusFilter.Split('~')[1] == "" ? 0 : Ordinary.IsInteger(AttendenceBonusFilter.Split('~')[1]) == true ? Convert.ToInt32(AttendenceBonusFilter.Split('~')[1]) : 0;
-            }
-            var EPZFrom = 0;
-            var EPZTo = 0;
-            if (EPZFilter.Contains('~'))
-            {
-                EPZFrom = EPZFilter.Split('~')[0] == "" ? 0 : Ordinary.IsInteger(EPZFilter.Split('~')[0]) == true ? Convert.ToInt32(EPZFilter.Split('~')[0]) : 0;
-                EPZTo = EPZFilter.Split('~')[1] == "" ? 0 : Ordinary.IsInteger(EPZFilter.Split('~')[1]) == true ? Convert.ToInt32(EPZFilter.Split('~')[1]) : 0;
-            }
-            var OtherFrom = 0;
-            var OtherTo = 0;
-            if (OtherFilter.Contains('~'))
-            {
-                OtherFrom = OtherFilter.Split('~')[0] == "" ? 0 : Ordinary.IsInteger(OtherFilter.Split('~')[0]) == true ? Convert.ToInt32(OtherFilter.Split('~')[0]) : 0;
-                OtherTo = OtherFilter.Split('~')[1] == "" ? 0 : Ordinary.IsInteger(OtherFilter.Split('~')[1]) == true ? Convert.ToInt32(OtherFilter.Split('~')[1]) : 0;
-            }
-            var IfterAmountFrom = 0;
-            var IfterAmountTo = 0;
-            if (IfterAmountFilter.Contains('~'))
-            {
-                IfterAmountFrom = IfterAmountFilter.Split('~')[0] == "" ? 0 : Ordinary.IsInteger(IfterAmountFilter.Split('~')[0]) == true ? Convert.ToInt32(IfterAmountFilter.Split('~')[0]) : 0;
-                IfterAmountTo = IfterAmountFilter.Split('~')[1] == "" ? 0 : Ordinary.IsInteger(IfterAmountFilter.Split('~')[1]) == true ? Convert.ToInt32(IfterAmountFilter.Split('~')[1]) : 0;
-            }
-            var DinnerAmountFrom = 0;
-            var DinnerAmountTo = 0;
-            if (DinnerAmountFilter.Contains('~'))
-            {
-                DinnerAmountFrom = DinnerAmountFilter.Split('~')[0] == "" ? 0 : Ordinary.IsInteger(DinnerAmountFilter.Split('~')[0]) == true ? Convert.ToInt32(DinnerAmountFilter.Split('~')[0]) : 0;
-                DinnerAmountTo = DinnerAmountFilter.Split('~')[1] == "" ? 0 : Ordinary.IsInteger(DinnerAmountFilter.Split('~')[1]) == true ? Convert.ToInt32(DinnerAmountFilter.Split('~')[1]) : 0;
-            }
-            var TiffinAmountFrom = 0;
-            var TiffinAmountTo = 0;
-            if (TiffinAmountFilter.Contains('~'))
-            {
-                TiffinAmountFrom = TiffinAmountFilter.Split('~')[0] == "" ? 0 : Ordinary.IsInteger(TiffinAmountFilter.Split('~')[0]) == true ? Convert.ToInt32(TiffinAmountFilter.Split('~')[0]) : 0;
-                TiffinAmountTo = TiffinAmountFilter.Split('~')[1] == "" ? 0 : Ordinary.IsInteger(TiffinAmountFilter.Split('~')[1]) == true ? Convert.ToInt32(TiffinAmountFilter.Split('~')[1]) : 0;
-            }
-            var ETiffinAmountFrom = 0;
-            var ETiffinAmountTo = 0;
-            if (ETiffinAmountFilter.Contains('~'))
-            {
-                ETiffinAmountFrom = ETiffinAmountFilter.Split('~')[0] == "" ? 0 : Ordinary.IsInteger(ETiffinAmountFilter.Split('~')[0]) == true ? Convert.ToInt32(ETiffinAmountFilter.Split('~')[0]) : 0;
-                ETiffinAmountTo = ETiffinAmountFilter.Split('~')[1] == "" ? 0 : Ordinary.IsInteger(ETiffinAmountFilter.Split('~')[1]) == true ? Convert.ToInt32(ETiffinAmountFilter.Split('~')[1]) : 0;
-            }
-            #endregion From-To
-
-            var OTAlloawanceFilter1 = OTAlloawanceFilter.ToLower() == "Y" ? true.ToString() : false.ToString();
-            var OTOrginalFilter1 = OTOrginalFilter.ToLower() == "y" ? true.ToString() : false.ToString();
-            var OTBayerFilter1 = OTBayerFilter.ToLower() == "y" ? true.ToString() : false.ToString();
-            var ExtraOTFilter1 = ExtraOTFilter.ToLower() == "y" ? true.ToString() : false.ToString();
-            var isActiveFilter1 = isActiveFilter.ToLower() == "Active" ? true.ToString() : false.ToString();
+            var isActiveFilter = Convert.ToString(Request["sSearch_3"]);
+            var isActiveFilter1 = isActiveFilter.ToLower() == "active" ? true.ToString() : false.ToString();
             #endregion Column Search
 
             #region Search and Filter Data
@@ -131,42 +60,14 @@ namespace SymWebUI.Areas.Common.Controllers
 
             if (!string.IsNullOrEmpty(param.sSearch))
             {
-
                 var isSearchable1 = Convert.ToBoolean(Request["bSearchable_1"]);
                 var isSearchable2 = Convert.ToBoolean(Request["bSearchable_2"]);
                 var isSearchable3 = Convert.ToBoolean(Request["bSearchable_3"]);
-                var isSearchable4 = Convert.ToBoolean(Request["bSearchable_4"]);
-                var isSearchable5 = Convert.ToBoolean(Request["bSearchable_5"]);
-                var isSearchable6 = Convert.ToBoolean(Request["bSearchable_6"]);
-                var isSearchable7 = Convert.ToBoolean(Request["bSearchable_7"]);
-                var isSearchable8 = Convert.ToBoolean(Request["bSearchable_8"]);
-                var isSearchable9 = Convert.ToBoolean(Request["bSearchable_9"]);
-                var isSearchable10 = Convert.ToBoolean(Request["bSearchable_10"]);
-                var isSearchable11 = Convert.ToBoolean(Request["bSearchable_11"]);
-                var isSearchable12 = Convert.ToBoolean(Request["bSearchable_12"]);
-                var isSearchable13 = Convert.ToBoolean(Request["bSearchable_13"]);
-                var isSearchable14 = Convert.ToBoolean(Request["bSearchable_14"]);
-                var isSearchable15 = Convert.ToBoolean(Request["bSearchable_15"]);
-                var isSearchable16 = Convert.ToBoolean(Request["bSearchable_16"]);
-
 
                 filteredData = getAllData.Where(c =>
                        isSearchable1 && c.Code.ToLower().Contains(param.sSearch.ToLower())
                     || isSearchable2 && c.Name.ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable3 && c.AttendenceBonus.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable4 && c.EPZ.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable5 && c.Other.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable6 && c.IfterAmount.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable7 && c.DinnerAmount.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable8 && c.TiffinAmount.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable9 && c.ETiffinAmount.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable10 && c.OTAlloawance.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable11 && c.OTOrginal.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable12 && c.OTBayer.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable13 && c.ExtraOT.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable14 && c.IsActive.ToString().ToLower().Contains(param.sSearch.ToLower())
-                    || isSearchable15 && c.OrderNo.ToString().Contains(param.sSearch.ToLower())
-                    || isSearchable16 && c.Remarks.ToLower().Contains(param.sSearch.ToLower())
+                    || isSearchable3 && c.IsActive.ToString().ToLower().Contains(param.sSearch.ToLower())
                     );
             }
             else
@@ -177,66 +78,25 @@ namespace SymWebUI.Areas.Common.Controllers
             #endregion Search and Filter Data
 
             #region Column Filtering
-            if (codeFilter != "" || nameFilter != "" || AttendenceBonusFilter != "" || IfterAmountFilter != "" || EPZFilter != "" || ETiffinAmountFilter != "" || OtherFilter != ""
-                || DinnerAmountFilter != "" || TiffinAmountFilter != "" || isActiveFilter != "" || remarksFilter != "" || OrderNoFilter != "")
+            if (codeFilter != "" || nameFilter != "" || isActiveFilter != "")
             {
                 filteredData = filteredData.Where(c =>
-                    (codeFilter == "" || c.Code.ToLower().Contains(codeFilter.ToLower()))                                                                                                             //1 
-                    && (nameFilter == "" || c.Name.ToLower().Contains(nameFilter.ToLower()))                                                                                                          //2 
-                    && (AttendenceBonusFrom == 0 || AttendenceBonusFrom <= Convert.ToInt32(c.AttendenceBonus)) && (AttendenceBonusTo == 0 || AttendenceBonusTo >= Convert.ToInt32(c.AttendenceBonus)) //3 
-                    && (EPZFrom == 0 || EPZFrom <= Convert.ToInt32(c.EPZ)) && (EPZTo == 0 || EPZTo >= Convert.ToInt32(c.EPZ))                                                                         //4 
-                    && (ETiffinAmountFrom == 0 || ETiffinAmountFrom <= Convert.ToInt32(c.ETiffinAmount)) && (ETiffinAmountTo == 0 || ETiffinAmountTo >= Convert.ToInt32(c.ETiffinAmount))             //5 
-                    && (IfterAmountFrom == 0 || IfterAmountFrom <= Convert.ToInt32(c.IfterAmount)) && (IfterAmountTo == 0 || IfterAmountTo >= Convert.ToInt32(c.IfterAmount))                         //6 
-                    && (OtherFrom == 0 || OtherFrom <= Convert.ToInt32(c.Other)) && (OtherTo == 0 || OtherTo >= Convert.ToInt32(c.DinnerAmount))                                                      //7                                                             //7 
-                    && (DinnerAmountTo == 0 || DinnerAmountTo >= Convert.ToInt32(c.Other)) && (DinnerAmountFrom == 0 || DinnerAmountFrom <= Convert.ToInt32(c.DinnerAmount))                          //8 
-                    && (TiffinAmountFrom == 0 || TiffinAmountFrom <= Convert.ToInt32(c.TiffinAmount)) && (TiffinAmountTo == 0 || TiffinAmountTo >= Convert.ToInt32(c.TiffinAmount))                   //9 
-                    && (OTAlloawanceFilter == "" || c.OTAlloawance.ToString().ToLower().Contains(OTAlloawanceFilter1.ToLower()))                                                                      //10
-                    && (OTOrginalFilter == "" || c.OTOrginal.ToString().ToLower().Contains(OTOrginalFilter1.ToLower()))                                                                               //11
-                    && (OTBayerFilter == "" || c.OTBayer.ToString().ToLower().Contains(OTBayerFilter1.ToLower()))                                                                                     //12
-                    && (ExtraOTFilter == "" || c.ExtraOT.ToString().ToLower().Contains(ExtraOTFilter1.ToLower()))                                                                                     //13
-                    && (isActiveFilter == "" || c.IsActive.ToString().ToLower().Contains(isActiveFilter1.ToLower()))                                                                                  //14
-                    && (OrderNoFilter == "" || c.OrderNo.ToString().Contains(OrderNoFilter.ToLower()))                                                                                                 //15
-                    && (remarksFilter == "" || c.Remarks.ToLower().Contains(remarksFilter.ToLower()))                                                                                                 //15
+                    (codeFilter == "" || c.Code.ToLower().Contains(codeFilter.ToLower()))
+                    && (nameFilter == "" || c.Name.ToLower().Contains(nameFilter.ToLower()))
+                    && (isActiveFilter == "" || c.IsActive.ToString().ToLower().Contains(isActiveFilter1.ToLower()))
                     );
             }
 
             #endregion Column Filtering
 
-
-            var isSortable_1 = Convert.ToBoolean(Request["bSortable_1 "]);
-            var isSortable_2 = Convert.ToBoolean(Request["bSortable_2 "]);
-            var isSortable_3 = Convert.ToBoolean(Request["bSortable_3 "]);
-            var isSortable_4 = Convert.ToBoolean(Request["bSortable_4 "]);
-            var isSortable_5 = Convert.ToBoolean(Request["bSortable_5 "]);
-            var isSortable_6 = Convert.ToBoolean(Request["bSortable_6 "]);
-            var isSortable_7 = Convert.ToBoolean(Request["bSortable_7 "]);
-            var isSortable_8 = Convert.ToBoolean(Request["bSortable_8 "]);
-            var isSortable_9 = Convert.ToBoolean(Request["bSortable_9 "]);
-            var isSortable_10 = Convert.ToBoolean(Request["bSortable_10"]);
-            var isSortable_11 = Convert.ToBoolean(Request["bSortable_11"]);
-            var isSortable_12 = Convert.ToBoolean(Request["bSortable_12"]);
-            var isSortable_13 = Convert.ToBoolean(Request["bSortable_13"]);
-            var isSortable_14 = Convert.ToBoolean(Request["bSortable_14"]);
-            var isSortable_15 = Convert.ToBoolean(Request["bSortable_15"]);
-            var isSortable_16 = Convert.ToBoolean(Request["bSortable_16"]);
+            var isSortable_1 = Convert.ToBoolean(Request["bSortable_1"]);
+            var isSortable_2 = Convert.ToBoolean(Request["bSortable_2"]);
+            var isSortable_3 = Convert.ToBoolean(Request["bSortable_3"]);
             var sortColumnIndex = Convert.ToInt32(Request["iSortCol_0"]);
             Func<DesignationVM, string> orderingFunction = (c =>
                 sortColumnIndex == 1 && isSortable_1 ? c.Code :
                 sortColumnIndex == 2 && isSortable_2 ? c.Name :
-                sortColumnIndex == 3 && isSortable_3 ? c.AttendenceBonus.ToString() :
-                sortColumnIndex == 4 && isSortable_4 ? c.EPZ.ToString() :
-                sortColumnIndex == 5 && isSortable_5 ? c.Other.ToString() :
-                sortColumnIndex == 6 && isSortable_6 ? c.IfterAmount.ToString() :
-                sortColumnIndex == 7 && isSortable_7 ? c.ExtraOT.ToString() :
-                sortColumnIndex == 8 && isSortable_8 ? c.TiffinAmount.ToString() :
-                sortColumnIndex == 9 && isSortable_9 ? c.ETiffinAmount.ToString() :
-                sortColumnIndex == 10 && isSortable_11 ? c.OTAlloawance.ToString() :
-                sortColumnIndex == 11 && isSortable_11 ? c.OTOrginal.ToString() :
-                sortColumnIndex == 12 && isSortable_12 ? c.OTBayer.ToString() :
-                sortColumnIndex == 13 && isSortable_13 ? c.ExtraOT.ToString() :
-                sortColumnIndex == 14 && isSortable_14 ? c.IsActive.ToString() :
-                sortColumnIndex == 15 && isSortable_15 ? c.OrderNo.ToString() :
-                sortColumnIndex == 16 && isSortable_16 ? c.Remarks :
+                sortColumnIndex == 3 && isSortable_3 ? c.IsActive.ToString() :
                 "");
 
             var sortDirection = Request["sSortDir_0"]; // asc or desc
@@ -251,20 +111,7 @@ namespace SymWebUI.Areas.Common.Controllers
                 Convert.ToString(c.Id)
                 , c.Code                                                        //1 
                 , c.Name                                                        //2 
-                , c.AttendenceBonus.ToString()                                  //3 
-                , c.EPZ.ToString()                                              //4 
-                , c.Other.ToString()                                            //5 
-                , c.IfterAmount.ToString()                                      //6 
-                , c.DinnerAmount.ToString()                                     //7 
-                , c.TiffinAmount.ToString()                                     //8 
-                , c.ETiffinAmount.ToString()                                    //9 
-                , Convert.ToString(c.OTAlloawance == true ? "Y" : "No")         //10
-                , Convert.ToString(c.OTOrginal == true ? "Y" : "No")            //11
-                , Convert.ToString(c.OTBayer == true ? "Y" : "No")              //12
-                , Convert.ToString(c.ExtraOT == true ? "Y" : "No")              //13
-                , Convert.ToString(c.IsActive == true ? "Active" : "Inactive")  //14
-                , c.OrderNo.ToString()                                          //15
-                , c.Remarks                                                     //16
+                , Convert.ToString(c.IsActive == true ? "Active" : "Inactive")  //3
             };
             return Json(new
             {
@@ -324,7 +171,16 @@ namespace SymWebUI.Areas.Common.Controllers
             vm.CreatedBy = identity.Name;
             vm.CreatedFrom = identity.WorkStationIP;
             //vm.BranchId = Convert.ToInt32(identity.BranchId);
-            vm.BranchId = Convert.ToInt32(Session["BranchId"]);
+            int branchId = 0;
+            if (Session["BranchId"] != null)
+            {
+                branchId = Convert.ToInt32(Session["BranchId"]);
+            }
+            if (branchId == 0 && identity.BranchId != null)
+            {
+                branchId = Convert.ToInt32(identity.BranchId);
+            }
+            vm.BranchId = branchId;
             try
             {
 
@@ -396,7 +252,20 @@ namespace SymWebUI.Areas.Common.Controllers
             vm.LastUpdateAt = DateTime.Now.ToString("yyyyMMddHHmmss");
             vm.LastUpdateBy = identity.Name;
             vm.LastUpdateFrom = identity.WorkStationIP;
-            vm.BranchId = Convert.ToInt32(identity.BranchId);
+            int branchId = 0;
+            if (vm.BranchId > 0)
+            {
+                branchId = vm.BranchId;
+            }
+            else if (Session["BranchId"] != null)
+            {
+                branchId = Convert.ToInt32(Session["BranchId"]);
+            }
+            else if (identity.BranchId != null)
+            {
+                branchId = Convert.ToInt32(identity.BranchId);
+            }
+            vm.BranchId = branchId;
             try
             {
 

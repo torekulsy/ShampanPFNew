@@ -1,4 +1,4 @@
-﻿using Excel;
+using Excel;
 using SymOrdinary;
 using SymViewModel.Common;
 using SymViewModel.HRM;
@@ -250,6 +250,19 @@ Where  id=@Id  and IsArchive=0
                     transaction = currConn.BeginTransaction("");
                 }
                 #endregion open connection and transaction
+                #region Validation
+                if (string.IsNullOrEmpty(vm.Code))
+                {
+                    retResults[1] = "Please Input Designation Group Code";
+                    return retResults;
+                }
+                else if (string.IsNullOrEmpty(vm.Name))
+                {
+                    retResults[1] = "Please Input Designation Group Name";
+                    return retResults;
+                }
+                #endregion Validation
+
                 #region Exist
                 CommonDAL cdal = new CommonDAL();
                 bool check = false;
@@ -258,65 +271,63 @@ Where  id=@Id  and IsArchive=0
                 string[] fieldValue = { vm.Code.Trim(), vm.Name.Trim() };
                 for (int i = 0; i < fieldName.Length; i++)
                 {
-                    check = cdal.CheckDuplicateInInsertWithBranch(tableName, fieldName[i], fieldValue[i], vm.BranchId, currConn, transaction);
-                    if (check == true)
+                    if (vm.BranchId > 0)
                     {
-                     
+                        check = cdal.CheckDuplicateInInsertWithBranch(tableName, fieldName[i], fieldValue[i], vm.BranchId, currConn, transaction);
                     }
                     else
                     {
+                        check = cdal.CheckDuplicateInInsert(tableName, fieldName[i], fieldValue[i], currConn, transaction);
+                    }
 
-                        #region Get Serial
-
-                        string sqlTextSerial = "select ISNULL(Max(Serial),0) from DesignationGroup";
-                        SqlCommand cmdSerial = new SqlCommand(sqlTextSerial, currConn);
-                        cmdSerial.Transaction = transaction;
-                        var exeResSerial = cmdSerial.ExecuteScalar();
-                        int countSerial = Convert.ToInt32(exeResSerial);
-
-                        vm.Serial = countSerial + 1;
-
-                        #endregion
-
-                        #region Save
-                        sqlText = "Select isnull(max(convert(int,  SUBSTRING(CONVERT(varchar(10), id),CHARINDEX('_', CONVERT(varchar(10), id))+1,10))),0) from DesignationGroup where BranchId=@BranchId";
-                        SqlCommand cmd2 = new SqlCommand(sqlText, currConn);
-                        cmd2.Parameters.AddWithValue("@BranchId", vm.BranchId);
-                        cmd2.Transaction = transaction;
-                        var exeRes = cmd2.ExecuteScalar();
-                        int count = Convert.ToInt32(exeRes);
-                        vm.Id = vm.BranchId.ToString() + "_" + (count + 1);
-                        //int foundId = (int)objfoundId;
-                        if (1 == 1)
-                        {
-                            sqlText = "  ";
-                            sqlText += @" INSERT INTO DesignationGroup(Id,Serial,BranchId,Code,Name,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom) 
-                                VALUES (@Id,@Serial,@BranchId,@Code,@Name,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom) 
-                                        ";
-                            SqlCommand cmdInsert = new SqlCommand(sqlText, currConn);
-                            cmdInsert.Parameters.AddWithValue("@Id", vm.Id);
-                            cmdInsert.Parameters.AddWithValue("@Serial", vm.Serial);
-                            cmdInsert.Parameters.AddWithValue("@BranchId", vm.BranchId);
-                            cmdInsert.Parameters.AddWithValue("@Code", vm.Code.Trim());
-                            cmdInsert.Parameters.AddWithValue("@Name", vm.Name.Trim());
-                            cmdInsert.Parameters.AddWithValue("@Remarks", vm.Remarks ?? Convert.DBNull);
-                            cmdInsert.Parameters.AddWithValue("@IsActive", true);
-                            cmdInsert.Parameters.AddWithValue("@IsArchive", false);
-                            cmdInsert.Parameters.AddWithValue("@CreatedBy", vm.CreatedBy);
-                            cmdInsert.Parameters.AddWithValue("@CreatedAt", vm.CreatedAt);
-                            cmdInsert.Parameters.AddWithValue("@CreatedFrom", vm.CreatedFrom);
-                            cmdInsert.Transaction = transaction;
-                            cmdInsert.ExecuteNonQuery();
-                        }
-                        else
-                        {
-                            retResults[1] = "This Designation Group already used!";
-                            throw new ArgumentNullException("Please Input Designation Group Value", "");
-                        }
-                        #endregion Save
+                    if (check == true)
+                    {
+                        retResults[1] = "This " + fieldName[i] + ": \"" + fieldValue[i] + "\" already used!";
+                        throw new ArgumentNullException("This " + fieldName[i] + ": \"" + fieldValue[i] + "\" already used!", "");
                     }
                 }
                 #endregion Exist
+
+                #region Get Serial
+
+                string sqlTextSerial = "select ISNULL(Max(Serial),0) from DesignationGroup";
+                SqlCommand cmdSerial = new SqlCommand(sqlTextSerial, currConn);
+                cmdSerial.Transaction = transaction;
+                var exeResSerial = cmdSerial.ExecuteScalar();
+                int countSerial = Convert.ToInt32(exeResSerial);
+
+                vm.Serial = countSerial + 1;
+
+                #endregion
+
+                #region Save
+                sqlText = "Select isnull(max(convert(int,  SUBSTRING(CONVERT(varchar(10), id),CHARINDEX('_', CONVERT(varchar(10), id))+1,10))),0) from DesignationGroup where BranchId=@BranchId";
+                SqlCommand cmd2 = new SqlCommand(sqlText, currConn);
+                cmd2.Parameters.AddWithValue("@BranchId", vm.BranchId);
+                cmd2.Transaction = transaction;
+                var exeRes = cmd2.ExecuteScalar();
+                int count = Convert.ToInt32(exeRes);
+                vm.Id = vm.BranchId.ToString() + "_" + (count + 1);
+
+                sqlText = "  ";
+                sqlText += @" INSERT INTO DesignationGroup(Id,Serial,BranchId,Code,Name,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom) 
+                    VALUES (@Id,@Serial,@BranchId,@Code,@Name,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom) 
+                            ";
+                SqlCommand cmdInsert = new SqlCommand(sqlText, currConn);
+                cmdInsert.Parameters.AddWithValue("@Id", vm.Id);
+                cmdInsert.Parameters.AddWithValue("@Serial", vm.Serial);
+                cmdInsert.Parameters.AddWithValue("@BranchId", vm.BranchId);
+                cmdInsert.Parameters.AddWithValue("@Code", vm.Code.Trim());
+                cmdInsert.Parameters.AddWithValue("@Name", vm.Name.Trim());
+                cmdInsert.Parameters.AddWithValue("@Remarks", vm.Remarks ?? Convert.DBNull);
+                cmdInsert.Parameters.AddWithValue("@IsActive", true);
+                cmdInsert.Parameters.AddWithValue("@IsArchive", false);
+                cmdInsert.Parameters.AddWithValue("@CreatedBy", vm.CreatedBy);
+                cmdInsert.Parameters.AddWithValue("@CreatedAt", vm.CreatedAt);
+                cmdInsert.Parameters.AddWithValue("@CreatedFrom", vm.CreatedFrom);
+                cmdInsert.Transaction = transaction;
+                cmdInsert.ExecuteNonQuery();
+                #endregion Save
 
                 #region Commit
                 if (Vtransaction == null)
@@ -401,6 +412,19 @@ Where  id=@Id  and IsArchive=0
                 if (transaction == null) { transaction = currConn.BeginTransaction("UpdateToDepartment"); }
                 #endregion open connection and transaction
 
+                #region Validation
+                if (string.IsNullOrEmpty(vm.Code))
+                {
+                    retResults[1] = "Please Input Designation Group Code";
+                    return retResults;
+                }
+                else if (string.IsNullOrEmpty(vm.Name))
+                {
+                    retResults[1] = "Please Input Designation Group Name";
+                    return retResults;
+                }
+                #endregion Validation
+
                 #region Exist
                 CommonDAL cdal = new CommonDAL();
                 bool check = false;
@@ -409,7 +433,15 @@ Where  id=@Id  and IsArchive=0
                 string[] fieldValue = { vm.Code.Trim(), vm.Name.Trim() };
                 for (int i = 0; i < fieldName.Length; i++)
                 {
-                    check = cdal.CheckDuplicateInUpdateWithBranch(vm.Id, tableName, fieldName[i], fieldValue[i], vm.BranchId, currConn, transaction);
+                    if (vm.BranchId > 0)
+                    {
+                        check = cdal.CheckDuplicateInUpdateWithBranch(vm.Id, tableName, fieldName[i], fieldValue[i], vm.BranchId, currConn, transaction);
+                    }
+                    else
+                    {
+                        check = cdal.CheckDuplicateInUpdate(vm.Id, tableName, fieldName[i], fieldValue[i], currConn, transaction);
+                    }
+
                     if (check == true)
                     {
                         retResults[1] = "This " + fieldName[i] + ": \"" + fieldValue[i] + "\" already used!";
