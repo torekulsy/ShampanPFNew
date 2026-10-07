@@ -1,4 +1,4 @@
-@*
+﻿@*
     InvestmentType
     InvestmentAddress
     InvestmentDate
@@ -9,7 +9,7 @@
     InvestmentValue
 *@
 
-@model SymViewModel.WPPF.InvestmentRenewVM
+@model SymViewModel.WWF.InvestmentRenewVM
 @using UIHelper.MVC
 @using (Html.BeginForm("CreateEdit", "InvestmentRenew", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmInvestment" }))
 {
@@ -65,8 +65,6 @@
                     </div>
                     <div class="editor-field">
                         @Html.SimpleDropDownFor(model => model.InvestmentVm.InvestmentNameId, "/Config/DropDown/PF_InvestmentName", new { @class = "   form-control", @readonly = "readonly" })
-                        @Html.TextBoxFor(model => model.InvestmentVm.InvestmentName, new { @placeholder = "Investment Name", @class = "   form-control", @readonly = "readonly" })
-                        @Html.HiddenFor(model => model.InvestmentVm.InvestmentNameId)
                         @Html.ValidationMessageFor(model => model.InvestmentVm.InvestmentNameId)
                     </div>
                 </div>
