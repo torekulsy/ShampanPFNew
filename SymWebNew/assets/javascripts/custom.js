@@ -919,17 +919,17 @@ function InitDropDowns() {
                         item.Value === null ||
                         item.Value === undefined
                             ? ""
-                            : String(item.Value);
+                            : String(item.Value).trim();
 
                     var itemText =
                         item.Text === null ||
                         item.Text === undefined
                             ? ""
-                            : item.Text;
+                            : String(item.Text).trim();
 
                     if (
                         hasSelectedValue &&
-                        String(selected) === itemValue
+                        String(selected).trim() === itemValue
                     ) {
                         listItems +=
                             '<option selected="selected" ' +

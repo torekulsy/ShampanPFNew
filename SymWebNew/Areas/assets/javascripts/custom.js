@@ -580,12 +580,15 @@ function InitDropDowns() {
                 var Listitems = '<option value="">Select</option>';
 
                 $.each(jsonData, function (i, item) {
+                    var itmVal = item.Value ? String(item.Value).trim() : "";
+                    var itmTxt = item.Text ? String(item.Text).trim() : "";
+                    var selVal = selected ? String(selected).trim() : "";
 
-                    if (selected && selected == item.Value) {
-                        Listitems += "<option selected='selected' value='" + item.Value + "'>" + item.Text + "</option>";
+                    if (selVal && selVal == itmVal) {
+                        Listitems += "<option selected='selected' value='" + itmVal + "'>" + itmTxt + "</option>";
                     }
                     else {
-                        Listitems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                        Listitems += "<option value='" + itmVal + "'>" + itmTxt + "</option>";
                     }
                 });
                 dropdownEl.html(Listitems).addClass("DropdownInited");
