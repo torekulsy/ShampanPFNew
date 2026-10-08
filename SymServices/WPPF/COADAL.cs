@@ -1,4 +1,4 @@
-﻿using SymOrdinary;
+using SymOrdinary;
 using SymServices.Common;
 using SymViewModel.WPPF;
 using System;
@@ -132,12 +132,11 @@ WHERE  1=1 and TransType=@TransType
                 sqlText = @"
 SELECT
 Id
-,Name
+,RTRIM(LTRIM(REPLACE(REPLACE(Name, CHAR(13), ''), CHAR(10), ''))) as Name
    FROM COAType
 WHERE  1=1
+ORDER BY Id
 ";
-
-                sqlText = sqlText + " ORDER BY Id";
 
                 SqlCommand objComm = new SqlCommand(sqlText, currConn);
 
@@ -148,7 +147,7 @@ WHERE  1=1
                 {
                     vm = new COAVM();
                     vm.Id = Convert.ToInt32(dr["Id"]);
-                    vm.Name = dr["Name"].ToString();
+                    vm.Name = dr["Name"].ToString().Trim();
                     VMs.Add(vm);
                 }
                 dr.Close();
@@ -319,7 +318,7 @@ WHERE COAs.IsArchive=0
                     vm.IsRetainedEarning = Convert.ToBoolean(dr["IsRetainedEarning"]);
                     vm.IsNetProfit = Convert.ToBoolean(dr["IsNetProfit"]);
                     vm.IsDepreciation = Convert.ToBoolean(dr["IsDepreciation"]);
-                    vm.COAType = dr["COAType"].ToString();
+                    vm.COAType = dr["COAType"] != null ? dr["COAType"].ToString().Trim() : "";
 
                     VMs.Add(vm);
                 }
@@ -490,7 +489,7 @@ VALUES (
                     cmdInsert.Parameters.AddWithValue("@COASL", vm.COASL);
                     cmdInsert.Parameters.AddWithValue("@IsNetProfit", vm.IsNetProfit);
                     cmdInsert.Parameters.AddWithValue("@IsDepreciation", vm.IsDepreciation);
-                    cmdInsert.Parameters.AddWithValue("@COAType", vm.COAType);
+                    cmdInsert.Parameters.AddWithValue("@COAType", string.IsNullOrWhiteSpace(vm.COAType) ? (object)DBNull.Value : vm.COAType.Trim());
                     cmdInsert.Parameters.AddWithValue("@TransType", vm.TransType ?? "WPPF");
 
                     cmdInsert.ExecuteNonQuery();
@@ -651,7 +650,7 @@ VALUES (
                     cmdUpdate.Parameters.AddWithValue("@COASL", vm.COASL);
                     cmdUpdate.Parameters.AddWithValue("@IsNetProfit", vm.IsNetProfit);
                     cmdUpdate.Parameters.AddWithValue("@IsDepreciation", vm.IsDepreciation);
-                    cmdUpdate.Parameters.AddWithValue("@COAType", vm.COAType);
+                    cmdUpdate.Parameters.AddWithValue("@COAType", string.IsNullOrWhiteSpace(vm.COAType) ? (object)DBNull.Value : vm.COAType.Trim());
                     cmdUpdate.Parameters.AddWithValue("@LastUpdateBy", vm.LastUpdateBy);
                     cmdUpdate.Parameters.AddWithValue("@LastUpdateAt", vm.LastUpdateAt);
                     cmdUpdate.Parameters.AddWithValue("@TransType", vm.TransType ?? "WPPF");

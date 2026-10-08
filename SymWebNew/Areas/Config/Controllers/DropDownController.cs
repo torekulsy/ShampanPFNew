@@ -1,4 +1,4 @@
-﻿using SymRepository.Common;
+using SymRepository.Common;
 using SymRepository.Enum;
 using System;
 using System.Collections.Generic;
@@ -91,7 +91,15 @@ namespace SymWebUI.Areas.Config.Controllers
 
         public JsonResult PF_COAType()
         {
-            return Json(new SelectList(new COARepo().COATypeDropDown(), "Name", "Name"), JsonRequestBehavior.AllowGet);
+            var list = new COARepo().COATypeDropDown();
+            foreach (var item in list)
+            {
+                if (item.Name != null)
+                {
+                    item.Name = item.Name.Trim();
+                }
+            }
+            return Json(new SelectList(list, "Name", "Name"), JsonRequestBehavior.AllowGet);
         }
         public JsonResult PF_EnumJournalEntryType()
         {
