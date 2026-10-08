@@ -1,0 +1,659 @@
+@using System.Data
+@model DataTable
+@{
+    Layout = null;
+    var dt = Model ?? new DataTable();
+    string companyName = ViewBag.CompanyName as string;
+    if (string.IsNullOrEmpty(companyName)) { companyName = "Symphony Softtech Limited"; }
+    string companyAddress = ViewBag.CompanyAddress as string ?? "";
+    string companyPhone = ViewBag.CompanyPhone as string ?? "";
+    string companyEmail = ViewBag.CompanyEmail as string ?? "";
+    string companyLogo = ViewBag.CompanyLogo as string ?? "/Images/COMPANYLOGOhtml.png";
+    string transType = ViewBag.TransType as string ?? "GF";
+    string fundTitle = transType.Equals("PF", StringComparison.OrdinalIgnoreCase) ? "Provident" : "Gratuity";
+    string reportHead = ViewBag.ReportHead as string ?? "Employee Statement Details";
+    int recordCount = dt.Rows.Count;
+
+    bool isSymphony = string.IsNullOrEmpty(companyName) || companyName.ToLower().Contains("symphony") || companyName.ToLower().Contains("softtech");
+    if (string.IsNullOrEmpty(companyAddress) && isSymphony)
+    {
+        companyAddress = "Tridhara Tower (2nd Floor), 67, West Panthapath, Lake Circus, Kalabagan, Dhaka-1205";
+    }
+    if (string.IsNullOrEmpty(companyPhone) && isSymphony)
+    {
+        companyPhone = "+88 02 58 157 384, +88 01872 650 660 - 69";
+    }
+    if (string.IsNullOrEmpty(companyEmail) && isSymphony)
+    {
+        companyEmail = "info@symphonysoftt.com, office@symphonysoftt.com";
+    }
+
+    string dateFromStr = ViewBag.DateFrom as string ?? "";
+    string dateToStr = ViewBag.DateTo as string ?? "";
+    DateTime parsedDateFrom, parsedDateTo;
+    if (DateTime.TryParse(dateFromStr, out parsedDateFrom))
+    {
+        dateFromStr = parsedDateFrom.ToString("dd-MMM-yyyy");
+    }
+    if (DateTime.TryParse(dateToStr, out parsedDateTo))
+    {
+        dateToStr = parsedDateTo.ToString("dd-MMM-yyyy");
+    }
+    string printDateStr = DateTime.Now.ToString("dd-MMM-yyyy");
+
+    // Group rows by EmployeeCode to support both single and multi-employee statement previews
+    var employeeGroups = dt.AsEnumerable()
+        .GroupBy(r => dt.Columns.Contains("EmployeeCode") && r["EmployeeCode"] != DBNull.Value ? r["EmployeeCode"].ToString().Trim() : "ALL")
+        .ToList();
+
+    Func<object, string> formatDate = (valObj) =>
+    {
+        if (valObj == null || valObj == DBNull.Value) { return ""; }
+        string s = valObj.ToString().Trim();
+        if (string.IsNullOrEmpty(s)) { return ""; }
+        DateTime dtVal;
+        if (DateTime.TryParse(s, out dtVal)) { return dtVal.ToString("dd-MMM-yyyy"); }
+        if (DateTime.TryParseExact(s, "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dtVal))
+        {
+            return dtVal.ToString("dd-MMM-yyyy");
+        }
+        return s;
+    };
+
+    Func<decimal, string> formatAmt = (val) =>
+    {
+        return val.ToString("#,##0.00");
+    };
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@fundTitle Fund - @reportHead</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, "Arial Narrow", Helvetica, sans-serif;
+            font-size: 11px;
+            color: #000;
+            background-color: #525659;
+        }
+
+        /* ── Sticky Toolbar ── */
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #323639;
+            color: #fff;
+            padding: 8px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            font-family: Arial, sans-serif;
+        }
+
+        .toolbar-title {
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .btn-print {
+            background: #0078d4;
+            color: #fff;
+        }
+        .btn-print:hover {
+            background: #005a9e;
+        }
+
+        .btn-excel {
+            background: #107c41;
+            color: #fff;
+        }
+        .btn-excel:hover {
+            background: #0b5a2f;
+        }
+
+        .btn-close {
+            background: #555;
+            color: #fff;
+        }
+        .btn-close:hover {
+            background: #444;
+        }
+
+        /* ── Page Layout ── */
+        .report-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0 40px 0;
+        }
+
+        .report-page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #fff;
+            padding: 10mm 12mm 15mm 12mm;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        /* ── Company Header: Logo Left, Company Info Center ── */
+        .company-header {
+            position: relative;
+            min-height: 60px;
+            padding-bottom: 8px;
+            border-bottom: 1.5px solid #000;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .company-logo {
+            position: absolute;
+            left: 0;
+            top: 0;
+            max-height: 56px;
+            max-width: 140px;
+            object-fit: contain;
+        }
+
+        .company-text {
+            text-align: center;
+            width: 100%;
+            padding: 0 145px;
+        }
+
+        .company-name {
+            font-size: 15px;
+            font-weight: bold;
+            color: #000;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            line-height: 1.25;
+        }
+
+        .company-address {
+            font-size: 10px;
+            color: #000;
+            margin-top: 2px;
+            line-height: 1.3;
+        }
+
+        .company-contact {
+            font-size: 9.5px;
+            color: #000;
+            margin-top: 1px;
+            line-height: 1.25;
+        }
+
+        .report-sub-header {
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .fund-title {
+            text-align: center;
+            font-size: 13.5px;
+            font-weight: bold;
+            color: #000;
+            margin-top: 2px;
+            margin-bottom: 2px;
+            font-family: Arial, sans-serif;
+        }
+
+        .report-title {
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 5px;
+            font-family: Arial, sans-serif;
+        }
+
+        .meta-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            color: #000;
+            margin-bottom: 6px;
+            padding: 0 2px;
+        }
+
+        /* ── Employee Master Info Table (GroupHeaderSection1) ── */
+        .emp-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000;
+            margin-bottom: 8px;
+            font-family: "Arial Narrow", Arial, sans-serif;
+            font-size: 11px;
+        }
+
+        .emp-info-table td {
+            border: 1px solid #000;
+            padding: 3px 6px;
+            vertical-align: middle;
+            color: #000;
+        }
+
+        .emp-info-table td.lbl {
+            font-weight: bold;
+            width: 110px;
+            background-color: #fff;
+        }
+
+        .emp-info-table td.val {
+            background-color: #fff;
+            width: 250px;
+        }
+
+        /* ── Detail Grid (GroupHeaderSection2 & DetailSection) ── */
+        .statement-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000;
+            font-family: "Arial Narrow", Arial, sans-serif;
+            font-size: 10.5px;
+            color: #000;
+        }
+
+        .statement-table th {
+            border: 1px solid #000;
+            padding: 5px 4px;
+            font-weight: bold;
+            background-color: #fff;
+            text-align: center;
+            vertical-align: middle;
+            line-height: 1.25;
+            color: #000;
+        }
+
+        .statement-table td {
+            border: 1px solid #000;
+            padding: 3px 5px;
+            vertical-align: middle;
+            color: #000;
+            background-color: #fff;
+            line-height: 1.25;
+        }
+
+        .statement-table tfoot td {
+            border-top: 1px solid #000;
+            border-bottom: 2px solid #000;
+            font-weight: bold;
+            background-color: #fff;
+            padding: 4px 5px;
+        }
+
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+
+        /* ── Footer ── */
+        .footer-section {
+            margin-top: auto;
+            padding-top: 50px;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding: 0 10px;
+        }
+
+        .sign-box {
+            border-top: 1px solid #000;
+            width: 160px;
+            text-align: center;
+            padding-top: 4px;
+            font-size: 10.5px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        /* ── Print Media Query ── */
+        @@media print {
+            @@page {
+                size: A4 portrait;
+                margin: 8mm 10mm;
+            }
+
+            body {
+                background: #fff !important;
+                color: #000 !important;
+            }
+
+            .toolbar {
+                display: none !important;
+            }
+
+            .report-container {
+                padding: 0 !important;
+                display: block !important;
+            }
+
+            .report-page {
+                width: 100% !important;
+                min-height: auto !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 4mm 0 !important;
+                margin: 0 !important;
+                page-break-after: always;
+            }
+
+            .statement-table th {
+                background-color: #fff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            tr {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+<link href="@Url.Content("~/assets/stylesheets/pf-module-views.css")" rel="stylesheet" media="screen" />
+</head>
+<body class="pf-module-theme pf-module-report">
+    <!-- Sticky Toolbar -->
+    <div class="toolbar">
+        <div class="toolbar-title">@fundTitle Fund - @reportHead (@recordCount Records)</div>
+        <div class="toolbar-actions">
+            <button type="button" class="btn btn-print" onclick="window.print()">Print</button>
+            <button type="button" class="btn btn-excel" onclick="exportExcel()">Export to Excel</button>
+            <button type="button" class="btn btn-close" onclick="window.close()">Close</button>
+        </div>
+    </div>
+
+    <!-- Report Container -->
+    <div class="report-container" id="printableArea">
+        @if (recordCount == 0)
+        {
+            <div class="report-page">
+                <!-- Company Header (Logo Left, Company Info Center) -->
+                <div class="company-header">
+                    <img src="@companyLogo" class="company-logo" onerror="this.onerror=null; this.src='/Images/COMPANYLOGO.png';" />
+                    <div class="company-text">
+                        <div class="company-name">@companyName</div>
+                        @if (!string.IsNullOrEmpty(companyAddress))
+                        {
+                            <div class="company-address">@companyAddress</div>
+                        }
+                        @if (!string.IsNullOrEmpty(companyPhone) || !string.IsNullOrEmpty(companyEmail))
+                        {
+                            <div class="company-contact">
+                                @if (!string.IsNullOrEmpty(companyPhone)) { <span>@companyPhone</span> }
+                                @if (!string.IsNullOrEmpty(companyPhone) && !string.IsNullOrEmpty(companyEmail)) { <span> | </span> }
+                                @if (!string.IsNullOrEmpty(companyEmail)) { <span>@companyEmail</span> }
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="report-sub-header">
+                    <div class="fund-title">@fundTitle Fund</div>
+                    <div class="report-title">@reportHead</div>
+                </div>
+                <div style="text-align: center; padding: 60px 0; font-size: 13px; color: #555; border: 1px solid #000; margin-top: 20px;">
+                    There are no data to Preview for @reportHead
+                </div>
+            </div>
+        }
+        else
+        {
+            foreach (var empGroup in employeeGroups)
+            {
+                var empRows = empGroup.ToList();
+                DataRow firstRow = empRows.FirstOrDefault();
+
+                string empCode = firstRow != null && dt.Columns.Contains("EmployeeCode") && firstRow["EmployeeCode"] != DBNull.Value ? firstRow["EmployeeCode"].ToString().Trim() : "";
+                string empName = firstRow != null && dt.Columns.Contains("EmpName") && firstRow["EmpName"] != DBNull.Value ? firstRow["EmpName"].ToString().Trim() : "";
+                string designation = firstRow != null && dt.Columns.Contains("Designation") && firstRow["Designation"] != DBNull.Value ? firstRow["Designation"].ToString().Trim() : "";
+                string department = firstRow != null && dt.Columns.Contains("Department") && firstRow["Department"] != DBNull.Value ? firstRow["Department"].ToString().Trim() : "";
+                string empSection = firstRow != null && dt.Columns.Contains("Section") && firstRow["Section"] != DBNull.Value ? firstRow["Section"].ToString().Trim() : "";
+                string project = firstRow != null && dt.Columns.Contains("Project") && firstRow["Project"] != DBNull.Value ? firstRow["Project"].ToString().Trim() : "";
+
+                decimal sumEmployerContrib = 0;
+                decimal sumEmployerProfit = 0;
+                decimal sumTotal = 0;
+                decimal lastBalance = 0;
+
+                <div class="report-page">
+                    <!-- Company Header (Logo Left, Company Info Center) -->
+                    <div class="company-header">
+                        <img src="@companyLogo" class="company-logo" onerror="this.onerror=null; this.src='/Images/COMPANYLOGO.png';" />
+                        <div class="company-text">
+                            <div class="company-name">@companyName</div>
+                            @if (!string.IsNullOrEmpty(companyAddress))
+                            {
+                                <div class="company-address">@companyAddress</div>
+                            }
+                            @if (!string.IsNullOrEmpty(companyPhone) || !string.IsNullOrEmpty(companyEmail))
+                            {
+                                <div class="company-contact">
+                                    @if (!string.IsNullOrEmpty(companyPhone)) { <span>@companyPhone</span> }
+                                    @if (!string.IsNullOrEmpty(companyPhone) && !string.IsNullOrEmpty(companyEmail)) { <span> | </span> }
+                                    @if (!string.IsNullOrEmpty(companyEmail)) { <span>@companyEmail</span> }
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Fund & Report Head -->
+                    <div class="report-sub-header">
+                        <div class="fund-title">@fundTitle Fund</div>
+                        <div class="report-title">@reportHead</div>
+
+                        <div class="meta-line">
+                            <div>
+                                @if (!string.IsNullOrEmpty(dateFromStr) || !string.IsNullOrEmpty(dateToStr))
+                                {
+                                    <span><strong>Period:</strong> @dateFromStr to @dateToStr</span>
+                                }
+                            </div>
+                            <div>
+                                <span><strong>Print Date:</strong> @printDateStr</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Employee Info Box (GroupHeaderSection1 in Crystal Report) -->
+                    <table class="emp-info-table">
+                        <tr>
+                            <td class="lbl">Code</td>
+                            <td class="val">@empCode</td>
+                            <td class="lbl">Department</td>
+                            <td class="val">@department</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">Employee Name</td>
+                            <td class="val">@empName</td>
+                            <td class="lbl">Section</td>
+                            <td class="val">@empSection</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">Designation</td>
+                            <td class="val">@designation</td>
+                            <td class="lbl">Project</td>
+                            <td class="val">@project</td>
+                        </tr>
+                    </table>
+
+                    <!-- Statement Detail Grid (GroupHeaderSection2 & Detail in Crystal Report) -->
+                    <table class="statement-table" id="statementTable_@empCode">
+                        <thead>
+                            <tr>
+                                <th style="width: 38px;">SL</th>
+                                <th style="width: 95px;">Transaction Date</th>
+                                <th style="width: 120px;">Employer Contribution</th>
+                                <th style="width: 110px;">Employer Profit</th>
+                                <th style="width: 110px;">Total</th>
+                                <th style="width: 115px;">Balance</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int sl = 1;
+                                foreach (DataRow row in empRows)
+                                {
+                                    string rowTransType = dt.Columns.Contains("TransType") && row["TransType"] != DBNull.Value ? row["TransType"].ToString().Trim() : "";
+
+                                    decimal emprContrib = 0;
+                                    if (dt.Columns.Contains("EmployerContribution") && row["EmployerContribution"] != DBNull.Value)
+                                    {
+                                        decimal.TryParse(row["EmployerContribution"].ToString(), out emprContrib);
+                                    }
+
+                                    decimal emprProfit = 0;
+                                    if (dt.Columns.Contains("EmployerProfit") && row["EmployerProfit"] != DBNull.Value)
+                                    {
+                                        decimal.TryParse(row["EmployerProfit"].ToString(), out emprProfit);
+                                    }
+
+                                    // Crystal Report Formula: if TransType == "Payment" then -1 * Value else Value
+                                    if (rowTransType.Equals("Payment", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        emprContrib = -1 * emprContrib;
+                                        emprProfit = -1 * emprProfit;
+                                    }
+
+                                    decimal rowTotal = emprContrib + emprProfit;
+
+                                    decimal balance = 0;
+                                    if (dt.Columns.Contains("Balance") && row["Balance"] != DBNull.Value)
+                                    {
+                                        decimal.TryParse(row["Balance"].ToString(), out balance);
+                                    }
+
+                                    sumEmployerContrib += emprContrib;
+                                    sumEmployerProfit += emprProfit;
+                                    sumTotal += rowTotal;
+                                    lastBalance = balance;
+
+                                    string tDate = dt.Columns.Contains("TransactionDate") ? formatDate(row["TransactionDate"]) : "";
+                                    string remarks = "";
+                                    if (dt.Columns.Contains("Remarks") && row["Remarks"] != DBNull.Value && !string.IsNullOrEmpty(row["Remarks"].ToString().Trim()) && row["Remarks"].ToString().Trim() != "-")
+                                    {
+                                        remarks = row["Remarks"].ToString().Trim();
+                                    }
+                                    else if (!string.IsNullOrEmpty(rowTransType))
+                                    {
+                                        remarks = rowTransType;
+                                    }
+
+                                    <tr>
+                                        <td class="text-center">@(sl++)</td>
+                                        <td class="text-center">@tDate</td>
+                                        <td class="text-right">@formatAmt(emprContrib)</td>
+                                        <td class="text-right">@formatAmt(emprProfit)</td>
+                                        <td class="text-right">@formatAmt(rowTotal)</td>
+                                        <td class="text-right">@formatAmt(balance)</td>
+                                        <td class="text-left">@remarks</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                        <!-- Group Footer (Totals matching GroupFooterSection1 in Crystal Report) -->
+                        <tfoot>
+                            <tr>
+                                <td colspan="2" class="text-right" style="font-weight: bold;">Total:</td>
+                                <td class="text-right">@formatAmt(sumEmployerContrib)</td>
+                                <td class="text-right">@formatAmt(sumEmployerProfit)</td>
+                                <td class="text-right">@formatAmt(sumTotal)</td>
+                                <td class="text-right">@formatAmt(lastBalance)</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <!-- Page Footer (Section5 in Crystal Report) -->
+                    <div class="footer-section">
+                        <div class="signatures">
+                            <div class="sign-box">Prepared By</div>
+                            <div class="sign-box">Checked By</div>
+                            <div class="sign-box">Manager (HR / Accounts)</div>
+                            <div class="sign-box">Authorized Signatory</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- Export to Excel Script -->
+    <script>
+        function exportExcel() {
+            var tables = document.querySelectorAll('.statement-table');
+            if (!tables || tables.length === 0) {
+                alert('No data to export.');
+                return;
+            }
+
+            var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+            html += '<head><meta charset="utf-8"/><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';
+            html += '<x:Name>Employee Statement</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><link href="@Url.Content("~/assets/stylesheets/pf-module-views.css")" rel="stylesheet" media="screen" />
+</head><body class="pf-module-theme pf-module-report">';
+            
+            var pages = document.querySelectorAll('.report-page');
+            pages.forEach(function (page) {
+                var empTable = page.querySelector('.emp-info-table');
+                var stmtTable = page.querySelector('.statement-table');
+                var fundTitle = page.querySelector('.fund-title') ? page.querySelector('.fund-title').innerText : '';
+                var reportTitle = page.querySelector('.report-title') ? page.querySelector('.report-title').innerText : '';
+
+                html += '<h3 style="text-align:center;">' + fundTitle + '</h3>';
+                html += '<h4 style="text-align:center;">' + reportTitle + '</h4>';
+                if (empTable) {
+                    html += empTable.outerHTML + '<br/>';
+                }
+                if (stmtTable) {
+                    html += stmtTable.outerHTML + '<br/><br/>';
+                }
+            });
+            html += '</body></html>';
+
+            var blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'EmployeeStatement_' + new Date().toISOString().slice(0, 10) + '.xls';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

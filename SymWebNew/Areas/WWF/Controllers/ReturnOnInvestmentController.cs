@@ -1,9 +1,9 @@
-﻿using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.CrystalReports.Engine;
 using JQueryDataTables.Models;
 using SymOrdinary;
 using SymRepository.Common;
-using SymRepository.PF;
-using SymViewModel.PF;
+using SymRepository.WWF;
+using SymViewModel.WWF;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,11 +12,11 @@ using System.Linq;
 using System.Threading;
 using System.Web.Mvc;
 using SymViewModel.Common;
-using SymReporting.PF;
-using SymWebUI.Areas.PF.Models;
+using SymReporting.WWF;
+using SymWebUI.Areas.WWF.Models;
 
 
-namespace SymWebUI.Areas.PF.Controllers
+namespace SymWebUI.Areas.WWF.Controllers
 {
     public class ReturnOnInvestmentController : Controller
     {

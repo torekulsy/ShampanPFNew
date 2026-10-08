@@ -1,0 +1,48 @@
+@model SymViewModel.PF.PFReportVM
+@using UIHelper.MVC
+@{
+    ViewBag.Title = "Forfeiture Report";
+    ViewBag.Location = "Report";
+}
+
+@using (Html.BeginForm("EmployeeForfeiturePF_Statement", "PFReport", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmStatement", @target = "_blank" }))
+{
+    @Html.ValidationSummary(true)
+    <div class="thinbox">
+        <div class="th_thinbox">
+            <p><i class="fa fa-file-text-o"></i> Forfeiture Report</p>
+        </div>
+        <div class="EnumEEHead" style="padding: 20px 24px;">
+            <div class="ep-form-grid" style="grid-template-columns: 1fr;">
+                <div class="ep-form-group">
+                    <label class="ep-field-label">Employee Code</label>
+                    <div class="editor-field">
+                        @Html.SimpleDropDownFor(model => model.EmployeeId, "/Config/DropDown/EmployeeCodeNameAll", new { @class = "codeFCom form-control selectDropdown" })
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 15px; padding-top: 10px; border-top: 1px solid #f1f5f9;">
+                <button type="button" title="Click for Report" onclick="reportData(this);" class="sym-btn-Excel-Export btn-erp-export">&nbsp;Download</button>
+                <button type="button" title="Clear the Entries" id="Clear" class="sym-btn-clear btn-erp-clear">&nbsp;Clear</button>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    $(function () {
+        $(".selectDropdown").select2();
+        $(".selectDropdown").removeClass('form-control');
+        InitDropDowns();
+        InitDateTimePickers();
+
+        $("#Clear").on('click', function () {
+            $("#frmStatement").find("input[type=text], textarea").val("");
+            $("#frmStatement").find("select").val(null).trigger('change');
+        });
+    });
+
+    function reportData(sender) {
+        $("#frmStatement").submit();
+    }
+</script>

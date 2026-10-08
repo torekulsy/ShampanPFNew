@@ -408,7 +408,9 @@ namespace SymServices.Common
         {
             ShampanIdentity identity = Thread.CurrentPrincipal.Identity as ShampanIdentity;
             if (identity != null && identity.IsAdmin
-                && string.Equals(permissionArea, "Admin", StringComparison.OrdinalIgnoreCase))
+                && (string.Equals(permissionArea, "Admin", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(permissionArea, "GF", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(permissionArea, "WWF", StringComparison.OrdinalIgnoreCase)))
             {
                 return true;
             }
@@ -592,7 +594,7 @@ namespace SymServices.Common
                 return modules;
             }
 
-            List<string> dynamicAreas = new List<string> { "Admin", "PF", "GL", "WPPF" };
+            List<string> dynamicAreas = new List<string> { "Admin", "PF", "GF", "GL", "WPPF", "WWF" };
 
             foreach (string areaName in dynamicAreas)
             {
@@ -645,6 +647,11 @@ namespace SymServices.Common
             if (string.Equals(areaName, "PF", StringComparison.OrdinalIgnoreCase))
             {
                 return identity.IsAdmin || identity.IsPF;
+            }
+
+            if (string.Equals(areaName, "GF", StringComparison.OrdinalIgnoreCase))
+            {
+                return identity.IsAdmin || identity.IsGF;
             }
 
             if (string.Equals(areaName, "WPPF", StringComparison.OrdinalIgnoreCase))

@@ -1,8 +1,8 @@
-﻿using JQueryDataTables.Models;
+using JQueryDataTables.Models;
 using SymOrdinary;
-using SymRepository.WPPF;
+using SymRepository.WWF;
 using SymRepository.Common;
-using SymViewModel.WPPF;
+using SymViewModel.WWF;
 using SymViewModel.Common;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 
-namespace SymWebUI.Areas.WPPF.Controllers
+namespace SymWebUI.Areas.WWF.Controllers
 {
     public class EEHeadController : Controller
     {

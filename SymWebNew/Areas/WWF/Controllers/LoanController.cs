@@ -1,4 +1,4 @@
-﻿using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.CrystalReports.Engine;
 using JQueryDataTables.Models;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -273,7 +273,11 @@ namespace SymWebUI.Areas.WWF.Controllers
                 vm.BranchId = identity.BranchId.ToString();
                 vm.BranchId = Session["BranchId"].ToString();
                 vm.IsHold = false;
-                decimal cPAmount = vm.PrincipalAmount;
+                if (!vm.PrincipalAmount.HasValue || vm.NumberOfInstallment.GetValueOrDefault() <= 0)
+                {
+                    throw new ArgumentException("Principal amount and a positive installment count are required.");
+                }
+                decimal cPAmount = vm.PrincipalAmount.Value;
                 decimal dPAmount = 0;
                 decimal dIAmount = 0;
                 decimal dTAmount = 0;
@@ -281,11 +285,11 @@ namespace SymWebUI.Areas.WWF.Controllers
 
                 var fractionValue = "0";
             
-                List<MonthCalculation> monthCalculations = Ordinary.MonthCalculation(Ordinary.DateToString(vm.StartDate), vm.NumberOfInstallment);
+                List<MonthCalculation> monthCalculations = Ordinary.MonthCalculation(Ordinary.DateToString(vm.StartDate), vm.NumberOfInstallment.GetValueOrDefault());
                 List<EmployeeLoanDetailVM> loanDetails = new List<EmployeeLoanDetailVM>();
                 EmployeeLoanDetailVM loanDetail;
 
-                var amount = vm.PrincipalAmount / vm.NumberOfInstallment;
+                var amount = vm.PrincipalAmount.GetValueOrDefault() / vm.NumberOfInstallment.GetValueOrDefault();
                 var actualValue = amount.ToString().Split('.')[0];
 
                 if (amount == Math.Round(amount))
@@ -296,12 +300,12 @@ namespace SymWebUI.Areas.WWF.Controllers
                 {
                     fractionValue = amount.ToString().Split('.')[1];
                 }
-                var totalCount = vm.NumberOfInstallment - 1;
+                var totalCount = vm.NumberOfInstallment.GetValueOrDefault() - 1;
 
 
                 #region  Reduce policy
                 double annualInterestRate = Convert.ToDouble(vm.InterestRate / 100); // Annual interest rate (10%)
-                int loanTermMonths = vm.NumberOfInstallment; // Loan term in months
+                int loanTermMonths = vm.NumberOfInstallment.GetValueOrDefault(); // Loan term in months
                 // Calculate monthly interest rate
 
                 double monthlyInterestRate = annualInterestRate / 12;
@@ -343,8 +347,8 @@ namespace SymWebUI.Areas.WWF.Controllers
                     }
                     else
                     {
-                        dPAmount = vm.PrincipalAmount / vm.NumberOfInstallment;
-                        dIAmount = vm.InterestAmount / vm.NumberOfInstallment;
+                        dPAmount = vm.PrincipalAmount.GetValueOrDefault() / vm.NumberOfInstallment.GetValueOrDefault();
+                        dIAmount = vm.InterestAmount.GetValueOrDefault() / vm.NumberOfInstallment.GetValueOrDefault();
                         dTAmount = dPAmount + dIAmount;
                     }
 
@@ -352,12 +356,12 @@ namespace SymWebUI.Areas.WWF.Controllers
                     {
                         if (totalCount == i)
                         {
-                            dPAmount = vm.PrincipalAmount - (Convert.ToInt32(actualValue) * (vm.NumberOfInstallment - 1));
+                            dPAmount = vm.PrincipalAmount.GetValueOrDefault() - (Convert.ToInt32(actualValue) * (vm.NumberOfInstallment.GetValueOrDefault() - 1));
 
                             dIAmount = Convert.ToDecimal(dIAmount);
                             var val = dIAmount.ToString().Split('.')[0];
 
-                            dIAmount = Convert.ToInt32(vm.InterestAmount) - (Convert.ToInt32(val) * (vm.NumberOfInstallment - 1));
+                            dIAmount = Convert.ToInt32(vm.InterestAmount.GetValueOrDefault()) - (Convert.ToInt32(val) * (vm.NumberOfInstallment.GetValueOrDefault() - 1));
                         }
                         else
                         {
@@ -584,18 +588,22 @@ namespace SymWebUI.Areas.WWF.Controllers
                 vm.CreatedFrom = identity.WorkStationIP;
                 vm.BranchId = identity.BranchId;
                 vm.IsHold = false;
-                decimal cPAmount = vm.PrincipalAmount;
+                if (!vm.PrincipalAmount.HasValue || vm.NumberOfInstallment.GetValueOrDefault() <= 0)
+                {
+                    throw new ArgumentException("Principal amount and a positive installment count are required.");
+                }
+                decimal cPAmount = vm.PrincipalAmount.Value;
                 decimal dPAmount = 0;
                 decimal dIAmount = 0;
                 decimal dTAmount = 0;
-                List<MonthCalculation> monthCalculations = Ordinary.MonthCalculation(Ordinary.DateToString(vm.StartDate), vm.NumberOfInstallment);
+                List<MonthCalculation> monthCalculations = Ordinary.MonthCalculation(Ordinary.DateToString(vm.StartDate), vm.NumberOfInstallment.GetValueOrDefault());
                 List<EmployeeLoanDetailVM> loanDetails = new List<EmployeeLoanDetailVM>();
                 EmployeeLoanDetailVM loanDetail;
 
-                var amount = vm.PrincipalAmount / vm.NumberOfInstallment;
+                var amount = vm.PrincipalAmount.GetValueOrDefault() / vm.NumberOfInstallment.GetValueOrDefault();
                 var actualValue = amount.ToString().Split('.')[0];
                 var fractionValue = amount.ToString().Split('.')[1];
-                var totalCount = vm.NumberOfInstallment - 1;
+                var totalCount = vm.NumberOfInstallment.GetValueOrDefault() - 1;
                 #region  Reduce policy
                 double annualInterestRate = Convert.ToDouble(vm.InterestRate / 100); // Annual interest rate (10%)
                 int loanTermMonths = 36; // Loan term in months
@@ -637,20 +645,20 @@ namespace SymWebUI.Areas.WWF.Controllers
                     }
                     else
                     {
-                        dPAmount = vm.PrincipalAmount / vm.NumberOfInstallment;
-                        dIAmount = vm.InterestAmount / vm.NumberOfInstallment;
+                        dPAmount = vm.PrincipalAmount.GetValueOrDefault() / vm.NumberOfInstallment.GetValueOrDefault();
+                        dIAmount = vm.InterestAmount.GetValueOrDefault() / vm.NumberOfInstallment.GetValueOrDefault();
                         dTAmount = dPAmount + dIAmount;
                     }
                     if (vm.InterestPolicy != "Reduce")
                     {
                         if (totalCount == i)
                         {
-                            dPAmount = vm.PrincipalAmount - (Convert.ToInt32(actualValue) * (vm.NumberOfInstallment - 1));
+                            dPAmount = vm.PrincipalAmount.GetValueOrDefault() - (Convert.ToInt32(actualValue) * (vm.NumberOfInstallment.GetValueOrDefault() - 1));
 
                             dIAmount = Convert.ToDecimal(dIAmount);
                             var val = dIAmount.ToString().Split('.')[0];
 
-                            dIAmount = Convert.ToInt32(vm.InterestAmount) - (Convert.ToInt32(val) * (vm.NumberOfInstallment - 1));
+                            dIAmount = Convert.ToInt32(vm.InterestAmount.GetValueOrDefault()) - (Convert.ToInt32(val) * (vm.NumberOfInstallment.GetValueOrDefault() - 1));
 
                         }
                         else
@@ -978,18 +986,22 @@ namespace SymWebUI.Areas.WWF.Controllers
                 vm.CreatedFrom = identity.WorkStationIP;
                 vm.BranchId = identity.BranchId;
                 vm.IsHold = false;
-                decimal cPAmount = vm.PrincipalAmount;
+                if (!vm.PrincipalAmount.HasValue || vm.NumberOfInstallment.GetValueOrDefault() <= 0)
+                {
+                    throw new ArgumentException("Principal amount and a positive installment count are required.");
+                }
+                decimal cPAmount = vm.PrincipalAmount.Value;
                 decimal dPAmount = 0;
                 decimal dIAmount = 0;
                 decimal dTAmount = 0;
-                List<MonthCalculation> monthCalculations = Ordinary.MonthCalculation(Ordinary.DateToString(vm.StartDate), vm.NumberOfInstallment);
+                List<MonthCalculation> monthCalculations = Ordinary.MonthCalculation(Ordinary.DateToString(vm.StartDate), vm.NumberOfInstallment.GetValueOrDefault());
                 List<EmployeeLoanDetailVM> loanDetails = new List<EmployeeLoanDetailVM>();
                 EmployeeLoanDetailVM loanDetail;
 
-                var amount = vm.PrincipalAmount / vm.NumberOfInstallment;
+                var amount = vm.PrincipalAmount.GetValueOrDefault() / vm.NumberOfInstallment.GetValueOrDefault();
                 var actualValue = amount.ToString().Split('.')[0];
                 var fractionValue = amount.ToString().Split('.')[1];
-                var totalCount = vm.NumberOfInstallment - 1;
+                var totalCount = vm.NumberOfInstallment.GetValueOrDefault() - 1;
                 #region  Reduce policy
                 double annualInterestRate = Convert.ToDouble(vm.InterestRate / 100); // Annual interest rate (10%)
                 int loanTermMonths = 36; // Loan term in months
@@ -1032,20 +1044,20 @@ namespace SymWebUI.Areas.WWF.Controllers
                     }
                     else
                     {
-                        dPAmount = vm.PrincipalAmount / vm.NumberOfInstallment;
-                        dIAmount = vm.InterestAmount / vm.NumberOfInstallment;
+                        dPAmount = vm.PrincipalAmount.GetValueOrDefault() / vm.NumberOfInstallment.GetValueOrDefault();
+                        dIAmount = vm.InterestAmount.GetValueOrDefault() / vm.NumberOfInstallment.GetValueOrDefault();
                         dTAmount = dPAmount + dIAmount;
                     }
                     if (vm.InterestPolicy != "Reduce")
                     {
                         if (totalCount == i)
                         {
-                            dPAmount = vm.PrincipalAmount - (Convert.ToInt32(actualValue) * (vm.NumberOfInstallment - 1));
+                            dPAmount = vm.PrincipalAmount.GetValueOrDefault() - (Convert.ToInt32(actualValue) * (vm.NumberOfInstallment.GetValueOrDefault() - 1));
 
                             dIAmount = Convert.ToDecimal(dIAmount);
                             var val = dIAmount.ToString().Split('.')[0];
 
-                            dIAmount = Convert.ToInt32(vm.InterestAmount) - (Convert.ToInt32(val) * (vm.NumberOfInstallment - 1));
+                            dIAmount = Convert.ToInt32(vm.InterestAmount.GetValueOrDefault()) - (Convert.ToInt32(val) * (vm.NumberOfInstallment.GetValueOrDefault() - 1));
 
                         }
                         else

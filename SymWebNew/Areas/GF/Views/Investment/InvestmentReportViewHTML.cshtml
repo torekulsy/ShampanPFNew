@@ -1,0 +1,550 @@
+@using System.Data
+@model DataSet
+@{
+    Layout = null;
+    string companyName = ViewBag.CompanyName as string ?? "Symphony Softtech Limited";
+    string companyAddress = ViewBag.CompanyAddress as string ?? "";
+    string companyLogo = ViewBag.CompanyLogo as string ?? "/Images/COMPANYLOGOhtml.png";
+    string reportHead = ViewBag.ReportHead as string ?? "Employees' Contributory Provident Fund";
+    string printDateStr = DateTime.Now.ToString("dd-MMM-yy");
+
+    DataTable dtDetails = null;
+    DataTable dtPolicy = null;
+
+    if (Model != null)
+    {
+        foreach (DataTable t in Model.Tables)
+        {
+            if (t.TableName == "dtInvestmentDetails" || t.Columns.Contains("InvestmentNameId") || (t.Columns.Contains("InvestmentValue") && t.Columns.Contains("InvestmentRate")))
+            {
+                dtDetails = t;
+            }
+            else if (t.TableName == "dtInvestmentNameDetails" || t.Columns.Contains("FromMonth") || t.Columns.Contains("ToMonth"))
+            {
+                dtPolicy = t;
+            }
+            else if (t.TableName == "dtInvestmentHeader")
+            {
+                if (dtDetails == null)
+                {
+                    dtDetails = t;
+                }
+            }
+        }
+        if (dtDetails == null && Model.Tables.Count > 0)
+        {
+            dtDetails = Model.Tables[0];
+        }
+        if (dtPolicy == null && Model.Tables.Count > 1)
+        {
+            dtPolicy = Model.Tables[1];
+        }
+    }
+
+    dtDetails = dtDetails ?? new DataTable();
+    dtPolicy = dtPolicy ?? new DataTable();
+
+    DataRow mRow = dtDetails.Rows.Count > 0 ? dtDetails.Rows[0] : null;
+
+    Func<object, string> formatDate = (valObj) => {
+        if (valObj == null || valObj == DBNull.Value) { return ""; }
+        string s = valObj.ToString().Trim();
+        if (string.IsNullOrEmpty(s)) { return ""; }
+        DateTime dt;
+        if (DateTime.TryParse(s, out dt)) { return dt.ToString("dd-MMM-yyyy"); }
+        if (DateTime.TryParseExact(s, "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dt))
+        {
+            return dt.ToString("dd-MMM-yyyy");
+        }
+        return s;
+    };
+
+    Func<object, string> formatAmt = (valObj) => {
+        if (valObj == null || valObj == DBNull.Value) { return ""; }
+        string str = valObj.ToString().Trim();
+        if (string.IsNullOrEmpty(str)) { return ""; }
+        decimal val;
+        if (!decimal.TryParse(str, out val)) { return str; }
+        if (val == 0) { return ""; }
+        if (val < 0) { return "(" + Math.Abs(val).ToString("#,##0.00") + ")"; }
+        return val.ToString("#,##0.00");
+    };
+
+    Func<object, string> formatRate = (valObj) => {
+        if (valObj == null || valObj == DBNull.Value) { return ""; }
+        string str = valObj.ToString().Trim();
+        if (string.IsNullOrEmpty(str)) { return ""; }
+        decimal val;
+        if (!decimal.TryParse(str, out val)) { return str; }
+        return val.ToString("0.00");
+    };
+
+    Func<DataRow, string, string> getColVal = (r, col) => {
+        if (r == null || !r.Table.Columns.Contains(col) || r[col] == DBNull.Value) { return ""; }
+        return r[col].ToString().Trim();
+    };
+
+    Func<DataRow, string> getAit = (r) => {
+        if (r == null) { return ""; }
+        if (r.Table.Columns.Contains("AIT") && r["AIT"] != DBNull.Value) { return formatAmt(r["AIT"]); }
+        if (r.Table.Columns.Contains("AitInterest") && r["AitInterest"] != DBNull.Value) { return formatAmt(r["AitInterest"]); }
+        if (r.Table.Columns.Contains("Interest") && r["Interest"] != DBNull.Value)
+        {
+            decimal intVal = 0;
+            if (decimal.TryParse(r["Interest"].ToString(), out intVal) && intVal > 0)
+            {
+                decimal aitCalc = Math.Round(intVal * 0.05m, 0);
+                if (aitCalc > 0) { return aitCalc.ToString("#,##0"); }
+            }
+        }
+        return "";
+    };
+
+    Func<DataRow, string> getNetInterest = (r) => {
+        if (r == null) { return ""; }
+        if (r.Table.Columns.Contains("NetInterest") && r["NetInterest"] != DBNull.Value) { return formatAmt(r["NetInterest"]); }
+        return "";
+    };
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Investment Details</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11px;
+            color: #000;
+            background-color: #525659;
+        }
+
+        /* â”€â”€ Sticky Toolbar â”€â”€ */
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #323639;
+            color: #fff;
+            padding: 8px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .toolbar-title {
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn {
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .btn-print { background: #0078d4; color: #fff; }
+        .btn-excel { background: #107c41; color: #fff; }
+        .btn-close { background: #555; color: #fff; }
+
+        /* â”€â”€ Report Page Layout (Landscape A4) â”€â”€ */
+        .report-container {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 40px 0;
+        }
+        .report-page {
+            width: 297mm;
+            min-height: 210mm;
+            background: #fff;
+            padding: 12mm 16mm 16mm 16mm;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            position: relative; border: 1.5px solid #000 !important box-sizing: border-box; }
+
+        /* â”€â”€ Header â”€â”€ */
+        .header-section {
+            position: relative;
+            text-align: center;
+            margin-bottom: 16px;
+            min-height: 56px;
+        }
+        .company-logo {
+            position: absolute;
+            left: 0;
+            top: 0;
+            max-height: 55px;
+            max-width: 150px;
+            object-fit: contain;
+        }
+        .print-date {
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 10px;
+            color: #000;
+            font-weight: normal;
+        }
+        .company-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+        .company-address {
+            font-size: 10.5px;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 6px;
+            line-height: 1.35;
+        }
+        .fund-head {
+            font-size: 13px;
+            font-weight: bold;
+            color: #000;
+            margin-top: 0;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+        .report-main-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #000;
+            margin-top: 0;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        /* â”€â”€ Master Info Grid (3 Columns Bordered Box) â”€â”€ */
+        .master-box {
+            border: 1.5px solid #555;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-bottom: 16px;
+        }
+        .master-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            color: #000;
+        }
+        .master-table td {
+            padding: 2.5px 3px;
+            vertical-align: top;
+            border: none;
+        }
+        .lbl {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .sep {
+            width: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .val {
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        /* â”€â”€ Details Grid Table â”€â”€ */
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10.5px;
+            color: #000;
+            margin-bottom: 20px;
+        }
+        .details-table th {
+            border-top: 1.5px solid #000;
+            border-bottom: 1.5px solid #000;
+            border-left: none;
+            border-right: none;
+            background: #fff;
+            padding: 5px 4px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .details-table td {
+            border-bottom: 1px solid #ccc;
+            padding: 4px 4px;
+            vertical-align: middle;
+        }
+        .details-table tbody tr:last-child td {
+            border-bottom: 1.5px solid #000;
+        }
+
+        /* â”€â”€ Interest Policy Section â”€â”€ */
+        .policy-title {
+            font-size: 11.5px;
+            font-weight: bold;
+            margin-top: 18px;
+            margin-bottom: 6px;
+            color: #000;
+        }
+        .policy-table {
+            width: 420px;
+            border-collapse: collapse;
+            border: 1.5px solid #555;
+            font-size: 10.5px;
+            color: #000;
+            margin-bottom: 16px;
+        }
+        .policy-table th {
+            border: 1px solid #555;
+            padding: 4px 6px;
+            font-weight: bold;
+            text-align: center;
+            background: #fff;
+        }
+        .policy-table td {
+            border: 1px solid #555;
+            padding: 3.5px 6px;
+            vertical-align: middle;
+        }
+
+        /* Alignments */
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: bold; }
+
+        /* â”€â”€ Print Styling â”€â”€ */
+        @@media print {
+            @@page {
+                size: landscape;
+                margin: 8mm 10mm;
+            }
+            body {
+                background: #fff;
+                color: #000;
+            }
+            .toolbar {
+                display: none !important;
+            }
+            .report-container {
+                padding: 0;
+            }
+            .report-page {
+                width: 100% !important;
+                min-height: 185mm !important;
+                box-shadow: none !important;
+                padding: 6mm 8mm !important; border: 1.5px solid #000 !important box-sizing: border-box; }
+            tr {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+<link href="@Url.Content("~/assets/stylesheets/pf-module-views.css")" rel="stylesheet" media="screen" />
+</head>
+<body class="pf-module-theme pf-module-report">
+    <div class="toolbar">
+        <div class="toolbar-title">Investment Details</div>
+        <div class="toolbar-actions">
+            <button type="button" class="btn btn-print" onclick="window.print()">Print</button>
+            <button type="button" class="btn btn-excel" onclick="exportExcel()">Excel</button>
+            <button type="button" class="btn btn-close" onclick="window.close()">Close</button>
+        </div>
+    </div>
+
+    <div class="report-container">
+        <div class="report-page" id="printableArea">
+            <!-- â”€â”€ Company & Report Header â”€â”€ -->
+            <div class="header-section">
+                <img src="@companyLogo" class="company-logo" onerror="this.style.display='none'" />
+                <div class="print-date">Print Date: @printDateStr</div>
+                @if (!string.IsNullOrEmpty(companyName))
+                {
+                    <div class="company-name">@companyName</div>
+                }
+                @if (!string.IsNullOrEmpty(companyAddress))
+                {
+                    <div class="company-address">@companyAddress</div>
+                }
+                <div class="fund-head">@reportHead</div>
+                <div class="report-main-title">Investment Details</div>
+            </div>
+
+            <!-- â”€â”€ Master Information Box (3 Columns) â”€â”€ -->
+            <div class="master-box">
+                <table class="master-table">
+                    <tr>
+                        <td class="lbl" style="width: 12%;">Investment Name</td>
+                        <td class="sep">:</td>
+                        <td class="val" style="width: 25%;">@getColVal(mRow, "InvestmentName")</td>
+
+                        <td class="lbl" style="width: 12%;">Investment Date</td>
+                        <td class="sep">:</td>
+                        <td class="val" style="width: 18%;">@(mRow != null ? formatDate(mRow["InvestmentDate"]) : "")</td>
+
+                        <td class="lbl" style="width: 10%;">Bank Name</td>
+                        <td class="sep">:</td>
+                        <td class="val" style="width: 23%;">@getColVal(mRow, "BankName")</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">Investment Address</td>
+                        <td class="sep">:</td>
+                        <td class="val">@getColVal(mRow, "InvestmentAddress")</td>
+
+                        <td class="lbl">Investment Types</td>
+                        <td class="sep">:</td>
+                        <td class="val">@getColVal(mRow, "InvestmentTypes")</td>
+
+                        <td class="lbl">Branch Name</td>
+                        <td class="sep">:</td>
+                        <td class="val">@getColVal(mRow, "BranchName")</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">Investment Rate(%)</td>
+                        <td class="sep">:</td>
+                        <td class="val">@(mRow != null ? formatRate(mRow["InvestmentRate"]) : "")</td>
+
+                        <td class="lbl">Maturity Date</td>
+                        <td class="sep">:</td>
+                        <td class="val">@(mRow != null ? formatDate(mRow["MaturityDate"]) : "")</td>
+
+                        <td colspan="3"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- â”€â”€ Details Grid Table â”€â”€ -->
+            <table class="details-table" id="detailsTable">
+                <thead>
+                    <tr>
+                        <th style="width: 30px;">Sl.</th>
+                        <th style="width: 105px;">Code</th>
+                        <th style="width: 100px;">Reference No</th>
+                        <th style="width: 85px;">FromDate</th>
+                        <th style="width: 85px;">ToDate</th>
+                        <th style="width: 105px;">Investment Value</th>
+                        <th style="width: 60px;">Rate(%)</th>
+                        <th style="width: 50px;">Month</th>
+                        <th style="width: 85px;">Interest</th>
+                        <th style="width: 65px;">AIT</th>
+                        <th style="width: 85px;">BankCharge</th>
+                        <th style="width: 85px;">Net Interest</th>
+                        <th style="width: 65px;">Encashed</th>
+                        <th style="width: 80px;">Trans Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int sl = 1;
+                    }
+                    @foreach (DataRow r in dtDetails.Rows)
+                    {
+                        string cCode = getColVal(r, "Code");
+                        string refNo = getColVal(r, "ReferenceNo");
+                        object fDate = r.Table.Columns.Contains("FromDate") ? r["FromDate"] : null;
+                        object tDate = r.Table.Columns.Contains("ToDate") ? r["ToDate"] : null;
+                        object invVal = r.Table.Columns.Contains("InvestmentValue") ? r["InvestmentValue"] : null;
+                        object rate = r.Table.Columns.Contains("InvestmentRate") ? r["InvestmentRate"] : null;
+                        string month = getColVal(r, "Month");
+                        object interest = r.Table.Columns.Contains("Interest") ? r["Interest"] : null;
+                        string ait = getAit(r);
+                        object bCharge = r.Table.Columns.Contains("BankCharge") ? r["BankCharge"] : null;
+                        string netInt = getNetInterest(r);
+                        string encashed = getColVal(r, "Encashed");
+                        if (string.IsNullOrEmpty(encashed))
+                        {
+                            encashed = getColVal(r, "IsEncashed");
+                        }
+                        if (string.IsNullOrEmpty(encashed))
+                        {
+                            encashed = "0";
+                        }
+                        string transType = getColVal(r, "TransactionType");
+
+                        <tr>
+                            <td class="text-center">@(sl++)</td>
+                            <td class="text-center">@cCode</td>
+                            <td class="text-center">@refNo</td>
+                            <td class="text-center">@formatDate(fDate)</td>
+                            <td class="text-center">@formatDate(tDate)</td>
+                            <td class="text-right font-bold">@formatAmt(invVal)</td>
+                            <td class="text-right">@formatRate(rate)</td>
+                            <td class="text-center">@month</td>
+                            <td class="text-right">@formatAmt(interest)</td>
+                            <td class="text-right">@ait</td>
+                            <td class="text-right">@formatAmt(bCharge)</td>
+                            <td class="text-right">@netInt</td>
+                            <td class="text-center">@encashed</td>
+                            <td class="text-center">@transType</td>
+                        </tr>
+                    }
+                    @if (dtDetails.Rows.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="14" class="text-center" style="padding: 20px; color: #666; font-style: italic;">
+                                No investment details available
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <!-- â”€â”€ Section 2: Interest Policy â”€â”€ -->
+            <div class="policy-title">Interest Policy</div>
+            <table class="policy-table" id="policyTable">
+                <thead>
+                    <tr>
+                        <th style="width: 85px;">From Month</th>
+                        <th style="width: 85px;">To Month</th>
+                        <th style="width: 95px;">Interest Rate</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DataRow pr in dtPolicy.Rows)
+                    {
+                        string fMonth = getColVal(pr, "FromMonth");
+                        string tMonth = getColVal(pr, "ToMonth");
+                        object pRate = pr.Table.Columns.Contains("InterestRate") ? pr["InterestRate"] : null;
+                        string pRemarks = getColVal(pr, "Remarks");
+
+                        <tr>
+                            <td class="text-center">@fMonth</td>
+                            <td class="text-center">@tMonth</td>
+                            <td class="text-right">@formatRate(pRate)</td>
+                            <td class="text-left">@pRemarks</td>
+                        </tr>
+                    }
+                    @if (dtPolicy.Rows.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center" style="padding: 10px; color: #666; font-style: italic;">
+                                No interest policy data available
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function exportExcel() {
+            var printable = document.getElementById('printableArea');
+            if (!printable) return;
+            var html = printable.innerHTML;
+            var url = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'InvestmentDetails_' + new Date().toISOString().slice(0, 10) + '.xls';
+            a.click();
+        }
+    </script>
+</body>
+</html>

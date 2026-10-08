@@ -1,0 +1,79 @@
+@model SymViewModel.GF.GFEmployeeProvisionVM
+@using UIHelper.MVC
+@Html.ValidationSummary(true)
+
+<div class="erp-page-wrapper">
+    <div class="erp-action-bar">
+        <div class="erp-action-btns">
+            <button type="button" title="Process Data" id="" class="process sym-btn-save btn-erp-save">&nbsp;Process</button>
+            <button type="button" title="Go To Index" data-url="/GF/GFEmployeeProvision/IndexFiscalPeriod" onclick="GoTo(this)" class="sym-btn-detail btn-erp-index">&nbsp;Index</button>
+        </div>
+        <div class="erp-breadcrumb">
+            <label class="pull-right">GF Employee Provision &gt; Process</label>
+        </div>
+    </div>
+
+    <div class="card erp-card">
+        <div class="card-header erp-card-header">
+            <p><i class="fa fa-cogs"></i> GF Employee Provision Process</p>
+        </div>
+        <div class="card-body erp-card-body" style="padding: 16px 20px;">
+            <div class="BankBranch">
+                <div class="ep-form-grid">
+                    <div class="ep-form-group col-span-1">
+                        <label class="ep-field-label">Year</label>
+                        <div>@Html.TextBox("Year", @Session["SessionYear"].ToString(), new { @Id = "fYear", @class = "fiscalyearCom form-control" })</div>
+                    </div>
+
+                    <div class="ep-form-group col-span-2">
+                        <label class="ep-field-label">Fiscal Period</label>
+                        <div>
+                            @Html.SimpleDropDown("FiscalPeriod", "/Config/DropDown/DropDownPeriodByFYear?year=" + @Session["SessionYear"].ToString(), new { @Id = "FiscalPeriodDetailId", @class = "fpDetailsCom required form-control" })
+                        </div>
+                    </div>
+
+                    <div class="ep-form-group col-span-2">
+                        <label class="ep-field-label"><label>@Session["ProjectLabel"]</label></label>
+                        <div>
+                            @Html.SimpleDropDown("ProjectId", "/Config/DropDown/Project", new { @Id = "ProjectId", @class = "sectionsCom form-control required" })
+                        </div>
+                    </div>
+
+                    <div class="ep-form-group col-span-1" style="display: flex; flex-direction: column; justify-content: center;">
+                        <label class="ep-field-label">All Project</label>
+                        <div class="editor-field">
+                            @Html.CheckBox("chkAll", new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        InitDropdownsCommon();
+    });
+
+    $('.process').on("click", function () {
+        var FiscalPeriodDetailId = $("#FiscalPeriodDetailId").val();
+        var ProjectId = $("#ProjectId").val();
+        var chkAll = $("#chkAll").prop("checked") ? true : false;
+        var fYear = $("#fYear").val();
+
+        if (FiscalPeriodDetailId == "") {
+            ShowResult("Fail", "Please Select the Fiscal Period");
+            return;
+        }
+        if (!chkAll && ProjectId == "") {
+            ShowResult("Fail", "Please Select the Project");
+            return;
+        }
+
+        var url = "/GF/GFEmployeeProvision/Process?fydid=" + FiscalPeriodDetailId + "&ProjectId=" + ProjectId + "&chkAll=" + chkAll;
+
+        submitProcess(url);
+    });
+</script>
+

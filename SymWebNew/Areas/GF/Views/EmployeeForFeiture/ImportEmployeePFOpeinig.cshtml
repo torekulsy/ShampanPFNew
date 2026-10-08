@@ -1,0 +1,167 @@
+@using UIHelper.MVC
+
+@{
+    ViewBag.Title = "ImportEmployeePFOpeinig";
+}
+
+<div class="erp-page-wrapper">
+    <div class="erp-action-bar">
+        <div class="erp-action-btns">
+            <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/EmployeePFOpeinig" onclick="GoTo(this)" class="sym-btn-detail btn-erp-index">&nbsp;Index</button>
+        </div>
+        <div class="erp-breadcrumb">
+            <label class="pull-right">Employee PF Opening &gt; Excel Import/Export</label>
+        </div>
+    </div>
+
+    <!-- Excel Import Card -->
+    <div class="card erp-card" style="margin-bottom: 16px;">
+        <div class="card-header erp-card-header">
+            <p><i class="fa fa-upload"></i> Employee PF Opening Import</p>
+        </div>
+        <div class="card-body erp-card-body" style="padding: 16px 20px;">
+            @using (Ajax.BeginForm("ImportExcel", "EmployeePFOpeinig", null, new AjaxOptions { }, new { enctype = "multipart/form-data", id = "ImportEmployeePFOpeinigExcel" }))
+            {
+                <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+                    <div class="ep-form-group" style="flex: 0 1 340px; min-width: 250px;">
+                        <label class="ep-field-label">Choose Excel File (.xlsx)</label>
+                        <input type="file" accept=".xlsx" name="file" id="FileUpload" class="required form-control" style="height: 28px; padding: 2px 6px;" />
+                    </div>
+                    <div>
+                        <button type="button" onclick="ImportExcle();" class="sym-btn-file-upload btn-erp-save" value="Upload" style="height: 28px; line-height: 26px; padding: 0 16px; white-space: nowrap;">&nbsp;Upload</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Excel Export Card -->
+    <div class="card erp-card">
+        <div class="card-header erp-card-header">
+            <p><i class="fa fa-download"></i> Employee PF Opening Export</p>
+        </div>
+        <div class="card-body erp-card-body" style="padding: 16px 20px;">
+            <div class="ep-form-grid">
+                <div class="ep-form-group col-span-1">
+                    <label class="ep-field-label">Employee Code (From)</label>
+                    <div class="editor-field">
+                        @Html.SimpleDropDown("CodeF", "/Config/DropDown/EmployeeCodeName", new { @class = "codeFCom form-control selectDropdown" })
+                    </div>
+                </div>
+                <div class="ep-form-group col-span-1">
+                    <label class="ep-field-label">Employee Code (To)</label>
+                    <div class="editor-field">
+                        @Html.SimpleDropDown("CodeT", "/Config/DropDown/EmployeeCodeName", new { @class = "codeTCom form-control selectDropdown" })
+                    </div>
+                </div>
+                <div class="ep-form-group col-span-1">
+                    <label class="ep-field-label">Designation</label>
+                    <div class="editor-field">
+                        @Html.SimpleDropDown("DesignationId", "/Config/DropDown/Designation", new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="ep-form-group col-span-1">
+                    <label class="ep-field-label">@Session["DepartmentLabel"]</label>
+                    <div class="editor-field">
+                        @Html.SimpleDropDown("DepartmentId", "/Config/DropDown/Department", new { @class = "departmentsCom form-control" })
+                    </div>
+                </div>
+                <div class="ep-form-group col-span-1">
+                    <label class="ep-field-label">@Session["SectionLabel"]</label>
+                    <div class="editor-field">
+                        @Html.SimpleDropDown("SectionId", "/Config/DropDown/Section", new { @class = "sectionsCom form-control" })
+                    </div>
+                </div>
+                <div class="ep-form-group col-span-1">
+                    <label class="ep-field-label">@Session["ProjectLabel"]</label>
+                    <div class="editor-field">
+                        @Html.SimpleDropDown("ProjectId", "/Config/DropDown/Project", new { @class = "projectsCom form-control" })
+                    </div>
+                </div>
+                <div class="ep-form-group col-span-1">
+                    <label class="ep-field-label">Order By</label>
+                    <div class="editor-field">
+                        @Html.SimpleDropDown("Orderby", "/Config/DropDown/EnumOrderBy?Module=Salary", new { @class = "required form-control" })
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid #f1f5f9;">
+                <button id="btnExportFormEmployee" class="sym-btn-Excel-Export btn-erp-export" type="button" style="height: 28px; line-height: 26px; padding: 0 16px;">&nbsp;Download from Employee</button>
+                <button id="btnExportFormOpening" class="sym-btn-Excel-Export btn-erp-export" type="button" style="height: 28px; line-height: 26px; padding: 0 16px;">&nbsp;Download from Opening</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        InitDropdownsCommon();
+        valiDation('ImportEmployeePFOpeinigExcel');
+    });
+
+    $('#btnExportFormEmployee').click(function () {
+        //var path = window.location.href;
+        //var fid = $("#FiscalPeriodDetailId").val();
+        var ProjectId = $("#ProjectId").val();
+        var DepartmentId = $("#DepartmentId").val();
+        var SectionId = $("#SectionId").val();
+        var DesignationId = $("#DesignationId").val();
+        var CodeF = $("#CodeF").val();
+        var CodeT = $("#CodeT").val();
+        //var ETId = $("#EarningTypeId").val();
+        var Orderby = $("#Orderby").val();
+
+       
+        if (Orderby == "") {
+            ShowResult('Fail', "Please Select Order By ");
+            return false;
+        }
+
+        window.location = '@Url.Action("DownloadExcel_Employee", "EmployeePFOpeinig")' + '?ProjectId=' + ProjectId
+                  + '&DepartmentId=' + DepartmentId
+                  + '&SectionId=' + SectionId
+                  + '&DesignationId=' + DesignationId
+                  + '&CodeF=' + CodeF
+                  + '&CodeT=' + CodeT                  
+                  + '&Orderby=' + Orderby
+    });
+
+    $('#btnExportFormOpening').click(function () {
+        //var path = window.location.href;
+        //var fid = $("#FiscalPeriodDetailId").val();
+        var ProjectId = $("#ProjectId").val();
+        var DepartmentId = $("#DepartmentId").val();
+        var SectionId = $("#SectionId").val();
+        var DesignationId = $("#DesignationId").val();
+        var CodeF = $("#CodeF").val();
+        var CodeT = $("#CodeT").val();
+        //var ETId = $("#EarningTypeId").val();
+        var Orderby = $("#Orderby").val();
+
+
+        if (Orderby == "") {
+            ShowResult('Fail', "Please Select Order By ");
+            return false;
+        }
+
+        window.location = '@Url.Action("DownloadExcel_Opening", "EmployeePFOpeinig")' + '?ProjectId=' + ProjectId
+                  + '&DepartmentId=' + DepartmentId
+                  + '&SectionId=' + SectionId
+                  + '&DesignationId=' + DesignationId
+                  + '&CodeF=' + CodeF
+                  + '&CodeT=' + CodeT
+                  + '&Orderby=' + Orderby
+    });
+
+</script>
+
+<script>
+
+    function ImportExcle() {
+
+        pageSubmit('ImportEmployeePFOpeinigExcel');
+
+    }
+
+</script>
+

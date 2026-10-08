@@ -1,0 +1,235 @@
+@model SymViewModel.HRM.EmployeeInfoVM
+@using UIHelper.MVC
+
+@using (Html.BeginForm("Create", "EmployeeGFPayment", FormMethod.Post, new { @Id = "afrmEmployeeEdit" }))
+{   
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.Operation)
+    @Html.HiddenFor(model => model.empGFPaymentVM.Id, new { @class = "cPFPaymentId" })
+    @Html.HiddenFor(model => model.empGFPaymentVM.EmployeeId)
+    @Html.HiddenFor(model => model.empGFPaymentVM.Post, new { @class = "cPost" })
+
+    <div class="row">
+        <!-- Employee Profile Card (Left) -->
+        <div class="col-md-5 col-lg-5">
+            <div class="card erp-card">
+                <div class="card-header erp-card-header" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);">
+                    <p><i class="fa fa-user"></i> @(string.IsNullOrEmpty(Model.EmpName) ? "Employee Profile" : Model.EmpName)</p>
+                </div>
+                <div class="card-body erp-card-body" style="padding: 14px 16px;">
+                    <div class="ep-side-form-grid">
+                        <label class="ep-side-label">Code</label>
+                        <div>
+                            @Html.TextBoxFor(model => model.Code, new { @id = "Code", @placeholder = "Employee Code", @class = "form-control", @readonly = "readonly", @style = "background: #f8fafc; font-weight: 600; height: 28px; font-size: 11.5px;" })
+                            @Html.ValidationMessageFor(model => model.Code)
+                        </div>
+
+                        <label class="ep-side-label">Join Date</label>
+                        <div>
+                            @Html.TextBoxFor(model => model.JoinDate, new { @placeholder = "Employee Join Date", @class = "form-control", @readonly = "readonly", @style = "background: #f8fafc; height: 28px; font-size: 11.5px;" })
+                            @Html.ValidationMessageFor(model => model.JoinDate)
+                        </div>
+
+                        <label class="ep-side-label">Designation</label>
+                        <div>
+                            @Html.TextBoxFor(model => model.Designation, new { @placeholder = "Employee Designation", @class = "form-control", @readonly = "readonly", @style = "background: #f8fafc; height: 28px; font-size: 11.5px;" })
+                            @Html.ValidationMessageFor(model => model.Designation)
+                        </div>
+
+                        <label class="ep-side-label">@Session["DepartmentLabel"]</label>
+                        <div>
+                            @Html.TextBoxFor(model => model.Department, new { @placeholder = "Employee Department", @class = "form-control", @readonly = "readonly", @style = "background: #f8fafc; height: 28px; font-size: 11.5px;" })
+                            @Html.ValidationMessageFor(model => model.Department)
+                        </div>
+
+                        <label class="ep-side-label">@Session["SectionLabel"]</label>
+                        <div>
+                            @Html.TextBoxFor(model => model.Section, new { @placeholder = "Employee Section", @class = "form-control", @readonly = "readonly", @style = "background: #f8fafc; height: 28px; font-size: 11.5px;" })
+                            @Html.ValidationMessageFor(model => model.Section)
+                        </div>
+
+                        <label class="ep-side-label">@Session["ProjectLabel"]</label>
+                        <div>
+                            @Html.TextBoxFor(model => model.Project, new { @placeholder = "Employee Project", @class = "form-control", @readonly = "readonly", @style = "background: #f8fafc; height: 28px; font-size: 11.5px;" })
+                            @Html.ValidationMessageFor(model => model.Project)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GF Payment Details Card (Right) -->
+        <div class="col-md-7 col-lg-7">
+            <div class="card erp-card">
+                <div class="card-header erp-card-header">
+                    <p><i class="fa fa-money"></i> GF Payment Details</p>
+                </div>
+                <div class="card-body erp-card-body" style="padding: 16px;">
+                    <div class="ep-form-grid" id="ot" style="margin-bottom: 12px;">
+                        <div class="ep-form-group col-span-3">
+                            <label class="ep-field-label">Employer Contribution</label>
+                            @Html.TextBoxFor(model => model.empGFPaymentVM.EmployerContribution, new { @placeholder = "Employer Contribution", @class = "cEmployerContribution form-control", @style = "height: 30px; text-align: right;" })
+                            @Html.ValidationMessageFor(model => model.empGFPaymentVM.EmployerContribution)
+                        </div>
+
+                        <div class="ep-form-group col-span-3">
+                            <label class="ep-field-label">Employer Profit</label>
+                            @Html.TextBoxFor(model => model.empGFPaymentVM.EmployerProfit, new { @placeholder = "Employer Profit", @class = "cEmployerProfit form-control", @style = "height: 30px; text-align: right;" })
+                            @Html.ValidationMessageFor(model => model.empGFPaymentVM.EmployerProfit)
+                        </div>
+
+                        <div class="ep-form-group col-span-3">
+                            <label class="ep-field-label">Payment Date <span class="text-danger">*</span></label>
+                            @Html.TextBoxFor(model => model.empGFPaymentVM.PaymentDate, new { @placeholder = "Payment Date", @class = "dpDate cOpeningDate customDatePicker required form-control", @style = "height: 30px;" })
+                            @Html.ValidationMessageFor(model => model.empGFPaymentVM.PaymentDate)
+                        </div>
+
+                        <div class="ep-form-group col-span-3">
+                            <label class="ep-field-label">Remarks</label>
+                            @Html.TextBoxFor(model => model.empGFPaymentVM.Remarks, new { @placeholder = "Remarks", @class = "form-control", @style = "height: 30px;" })
+                            @Html.ValidationMessageFor(model => model.empGFPaymentVM.Remarks)
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div style="display: flex; gap: 8px; justify-content: flex-start; padding-top: 12px; border-top: 1px dashed #e2e8f0; margin-top: 8px;">
+                        <button type="button" title="Save Data" id="SaveJSON" class="Save sym-btn-save btn-erp-save">&nbsp;Save</button>
+                        <button type="button" title="Update Data" id="UpdateJSON" class="Save sym-btn-update btn-erp-update">&nbsp;Update</button>
+                        <button type="button" title="Post Data" id="PostJSON" class="Save sym-btn-post btn-erp-post">&nbsp;Post</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script>
+    $(function () {
+        InitDateTimePickers();
+        InitDropDowns();
+        checkvalue();
+        if ('@Model.Code' == null || '@Model.Code' == "") {
+            $('#empId').val("");
+        }
+        else {
+            $('#empId').val('@Model.Code~@Model.EmpName');
+        }
+        $('.selectDropdown').val('@Model.Code').change();
+        valiDation("afrmEmployeeEdit");
+    });
+
+    $('#DeleteJSON').click(function () {
+        var myData = $('#afrmEmployeeEdit').serialize();
+        var url = "/@ViewBag.TransType/EmployeeOtherEarning/Create?btn=delete";
+        submit(url, myData);
+        $('.EarningAmount').val('0');
+    });
+
+    function checkvalue() {
+        var empPFPaymentId = '@Model.empGFPaymentVM.Id';
+        var operation = '@Model.Operation';
+
+        if (empPFPaymentId == 0 || empPFPaymentId == "") {
+            $("#SaveJSON").show();
+            $("#UpdateJSON").hide();
+            $("#PostJSON").hide();
+        }
+        else {
+            if (operation == "add") {
+                $("#SaveJSON").show();
+                $("#UpdateJSON").hide();
+            }
+            else {
+                $("#SaveJSON").hide();
+                $("#UpdateJSON").show();
+            }
+            $("#PostJSON").show();
+        }
+    }
+
+    function checkbtn() {
+        $("#SaveJSON").hide();
+        $("#UpdateJSON").show();
+        $("#PostJSON").show();
+    }
+
+    $('#SaveJSON').click(function () {
+        var OpeningDate = $('.cOpeningDate').val();
+        var Code = $('#Code').val();
+        if (Code == "") {
+            ShowResult("Fail", "Please Select Code!");
+            return;
+        }
+        if (OpeningDate == "") {
+            ShowResult("Fail", "Please Select Opening Date!");
+            return;
+        }
+        var myData = $('#afrmEmployeeEdit').serialize();
+        var url = "/@ViewBag.TransType/EmployeeGFPayment/Create";
+        $.ajax({
+            url: url,
+            data: myData,
+            type: 'POST',
+            beforeSend: function () { $(".loading").show(); },
+            complete: function () { $(".loading").fadeOut(200).hide("slow") },
+            success: function (data) {
+                var msg1 = data.split('~')[0];
+                var msg2 = data.split('~')[1];
+                var msg3 = data.split('~')[2];
+
+                if (msg1.toLowerCase() == "success") {
+                    checkbtn();
+                    $('#Id').val(msg3);
+                    $('.cPFPaymentId').val(msg3);
+                }
+                ShowResult(msg1, msg2);
+            }
+        });
+    });
+
+    $('#UpdateJSON').click(function () {
+        var OpeningDate = $('.cOpeningDate').val();
+        var Post = $('.cPost').val();
+        var Code = $('#Code').val();
+        if (Code == "") {
+            ShowResult("Fail", "Please Select Code!");
+            return;
+        }
+        if (OpeningDate == "") {
+            ShowResult("Fail", "Please Select Opening Date!");
+            return;
+        }
+
+        if (Post.toLowerCase() == "true") {
+            ShowResult("Fail", "This transaction already posted!");
+            return;
+        }
+
+        var myData = $('#afrmEmployeeEdit').serialize();
+        var url = "/@ViewBag.TransType/EmployeeGFPayment/Update";
+        submit(url, myData);
+    });
+
+    $('#PostJSON').click(function () {
+        var Post = $('.cPost').val();
+        var Code = $('#Code').val();
+        if (Code == "") {
+            ShowResult("Fail", "Please Select Code!");
+            return;
+        }
+        
+        if (Post.toLowerCase() == "true") {
+            ShowResult("Fail", "This transaction already posted!");
+            return;
+        }
+
+        var myData = $('#afrmEmployeeEdit').serialize();
+        var url = "/@ViewBag.TransType/EmployeeGFPayment/Post";
+        submit(url, myData);
+    });
+
+    $(document).ready(function () {
+        $('#afrmEmployeeEdit').on('click', 'input[type="text"], textarea.NumberCheck', function () {
+            $(this).select();
+        });
+    });
+</script>

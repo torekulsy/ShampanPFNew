@@ -1,4 +1,4 @@
-﻿using SymServices.PF;
+using SymServices.PF;
 using SymViewModel.PF;
 using System;
 using System.Collections.Generic;
@@ -12,6 +12,18 @@ namespace SymRepository.PF
 {
     public class PFReportRepo
     {
+        public DataTable ProfitDistributionSummery(int preDistributionFundId = 0, bool isGF = false)
+          {
+              try
+              {
+                  return new PFReportDAL().ProfitDistributionSummery(preDistributionFundId, isGF);
+              }
+              catch (Exception ex)
+              {
+                  throw ex;
+              }
+          }
+
         public DataSet Report(PFReportVM vm)
         {
             try

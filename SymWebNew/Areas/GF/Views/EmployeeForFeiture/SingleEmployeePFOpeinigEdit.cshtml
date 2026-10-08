@@ -1,0 +1,102 @@
+@model SymViewModel.HRM.EmployeeInfoVM
+@using UIHelper.MVC
+
+<div class="erp-page-wrapper">
+    <div class="erp-action-bar">
+        <div class="erp-action-btns">
+            <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/EmployeeForFeiture" onclick="GoTo(this)" class="sym-btn-detail btn-erp-index">&nbsp;Index</button>
+        </div>
+        <div class="erp-breadcrumb">
+            <label class="pull-right">Employee Forfeiture &gt; Edit</label>
+        </div>
+    </div>
+
+    <div class="card erp-card">
+        <div class="card-header erp-card-header">
+            <p><i class="fa fa-user"></i> Select Employee</p>
+        </div>
+        <div class="card-body erp-card-body" style="padding: 16px 20px;">
+            <div class="erp-emp-pager">
+                <a class="btn-pager hidden-xs" data-pager-action='first' id="first" title="First"><i class="fa fa-angle-double-left"></i><span> First</span></a>
+                <a class="btn-pager" data-pager-action='previous' id="precode" title="Previous"><i class="fa fa-angle-left"></i><span> Previous</span></a>
+                <div class="pager-dropdown">
+                    @Html.SimpleDropDownFor(model => model.Code, "/Config/DropDown/EmployeeCodeName", new { @id = "FiscalYearDetailId", @class = "form-control selectDropdown empId" })
+                </div>
+                <a class="btn-pager" data-pager-action='next' id="current" title="Search"><i class="fa fa-search"></i></a>
+                <a class="btn-pager" data-pager-action='next' id="nextcode" title="Next"><span>Next </span><i class="fa fa-angle-right"></i></a>
+                <a class="btn-pager hidden-xs" data-pager-action='last' id="last" title="Last"><span>Last </span><i class="fa fa-angle-double-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailsDiv"></div>
+</div>
+
+<script>
+    $(function () {
+        InitDropDowns();
+        InitDropdownsCommon();
+    });
+
+    $(function () {
+        $('#empId').autocomplete({ source: '@Url.Action("EmployeeCodeAll", "Autocomplete", new { area = "Config" })', minLength: 2 });
+        $.get('@Url.Action("DetailCreate", "EmployeeForFeiture", new { id = Model.empPFOpeinigVM.Id })', function (data) {
+            $('#detailsDiv').html(data);
+        });
+    });
+
+    $('.eType').change(function () {
+        var btn = 'current';
+        Searching(btn);
+    });
+
+    $('#current').click(function () {
+        var empId = $('#empId').val();
+        if (empId == "") {
+            ShowResult("Fail", "Please Input Code!");
+            return;
+        }
+        var btn = 'current';
+        Searching(btn);
+    });
+
+    $('#nextcode').click(function () {
+        var btn = 'next';
+        Searching(btn);
+    });
+    $('#precode').click(function () {
+        var btn = 'previous';
+        Searching(btn);
+    });
+    $('#first').click(function () {
+        var btn = 'first';
+        Searching(btn);
+    });
+    $('#last').click(function () {
+        var btn = 'last';
+        Searching(btn);
+    });
+
+    function Searching(btn) {
+        var empid = $('.selectDropdown :selected').text();
+        empid = empid.split('~')[0];
+
+        url = "/@ViewBag.TransType/EmployeeForFeiture/DetailCreate?empcode=" + empid + '&btn=' + btn + '&id=' + '@Model.empPFOpeinigVM.Id';
+        $.ajax({
+            url: url,
+            type: 'GET',
+            beforeSend: function () { $(".loading").show(); },
+            complete: function () { $(".loading").fadeOut(200).hide("slow") },
+            success: function (data) {
+                $('#detailsDiv').html(data);
+            },
+        });
+    }
+
+    function goBack() {
+        window.history.back();
+    }
+    $(function () {
+        InitDateTimePickers();
+    });
+</script>

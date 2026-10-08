@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -12,5 +12,9 @@ namespace SymWebUI.Areas.WWF.Models
     public class AreaTypeGFVM
     {
         public static string TransType = "GF";
+    }
+    public class AreaTypeVM
+    {
+        public static string TransType = "WWF";
     }
 }

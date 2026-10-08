@@ -1,0 +1,181 @@
+@model SymViewModel.HRM.EmployeeInfoVM
+@using UIHelper.MVC
+
+<style>
+    .erp-emp-pager {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        margin: 0 auto;
+        max-width: 650px;
+    }
+    .erp-emp-pager .btn-pager {
+        background: #f1f5f9;
+        color: #334155;
+        border: 1px solid #cbd5e1;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 6px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        text-decoration: none !important;
+        transition: all 0.2s;
+    }
+    .erp-emp-pager .btn-pager:hover {
+        background: #1e40af;
+        color: #ffffff;
+        border-color: #1e40af;
+    }
+    .erp-emp-pager .select2-container,
+    .erp-emp-pager .empId {
+        flex: 1;
+        min-width: 240px;
+    }
+</style>
+
+<div class="erp-page-wrapper">
+    <div class="erp-action-bar">
+        <div class="erp-action-btns">
+            <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/EmployeeGFForfeiture" onclick="GoTo(this)" class="sym-btn-detail btn-erp-index">&nbsp;Index</button>
+            @if (!string.IsNullOrEmpty(Model.empGFForfeitureVM.Id) && Model.empGFForfeitureVM.Id != "0")
+            {
+                <button type="button" title="Add New Employee Forfeiture" data-url="/@ViewBag.TransType/EmployeeGFForfeiture/SingleEmployeeForfeitureEdit?PFOpeinigId=&Operation=add" onclick="GoTo(this)" id="" class="sym-btn-add btn-erp-add">&nbsp;New</button>
+                <button type="button" title="Click to view Report" onclick="window.open('/@ViewBag.TransType/EmployeeGFForfeiture/ReportView?id=@Model.empGFForfeitureVM.Id')" id="" class="sym-btn-report btn-erp-print">&nbsp;Report</button>
+                if (Model.empGFForfeitureVM.Post)
+                {
+                    <button type="button" title="Click for Journal" onclick="window.open('/@ViewBag.TransType/Journal/Create?JournalType=1&TransactionForm=Forfeiture&TransactionId=@Model.empGFForfeitureVM.Id')" id="" class="sym-btn-bank-row btn-erp-post">&nbsp;Journal</button>
+                }
+            }
+        </div>
+        <div class="erp-breadcrumb">
+            <label class="pull-right">Employee Forfeiture &gt; Edit</label>
+        </div>
+    </div>
+
+    <div class="card erp-card" style="margin-bottom: 16px;">
+        <div class="card-header erp-card-header">
+            <p><i class="fa fa-sliders"></i> Filter Parameters &amp; Employee Search</p>
+        </div>
+        <div class="card-body erp-card-body" style="padding: 16px 20px;">
+            @Html.HiddenFor(model => model.Operation)
+            <div class="erp-emp-pager">
+                <a class="btn-pager hidden-xs" data-pager-action='first' id="first" title="First Employee">
+                    <i class="fa fa-angle-double-left"></i> First
+                </a>
+                <a class="btn-pager" data-pager-action='previous' id="precode" title="Previous Employee">
+                    <i class="fa fa-angle-left"></i> Previous
+                </a>
+                @Html.SimpleDropDownFor(model => model.Code, "/Config/DropDown/EmployeeCodeNameAll", new { @id = "FiscalYearDetailId", @class = "form-control selectDropdown empId" })
+                <a class="btn-pager" data-pager-action='next' id="current" title="Search Current">
+                    <i class="fa fa-search"></i>
+                </a>
+                <a class="btn-pager" data-pager-action='next' id="nextcode" title="Next Employee">
+                    Next <i class="fa fa-angle-right"></i>
+                </a>
+                <a class="btn-pager hidden-xs" data-pager-action='last' id="last" title="Last Employee">
+                    Last <i class="fa fa-angle-double-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailsDiv"></div>
+</div>
+
+<script>
+    var isSearching = false;
+    var lastSearchedCode = '';
+
+    function syncEmployeeDropdown(loadedCode) {
+        lastSearchedCode = loadedCode;
+        var $empSelect = $('select.empId');
+        if ($empSelect.length) {
+            if ($empSelect.find("option[value='" + loadedCode + "']").length === 0) {
+                var empNameHeader = $('#detailsDiv').find('.erp-card-header p').text().replace(/[\n\r]/g, '').trim();
+                var displayText = (empNameHeader && empNameHeader !== 'Employee Profile') ? loadedCode + ' ~ ' + empNameHeader : loadedCode;
+                $empSelect.append(new Option(displayText, loadedCode, true, true));
+            }
+            $empSelect.val(loadedCode);
+            if ($.fn.select2 && $empSelect.data('select2')) {
+                $empSelect.select2('val', loadedCode);
+            }
+        }
+    }
+
+    function Searching(btn, forceEmpCode) {
+        if (isSearching) return;
+
+        var empid = forceEmpCode || $('select.empId').val() || lastSearchedCode || '';
+        if (!empid || empid === '0' || empid === 'Select') {
+            var txt = $('select.empId :selected').text() || '';
+            if (txt && txt !== 'Select' && txt !== '0') {
+                empid = txt.split('~')[0].trim();
+            } else {
+                empid = '';
+            }
+        }
+        if (empid && empid.indexOf('~') !== -1) {
+            empid = empid.split('~')[0].trim();
+        }
+
+        if (!empid && (btn === 'current' || btn === 'previous' || btn === 'next')) {
+            btn = 'first';
+        }
+
+        var url = "/@ViewBag.TransType/EmployeeGFForfeiture/DetailCreate?empcode=" + encodeURIComponent(empid) + '&btn=' + btn + '&id=' + '@Model.empGFForfeitureVM.Id' + '&Operation=' + '@Model.Operation';
+
+        isSearching = true;
+        $.ajax({
+            url: url,
+            type: 'GET',
+            beforeSend: function () { $(".loading").show(); },
+            complete: function () { 
+                $(".loading").fadeOut(200).hide("slow"); 
+                isSearching = false;
+            },
+            success: function (data) {
+                $('#detailsDiv').html(data);
+                var loadedCode = $('#detailsDiv').find('#Code').val();
+                if (loadedCode) {
+                    syncEmployeeDropdown(loadedCode);
+                }
+            },
+            error: function () {
+                isSearching = false;
+            }
+        });
+    }
+
+    $(function () {
+        InitDropDowns();
+        InitDropdownsCommon();
+        InitDateTimePickers();
+
+        $('#empId').autocomplete({ source: '@Url.Action("EmployeeCodeAll", "Autocomplete", new { area = "Config" })', minLength: 2 });
+        
+        $.get('@Url.Action("DetailCreate", "EmployeeGFForfeiture", new { id = Model.empGFForfeitureVM.Id })', function (data) {
+            $('#detailsDiv').html(data);
+            var initialCode = $('#detailsDiv').find('#Code').val();
+            if (initialCode) {
+                syncEmployeeDropdown(initialCode);
+            }
+        });
+
+        $('select.empId').on('change', function () {
+            var selectedVal = $(this).val();
+            if (selectedVal && selectedVal !== '0' && selectedVal !== lastSearchedCode) {
+                Searching('current', selectedVal);
+            }
+        });
+
+        $('#current').click(function () { Searching('current'); });
+        $('#nextcode').click(function () { Searching('next'); });
+        $('#precode').click(function () { Searching('previous'); });
+        $('#first').click(function () { Searching('first'); });
+        $('#last').click(function () { Searching('last'); });
+    });
+</script>

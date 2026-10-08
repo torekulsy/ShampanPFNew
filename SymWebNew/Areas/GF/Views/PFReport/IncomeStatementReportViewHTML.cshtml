@@ -1,0 +1,504 @@
+@using System.Data
+@model DataTable
+@{
+    Layout = null;
+    var dt = Model ?? new DataTable();
+    string companyName = ViewBag.CompanyName as string ?? "Symphony Softtech Limited";
+    string companyAddress = ViewBag.CompanyAddress as string ?? "";
+    string companyLogo = ViewBag.CompanyLogo as string ?? "/Images/COMPANYLOGOhtml.png";
+    string reportHead = ViewBag.ReportHead as string ?? "";
+    string printDateStr = DateTime.Now.ToString("dd-MMM-yy");
+
+    string dateToStr = ViewBag.DateTo as string ?? "";
+    string yearToStr = ViewBag.YearTo as string ?? "";
+    string yearFromStr = ViewBag.YearFrom as string ?? "";
+
+    DateTime dateTo;
+    string endedDateStr = "For the Year Ended June 30, 2025";
+    if (DateTime.TryParse(dateToStr, out dateTo))
+    {
+        endedDateStr = "For the Year Ended " + dateTo.ToString("MMMM dd, yyyy");
+    }
+    else if (!string.IsNullOrEmpty(dateToStr))
+    {
+        endedDateStr = "For the Year Ended " + dateToStr;
+    }
+    else if (!string.IsNullOrEmpty(yearToStr))
+    {
+        endedDateStr = "For the Year Ended June 30, " + yearToStr;
+    }
+
+    string yearTo = !string.IsNullOrEmpty(yearToStr) ? yearToStr : (dateTo != DateTime.MinValue ? dateTo.Year.ToString() : "2025");
+    string yearFrom = !string.IsNullOrEmpty(yearFromStr) ? yearFromStr : "";
+    if (string.IsNullOrEmpty(yearFrom))
+    {
+        int y;
+        if (int.TryParse(yearTo, out y))
+        {
+            yearFrom = (y - 1).ToString();
+        }
+        else
+        {
+            yearFrom = "2024";
+        }
+    }
+
+    string displayFundHead = "";
+    if (!string.IsNullOrEmpty(reportHead))
+    {
+        string trimmed = reportHead.Trim('(', ')', ' ');
+        displayFundHead = string.IsNullOrEmpty(trimmed) ? "" : "(" + trimmed + ")";
+    }
+
+    List<DataRow> incomeRows = new List<DataRow>();
+    List<DataRow> expenseRows = new List<DataRow>();
+    foreach (DataRow row in dt.Rows)
+    {
+        string coaType = dt.Columns.Contains("COAType") && row["COAType"] != DBNull.Value ? row["COAType"].ToString() : "";
+        string sl = dt.Columns.Contains("SL") && row["SL"] != DBNull.Value ? row["SL"].ToString() : "";
+        if (coaType.Equals("Revenue", StringComparison.OrdinalIgnoreCase) || coaType.Equals("Income", StringComparison.OrdinalIgnoreCase) || sl == "3")
+        {
+            incomeRows.Add(row);
+        }
+        else if (coaType.Equals("Expense", StringComparison.OrdinalIgnoreCase) || coaType.Equals("Expenditure", StringComparison.OrdinalIgnoreCase) || sl == "4")
+        {
+            expenseRows.Add(row);
+        }
+    }
+
+    decimal totalIncomeCurrent = 0;
+    decimal totalIncomePrevious = 0;
+    foreach (DataRow r in incomeRows)
+    {
+        if (dt.Columns.Contains("ClosingAmount") && r["ClosingAmount"] != DBNull.Value)
+        {
+            decimal v = 0;
+            if (decimal.TryParse(r["ClosingAmount"].ToString(), out v))
+            {
+                totalIncomeCurrent += v;
+            }
+        }
+        if (dt.Columns.Contains("OpeningAmount") && r["OpeningAmount"] != DBNull.Value)
+        {
+            decimal v = 0;
+            if (decimal.TryParse(r["OpeningAmount"].ToString(), out v))
+            {
+                totalIncomePrevious += v;
+            }
+        }
+    }
+
+    decimal totalExpenseCurrent = 0;
+    decimal totalExpensePrevious = 0;
+    foreach (DataRow r in expenseRows)
+    {
+        if (dt.Columns.Contains("ClosingAmount") && r["ClosingAmount"] != DBNull.Value)
+        {
+            decimal v = 0;
+            if (decimal.TryParse(r["ClosingAmount"].ToString(), out v))
+            {
+                totalExpenseCurrent += v;
+            }
+        }
+        if (dt.Columns.Contains("OpeningAmount") && r["OpeningAmount"] != DBNull.Value)
+        {
+            decimal v = 0;
+            if (decimal.TryParse(r["OpeningAmount"].ToString(), out v))
+            {
+                totalExpensePrevious += v;
+            }
+        }
+    }
+
+    decimal lastNetProfit = 0;
+    if (ViewBag.LastNetProfit != null)
+    {
+        decimal.TryParse(ViewBag.LastNetProfit.ToString(), out lastNetProfit);
+    }
+    else
+    {
+        lastNetProfit = totalIncomeCurrent - totalExpenseCurrent;
+    }
+
+    decimal firstNetProfit = 0;
+    if (ViewBag.FirstNetProfit != null)
+    {
+        decimal.TryParse(ViewBag.FirstNetProfit.ToString(), out firstNetProfit);
+    }
+    else
+    {
+        firstNetProfit = totalIncomePrevious - totalExpensePrevious;
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Statement of Profit or Loss and Other Comprehensive Income</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11px;
+            color: #000;
+            background-color: #525659;
+        }
+
+        /* â”€â”€ Sticky Toolbar â”€â”€ */
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #323639;
+            color: #fff;
+            padding: 8px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .toolbar-title {
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn {
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .btn-print { background: #0078d4; color: #fff; }
+        .btn-excel { background: #107c41; color: #fff; }
+        .btn-close { background: #555; color: #fff; }
+
+        /* â”€â”€ Report Page Layout â”€â”€ */
+        .report-container {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 40px 0;
+        }
+        .report-page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #fff;
+            padding: 14mm 18mm 18mm 18mm;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            position: relative; border: 1.5px solid #000 !important box-sizing: border-box; }
+
+        /* â”€â”€ Header â”€â”€ */
+        .header-section {
+            position: relative;
+            text-align: center;
+            margin-bottom: 16px;
+            min-height: 56px;
+        }
+        .company-logo {
+            position: absolute;
+            left: 0;
+            top: 0;
+            max-height: 55px;
+            max-width: 150px;
+            object-fit: contain;
+        }
+        .print-date {
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 10px;
+            color: #000;
+            font-weight: normal;
+        }
+        .company-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+            text-transform: uppercase;
+        }
+        .company-address {
+            font-size: 10px;
+            color: #444;
+            margin-top: 1px;
+            margin-bottom: 2px;
+        }
+        .fund-head {
+            font-size: 12.5px;
+            font-weight: bold;
+            color: #000;
+            margin-top: 2px;
+            margin-bottom: 2px;
+        }
+        .report-main-title {
+            font-size: 13.5px;
+            font-weight: bold;
+            color: #000;
+            margin-top: 2px;
+            margin-bottom: 2px;
+        }
+        .report-subtitle {
+            font-size: 12px;
+            font-weight: bold;
+            color: #000;
+            margin-top: 2px;
+        }
+
+        /* â”€â”€ Report Table â”€â”€ */
+        .is-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            color: #000;
+        }
+        .col-name {
+            width: 64%;
+            text-align: left;
+            padding-left: 4px;
+        }
+        .col-amount {
+            width: 18%;
+            text-align: right;
+            padding-right: 4px;
+            white-space: nowrap;
+        }
+
+        /* Column Headers */
+        .header-row th {
+            font-weight: bold;
+            font-size: 11.5px;
+            color: #000;
+            vertical-align: bottom;
+            padding-bottom: 6px;
+            border: none;
+        }
+        .header-year {
+            font-weight: bold;
+            font-size: 12.5px;
+            display: inline-block;
+            margin-top: 2px;
+        }
+
+        /* Full Width Section Box */
+        .box-row td {
+            padding: 10px 0 2px 0;
+            border: none;
+        }
+        .section-box {
+            border: 1px solid #000;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            padding: 3.5px 0;
+            color: #000;
+        }
+
+        /* Item Rows */
+        .item-row td {
+            padding: 4px 4px;
+            border-bottom: 1px solid #000;
+            font-size: 11px;
+            color: #000;
+        }
+
+        /* Subtotal Rows */
+        .subtotal-row td {
+            padding: 6px 4px 18px 4px;
+            font-weight: bold;
+            font-size: 11.5px;
+            color: #0000ff;
+            border: none;
+        }
+
+        /* Summary / Excess Row */
+        .excess-row td {
+            padding: 6px 4px;
+            font-weight: bold;
+            font-size: 11.5px;
+            color: #000;
+            border-top: 1px solid #000;
+            border-bottom: 3px double #000;
+        }
+
+        /* Footer */
+        .page-footer {
+            position: absolute;
+            bottom: 12mm;
+            right: 18mm;
+            font-size: 10px;
+            color: #000;
+        }
+
+        /* â”€â”€ Print Styling â”€â”€ */
+        @@media print {
+            @@page {
+                size: portrait;
+                margin: 10mm 15mm;
+            }
+            body {
+                background: #fff;
+                color: #000;
+            }
+            .toolbar {
+                display: none !important;
+            }
+            .report-container {
+                padding: 0;
+            }
+            .report-page {
+                width: 100% !important;
+                min-height: 270mm !important;
+                box-shadow: none !important;
+                padding: 6mm 8mm !important; border: 1.5px solid #000 !important box-sizing: border-box; }
+            tr {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+<link href="@Url.Content("~/assets/stylesheets/pf-module-views.css")" rel="stylesheet" media="screen" />
+</head>
+<body class="pf-module-theme pf-module-report">
+    <div class="toolbar">
+        <div class="toolbar-title">Statement of Profit or Loss and Other Comprehensive Income</div>
+        <div class="toolbar-actions">
+            <button type="button" class="btn btn-print" onclick="window.print()">Print</button>
+            <button type="button" class="btn btn-excel" onclick="exportExcel()">Excel</button>
+            <button type="button" class="btn btn-close" onclick="window.close()">Close</button>
+        </div>
+    </div>
+
+    <div class="report-container">
+        <div class="report-page">
+            <!-- â”€â”€ Company & Report Header â”€â”€ -->
+            <div class="header-section">
+                <img src="@companyLogo" class="company-logo" onerror="this.style.display='none'" />
+                <div class="print-date">Print Date: @printDateStr</div>
+                @if (!string.IsNullOrEmpty(companyName))
+                {
+                    <div class="company-name">@companyName</div>
+                }
+                @if (!string.IsNullOrEmpty(companyAddress))
+                {
+                    <div class="company-address">@companyAddress</div>
+                }
+                @if (!string.IsNullOrEmpty(displayFundHead))
+                {
+                    <div class="fund-head">@displayFundHead</div>
+                }
+                <div class="report-main-title">Statement of Profit or Loss and Other Comprehensive Income</div>
+                <div class="report-subtitle">@endedDateStr</div>
+            </div>
+
+            <table class="is-table" id="reportTable">
+                <thead>
+                    <tr class="header-row">
+                        <th class="col-name"></th>
+                        <th class="col-amount">
+                            Current Year<br />
+                            <span class="header-year">@yearTo</span>
+                        </th>
+                        <th class="col-amount">
+                            Previous Year<br />
+                            <span class="header-year">@yearFrom</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- â”€â”€ Section 1: Income â”€â”€ -->
+                    <tr class="box-row">
+                        <td colspan="3">
+                            <div class="section-box">Income</div>
+                        </td>
+                    </tr>
+                    @foreach (DataRow row in incomeRows)
+                    {
+                        decimal closingAmt = 0;
+                        decimal openingAmt = 0;
+                        if (dt.Columns.Contains("ClosingAmount") && row["ClosingAmount"] != DBNull.Value)
+                        {
+                            decimal.TryParse(row["ClosingAmount"].ToString(), out closingAmt);
+                        }
+                        if (dt.Columns.Contains("OpeningAmount") && row["OpeningAmount"] != DBNull.Value)
+                        {
+                            decimal.TryParse(row["OpeningAmount"].ToString(), out openingAmt);
+                        }
+                        string coaName = dt.Columns.Contains("COAName") && row["COAName"] != DBNull.Value ? row["COAName"].ToString() : "";
+                        <tr class="item-row">
+                            <td class="col-name">@coaName</td>
+                            <td class="col-amount">@closingAmt.ToString("#,##0.00")</td>
+                            <td class="col-amount">@openingAmt.ToString("#,##0.00")</td>
+                        </tr>
+                    }
+                    <tr class="subtotal-row">
+                        <td class="col-name">Total( Income )</td>
+                        <td class="col-amount">@totalIncomeCurrent.ToString("#,##0.00")</td>
+                        <td class="col-amount">@totalIncomePrevious.ToString("#,##0.00")</td>
+                    </tr>
+
+                    <!-- â”€â”€ Section 2: Expenditure â”€â”€ -->
+                    <tr class="box-row">
+                        <td colspan="3">
+                            <div class="section-box">Expenditure</div>
+                        </td>
+                    </tr>
+                    @foreach (DataRow row in expenseRows)
+                    {
+                        decimal closingAmt = 0;
+                        decimal openingAmt = 0;
+                        if (dt.Columns.Contains("ClosingAmount") && row["ClosingAmount"] != DBNull.Value)
+                        {
+                            decimal.TryParse(row["ClosingAmount"].ToString(), out closingAmt);
+                        }
+                        if (dt.Columns.Contains("OpeningAmount") && row["OpeningAmount"] != DBNull.Value)
+                        {
+                            decimal.TryParse(row["OpeningAmount"].ToString(), out openingAmt);
+                        }
+                        string coaName = dt.Columns.Contains("COAName") && row["COAName"] != DBNull.Value ? row["COAName"].ToString() : "";
+                        <tr class="item-row">
+                            <td class="col-name">@coaName</td>
+                            <td class="col-amount">@closingAmt.ToString("#,##0.00")</td>
+                            <td class="col-amount">@openingAmt.ToString("#,##0.00")</td>
+                        </tr>
+                    }
+                    <tr class="subtotal-row">
+                        <td class="col-name">Total( Expenditure )</td>
+                        <td class="col-amount">@totalExpenseCurrent.ToString("#,##0.00")</td>
+                        <td class="col-amount">@totalExpensePrevious.ToString("#,##0.00")</td>
+                    </tr>
+
+                    <!-- â”€â”€ Section 3: Excess Row â”€â”€ -->
+                    <tr class="excess-row">
+                        <td class="col-name">Excess of Income over expenditure</td>
+                        <td class="col-amount">@lastNetProfit.ToString("#,##0.00")</td>
+                        <td class="col-amount">@firstNetProfit.ToString("#,##0.00")</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="page-footer">
+                Page 1 of 1
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function exportExcel() {
+            var table = document.getElementById('reportTable');
+            if (!table) return;
+            var html = table.outerHTML;
+            var url = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'IncomeStatement_' + new Date().toISOString().slice(0, 10) + '.xls';
+            a.click();
+        }
+    </script>
+</body>
+</html>

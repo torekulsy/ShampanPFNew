@@ -1,9 +1,9 @@
-﻿using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.CrystalReports.Engine;
 using JQueryDataTables.Models;
 using SymOrdinary;
-using SymRepository.WPPF;
+using SymRepository.WWF;
 using SymRepository.Common;
-using SymViewModel.WPPF;
+using SymViewModel.WWF;
 using SymViewModel.Common;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace SymWebUI.Areas.WPPF.Controllers
+namespace SymWebUI.Areas.WWF.Controllers
 {
     public class EETransactionController : Controller
     {

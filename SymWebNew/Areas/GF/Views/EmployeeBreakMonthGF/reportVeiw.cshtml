@@ -1,0 +1,73 @@
+@model SymViewModel.PF.PFReportVM
+@using UIHelper.MVC
+@{
+    ViewBag.Title = "Employee Break Month GF Report";
+}
+
+@using (Html.BeginForm("EmployeeBreakMonthGFReport", "EmployeeBreakMonthGF", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmVAT6_3", @target = "_blank" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(m => m.Id)
+    <div class="erp-page-wrapper">
+        <div class="erp-action-bar">
+            <div class="erp-action-btns">
+                <button type="button" title="Click for Report" data-url="/@ViewBag.TransType/EmployeeBreakMonthGF/EmployeeBreakMonthGFReport" onclick="reportData(this);" id="" class="sym-btn-report btn-erp-preview">&nbsp;Preview</button>
+                <button type="button" title="Clear the Entries" id="Clear" class="sym-btn-clear btn-erp-clear">&nbsp;Clear</button>
+                <button type="button" title="Cancel Data" class="sym-btn-cancel btn-erp-cancel btncancel">&nbsp;Cancel</button>
+            </div>
+            <div class="erp-breadcrumb">
+                <label class="pull-right">Employee Break Month GF &gt; Report</label>
+            </div>
+        </div>
+
+        <div class="card erp-card">
+            <div class="card-header erp-card-header">
+                <p><i class="fa fa-file-text-o"></i> Employee Break Month GF Report</p>
+            </div>
+            <div class="card-body erp-card-body" style="padding: 16px 20px;">
+                <div class="EnumEEHead">
+                    <div class="ep-form-grid">
+                        <div class="ep-form-group col-span-1">
+                            <label class="ep-field-label">Code</label>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.Code, new { @placeholder = "Code", @class = "form-control" })
+                            </div>
+                        </div>
+
+                        <div class="ep-form-group col-span-1">
+                            <label class="ep-field-label">@Html.LabelFor(model => model.DateFrom)</label>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.DateFrom, new { @placeholder = "Date From", @class = "customDatePicker form-control" })
+                                @Html.ValidationMessageFor(model => model.DateFrom)
+                            </div>
+                        </div>
+
+                        <div class="ep-form-group col-span-1">
+                            <label class="ep-field-label">@Html.LabelFor(model => model.DateTo)</label>
+                            <div class="editor-field">
+                                @Html.TextBoxFor(model => model.DateTo, new { @placeholder = "Date To", @class = "customDatePicker form-control" })
+                                @Html.ValidationMessageFor(model => model.DateTo)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script>
+    $(function () {
+        InitDropDowns();
+        InitDateTimePickers();
+        $("#Clear").on('click', function () {
+            $("#Code").val("");
+            $("#Id").val("");
+            $("#DateFrom").val("");
+            $("#DateTo").val("");
+        });
+    });
+   
+    function reportData(sender) {
+        $("#frmVAT6_3").submit();
+    }
+</script>

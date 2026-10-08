@@ -1,0 +1,59 @@
+@model SymViewModel.PF.PFReportVM
+@using UIHelper.MVC
+@{
+    ViewBag.Title = "Year Closing For Financial Report";
+}
+
+@using (Html.BeginForm("Year_Closing", "PFReport", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmYearClosing", @target = "_blank" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.JournalType)
+    @Html.HiddenFor(model => model.TransType)
+
+    <div class="erp-page-wrapper">
+        <div class="erp-action-bar">
+            <div class="erp-action-btns">
+            </div>
+            <div class="erp-breadcrumb">
+                <label class="pull-right">Year Closing &gt; Process</label>
+            </div>
+        </div>
+
+        <div class="card erp-card">
+            <div class="card-header erp-card-header">
+                <p><i class="fa fa-calendar-check-o"></i> Year Closing For Financial Report</p>
+            </div>
+            <div class="card-body erp-card-body" style="padding: 20px 24px;">
+                <div style="display: flex; gap: 12px; align-items: flex-end; max-width: 480px;">
+                    <div class="ep-form-group" style="flex: 1; min-width: 200px;">
+                        <label class="ep-field-label">Year <span class="text-danger">*</span></label>
+                        @Html.SimpleDropDownFor(model => model.YearTo, "/Config/DropDown/DropDownYear", new { @class = "fiscalyearTo required form-control selectDropdown" })
+                        @Html.ValidationMessageFor(model => model.YearTo)
+                    </div>
+                    <div>
+                        <button type="button" title="Process Year Closing" class="saveJSON sym-btn-save btn-erp-save" style="height: 28px; line-height: 26px; padding: 0 16px; white-space: nowrap;">&nbsp;Process</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    $(function () {
+        InitDropDowns();
+    });
+
+    $('.saveJSON').click(function () {
+        Ask("Do you want to Process the year end?", function () {
+            var FiscalPeriodDetailId = $("#YearTo").val();
+            if (FiscalPeriodDetailId == "" || FiscalPeriodDetailId == null || FiscalPeriodDetailId == "0") {
+                ShowResult("Fail", "Please Select the Fiscal Period / Year");
+                return;
+            }
+
+            var url = "/GF/PFReport/Year_Closing?fydid=" + FiscalPeriodDetailId;
+            submit(url);
+        });
+    });
+</script>

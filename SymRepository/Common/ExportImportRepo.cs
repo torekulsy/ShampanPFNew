@@ -1,4 +1,4 @@
-﻿using SymServices.Common;
+using SymServices.Common;
 using SymViewModel.Common;
 using SymViewModel.HRM;
 using SymViewModel.PF;
@@ -13,6 +13,19 @@ namespace SymRepository.Common
 {
     public class ExportImportRepo
     {
+        public DataTable SelectGFProfitDistributionInfo(string fiscalyear)
+       {
+
+           try
+           {
+               return new ExportImportDAL().SelectGFProfitDistributionInfo(fiscalyear);
+           }
+           catch (Exception ex)
+           {
+               throw ex;
+           }
+       }
+
 
         //==================SelectAll=================
 

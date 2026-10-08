@@ -1,0 +1,90 @@
+<div class="erp-page-wrapper">
+    <div class="erp-action-bar">
+        <div class="erp-action-btns">
+            <button type="button" data-url="/@(ViewBag.TransType ?? "GF")/ProfitDistributionNew/DownloadExcel?PreDistributionFundId=@ViewBag.PreDistributionFundId" onclick="downloadExcel(this)" id="" title="Click to Download the Report" class="sym-btn-Excel-Export btn-erp-export">&nbsp;Download</button>
+        </div>
+        <div class="erp-breadcrumb">
+            <span>Profit Distribution New</span>
+        </div>
+    </div>
+
+    <div class="card erp-card thinbox">
+        <div class="card-header erp-card-header th_thinbox">
+            <p><i class="fa fa-list"></i> Profit Distribution List</p>
+        </div>
+        <div class="card-body erp-card-body" style="padding: 16px 20px;">
+            <table id="myDataTable" class="display">
+                <thead>
+                    <tr>
+                        <th class="center">
+                            <input type="checkbox" class="chkAll" />Select All
+                        </th>
+                        <th>Employee Code</th>
+                        <th>Employee Name</th>
+                        <th>Distribution Date</th>
+                        <th>Employee Profit</th>
+                        <th>Employer Profit</th>
+                        <th>Post Status</th>
+                        <th>Payment Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        SelectAllForDelete();
+        $.datepicker.regional[""].dateFormat = 'dd/M/y';
+        $.datepicker.setDefaults($.datepicker.regional['']);
+        var oTable = $('#myDataTable').dataTable({
+            "bServerSide": true,
+            "sAjaxSource": "/@ViewBag.TransType/ProfitDistributionNew/_index",
+            "bProcessing": true,
+            "aLengthMenu": tablelength(),
+            "bJqueryUI": true,
+            "bAutoWidth": false,
+            "aoColumns": [
+                            {
+                                "sName": "Id",
+                                "bSearchable": false,
+                                "bSortable": false,
+                                "sWidth": "20%",
+                                "sClass": "center",
+                                "fnRender": function (oObj) {
+
+                                    return ' <input onclick="CheckAll(this)" type="checkbox" data-Id="' + oObj.aData[0] + '">'
+                                        + '&nbsp; <a id=""  title="Click on for Edit"    href=\"/@ViewBag.TransType/ProfitDistributionNew/Edit/' + oObj.aData[0] + '\" class="  sym-btn-edit-row"></a>'
+                                         + '&nbsp; <a id=""  title="Click on for Edit"    href=\"/@ViewBag.TransType/ProfitDistributionNew/Delete/' + oObj.aData[0] + '\" onclick="return confirm(\'Are you sure you want to delete this record?\')" class="  sym-btn-remove-row"></a>'                                     
+                                    ;
+                                }
+                            }
+                            , { "sName": "EmployeeCode", "sWidth": "10%" }
+                            , { "sName": "Name", "sWidth": "10%" }
+                            , { "sName": "DistributionDate", "sWidth": "10%" }
+                            , { "sName": "EmployeeProfit", "sWidth": "10%" }
+                            , { "sName": "EmployerProfit", "sWidth": "10%" }
+                            , { "sName": "Post", "sWidth": "10%" }
+                            , { "sName": "IsPaid", "sWidth": "10%" }
+            ]
+        });
+    });
+
+    function downloadExcel(sender) {
+        var preDistributionFundId = '@ViewBag.PreDistributionFundId';
+        if (!preDistributionFundId && window.location.search) {
+            var match = window.location.search.match(/[?&]PreDistributionFundId=([^&]+)/i);
+            if (match) {
+                preDistributionFundId = decodeURIComponent(match[1]);
+            }
+        }
+        var url = '/@(ViewBag.TransType ?? "GF")/ProfitDistributionNew/DownloadExcel';
+        if (preDistributionFundId) {
+            url += '?PreDistributionFundId=' + encodeURIComponent(preDistributionFundId);
+        }
+        window.location = url;
+    }
+</script>

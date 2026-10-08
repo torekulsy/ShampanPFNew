@@ -1,0 +1,79 @@
+
+@using UIHelper.MVC
+@{
+    ViewBag.Title = "Import";
+}
+
+<div class="erp-page-wrapper">
+    <div class="erp-action-bar">
+        <div class="erp-action-btns">
+            <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/ProfitDistributionNew" onclick="GoTo(this)" class="sym-btn-detail btn-erp-index">&nbsp;Index</button>
+        </div>
+        <div class="erp-breadcrumb">
+            <span>Profit Distribution &gt; Excel Import/Export</span>
+        </div>
+    </div>
+
+    <!-- Export Card -->
+    <div class="card erp-card" style="margin-bottom: 16px;">
+        <div class="card-header erp-card-header">
+            <p><i class="fa fa-download"></i> Profit Distribution Export</p>
+        </div>
+        <div class="card-body erp-card-body" style="padding: 16px 20px;">
+            <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+                <div class="ep-form-group" style="flex: 0 1 180px; min-width: 140px;">
+                    <label class="ep-field-label">Year</label>
+                    <div class="editor-field">
+                        @Html.TextBox("Year", @Session["SessionYear"].ToString(), new { @Id = "fYear", @class = "fiscalyearCom form-control", @style = "height: 28px;" })
+                    </div>
+                </div>
+                <div class="ep-form-group" style="flex: 0 1 240px; min-width: 180px;">
+                    <label class="ep-field-label">Fiscal Period</label>
+                    <div class="editor-field">
+                        @Html.SimpleDropDown("FiscalPeriod", "/Config/DropDown/DropDownPeriodByFYear?year=" + @Session["SessionYear"].ToString(), new { @Id = "FiscalPeriodDetailId", @class = " fpDetailsCom required form-control" })
+                    </div>
+                </div>
+                <div>
+                    <button type="button" title="Export Data" onclick="ExportExcell()" class="sym-btn-Excel-Export btn-erp-export" style="height: 28px; line-height: 26px; padding: 0 16px;">&nbsp;Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Card -->
+    <div class="card erp-card">
+        <div class="card-header erp-card-header">
+            <p><i class="fa fa-upload"></i> Profit Distribution Import</p>
+        </div>
+        <div class="card-body erp-card-body" style="padding: 16px 20px;">
+            @using (Ajax.BeginForm("UploadExcel", "ProfitDistributionNew", null, new AjaxOptions { }, new { enctype = "multipart/form-data", id = "frmUploadExcel" }))
+            {
+                <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+                    <div class="ep-form-group" style="flex: 0 1 340px; min-width: 250px;">
+                        <label class="ep-field-label">Choose Excel File (.xlsx)</label>
+                        <input type="File" accept=".xlsx" name="file" id="FileUpload" class="required form-control" style="height: 28px; padding: 2px 6px;" />
+                    </div>
+                    <div>
+                        <button type="button" onclick="pageSubmit('frmUploadExcel');" title="Bonus Import" class="sym-btn-file-upload btn-erp-save" value="Upload" style="height: 28px; line-height: 26px; padding: 0 16px; white-space: nowrap;">&nbsp;Upload</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        InitDropdownsCommon();
+    });
+
+    function ExportExcell() {
+        debugger;
+        var FiscalPeriod = $('#FiscalPeriodDetailId').val(); // get the selected value from the dropdown
+        var questionMSG = "Are you sure you want to export data?";
+        Ask(questionMSG, function () {
+            window.location.href = '/@(ViewBag.TransType ?? "GF")/ProfitDistributionNew/ExportExcell?fiscalYear=' + encodeURIComponent(FiscalPeriod);
+        });
+    }
+
+    InitDropdownsCommon();
+</script>

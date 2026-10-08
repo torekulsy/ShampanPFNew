@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -286,4 +286,76 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Compile Include="GF\EmployeeSettlementDAL.cs" />
+    <Compile Include="GF\GFEmployeeBreakMonthDAL.cs" />
+    <Compile Include="GF\GFEmployeeForfeitureDAL.cs" />
+    <Compile Include="GF\GFEmployeeOpeinigDAL.cs" />
+    <Compile Include="GF\GFEmployeePaymentDAL.cs" />
+    <Compile Include="GF\GFEmployeeProvisionDAL.cs" />
+    <Compile Include="GF\GFPolicyDAL.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="WWF\AccountDAL.cs" />
+    <Compile Include="WWF\AccountTypeDAL.cs" />
+    <Compile Include="WWF\AutoJournalSetupDAL.cs" />
+    <Compile Include="WWF\BankBranchDAL.cs" />
+    <Compile Include="WWF\BankChargeDAL.cs" />
+    <Compile Include="WWF\BankNameDAL.cs" />
+    <Compile Include="WWF\COACategoryDAL.cs" />
+    <Compile Include="WWF\COADAL.cs" />
+    <Compile Include="WWF\COAGroupDAL.cs" />
+    <Compile Include="WWF\COASubCategoryDAL.cs" />
+    <Compile Include="WWF\COASubGroupDAL.cs" />
+    <Compile Include="WWF\EEHeadDAL.cs" />
+    <Compile Include="WWF\EETransactionDAL.cs" />
+    <Compile Include="WWF\EETransactionDetailDAL.cs" />
+    <Compile Include="WWF\EmployeeBreakMonthPFDAL.cs" />
+    <Compile Include="WWF\EmployeeForfeitureDAL.cs" />
+    <Compile Include="WWF\EmployeeInfoForPFDAL.cs" />
+    <Compile Include="WWF\EmployeePFDAL.cs" />
+    <Compile Include="WWF\EmployeePFOpeinigDAL.cs" />
+    <Compile Include="WWF\EmployeePFPaymentDAL.cs" />
+    <Compile Include="WWF\EmployeeTransferDAL.cs" />
+    <Compile Include="WWF\EnumInvestmentTypeDAL.cs" />
+    <Compile Include="WWF\EnumJournalTypeDAL.cs" />
+    <Compile Include="WWF\ForfeitureAccountDAL.cs" />
+    <Compile Include="WWF\GLJournalDAL.cs" />
+    <Compile Include="WWF\GLTransactionDetailDAL.cs" />
+    <Compile Include="WWF\InvestmentAccruedDAL.cs" />
+    <Compile Include="WWF\InvestmentDAL.cs" />
+    <Compile Include="WWF\InvestmentDetailDAL.cs" />
+    <Compile Include="WWF\InvestmentNameDAL.cs" />
+    <Compile Include="WWF\InvestmentRenewDAL.cs" />
+    <Compile Include="WWF\LoanDAL.cs" />
+    <Compile Include="WWF\LoanMonthlyPaymentDAL.cs" />
+    <Compile Include="WWF\LoanRepaymentToBankDAL.cs" />
+    <Compile Include="WWF\LoanSattlementDAL.cs" />
+    <Compile Include="WWF\PFBankDepositDAL.cs" />
+    <Compile Include="WWF\PFBankDepositDetailDAL.cs" />
+    <Compile Include="WWF\PFDetailDAL.cs" />
+    <Compile Include="WWF\PFReportDAL.cs" />
+    <Compile Include="WWF\PFSettlementDAL.cs" />
+    <Compile Include="WWF\PFSettlementDetailDAL.cs" />
+    <Compile Include="WWF\PFStructureDAL.cs" />
+    <Compile Include="WWF\PreDistributionFundDAL.cs" />
+    <Compile Include="WWF\ProfitDistributionDAL.cs" />
+    <Compile Include="WWF\ProfitDistributionDetailDAL.cs" />
+    <Compile Include="WWF\ProfitDistributionNewDAL.cs" />
+    <Compile Include="WWF\ProfitDistributionOfBankInterestDAL.cs" />
+    <Compile Include="WWF\ProfitDistributionOfInvestmentDAL.cs" />
+    <Compile Include="WWF\ProfitDistributionOfReservedfundDAL.cs" />
+    <Compile Include="WWF\ReservedFundDAL.cs" />
+    <Compile Include="WWF\ReturnOnBankInterestDAL.cs" />
+    <Compile Include="WWF\ReturnOnInvestmentDAL.cs" />
+    <Compile Include="WWF\ROIDetailDAL.cs" />
+    <Compile Include="WWF\SettlementPolicyDAL.cs" />
+    <Compile Include="WWF\TransactionMediaDAL.cs" />
+    <Compile Include="WWF\WithdrawDAL.cs" />
+    <Compile Include="WWF\WithdrawDetailDAL.cs" />
+    <Compile Include="WWF\WithdrawTypeDAL.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GF\GFProfitDistributionNewDAL.cs" />
+  </ItemGroup>
 </Project>

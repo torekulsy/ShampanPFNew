@@ -1,9 +1,9 @@
-﻿using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.CrystalReports.Engine;
 using JQueryDataTables.Models;
 using SymOrdinary;
 using SymRepository.Common;
-using SymRepository.WPPF;
-using SymViewModel.WPPF;
+using SymRepository.WWF;
+using SymViewModel.WWF;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,9 +12,9 @@ using System.Linq;
 using System.Threading;
 using System.Web.Mvc;
 using SymViewModel.Common;
-using SymWebUI.Areas.WPPF.Models;
+using SymWebUI.Areas.WWF.Models;
 
-namespace SymWebUI.Areas.WPPF.Controllers
+namespace SymWebUI.Areas.WWF.Controllers
 {
     public class ReservedFundController : Controller
     {

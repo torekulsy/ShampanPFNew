@@ -1,4 +1,4 @@
-﻿using SymOrdinary;
+using SymOrdinary;
 using SymViewModel.Common;
 using System;
 using System.Collections.Generic;
@@ -13,6 +13,84 @@ namespace SymServices.Common
 {
     public class SettingDAL
     {
+        public string settingValueByName(string settingName, SqlConnection VcurrConn = null, SqlTransaction Vtransaction = null)
+        {
+            string retResults = "0";
+            SqlConnection currConn = null;
+            string sqlText = "";
+            try
+            {
+                if (VcurrConn != null)
+                {
+                    currConn = VcurrConn;
+                }
+                if (currConn == null)
+                {
+                    currConn = _dbsqlConnection.GetConnection();
+                    if (currConn.State != ConnectionState.Open)
+                    {
+                        currConn.Open();
+                    }
+                }
+
+                sqlText = "SELECT TOP 1 SettingValue FROM Setting WHERE SettingName=@SettingName";
+                using (SqlCommand cmd = new SqlCommand(sqlText, currConn))
+                {
+                    if (Vtransaction != null)
+                    {
+                        cmd.Transaction = Vtransaction;
+                    }
+                    cmd.Parameters.AddWithValue("@SettingName", settingName);
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            retResults = dr["SettingValue"].ToString();
+                        }
+                        dr.Close();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    if (currConn != null && currConn.State == ConnectionState.Open)
+                    {
+                        sqlText = "SELECT TOP 1 SettingValue FROM Settings WHERE SettingName=@SettingName";
+                        using (SqlCommand cmd = new SqlCommand(sqlText, currConn))
+                        {
+                            if (Vtransaction != null)
+                            {
+                                cmd.Transaction = Vtransaction;
+                            }
+                            cmd.Parameters.AddWithValue("@SettingName", settingName);
+                            using (SqlDataReader dr = cmd.ExecuteReader())
+                            {
+                                if (dr.Read())
+                                {
+                                    retResults = dr["SettingValue"].ToString();
+                                }
+                                dr.Close();
+                            }
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            }
+            finally
+            {
+                if (VcurrConn == null && currConn != null && currConn.State == ConnectionState.Open)
+                {
+                    currConn.Close();
+                }
+            }
+            return retResults;
+        }
+
         #region Global Variables
 
         private DBSQLConnection _dbsqlConnection = new DBSQLConnection();

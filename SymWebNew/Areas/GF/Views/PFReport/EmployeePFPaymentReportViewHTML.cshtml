@@ -1,0 +1,187 @@
+@using System.Data
+@model DataTable
+@{
+    Layout = null;
+    var dt = Model ?? new DataTable();
+    string companyName = ViewBag.CompanyName as string ?? "Symphony Softtech Limited";
+    string companyAddress = ViewBag.CompanyAddress as string ?? "";
+    string companyLogo = ViewBag.CompanyLogo as string ?? "/Images/COMPANYLOGOhtml.png";
+    string reportHead = ViewBag.ReportHead as string ?? "Employee PF Payment Statement";
+    int recordCount = dt.Rows.Count;
+
+    decimal totalAmount = 0;
+    foreach (DataRow row in dt.Rows)
+    {
+        if (dt.Columns.Contains("Amount") && row["Amount"] != DBNull.Value)
+        {
+            decimal v = 0; decimal.TryParse(row["Amount"].ToString(), out v); totalAmount += v;
+        }
+        else if (dt.Columns.Contains("PaymentAmount") && row["PaymentAmount"] != DBNull.Value)
+        {
+            decimal v = 0; decimal.TryParse(row["PaymentAmount"].ToString(), out v); totalAmount += v;
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@reportHead</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #111; background-color: #525659; }
+        .toolbar { position: sticky; top: 0; z-index: 1000; background: #323639; color: #fff; padding: 8px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .toolbar-title { font-size: 13px; font-weight: bold; }
+        .toolbar-actions { display: flex; gap: 8px; }
+        .btn { padding: 5px 12px; font-size: 12px; font-weight: bold; border: none; border-radius: 3px; cursor: pointer; }
+        .btn-print { background: #0078d4; color: #fff; }
+        .btn-excel { background: #107c41; color: #fff; }
+        .btn-close { background: #555; color: #fff; }
+        .report-container { display: flex; justify-content: center; padding: 20px 0 40px 0; }
+        .report-page { width: 280mm; min-height: 200mm; background: #fff; padding: 12mm 15mm; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1.5px solid #000 !important box-sizing: border-box; }
+        .company-header { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 12px; }
+        .company-logo { position: absolute; left: 0; top: 0; max-height: 50px; max-width: 120px; object-fit: contain; }
+        .company-text { text-align: center; }
+        .company-name { font-size: 16px; font-weight: bold; color: #000; text-transform: uppercase; }
+        .company-address { font-size: 10px; color: #444; margin-top: 2px; }
+        .report-title { font-size: 13px; font-weight: bold; margin-top: 5px; text-decoration: underline; }
+        .param-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 10px; }
+        .param-table td { padding: 2px 4px; border: none; }
+        .param-label { font-weight: bold; width: 100px; color: #333; }
+        .report-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 10px; }
+        .report-table th, .report-table td { border: 1px solid #444; padding: 4px 6px; }
+        .report-table th { background: #f0f0f0; text-align: center; font-weight: bold; }
+        .report-table tfoot td { font-weight: bold; background: #f9f9f9; border-top: 2px solid #000; }
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .report-footer { margin-top: 40px; display: flex; justify-content: space-between; text-align: center; font-size: 11px; font-weight: bold; }
+        .sign-box { border-top: 1px solid #000; width: 170px; padding-top: 4px; }
+        @@media print {
+            @@page { size: landscape; margin: 8mm; }
+            body { background: #fff; }
+            .toolbar { display: none !important; }
+            .report-container { padding: 0; }
+            .report-page { width: 100% !important; min-height: 185mm !important; box-shadow: none !important; padding: 6mm 8mm !important; border: 1.5px solid #000 !important box-sizing: border-box; }
+            .report-table th { background: #e8e8e8 !important; -webkit-print-color-adjust: exact; }
+            tr { page-break-inside: avoid; }
+        }
+    </style>
+<link href="@Url.Content("~/assets/stylesheets/pf-module-views.css")" rel="stylesheet" media="screen" />
+</head>
+<body class="pf-module-theme pf-module-report">
+    <div class="toolbar">
+        <div class="toolbar-title">@reportHead - @recordCount Records</div>
+        <div class="toolbar-actions">
+            <button type="button" class="btn btn-print" onclick="window.print()">Print</button>
+            <button type="button" class="btn btn-excel" onclick="exportExcel()">Excel</button>
+            <button type="button" class="btn btn-close" onclick="window.close()">Close</button>
+        </div>
+    </div>
+    <div class="report-container">
+        <div class="report-page">
+            <div class="company-header">
+                <img src="@companyLogo" class="company-logo" onerror="this.style.display='none'" />
+                <div class="company-text">
+                    <div class="company-name">@companyName</div>
+                    @if (!string.IsNullOrEmpty(companyAddress)) { <div class="company-address">@companyAddress</div> }
+                    <div class="report-title">@reportHead</div>
+                </div>
+            </div>
+
+            <table class="param-table">
+                <tr>
+                    @if (ViewBag.EmployeeId != null) { <td class="param-label">Employee ID:</td><td>@ViewBag.EmployeeId</td> }
+                    @if (ViewBag.DateFrom != null) { <td class="param-label">Date From:</td><td>@ViewBag.DateFrom</td> }
+                    @if (ViewBag.DateTo != null) { <td class="param-label">Date To:</td><td>@ViewBag.DateTo</td> }
+                </tr>
+            </table>
+
+            @if (recordCount == 0)
+            {
+                <div style="text-align:center; padding: 40px; font-size: 13px; color: #666;">There are no data to Preview for @reportHead</div>
+            }
+            else
+            {
+                <table class="report-table" id="reportTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 35px;">SL#</th>
+                            @foreach (DataColumn col in dt.Columns)
+                            {
+                                if (col.ColumnName.Equals("Id", StringComparison.OrdinalIgnoreCase) || col.ColumnName.Equals("BranchId", StringComparison.OrdinalIgnoreCase)) { continue; }
+                                string align = "text-left";
+                                if (col.DataType == typeof(decimal) || col.DataType == typeof(double) || col.DataType == typeof(int) || col.ColumnName.Contains("Amount") || col.ColumnName.Contains("Balance"))
+                                {
+                                    align = "text-right";
+                                }
+                                else if (col.DataType == typeof(DateTime) || col.ColumnName.Contains("Date"))
+                                {
+                                    align = "text-center";
+                                }
+                                <th class="@align">@col.ColumnName</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ int sl = 1; }
+                        @foreach (DataRow row in dt.Rows)
+                        {
+                            <tr>
+                                <td class="text-center">@(sl++)</td>
+                                @foreach (DataColumn col in dt.Columns)
+                                {
+                                    if (col.ColumnName.Equals("Id", StringComparison.OrdinalIgnoreCase) || col.ColumnName.Equals("BranchId", StringComparison.OrdinalIgnoreCase)) { continue; }
+                                    var val = row[col];
+                                    string text = val != null && val != DBNull.Value ? val.ToString() : "";
+                                    decimal dVal;
+                                    if (decimal.TryParse(text, out dVal) && (col.DataType == typeof(decimal) || col.DataType == typeof(double) || col.ColumnName.Contains("Amount") || col.ColumnName.Contains("Balance")))
+                                    {
+                                        <td class="text-right">@dVal.ToString("N2")</td>
+                                    }
+                                    else if (col.DataType == typeof(DateTime))
+                                    {
+                                        <td class="text-center">@(val != DBNull.Value ? Convert.ToDateTime(val).ToString("dd-MMM-yyyy") : "")</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="text-left">@text</td>
+                                    }
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                    @if (totalAmount > 0)
+                    {
+                        <tfoot>
+                            <tr>
+                                <td colspan="@(dt.Columns.Count - 1)" class="text-right">Grand Total:</td>
+                                <td class="text-right">@totalAmount.ToString("N2")</td>
+                            </tr>
+                        </tfoot>
+                    }
+                </table>
+            }
+
+            <div class="report-footer">
+                <div class="sign-box">Prepared By</div>
+                <div class="sign-box">Checked By</div>
+                <div class="sign-box">Manager (Finance & Accounts)</div>
+                <div class="sign-box">Trustee / Authorized Signatory</div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function exportExcel() {
+            var table = document.getElementById('reportTable');
+            if (!table) return;
+            var html = table.outerHTML;
+            var url = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'PFPaymentStatement_' + new Date().toISOString().slice(0,10) + '.xls';
+            a.click();
+        }
+    </script>
+</body>
+</html>

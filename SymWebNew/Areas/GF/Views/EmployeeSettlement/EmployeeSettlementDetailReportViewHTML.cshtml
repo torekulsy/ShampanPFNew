@@ -1,0 +1,221 @@
+@using System.Data
+@model DataTable
+@{
+    Layout = null;
+    var dt = Model ?? new DataTable();
+    string companyName = ViewBag.CompanyName as string ?? "Symphony Softtech Limited";
+    string companyAddress = ViewBag.CompanyAddress as string ?? "";
+    string companyLogo = ViewBag.CompanyLogo as string ?? "/Images/COMPANYLOGOhtml.png";
+    string reportHead = ViewBag.ReportHead as string ?? "Employee Settlement (Detail)";
+    int recordCount = dt.Rows.Count;
+
+    decimal totalLastGross = 0;
+    decimal totalLastBasic = 0;
+    decimal totalGFValue = 0;
+    decimal totalServiceCharge = 0;
+
+    foreach (DataRow row in dt.Rows)
+    {
+        if (dt.Columns.Contains("LastGross") && row["LastGross"] != DBNull.Value)
+        {
+            decimal v = 0; decimal.TryParse(row["LastGross"].ToString(), out v); totalLastGross += v;
+        }
+        if (dt.Columns.Contains("LastBasic") && row["LastBasic"] != DBNull.Value)
+        {
+            decimal v = 0; decimal.TryParse(row["LastBasic"].ToString(), out v); totalLastBasic += v;
+        }
+        if (dt.Columns.Contains("GFValue") && row["GFValue"] != DBNull.Value)
+        {
+            decimal v = 0; decimal.TryParse(row["GFValue"].ToString(), out v); totalGFValue += v;
+        }
+        if (dt.Columns.Contains("ServiceCharge") && row["ServiceCharge"] != DBNull.Value)
+        {
+            decimal v = 0; decimal.TryParse(row["ServiceCharge"].ToString(), out v); totalServiceCharge += v;
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@reportHead</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #111; background-color: #525659; }
+        .toolbar { position: sticky; top: 0; z-index: 1000; background: #323639; color: #fff; padding: 8px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .toolbar-title { font-size: 13px; font-weight: bold; }
+        .toolbar-actions { display: flex; gap: 8px; }
+        .btn { padding: 5px 12px; font-size: 12px; font-weight: bold; border: none; border-radius: 3px; cursor: pointer; }
+        .btn-print { background: #0078d4; color: #fff; }
+        .btn-excel { background: #107c41; color: #fff; }
+        .btn-close { background: #555; color: #fff; }
+        .report-container { display: flex; justify-content: center; padding: 20px 0 40px 0; }
+        .report-page { width: 297mm; min-height: 210mm; background: #fff; padding: 12mm 15mm; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1.5px solid #000 !important box-sizing: border-box; }
+        .company-header { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 12px; }
+        .company-logo { position: absolute; left: 0; top: 0; max-height: 50px; max-width: 120px; object-fit: contain; }
+        .company-text { text-align: center; }
+        .company-name { font-size: 16px; font-weight: bold; color: #000; text-transform: uppercase; }
+        .company-address { font-size: 10px; color: #444; margin-top: 2px; }
+        .report-title { font-size: 13px; font-weight: bold; margin-top: 5px; text-decoration: underline; }
+        .param-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 10px; }
+        .param-table td { padding: 2px 4px; border: none; }
+        .param-label { font-weight: bold; width: 100px; color: #333; }
+        .report-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 9px; }
+        .report-table th, .report-table td { border: 1px solid #444; padding: 3px 5px; }
+        .report-table th { background: #f0f0f0; text-align: center; font-weight: bold; }
+        .report-table tfoot td { font-weight: bold; background: #f9f9f9; border-top: 2px solid #000; }
+        .text-left { text-align: left; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .report-footer { margin-top: 40px; display: flex; justify-content: space-between; text-align: center; font-size: 11px; font-weight: bold; }
+        .sign-box { border-top: 1px solid #000; width: 170px; padding-top: 4px; }
+        @@media print {
+            body { background-color: #fff; }
+            .toolbar { display: none !important; }
+            .report-container { padding: 0; }
+            .report-page { width: 100%; padding: 6mm 8mm !important; box-shadow: none; border: 1.5px solid #000 !important box-sizing: border-box; }
+            @@page { size: landscape; margin: 10mm; }
+        }
+    </style>
+<link href="@Url.Content("~/assets/stylesheets/pf-module-views.css")" rel="stylesheet" media="screen" />
+</head>
+<body class="pf-module-theme pf-module-report">
+    <div class="toolbar">
+        <div class="toolbar-title">@reportHead</div>
+        <div class="toolbar-actions">
+            <button class="btn btn-print" onclick="window.print()">Print</button>
+            <button class="btn btn-excel" onclick="exportToExcel()">Export to Excel</button>
+            <button class="btn btn-close" onclick="window.close()">Close</button>
+        </div>
+    </div>
+
+    <div class="report-container">
+        <div class="report-page" id="printableArea">
+            <div class="company-header">
+                @if (!string.IsNullOrEmpty(companyLogo))
+                {
+                    <img src="@companyLogo" class="company-logo" alt="Logo" onerror="this.style.display='none'" />
+                }
+                <div class="company-text">
+                    <div class="company-name">@companyName</div>
+                    @if (!string.IsNullOrEmpty(companyAddress))
+                    {
+                        <div class="company-address">@companyAddress</div>
+                    }
+                    <div class="report-title">@reportHead</div>
+                </div>
+            </div>
+
+            <table class="param-table">
+                <tr>
+                    <td class="param-label">Date From:</td>
+                    <td>@(ViewBag.DateFrom != null ? ViewBag.DateFrom.ToString() : "All")</td>
+                    <td class="param-label">Date To:</td>
+                    <td>@(ViewBag.DateTo != null ? ViewBag.DateTo.ToString() : "All")</td>
+                    <td class="param-label">Print Date:</td>
+                    <td>@DateTime.Now.ToString("dd-MMM-yyyy hh:mm tt")</td>
+                </tr>
+            </table>
+
+            <table class="report-table" id="reportTable">
+                <thead>
+                    <tr>
+                        <th style="width: 30px;">#</th>
+                        <th>Emp Code</th>
+                        <th>Employee Name</th>
+                        <th>Designation</th>
+                        <th>Department</th>
+                        <th>Section</th>
+                        <th>Join Date</th>
+                        <th>Left Date</th>
+                        <th>Duration (Yrs)</th>
+                        <th>Last Gross</th>
+                        <th>Last Basic</th>
+                        <th>Policy</th>
+                        <th>Settlement Date</th>
+                        <th>GF Value</th>
+                        <th>Service Charge</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (recordCount > 0)
+                    {
+                        int sl = 1;
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            decimal lGross = 0; if (dt.Columns.Contains("LastGross") && row["LastGross"] != DBNull.Value) { decimal.TryParse(row["LastGross"].ToString(), out lGross); }
+                            decimal lBasic = 0; if (dt.Columns.Contains("LastBasic") && row["LastBasic"] != DBNull.Value) { decimal.TryParse(row["LastBasic"].ToString(), out lBasic); }
+                            decimal gfVal = 0; if (dt.Columns.Contains("GFValue") && row["GFValue"] != DBNull.Value) { decimal.TryParse(row["GFValue"].ToString(), out gfVal); }
+                            decimal sCharge = 0; if (dt.Columns.Contains("ServiceCharge") && row["ServiceCharge"] != DBNull.Value) { decimal.TryParse(row["ServiceCharge"].ToString(), out sCharge); }
+
+                            <tr>
+                                <td class="text-center">@(sl++)</td>
+                                <td class="text-center">@(dt.Columns.Contains("EmpCode") ? row["EmpCode"] : "")</td>
+                                <td class="text-left">@(dt.Columns.Contains("EmpName") ? row["EmpName"] : "")</td>
+                                <td class="text-left">@(dt.Columns.Contains("Designation") ? row["Designation"] : "")</td>
+                                <td class="text-left">@(dt.Columns.Contains("Department") ? row["Department"] : "")</td>
+                                <td class="text-left">@(dt.Columns.Contains("Section") ? row["Section"] : "")</td>
+                                <td class="text-center">@(dt.Columns.Contains("JoinDate") && row["JoinDate"] != DBNull.Value ? Convert.ToDateTime(row["JoinDate"]).ToString("dd-MMM-yyyy") : "")</td>
+                                <td class="text-center">@(dt.Columns.Contains("LeftDate") && row["LeftDate"] != DBNull.Value ? Convert.ToDateTime(row["LeftDate"]).ToString("dd-MMM-yyyy") : "")</td>
+                                <td class="text-center">@(dt.Columns.Contains("TotalJobDurationYear") ? row["TotalJobDurationYear"] : "")</td>
+                                <td class="text-right">@lGross.ToString("N2")</td>
+                                <td class="text-right">@lBasic.ToString("N2")</td>
+                                <td class="text-left">@(dt.Columns.Contains("GFPolicyName") ? row["GFPolicyName"] : "")</td>
+                                <td class="text-center">@(dt.Columns.Contains("SettlementDate") && row["SettlementDate"] != DBNull.Value ? Convert.ToDateTime(row["SettlementDate"]).ToString("dd-MMM-yyyy") : "")</td>
+                                <td class="text-right">@gfVal.ToString("N2")</td>
+                                <td class="text-right">@sCharge.ToString("N2")</td>
+                                <td class="text-left">@(dt.Columns.Contains("Remarks") ? row["Remarks"] : "")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="16" class="text-center" style="padding: 20px; color: #888;">No data available for preview</td>
+                        </tr>
+                    }
+                </tbody>
+                @if (recordCount > 0)
+                {
+                    <tfoot>
+                        <tr>
+                            <td colspan="9" class="text-right">Total:</td>
+                            <td class="text-right">@totalLastGross.ToString("N2")</td>
+                            <td class="text-right">@totalLastBasic.ToString("N2")</td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-right">@totalGFValue.ToString("N2")</td>
+                            <td class="text-right">@totalServiceCharge.ToString("N2")</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                }
+            </table>
+
+            <div class="report-footer">
+                <div class="sign-box">Prepared By</div>
+                <div class="sign-box">Checked By</div>
+                <div class="sign-box">Manager HR/Admin</div>
+                <div class="sign-box">Authorized Signature</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function exportToExcel() {
+            var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>EmployeeSettlement</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><link href="@Url.Content("~/assets/stylesheets/pf-module-views.css")" rel="stylesheet" media="screen" />
+</head><body class="pf-module-theme pf-module-report">';
+            html += document.getElementById("printableArea").innerHTML;
+            html += "</body></html>";
+            var blob = new Blob([html], { type: "application/vnd.ms-excel;charset=utf-8" });
+            var a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "@reportHead" + "_" + new Date().toISOString().slice(0, 10) + ".xls";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>

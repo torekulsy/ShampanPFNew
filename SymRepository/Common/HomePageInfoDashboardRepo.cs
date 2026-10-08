@@ -27,6 +27,11 @@ namespace SymRepository.Common
         //    }
         //}
 
+        public GfInfoDashboardVM GetGfInfoDashboard()
+        {
+            return new HomePageInfoDashboardDAL().GetGfInfoDashboard();
+        }
+
         public PfInfoDashboardVM GetPfInfoDashboard(int branchId)
         {
             try

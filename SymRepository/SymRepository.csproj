@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -204,4 +204,73 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Compile Include="GF\EmployeeBreakMonthGFRepo.cs" />
+    <Compile Include="GF\EmployeeGFForfeitureRepo.cs" />
+    <Compile Include="GF\EmployeeGFOpeinigRepo.cs" />
+    <Compile Include="GF\EmployeeGFPaymentRepo.cs" />
+    <Compile Include="GF\EmployeeSettlementRepo.cs" />
+    <Compile Include="GF\GFEmployeeProvisionRepo.cs" />
+    <Compile Include="GF\GFPolicyRepo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="WWF\AccountRepo.cs" />
+    <Compile Include="WWF\AccountTypeRepo.cs" />
+    <Compile Include="WWF\AutoJournalSetupRepo.cs" />
+    <Compile Include="WWF\BankBranchRepo.cs" />
+    <Compile Include="WWF\BankChargeRepo.cs" />
+    <Compile Include="WWF\BankNameRepo.cs" />
+    <Compile Include="WWF\COACategoryRepo.cs" />
+    <Compile Include="WWF\COAGroupRepo.cs" />
+    <Compile Include="WWF\COARepo.cs" />
+    <Compile Include="WWF\COASubCategoryRepo.cs" />
+    <Compile Include="WWF\COASubGroupRepo.cs" />
+    <Compile Include="WWF\EEHeadRepo.cs" />
+    <Compile Include="WWF\EETransactionDetailRepo.cs" />
+    <Compile Include="WWF\EETransactionRepo.cs" />
+    <Compile Include="WWF\EmployeeBreakMonthPFRepo.cs" />
+    <Compile Include="WWF\EmployeeForfeitureRepo.cs" />
+    <Compile Include="WWF\EmployeeInfoForPFRepo.cs" />
+    <Compile Include="WWF\EmployeePFOpeinigRepo.cs" />
+    <Compile Include="WWF\EmployeePFPaymentRepo.cs" />
+    <Compile Include="WWF\EmployeePFRepo.cs" />
+    <Compile Include="WWF\EmployeeTransferRepo.cs" />
+    <Compile Include="WWF\EnumInvestmentTypeRepo.cs" />
+    <Compile Include="WWF\EnumJournalTypeRepo.cs" />
+    <Compile Include="WWF\ForfeitureAccountRepo.cs" />
+    <Compile Include="WWF\GLJournalRepo.cs" />
+    <Compile Include="WWF\GLTransactionDetailRepo.cs" />
+    <Compile Include="WWF\InvestmentAccruedRepo.cs" />
+    <Compile Include="WWF\InvestmentDetailRepo.cs" />
+    <Compile Include="WWF\InvestmentNameRepo.cs" />
+    <Compile Include="WWF\InvestmentRenewRepo.cs" />
+    <Compile Include="WWF\InvestmentRepo.cs" />
+    <Compile Include="WWF\LoanMonthlyPaymentRepo.cs" />
+    <Compile Include="WWF\LoanRepaymentToBankRepo.cs" />
+    <Compile Include="WWF\LoanRepo.cs" />
+    <Compile Include="WWF\LoanSattlementRepo.cs" />
+    <Compile Include="WWF\PFBankDepositDetailRepo.cs" />
+    <Compile Include="WWF\PFBankDepositRepo.cs" />
+    <Compile Include="WWF\PFDetailRepo.cs" />
+    <Compile Include="WWF\PFReportRepo.cs" />
+    <Compile Include="WWF\PFSettlementDetailRepo.cs" />
+    <Compile Include="WWF\PFSettlementRepo.cs" />
+    <Compile Include="WWF\PFStructureRepo.cs" />
+    <Compile Include="WWF\PreDistributionFundRepo.cs" />
+    <Compile Include="WWF\ProfitDistributionDetailRepo.cs" />
+    <Compile Include="WWF\ProfitDistributionNewRepo.cs" />
+    <Compile Include="WWF\ProfitDistributionRepo.cs" />
+    <Compile Include="WWF\ReservedFundRepo.cs" />
+    <Compile Include="WWF\ReturnOnBankInterestRepo.cs" />
+    <Compile Include="WWF\ReturnOnInvestmentRepo.cs" />
+    <Compile Include="WWF\ROIDetailRepo.cs" />
+    <Compile Include="WWF\SettlementPolicyRepo.cs" />
+    <Compile Include="WWF\TransactionMediaRepo.cs" />
+    <Compile Include="WWF\WithdrawDetailRepo.cs" />
+    <Compile Include="WWF\WithdrawRepo.cs" />
+    <Compile Include="WWF\WithdrawTypeRepo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GF\GFProfitDistributionNewRepo.cs" />
+  </ItemGroup>
 </Project>

@@ -1957,6 +1957,10 @@ UNION ALL
 SELECT 'GL' symArea, 3 SortOrder
 UNION ALL
 SELECT 'WPPF' symArea, 4 SortOrder
+UNION ALL
+SELECT 'GF' symArea, 5 SortOrder
+UNION ALL
+SELECT 'WWF' symArea, 6 SortOrder
 ORDER BY SortOrder
 ";
 

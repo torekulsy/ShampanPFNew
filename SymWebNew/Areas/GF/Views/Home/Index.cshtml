@@ -1,0 +1,188 @@
+@model SymViewModel.Common.GfInfoDashboardVM
+@{
+    ViewBag.Title = "GF Dashboard";
+    decimal totalPerson = Model == null ? 0 : Model.TotalPerson;
+    decimal gfValue = Model == null ? 0 : Model.GFValue;
+    decimal monthlyGf = Model == null ? 0 : Model.MonthlyGFValue;
+    decimal averageGf = totalPerson > 0 ? gfValue / totalPerson : 0;
+}
+
+<style>
+    .module-dashboard {
+       
+        background: #eef2f7;
+        min-height: calc(100vh - 84px);
+    }
+
+    .module-hero {
+        background: linear-gradient(135deg, #163c3a 0%, #20c997 100%);
+        color: #fff;
+        border-radius: 4px;
+        padding: 24px 28px;
+        margin-bottom: 18px;
+        box-shadow: 0 14px 30px rgba(22, 60, 58, .18);
+    }
+
+        .module-hero h2 {
+            margin: 0 0 8px;
+            font-size: 26px;
+            font-weight: 800;
+            color: #fff
+        }
+
+        .module-hero p {
+            margin: 0;
+            color: rgba(255,255,255,.78);
+        }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(170px, 1fr));
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .summary-card, .dashboard-panel {
+        background: #fff;
+        border-radius: 4px;
+        box-shadow: 0 10px 26px rgba(18, 53, 95, .10);
+        border: 1px solid #dce5f0;
+    }
+
+    .summary-card {
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .summary-card:after {
+            content: "";
+            position: absolute;
+            right: -28px;
+            top: -30px;
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            background: rgba(245,185,66,.16);
+        }
+
+    .summary-label {
+        color: #60758c;
+        font-weight: 700;
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+
+    .summary-value {
+        color: #15304f;
+        font-size: 30px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .panel-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 18px;
+    }
+
+    .dashboard-panel {
+        padding: 20px;
+        min-height: 320px;
+    }
+
+        .dashboard-panel h3 {
+            margin: 0 0 18px;
+            font-size: 19px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+    .process-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .process-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 16px;
+        background: #f7fafc;
+        border: 1px solid #e3ebf4;
+        border-radius: 8px;
+        color: #1f344c;
+    }
+
+        .process-item strong {
+            color: #12355f;
+        }
+
+    .dashboard-error {
+        background: #fff7e6;
+        border: 1px solid #ffd58a;
+        color: #7a4a00;
+        padding: 12px 14px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+    }
+
+    @@media (max-width: 1100px) {
+        .summary-grid, .panel-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @@media (max-width: 760px) {
+        .summary-grid, .panel-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="module-dashboard">
+    <div class="module-hero">
+        <h2>Gratuity Fund Dashboard</h2>
+        <p>GF applicable employee, provision value, monthly account and liability overview.</p>
+    </div>
+    @if (ViewBag.DashboardError != null)
+    {
+        <div class="dashboard-error">@ViewBag.DashboardError</div>
+    }
+    <div class="summary-grid">
+        <div class="summary-card"><div class="summary-label">GF Applicable</div><div class="summary-value">@totalPerson.ToString("N0")</div></div>
+        <div class="summary-card"><div class="summary-label">GF Amount</div><div class="summary-value">@gfValue.ToString("N2")</div></div>
+        <div class="summary-card"><div class="summary-label">Monthly GF</div><div class="summary-value">@monthlyGf.ToString("N2")</div></div>
+        <div class="summary-card"><div class="summary-label">Average GF</div><div class="summary-value">@averageGf.ToString("N2")</div></div>
+    </div>
+    <div class="panel-grid">
+        <div class="dashboard-panel">
+            <h3>GF Liability Snapshot</h3>
+            <canvas id="gfChart" height="120"></canvas>
+        </div>
+        <div class="dashboard-panel">
+            <h3>GF Review Points</h3>
+            <div class="process-list">
+                <div class="process-item"><span>Applicable Employees</span><strong>@totalPerson.ToString("N0")</strong></div>
+                <div class="process-item"><span>Provision Control</span><strong>Monitored</strong></div>
+                <div class="process-item"><span>Monthly Posting</span><strong>@monthlyGf.ToString("N2")</strong></div>
+                <div class="process-item"><span>Settlement Readiness</span><strong>Available</strong></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var topMenuActive = "Home";
+    $(function () {
+        if (window.Chart) {
+            var gfValue = Number("@gfValue.ToString(System.Globalization.CultureInfo.InvariantCulture)");
+            var monthlyGf = Number("@monthlyGf.ToString(System.Globalization.CultureInfo.InvariantCulture)");
+            var averageGf = Number("@averageGf.ToString(System.Globalization.CultureInfo.InvariantCulture)");
+            new Chart(document.getElementById("gfChart"), {
+                type: "bar",
+                data: { labels: ["GF Amount", "Monthly GF", "Average GF"], datasets: [{ label: "GF", backgroundColor: ["#20c997", "#2f80ed", "#f5b942"], data: [gfValue, monthlyGf, averageGf] }] },
+                options: { responsive: true, legend: { display: false }, scales: { yAxes: [{ ticks: { beginAtZero: true } }] } }
+            });
+        }
+    });
+</script>
