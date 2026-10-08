@@ -1,0 +1,97 @@
+@using UIHelper.MVC
+@{
+    ViewBag.Title = "Employee Statement";
+}
+@using (Html.BeginForm("EmployeePFStatements", "PFReport", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmEmployeePFStatement", @target = "_blank" }))
+{
+    <div class="thinbox">
+        <div class="th_thinbox">
+            <p><i class="fa fa-file-text-o"></i> Employee Statement</p>
+        </div>
+        <div class="EnumEEHead" style="padding: 20px 24px;">
+            <div class="ep-form-grid" style="grid-template-columns: repeat(3, 1fr); gap: 12px 16px;">
+                <div class="ep-form-group col-span-1">
+                    <label class="ep-field-label">Employee Name <span class="text-danger">*</span></label>
+                    <div class="editor-field">
+                        @Html.SimpleDropDown("EmployeeId", "/Config/DropDown/EmployeeCodeNameAll", new { @id = "EmployeeId", @class = " EmpId required form-control selectDropdown" })
+                    </div>
+                </div>
+
+                <div class="ep-form-group col-span-1">
+                    <label class="ep-field-label">From Date <span class="text-danger">*</span></label>
+                    <div class="editor-field">
+                        @Html.TextBox("DateFrom", "", new { @placeholder = "From Date", @class = " dtFrom customDatePicker form-control" })
+                    </div>
+                </div>
+
+                <div class="ep-form-group col-span-1">
+                    <label class="ep-field-label">To Date <span class="text-danger">*</span></label>
+                    <div class="editor-field">
+                        @Html.TextBox("DateTo", "", new { @placeholder = "To Date", @class = " dtTo customDatePicker form-control" })
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 15px; padding-top: 10px; border-top: 1px solid #f1f5f9;">
+                <button type="button" title="Click to View Report Summary" class="sym-btn-report btnSummary btn-erp-print">&nbsp;Summary</button>
+                <button type="button" title="Click to View Report Detail" class="sym-btn-report btnDetail btn-erp-preview">&nbsp;Detail</button>
+                <button type="button" title="Clear the Entries" id="Clear" class="sym-btn-clear btn-erp-clear">&nbsp;Clear</button>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    $(function () {
+        $(".selectDropdown").select2();
+        $(".selectDropdown").removeClass('form-control');
+        InitDropDowns();
+        InitDateTimePickers();
+
+        $("#Clear").on('click', function () {
+            $("#frmEmployeePFStatement").find("input[type=text], textarea").val("");
+            $("#frmEmployeePFStatement").find("select").val(null).trigger('change');
+        });
+
+        $('.btnSummary').click(function () {
+            var empId = $('.EmpId').val();
+            var ToDate = $('.dtTo').val();
+            var FromDate = $('.dtFrom').val();
+            if (empId == "") {
+                ShowResult("Fail", "Please select Employee !");
+                return;
+            }
+            if (FromDate == "") {
+                ShowResult("Fail", "Please select From Date !");
+                return;
+            }
+            if (ToDate == "") {
+                ShowResult("Fail", "Please select To Date !");
+                return;
+            }
+           
+            var url = "/@ViewBag.TransType/PFReport/EmployeePFStatements?rType=" + "Summary" + '&EmployeeId=' + empId + '&ToDate=' + ToDate + '&FromDate=' + FromDate;
+            var win = window.open(url, '_blank');
+        });
+
+        $('.btnDetail').click(function () {
+            var empId = $('.EmpId').val();
+            var ToDate = $('.dtTo').val();
+            var FromDate = $('.dtFrom').val();
+            if (empId == "") {
+                ShowResult("Fail", "Please select Employee !");
+                return;
+            }
+            if (FromDate == "") {
+                ShowResult("Fail", "Please select From Date !");
+                return;
+            }
+            if (ToDate == "") {
+                ShowResult("Fail", "Please select To Date !");
+                return;
+            }
+            var url = "/@ViewBag.TransType/PFReport/EmployeePFStatements?rType=" + "Detail" + '&EmployeeId=' + empId + '&ToDate=' + ToDate + '&FromDate=' + FromDate;
+            var win = window.open(url, '_blank');
+        });
+    });
+</script>

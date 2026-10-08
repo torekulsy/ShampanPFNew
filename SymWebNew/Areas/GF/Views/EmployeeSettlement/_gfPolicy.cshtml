@@ -1,0 +1,51 @@
+@model SymViewModel.GF.EmployeeSettlementVM
+@using UIHelper.MVC
+<div class="GFPolicy table-responsive" style="overflow-x: auto;">
+    <table class="table table-bordered table-striped" style="margin-bottom: 0; width: 100%;">
+        <thead style="background: #f1f5f9;">
+            <tr>
+                <th style="font-size: 12.5px; font-weight: 600; color: #334155;">Policy Name</th>
+                <th style="font-size: 12.5px; font-weight: 600; color: #334155;">Job Year From</th>
+                <th style="font-size: 12.5px; font-weight: 600; color: #334155;">Job Year To</th>
+                <th style="font-size: 12.5px; font-weight: 600; color: #334155;">Multiplication Factor</th>
+                <th style="font-size: 12.5px; font-weight: 600; color: #334155; text-align: center;">Fixed</th>
+                <th style="font-size: 12.5px; font-weight: 600; color: #334155;">Last Basic Multiplication</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.gfPolicyVMs != null && Model.gfPolicyVMs.Count > 0)
+            {
+                for (int i = 0; i < Model.gfPolicyVMs.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            @Html.TextBoxFor(model => model.gfPolicyVMs[i].PolicyName, new { @class = "form-control", @readonly = "readonly", @style = "height: 28px; font-size: 12px;" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.gfPolicyVMs[i].JobDurationYearFrom, new { @class = "form-control", @readonly = "readonly", @style = "height: 28px; font-size: 12px;" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.gfPolicyVMs[i].JobDurationYearTo, new { @class = "form-control", @readonly = "readonly", @style = "height: 28px; font-size: 12px;" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.gfPolicyVMs[i].MultipicationFactor, new { @class = "form-control", @readonly = "readonly", @style = "height: 28px; font-size: 12px;" })
+                        </td>
+                        <td style="text-align: center; vertical-align: middle;">
+                            @Html.CheckBoxFor(model => model.gfPolicyVMs[i].IsFixed, new { @class = "form-control", @readonly = "readonly", @disabled = "disabled", @style = "width: 16px; height: 16px; margin: 0 auto; display: inline-block;" })
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(model => model.gfPolicyVMs[i].LastBasicMultipication, new { @class = "form-control", @readonly = "readonly", @style = "height: 28px; font-size: 12px;" })
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center" style="color: #64748b; padding: 12px;">No GF Policies available</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

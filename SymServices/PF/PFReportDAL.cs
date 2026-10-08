@@ -1,4 +1,4 @@
-﻿using SymOrdinary;
+using SymOrdinary;
 using SymServices.Common;
 
 using SymViewModel.Common;
@@ -18,6 +18,76 @@ namespace SymServices.PF
 {
     public class PFReportDAL
     {
+        public DataTable ProfitDistributionSummery(int preDistributionFundId = 0, bool isGF = false)
+        {
+            string[] retResults = new string[6];
+            DataTable dt = new DataTable();
+            SqlTransaction transaction = null;
+            string hrmDB = "";
+            try
+            {
+                #region Variables
+                SqlConnection currConn = null;
+                string sqlText = "";
+                #endregion
+                #region open connection and transaction
+                currConn = _dbsqlConnection.GetConnection();
+                hrmDB = "[" + currConn.Database.Replace("]", "]]") + "]";
+                if (currConn.State != ConnectionState.Open)
+                {
+                    currConn.Open();
+                }
+                if (transaction == null) { transaction = currConn.BeginTransaction("ExportExcelFile"); }
+                #endregion open connection and transaction
+                #region DataRead From DB
+                #region sql statement
+                string distributionTable = isGF ? "GFProfitDistributionNew" : "ProfitDistributionNew";
+                string preDistributionFundColumn = isGF ? "GFPreDistributionFundId" : "PreDistributionFundId";
+                string employeeContributionColumn = isGF ? "CAST(0 AS DECIMAL(18,2))" : "pd.EmployeeContribution";
+                string employeeProfitColumn = isGF ? "CAST(0 AS DECIMAL(18,2))" : "pd.EmployeeProfit";
+
+                sqlText = @"
+SELECT
+ve.Code
+,ve.EmpName
+,ve.JoinDate
+,pd.DistributionDate
+," + employeeContributionColumn + @" EmployeeContribution
+,pd.EmployerContribution
+," + employeeContributionColumn + @"+ pd.EmployerContribution TotalContribution
+," + employeeProfitColumn + @" EmployeeProfit
+,pd.EmployerProfit
+," + employeeProfitColumn + @" + pd.EmployerProfit TotalProfit
+FROM " + distributionTable + @" pd
+LEFT OUTER JOIN " + hrmDB + @".[dbo].FiscalYearDetail fydFrom ON pd.FiscalYearDetailId=fydFrom.Id
+LEFT OUTER JOIN " + hrmDB + @".[dbo].ViewEmployeeInformation ve ON ve.EmployeeId=pd.EmployeeId
+WHERE  1=1 AND pd.IsArchive = 0
+";
+                if (preDistributionFundId > 0)
+                {
+                    sqlText += " AND pd." + preDistributionFundColumn + "=@PreDistributionFundId";
+                }
+
+                SqlDataAdapter da = new SqlDataAdapter(sqlText, currConn);
+                da.SelectCommand.Transaction = transaction;
+                if (preDistributionFundId > 0)
+                {
+                    da.SelectCommand.Parameters.AddWithValue("@PreDistributionFundId", preDistributionFundId);
+                }
+                da.Fill(dt);
+                #endregion
+
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                retResults[0] = "Fail";
+                retResults[1] = ex.Message;
+                throw ex;
+            }
+            return dt;
+        }
+
         #region Global Variables
         private const string FieldDelimeter = DBConstant.FieldDelimeter;
         private DBSQLConnection _dbsqlConnection = new DBSQLConnection();

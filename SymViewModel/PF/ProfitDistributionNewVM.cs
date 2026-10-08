@@ -5,6 +5,7 @@ namespace SymViewModel.PF
 {
     public class ProfitDistributionNewVM
     {
+        public System.Web.HttpPostedFileBase File { get; set; }
         public int Id { get; set; }
 
 

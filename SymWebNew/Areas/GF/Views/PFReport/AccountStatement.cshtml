@@ -1,0 +1,40 @@
+@model SymViewModel.PF.PFParameterVM
+@using UIHelper.MVC
+@*@using (Html.BeginForm("AccountStatementReport", "PFReport", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmAccountStatement", @target = "_blank" }))*@
+@using (Html.BeginForm("AccountLedgerReport", "PFReport", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmAccountStatement", @target = "_blank" }))
+{
+    @Html.ValidationSummary(true)
+
+    <div class="thinbox">
+        <div class="th_thinbox">
+            <p><i class="fa fa-file-text-o"></i> Account Statement</p>
+        </div>
+        <div class="Withdraw" style="padding: 20px 24px;">
+            <div class="ep-form-grid">
+                <div class="ep-form-group col-span-4">
+                    <label class="ep-field-label">@Html.LabelFor(model => model.AccountId)</label>
+                    @Html.SimpleDropDownFor(model => model.AccountId, "/Config/DropDown/PF_Account", new { @class = " required form-control" })
+                    @Html.ValidationMessageFor(model => model.AccountId)
+                </div>
+                <div class="ep-form-group col-span-4">
+                    <label class="ep-field-label">Date From</label>
+                    @Html.TextBox("DateFrom", "", new { @placeholder = "Date From", @class = " dtFrom customDatePicker form-control" })
+                </div>
+                <div class="ep-form-group col-span-4">
+                    <label class="ep-field-label">Date To</label>
+                    @Html.TextBox("DateTo", "", new { @placeholder = "Date To", @class = " dtTo customDatePicker form-control" })
+                </div>
+            </div>
+            <div class="ep-report-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+                <button type="button" title="Click to View Report" onclick="pageSubmit('frmAccountStatement');" class="sym-btn-detail btn-erp-print">&nbsp;Report</button>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+
+    $(function () {
+        valiDation("frmAccountStatement");
+    });
+</script>

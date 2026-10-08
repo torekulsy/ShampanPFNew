@@ -1,0 +1,107 @@
+@model SymViewModel.GF.GFPolicyVM
+@using UIHelper.MVC
+@{
+    ViewBag.Title = Model.Id > 0 ? "Edit" : "Create";
+    ViewBag.Location = "Create"; 
+}
+
+@using (Html.BeginForm("CreateEdit", "GFPolicy", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmGFPolicy" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.Operation)
+
+    <div class="erp-page-wrapper">
+        <div class="erp-action-bar">
+            <div class="erp-action-btns">
+                @if (string.IsNullOrEmpty(Model.Operation) || Model.Operation.ToLower() == "add")
+                {
+                    <button type="button" name="btnName" value="Save" title="Save Data" onclick="pageSubmit('frmGFPolicy');" class="sym-btn-save btn-erp-save">&nbsp;Save</button>
+                }
+                else
+                {
+                    <button type="button" name="btnName" value="Update" title="Update Data" onclick="pageSubmit('frmGFPolicy');" class="sym-btn-update btn-erp-save">&nbsp;Update</button>
+                }
+                <button type="button" title="Cancel Data" onclick="clearForm();" class="sym-btn-cancel btn-erp-cancel btncancel">&nbsp;Clear</button>
+                <button type="button" title="Go To Index" data-url="/GF/GFPolicy" onclick="GoTo(this)" class="sym-btn-detail btn-erp-index">&nbsp;Index</button>
+            </div>
+            <div class="erp-breadcrumb">
+                <label class="pull-right">GF Policy &gt; @(string.IsNullOrEmpty(Model.Operation) || Model.Operation.ToLower() == "add" ? "Create" : "Edit")</label>
+            </div>
+        </div>
+
+        <div class="card erp-card">
+            <div class="card-header erp-card-header">
+                <p><i class="fa fa-shield"></i> GF Policy</p>
+            </div>
+            <div class="card-body erp-card-body" style="padding: 16px 20px;">
+                <div class="EnumGFPolicy">
+                    <div class="ep-form-grid">
+                        <!-- Row 1: Policy Name (1) | From < To (2) | Multiplication Factor (1) | Last Basic (1) | Fixed (1) = 6 cols -->
+                        <div class="ep-form-group col-span-1">
+                            <label class="ep-field-label">@Html.LabelFor(model => model.PolicyName)</label>
+                            @Html.TextBoxFor(model => model.PolicyName, new { @placeholder = "Policy Name", @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.PolicyName)
+                        </div>
+
+                        <div class="col-span-2" style="display: flex; gap: 6px; align-items: flex-end;">
+                            <div class="ep-form-group" style="flex: 1; min-width: 0;">
+                                <label class="ep-field-label">@Html.LabelFor(model => model.JobDurationYearFrom)</label>
+                                @Html.TextBoxFor(model => model.JobDurationYearFrom, new { @placeholder = "0", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.JobDurationYearFrom)
+                            </div>
+                            <div style="width: 24px; height: 28px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: 700; color: #334155; font-size: 13px; flex-shrink: 0; user-select: none;">
+                                &lt;
+                            </div>
+                            <div class="ep-form-group" style="flex: 1; min-width: 0;">
+                                <label class="ep-field-label">@Html.LabelFor(model => model.JobDurationYearTo)</label>
+                                @Html.TextBoxFor(model => model.JobDurationYearTo, new { @placeholder = "0", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.JobDurationYearTo)
+                            </div>
+                        </div>
+
+                        <div class="ep-form-group col-span-1">
+                            <label class="ep-field-label">@Html.LabelFor(model => model.MultipicationFactor)</label>
+                            @Html.TextBoxFor(model => model.MultipicationFactor, new { @placeholder = "0", @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.MultipicationFactor)
+                        </div>
+
+                        <div class="ep-form-group col-span-1">
+                            <label class="ep-field-label">@Html.LabelFor(model => model.LastBasicMultipication)</label>
+                            @Html.TextBoxFor(model => model.LastBasicMultipication, new { @placeholder = "0", @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.LastBasicMultipication)
+                        </div>
+
+                        <div class="ep-form-group col-span-1">
+                            <label class="ep-field-label">@Html.LabelFor(model => model.IsFixed)</label>
+                            <div class="ep-checkbox-card" style="margin: 0; width: 100%; height: 28px;">
+                                <span class="ep-addon-box">
+                                    @Html.CheckBoxFor(model => model.IsFixed, new { @class = "form-control" })
+                                </span>
+                                <span class="ep-addon-text">Is Fixed</span>
+                            </div>
+                            @Html.ValidationMessageFor(model => model.IsFixed)
+                        </div>
+
+                        <!-- Row 2: Remarks (Full 6 cols) -->
+                        <div class="ep-form-group col-span-2">
+                            <label class="ep-field-label">@Html.LabelFor(model => model.Remarks)</label>
+                            @Html.TextAreaFor(model => model.Remarks, new { @placeholder = "Remarks", @class = "form-control", @style = "height: 28px; min-height: 28px; resize: vertical;" })
+                            @Html.ValidationMessageFor(model => model.Remarks)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script>
+    $(function () {
+        InitDropDowns();
+        valiDation("frmGFPolicy");
+    });
+
+    function clearForm() {
+        document.getElementById("frmGFPolicy").reset();
+    }
+</script>

@@ -1,0 +1,55 @@
+@model SymViewModel.PF.ProfitDistributionNewVM
+@using UIHelper.MVC
+@using (Html.BeginForm("CreateEdit", "ProfitDistributionNew", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmProfitDistributionNew" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.Post)
+    @Html.HiddenFor(model => model.Operation)
+    @Html.HiddenFor(model => model.TransactionType)
+    @Html.HiddenFor(model => model.PreDistributionFundId)
+
+    <div class="erp-page-wrapper">
+        <div class="erp-action-bar">
+            <div class="erp-action-btns">
+                <button type="button" name="btnName" value="Save" title="Save Data" onclick="pageSubmit('frmProfitDistributionNew')" class="sym-btn-save btn-erp-save">&nbsp;Update</button>
+                <button type="button" title="Go To Index" data-url="/@ViewBag.TransType/ProfitDistributionNew?PreDistributionFundId=@Model.PreDistributionFundId"
+                        onclick="GoTo(this)" class="sym-btn-detail btn-erp-index">
+                    &nbsp;Index
+                </button>
+            </div>
+            <div class="erp-breadcrumb">
+                <span>Profit Distribution &gt; Edit</span>
+            </div>
+        </div>
+
+        <div class="card erp-card thinbox">
+            <div class="card-header erp-card-header th_thinbox">
+                <p><i class="fa fa-pencil-square-o"></i> Edit Profit Distribution</p>
+            </div>
+            <div class="card-body erp-card-body PreDistributionFund" style="padding: 16px 20px;">
+                <div class="ep-form-grid">
+                    <div class="ep-form-group col-span-3">
+                        <label class="ep-field-label">@Html.LabelFor(model => model.EmployeeProfit)</label>
+                        @Html.TextBoxFor(model => model.EmployeeProfit, new { @placeholder = "Employee Profit", @class = " required form-control" })
+                        @Html.ValidationMessageFor(model => model.EmployeeProfit)
+                    </div>
+                    <div class="ep-form-group col-span-3">
+                        <label class="ep-field-label">@Html.LabelFor(model => model.EmployerProfit)</label>
+                        @Html.TextBoxFor(model => model.EmployerProfit, new { @placeholder = "Employer Profit", @class = " required form-control" })
+                        @Html.ValidationMessageFor(model => model.EmployerProfit)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script>
+    $(function () {
+        valiDation("frmProfitDistributionNew");
+    });
+    function UpdateData() {
+     
+        pageSubmit('frmProfitDistributionNew');
+    }
+</script>

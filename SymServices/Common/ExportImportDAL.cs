@@ -1,4 +1,4 @@
-﻿using SymOrdinary;
+using SymOrdinary;
 
 using SymViewModel.Common;
 using SymViewModel.HRM;
@@ -17,6 +17,74 @@ namespace SymServices.Common
 {
     public class ExportImportDAL
     {
+        public DataTable SelectGFProfitDistributionInfo(string fiscalyear)
+        {
+            #region Variables
+            SqlConnection currConn = null;
+            string sqlText = "";
+            DataTable dt = new DataTable();
+            #endregion
+
+            try
+            {
+                #region open connection and transaction
+                currConn = _dbsqlConnection.GetConnection();
+                string hrmDB = ("[" + currConn.Database.Replace("]", "]]") + "]");
+                if (currConn.State != ConnectionState.Open)
+                {
+                    currConn.Open();
+                }
+                #endregion open connection and transaction
+                #region sql statement
+                #region sqlText
+                sqlText = @"SELECT
+                            pd.Id
+                            ,ve.EmployeeId
+                            ,ve.EmpName EmployeeName
+                          ,[FiscalYearDetailId]
+                          ,CAST(0 AS DECIMAL(18,2)) EmployeeContribution
+                          ,[EmployerContribution]
+                          ,CAST(0 AS DECIMAL(18,2)) EmployeeProfit
+                          ,[EmployerProfit]
+                          ,CAST(0 AS DECIMAL(18,2)) EmployeeProfitDistribution
+                          ,[EmployeerProfitDistribution]
+                          ,[TotalProfit]
+                          FROM GFProfitDistributionNew pd
+                          Left Outer Join " + hrmDB + @".[dbo].[ViewEmployeeInformation] ve on ve.EmployeeId=pd.EmployeeId
+                          where pd.FiscalYearDetailId=@FiscalYearDetailId and ve.IsActive=1";
+                #endregion
+                #region More Conditions
+                #endregion
+                SqlDataAdapter da = new SqlDataAdapter(sqlText, currConn);
+                da.SelectCommand.Parameters.AddWithValue("@FiscalYearDetailId", fiscalyear);
+                da.Fill(dt);
+                #endregion
+            }
+            #region catch
+            catch (SqlException sqlex)
+            {
+                throw new ArgumentNullException("", "SQL:" + sqlText + FieldDelimeter + sqlex.Message.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentNullException("", "SQL:" + sqlText + FieldDelimeter + ex.Message.ToString());
+            }
+            #endregion
+            #region finally
+            finally
+            {
+                if (currConn != null)
+                {
+                    if (currConn.State == ConnectionState.Open)
+                    {
+                        currConn.Close();
+                    }
+                }
+            }
+            #endregion
+            return dt;
+        }
+
         #region Global Variables
         private const string FieldDelimeter = DBConstant.FieldDelimeter;
         private DBSQLConnection _dbsqlConnection = new DBSQLConnection();
@@ -53,13 +121,13 @@ namespace SymServices.Common
         //SELECT
         // e.Id
         //,e.BranchId
-        //,e.EmpName 
+        //,e.EmpName
         //,e.Code
         //,e.Designation
         //,e.Branch
         //,e.Department
         //,e.Section
-        //,e.Project 
+        //,e.Project
         //,e.Salutation_E
         //,e.MiddleName
         //,e.LastName
@@ -242,8 +310,8 @@ Where vei.IsArchive=0 AND vei.IsActive=1
                 #region SQL query
                 string sqlText = @"
       SELECT
-                  a.Code, 
-                  a.Name, 
+                  a.Code,
+                  a.Name,
                   b.Name AS Department,
                   c.Name AS Designation,
                   ISNULL(d.Name, 'SSL') AS Project,
@@ -274,7 +342,7 @@ Where vei.IsArchive=0 AND vei.IsActive=1
                  , a.NomineeRemarks
                  , a.NomineeNID
                  , a.BranchId
-                 from EmployeeInfo a 
+                 from EmployeeInfo a
 					left join Department b on a.Department = b.Id
 					left join Designation c on a.Designation = c.Id
 					left join Project d on a.Project = d.Id
@@ -297,8 +365,8 @@ Where vei.IsArchive=0 AND vei.IsActive=1
                 {
                     sqlText = @"
          SELECT
-             '1001' Code, 
-             'Enter Name' Name, 
+             '1001' Code,
+             'Enter Name' Name,
              'Development' Department,
              'Sr. Software Developer' Designation,
              '1_1' Project,
@@ -388,7 +456,7 @@ SELECT
 vei.EmployeeId
 ,vei.Code
 ,epd.OtherId
-,vei.EmpName 
+,vei.EmpName
 ,epd.FatherName
 ,epd.MotherName
 ,epd.SpouseName
@@ -557,7 +625,7 @@ END IsArchive
 ,CASE
 WHEN j.IsPermanent =1  THEN '1'  ELSE '0'
 END IsPermanent
-      
+
       ,j.[StructureGroupId]
       ,j.[GrossSalary]
       ,j.[BasicSalary]
@@ -614,7 +682,7 @@ WHEN j.IsPFApplicable =1  THEN '1'  ELSE '0'
 END IsPFApplicable
 ,CASE
 WHEN IsGFApplicable =1  THEN '1'  ELSE '0'
-END IsGFApplicable 
+END IsGFApplicable
 ,CASE
 WHEN j.IsInactive =1  THEN '1'  ELSE '0'
 END IsInactive
@@ -854,7 +922,7 @@ SELECT
       ,edu.[Major]
       ,edu.[YearOfPassing]
       ,edu.[IsLast]
-      
+
       ,edu.[Remarks]
       ,edu.[CGPA]
       ,edu.[Scale]
@@ -955,7 +1023,7 @@ SELECT
       ,p.[Institute]
       ,p.[YearOfPassing]
       ,p.[IsLast]
-      
+
       ,p.[Remarks]
       ,CASE
 WHEN p.IsActive =1  THEN '1'  ELSE '0'
@@ -1597,7 +1665,7 @@ SELECT
       ,nome.[Mobile]
       ,nome.[BirthCertificateNo]
       ,nome.[Fax]
-      
+
       ,nome.[Remarks]
       ,nome.[IsActive]
       ,nome.[IsArchive]
@@ -1736,7 +1804,7 @@ END IsDependentAllowance
 ,CASE
 WHEN dpt.IsVaccineDose1Complete =1  THEN '1'  ELSE '0'
 END IsVaccineDose1Complete
-    
+
       ,dpt.[VaccineDose1Date]
       ,dpt.[VaccineDose1Name]
     ,CASE
@@ -2048,7 +2116,7 @@ and  vei.EmployeeId in (";
                 #region sql statement
                 #region sqlText
                 sqlText = @"
-SELECT 
+SELECT
        ''[Code]
       ,''[Name]
       ,''[Remarks]
@@ -2243,7 +2311,7 @@ FROM DesignationGroup";
                 #region sqlText
                 sqlText = @"
 
-SELECT 
+SELECT
       ''[Code]
       ,''[Name]
       ,''[Remarks]
@@ -2307,7 +2375,7 @@ FROM Bank";
                 #region sqlText
                 sqlText = @"
 
-SELECT 
+SELECT
       ''[Code]
       ,''[Name]
       ,''[Remarks]
@@ -2376,16 +2444,16 @@ SELECT
       vei.[EmployeeId]
       ,vei.EmpName EmployeeName
       ,vei.[Designation]
-      
+
 	  ,PF.Name PfStructureName
       ,EPF.[PFValue]
       ,CASE
 WHEN EPF.IsFixed =1  THEN '1'  ELSE '0'
 END IsFixed
       ,EPF.[PortionSalaryType]
-	 
-      
-     
+
+
+
 From ViewEmployeeInformation vei
 left outer join EmployeePF EPF on EPF.EmployeeId=vei.EmployeeId
 left outer join PFStructure PF on EPF.PFStructureId= PF.Id
@@ -2470,7 +2538,7 @@ where  vei.EmployeeId in (";
                 #region sqlText
                 sqlText = @"
 
-SELECT 
+SELECT
       [BranchId]
       ,[Code]
       ,[Name]
@@ -2687,7 +2755,7 @@ and  BranchId in (";
                                 ,IsActive
                                 ,IsArchive
                                 ,PhotoName
-                                ) 
+                                )
                                    VALUES (
                                 @Id
                                 ,@BranchId
@@ -2699,7 +2767,7 @@ and  BranchId in (";
                                 ,@IsActive
                                 ,@IsArchive
                                 ,@PhotoName
-                                ) 
+                                )
                                         ";
                     SqlCommand cmdInsert = new SqlCommand(sqlText, currConn, transaction);
                     cmdInsert.Parameters.AddWithValue("@Id", vm.Id);
@@ -2719,7 +2787,7 @@ and  BranchId in (";
                     retResults[1] = "This EmployeeInfo already used";
                     throw new ArgumentNullException("Please Input EmployeeInfo Value", "");
                 }
-                
+
 
                 #region User Create
                 string AutoUser = _settingDal.settingValue("AutoUser", "Employee", currConn, transaction);
@@ -3059,11 +3127,11 @@ and  BranchId in (";
                             sqlText = "";
                             sqlText += @" INSERT INTO EmployeePersonalDetail(
 EmployeeId,OtherId
-,FatherName	
-,MotherName	
-,SpouseName	
-,PersonalContactNo	
-,CorporateContactNo	
+,FatherName
+,MotherName
+,SpouseName
+,PersonalContactNo
+,CorporateContactNo
 ,CorporateContactLimit
 ,Gender_E,MaritalStatus_E,Nationality_E,DateOfBirth,NickName,Smoker,NID,IsActive
 ,PassportNumber
@@ -3076,11 +3144,11 @@ EmployeeId,OtherId
 ,IsArchive,CreatedBy,CreatedAt,CreatedFrom
 ) VALUES (
 @EmployeeId,@OtherId
-,@FatherName	
-,@MotherName	
-,@SpouseName	
-,@PersonalContactNo	
-,@CorporateContactNo	
+,@FatherName
+,@MotherName
+,@SpouseName
+,@PersonalContactNo
+,@CorporateContactNo
 ,@CorporateContactLimit
 ,@Gender_E,@MaritalStatus_E,@Nationality_E,@DateOfBirth,@NickName,@Smoker,@NID,@IsActive
 ,@PassportNumber
@@ -3410,11 +3478,11 @@ EmployeeId,OtherId
                             sqlText = "";
                             sqlText += @" INSERT INTO EmployeePersonalDetail(
 EmployeeId,OtherId
-,FatherName	
-,MotherName	
-,SpouseName	
-,PersonalContactNo	
-,CorporateContactNo	
+,FatherName
+,MotherName
+,SpouseName
+,PersonalContactNo
+,CorporateContactNo
 ,CorporateContactLimit
 ,Gender_E,MaritalStatus_E,Nationality_E,DateOfBirth,NickName,Smoker,NID,IsActive
 ,PassportNumber
@@ -3427,11 +3495,11 @@ EmployeeId,OtherId
 ,IsArchive
 ) VALUES (
 @EmployeeId,@OtherId
-,@FatherName	
-,@MotherName	
-,@SpouseName	
-,@PersonalContactNo	
-,@CorporateContactNo	
+,@FatherName
+,@MotherName
+,@SpouseName
+,@PersonalContactNo
+,@CorporateContactNo
 ,@CorporateContactLimit
 ,@Gender_E,@MaritalStatus_E,@Nationality_E,@DateOfBirth,@NickName,@Smoker,@NID,@IsActive
 ,@PassportNumber
@@ -3660,7 +3728,7 @@ EmployeeId,OtherId
                         {
                             #region Sql Satement professional Degree
                             sqlText = "  ";
-                            sqlText += @" 
+                            sqlText += @"
 INSERT INTO EmployeeEducation(
 EmployeeId
 ,Degree_E
@@ -3953,7 +4021,7 @@ EmployeeId
                         {
                             #region Sql Satement
                             sqlText = "  ";
-                            sqlText += @" INSERT INTO EmployeeImmigration(	
+                            sqlText += @" INSERT INTO EmployeeImmigration(
 EmployeeId,ImmigrationType_E,ImmigrationNumber,IssueDate,ExpireDate,IssuedBy_E,EligibleReviewDate
 ,Remarks,IsActive,IsArchive
 ) VALUES (
@@ -4470,7 +4538,7 @@ EmployeeId
                                 #region Sql Satement
                                 sqlText = "  ";
                                 sqlText += @" INSERT INTO EmployeeTraining(	EmployeeId,TrainingStatus_E
-,TrainingPlace_E,Topics,InstituteName,Location,FundedBy,DurationMonth,DurationDay,Achievement,AllowancesTotalTk,DateFrom,DateTo,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom) 
+,TrainingPlace_E,Topics,InstituteName,Location,FundedBy,DurationMonth,DurationDay,Achievement,AllowancesTotalTk,DateFrom,DateTo,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom)
                                 VALUES (@EmployeeId,@TrainingStatus_E
 ,@TrainingPlace_E,@Topics,@InstituteName,@Location,@FundedBy,@DurationMonth,@DurationDay,@Achievement,@AllowancesTotalTk,@DateFrom,@DateTo,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom) SELECT SCOPE_IDENTITY()";
                                 SqlCommand cmdInsert = new SqlCommand(sqlText, currConn, transaction);
@@ -4721,7 +4789,7 @@ EmployeeId
                         {
                             #region Sql Satement
                             sqlText = "  ";
-                            sqlText += @" INSERT INTO EmployeeTravel(	
+                            sqlText += @" INSERT INTO EmployeeTravel(
 	EmployeeId,TravelType_E,TravelFromAddress,TravelToAddress,FromDate,ToDate,FromTime,ToTime,Allowances
 ,IssueDate,ExpiryDate,Country,PassportNumber,EmbassyName
 ,Remarks,IsActive,IsArchive
@@ -5287,10 +5355,10 @@ EmployeeId,Name,Relation,Address,District,Division,Country,City,PostalCode,Mobil
                             sqlText = "  ";
                             sqlText += @" INSERT INTO EmployeeDependent(
 EmployeeId,Name,Relation,DateofBirth,BirthCertificateNo,Address,District,Division,Country,City,PostalCode,PostOffice
-,Phone,Mobile,Fax,Remarks,IsActive,IsArchive) 
+,Phone,Mobile,Fax,Remarks,IsActive,IsArchive)
 VALUES (
 @EmployeeId,@Name,@Relation,@DateofBirth,@BirthCertificateNo,@Address,@District,@Division,@Country,@City,@PostalCode,@PostOffice
-,@Phone,@Mobile,@Fax,@Remarks,@IsActive,@IsArchive) 
+,@Phone,@Mobile,@Fax,@Remarks,@IsActive,@IsArchive)
 SELECT SCOPE_IDENTITY()";
 
                             SqlCommand cmdInsert = new SqlCommand(sqlText, currConn, transaction);
@@ -5514,8 +5582,8 @@ SELECT SCOPE_IDENTITY()";
                             #region Sql Satement
                             sqlText = " ";
                             sqlText += @" INSERT INTO EmployeeAssets(
-EmployeeId,AssetId,IssueDate, Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom) 
-VALUES (@Id,@EmployeeId,1,@IssueDate,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom) 
+EmployeeId,AssetId,IssueDate, Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom)
+VALUES (@Id,@EmployeeId,1,@IssueDate,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom)
 ";
                             SqlCommand cmdInsert = new SqlCommand(sqlText, currConn, transaction);
                             cmdInsert.Parameters.AddWithValue("@EmployeeId", EmployeeId);
@@ -5726,8 +5794,8 @@ VALUES (@Id,@EmployeeId,1,@IssueDate,@Remarks,@IsActive,@IsArchive,@CreatedBy,@C
                             #region Sql Satement
                             sqlText = " ";
                             sqlText += @" INSERT INTO EmployeeAssets(
-EmployeeId,AssetId,IssueDate, Remarks,IsActive,IsArchive) 
-VALUES (@Id,@EmployeeId,1,@IssueDate,@Remarks,@IsActive,@IsArchive) 
+EmployeeId,AssetId,IssueDate, Remarks,IsActive,IsArchive)
+VALUES (@Id,@EmployeeId,1,@IssueDate,@Remarks,@IsActive,@IsArchive)
 ";
                             SqlCommand cmdInsert = new SqlCommand(sqlText, currConn, transaction);
                             cmdInsert.Parameters.AddWithValue("@EmployeeId", EmployeeId);
@@ -5938,8 +6006,8 @@ VALUES (@Id,@EmployeeId,1,@IssueDate,@Remarks,@IsActive,@IsArchive)
         //                            #region Sql Satement
         //                            sqlText = " ";
         //                            sqlText += @" INSERT INTO EmployeeAssets(
-        //EmployeeId,AssetId,IssueDate, Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom) 
-        //VALUES (@Id,@EmployeeId,1,@IssueDate,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom) 
+        //EmployeeId,AssetId,IssueDate, Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom)
+        //VALUES (@Id,@EmployeeId,1,@IssueDate,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom)
         //";
         //                            SqlCommand cmdInsert = new SqlCommand(sqlText, currConn, transaction);
         //                            cmdInsert.Parameters.AddWithValue("@EmployeeId", EmployeeId);
@@ -7093,7 +7161,7 @@ EmployeeId,Name,Relation,Address,District,Division,Country,City,PostalCode,PostO
 
                             sqlText = "  ";
                             sqlText += @" INSERT INTO EmployeePromotion(	EmployeeId,DesignationId,IsPromotion,PromotionDate
-,IsCurrent,FileName,Remarks,IsActive,IsArchive) 
+,IsCurrent,FileName,Remarks,IsActive,IsArchive)
 VALUES (@EmployeeId,@DesignationId,@IsPromotion,@PromotionDate
 ,@IsCurrent,@FileName,@Remarks,@IsActive,@IsArchive) SELECT SCOPE_IDENTITY()";
 
@@ -7234,7 +7302,7 @@ EmployeeId
 ,@IsPermanent
 ,@IsBuild
 ,@IsTAXApplicable
-,@IsPFApplicable 
+,@IsPFApplicable
 ,@IsGFApplicable
 ,@IsInactive
 ,@GrossSalary
@@ -7547,7 +7615,7 @@ EmployeeId
 
         //                            sqlText = "  ";
         //                            sqlText += @" INSERT INTO EmployeePF(EmployeeId,PFStructureId,PFValue,IsFixed,
-        //PortionSalaryType) 
+        //PortionSalaryType)
         //VALUES (@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
         //@PortionSalaryType) SELECT SCOPE_IDENTITY()";
 
@@ -7567,7 +7635,7 @@ EmployeeId
         //                            sqlText = "";
         //                            sqlText += @" INSERT INTO EmployeePF(
         //EmployeeId,PFStructureId,PFValue,IsFixed,
-        //PortionSalaryType) 
+        //PortionSalaryType)
         //VALUES (@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
         //@PortionSalaryType) SELECT SCOPE_IDENTITY()";
 
@@ -7735,7 +7803,7 @@ EmployeeId
 
 
         //                        sqlText = "  ";
-        //                        sqlText += @" update  EmployeePF set 
+        //                        sqlText += @" update  EmployeePF set
         //                            PFStructureId=@PFStructureId
         //                            ,PFValue=@PFValue
         //                            ,IsFixed=@IsFixed
@@ -7750,7 +7818,7 @@ EmployeeId
         //                        cmdUpdate.Parameters.AddWithValue("@PortionSalaryType", item["PortionSalaryType"]);
         //                        cmdUpdate.ExecuteNonQuery();
 
-        //                        sqlText = @"Select count(Id) from EmployeePF 
+        //                        sqlText = @"Select count(Id) from EmployeePF
         //                                where EmployeeId=@EmployeeId";
         //                        SqlCommand cmdExist = new SqlCommand(sqlText, currConn, transaction);
         //                        cmdExist.Parameters.AddWithValue("@EmployeeId", EmployeeId);
@@ -7764,7 +7832,7 @@ EmployeeId
         //                        sqlText = "";
         //                        sqlText += @" INSERT INTO EmployeePF(Id,
         //EmployeeId,PFStructureId,PFValue,IsFixed,
-        //PortionSalaryType,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom) 
+        //PortionSalaryType,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom)
         //VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
         //@PortionSalaryType,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom) SELECT SCOPE_IDENTITY()";
 
@@ -7912,7 +7980,7 @@ EmployeeId
         //                        object exeRes;
         //                        #region ESG Update
         //                        sqlText = "  ";
-        //                        sqlText += @" update  EmployeeStructureGroup set 
+        //                        sqlText += @" update  EmployeeStructureGroup set
         //                            LeaveStructureId=@LeaveStructureId
         //                            ,CreatedBy=@CreatedBy
         //                            ,CreatedAt=@CreatedAt
@@ -7927,7 +7995,7 @@ EmployeeId
         //                        cmdSGUpdate.ExecuteNonQuery();
         //                        #endregion ESG Update
         //                        #region Save
-        //                        sqlText = @"Select count(Id) from EmployeeLeaveStructure 
+        //                        sqlText = @"Select count(Id) from EmployeeLeaveStructure
         //                                where EmployeeId=@EmployeeId and LeaveYear=@LeaveYear
         //                            ";
         //                        SqlCommand cmdExist = new SqlCommand(sqlText, currConn, transaction);
@@ -7959,8 +8027,8 @@ EmployeeId
         //                                    //Update
         //                                    sqlText = @"SELECT *
         //                                FROM EmployeeLeaveStructure
-        //                                WHERE  
-        //                                EmployeeId=@EmployeeId AND 
+        //                                WHERE
+        //                                EmployeeId=@EmployeeId AND
         //                                LeaveYear=@LeaveYear AND
         //                                LeaveType_E=@LeaveType_E
         //                                ";
@@ -8002,7 +8070,7 @@ EmployeeId
         //                                        #region Save
         //                                        sqlText = "  ";
         //                                        sqlText += @"   INSERT INTO EmployeeLeaveStructure(
-        //                                            Id,EmployeeId,LeaveStructureId,LeaveYear,LeaveType_E,LeaveDays,OpeningLeaveDays,IsEarned,IsCompensation,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom,IsCarryForward,MaxBalance         
+        //                                            Id,EmployeeId,LeaveStructureId,LeaveYear,LeaveType_E,LeaveDays,OpeningLeaveDays,IsEarned,IsCompensation,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom,IsCarryForward,MaxBalance
         //                                            ) VALUES (
         //                                            @Id,@EmployeeId,@LeaveStructureId,@LeaveYear,@LeaveType_E,@LeaveDays,@OpeningLeaveDays,@IsEarned,@IsCompensation,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom,@IsCarryForward,@MaxBalance
         //                                            )  ";
@@ -8050,7 +8118,7 @@ EmployeeId
         //                                #region Save
         //                                sqlText = "  ";
         //                                sqlText += @"   INSERT INTO EmployeeLeaveStructure(
-        //                                            Id,EmployeeId,LeaveStructureId,LeaveYear,LeaveType_E,LeaveDays,OpeningLeaveDays,IsEarned,IsCompensation,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom,IsCarryForward,MaxBalance         
+        //                                            Id,EmployeeId,LeaveStructureId,LeaveYear,LeaveType_E,LeaveDays,OpeningLeaveDays,IsEarned,IsCompensation,Remarks,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom,IsCarryForward,MaxBalance
         //                                            ) VALUES (
         //                                            @Id,@EmployeeId,@LeaveStructureId,@LeaveYear,@LeaveType_E,@LeaveDays,@OpeningLeaveDays,@IsEarned,@IsCompensation,@Remarks,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom,@IsCarryForward,@MaxBalance
         //                                            )  ";
@@ -8215,7 +8283,7 @@ EmployeeId
 
 
         ////                        sqlText = "  ";
-        ////                        sqlText += @" update  EmployeePF set 
+        ////                        sqlText += @" update  EmployeePF set
         ////                            PFStructureId=@PFStructureId
         ////                            ,PFValue=@PFValue
         ////                            ,IsFixed=@IsFixed
@@ -8230,7 +8298,7 @@ EmployeeId
         ////                        cmdUpdate.Parameters.AddWithValue("@PortionSalaryType", item["PortionSalaryType"]);
         ////                        cmdUpdate.ExecuteNonQuery();
 
-        //                        sqlText = @"Select count(Id) from EmployeePF 
+        //                        sqlText = @"Select count(Id) from EmployeePF
         //                                where EmployeeId=@EmployeeId";
         //                        SqlCommand cmdExist = new SqlCommand(sqlText, currConn, transaction);
         //                        cmdExist.Parameters.AddWithValue("@EmployeeId", EmployeeId);
@@ -8264,7 +8332,7 @@ EmployeeId
         //                                    //Update
         //                                    sqlText = @"SELECT *
         //                                FROM EmployeeEPF
-        //                                WHERE  
+        //                                WHERE
         //                                EmployeeId=@EmployeeId
         //                                ";
         //                                    SqlCommand cmdEmpPF= new SqlCommand(sqlText, currConn, transaction);
@@ -8284,7 +8352,7 @@ EmployeeId
         //                                        string pfStructureId = dtEmpPF.Rows[0]["Id"].ToString();
         //                                        #region Update Setting
         //                                        sqlText = "";
-        //                                        sqlText += @" update  EmployeePF set 
+        //                                        sqlText += @" update  EmployeePF set
         //                            PFStructureId=@PFStructureId
         //                            ,PFValue=@PFValue
         //                            ,IsFixed=@IsFixed
@@ -8304,7 +8372,7 @@ EmployeeId
         //                        sqlText = "";
         //                        sqlText += @" INSERT INTO EmployeePF(Id,
         //EmployeeId,PFStructureId,PFValue,IsFixed,
-        //PortionSalaryType,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom) 
+        //PortionSalaryType,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom)
         //VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
         //@PortionSalaryType,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom) SELECT SCOPE_IDENTITY()";
 
@@ -8326,7 +8394,7 @@ EmployeeId
         //                    }
         //                  }
         //               }
-        //       }        
+        //       }
         //else{
         //    #region sql statement
         //    sqlText = @"SELECT *
@@ -8343,7 +8411,7 @@ EmployeeId
         //        sqlText = "  ";
         //        sqlText += @"  INSERT INTO EmployeePF(Id,
         //EmployeeId,PFStructureId,PFValue,IsFixed,
-        //PortionSalaryType,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom) 
+        //PortionSalaryType,IsActive,IsArchive,CreatedBy,CreatedAt,CreatedFrom)
         //VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
         //@PortionSalaryType,@IsActive,@IsArchive,@CreatedBy,@CreatedAt,@CreatedFrom) SELECT SCOPE_IDENTITY()";
 
@@ -8548,7 +8616,7 @@ EmployeeId
                             sqlText = "";
                             sqlText += @" INSERT INTO EmployeePF(Id,
 EmployeeId,PFStructureId,PFValue,IsFixed,
-PortionSalaryType,IsActive,IsArchive) 
+PortionSalaryType,IsActive,IsArchive)
 VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
 @PortionSalaryType,@IsActive,@IsArchive) SELECT SCOPE_IDENTITY()";
 
@@ -8702,16 +8770,16 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                         object exeRes;
 
                         sqlText = "  ";
-                        sqlText += @" update  EmployeeStructureGroup set 
+                        sqlText += @" update  EmployeeStructureGroup set
                             LeaveStructureId=@LeaveStructureId
-                            
+
                             where EmployeeId=@EmployeeId   ";
                         SqlCommand cmdSGUpdate = new SqlCommand(sqlText, currConn, transaction);
                         cmdSGUpdate.Parameters.AddWithValue("@EmployeeId", EmployeeId);
                         cmdSGUpdate.Parameters.AddWithValue("@LeaveStructureId", item["LeaveStructureId"]);
                         cmdSGUpdate.ExecuteNonQuery();
 
-                        sqlText = @"Select count(Id) from EmployeeLeaveStructure 
+                        sqlText = @"Select count(Id) from EmployeeLeaveStructure
                                 where EmployeeId=@EmployeeId and LeaveYear=@LeaveYear
                             ";
                         SqlCommand cmdExist = new SqlCommand(sqlText, currConn, transaction);
@@ -8743,8 +8811,8 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                                     //Update
                                     sqlText = @"SELECT *
                                 FROM EmployeeLeaveStructure
-                                WHERE  
-                                EmployeeId=@EmployeeId AND 
+                                WHERE
+                                EmployeeId=@EmployeeId AND
                                 LeaveYear=@LeaveYear AND
                                 LeaveType_E=@LeaveType_E
                                 ";
@@ -8779,7 +8847,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
 
                                         sqlText = "  ";
                                         sqlText += @"   INSERT INTO EmployeeLeaveStructure(
-                                            Id,EmployeeId,LeaveStructureId,LeaveYear,LeaveType_E,LeaveDays,OpeningLeaveDays,IsEarned,IsCompensation,Remarks,IsActive,IsArchive,IsCarryForward,MaxBalance         
+                                            Id,EmployeeId,LeaveStructureId,LeaveYear,LeaveType_E,LeaveDays,OpeningLeaveDays,IsEarned,IsCompensation,Remarks,IsActive,IsArchive,IsCarryForward,MaxBalance
                                             ) VALUES (
                                             @Id,@EmployeeId,@LeaveStructureId,@LeaveYear,@LeaveType_E,@LeaveDays,@OpeningLeaveDays,@IsEarned,@IsCompensation,@Remarks,@IsActive,@IsArchive,@IsCarryForward,@MaxBalance
                                             )  ";
@@ -8825,7 +8893,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
 
                                 sqlText = "  ";
                                 sqlText += @"   INSERT INTO EmployeeLeaveStructure(
-                                            Id,EmployeeId,LeaveStructureId,LeaveYear,LeaveType_E,LeaveDays,OpeningLeaveDays,IsEarned,IsCompensation,Remarks,IsActive,IsArchive,IsCarryForward,MaxBalance         
+                                            Id,EmployeeId,LeaveStructureId,LeaveYear,LeaveType_E,LeaveDays,OpeningLeaveDays,IsEarned,IsCompensation,Remarks,IsActive,IsArchive,IsCarryForward,MaxBalance
                                             ) VALUES (
                                             @Id,@EmployeeId,@LeaveStructureId,@LeaveYear,@LeaveType_E,@LeaveDays,@OpeningLeaveDays,@IsEarned,@IsCompensation,@Remarks,@IsActive,@IsArchive,@IsCarryForward,@MaxBalance
                                             )  ";
@@ -8949,7 +9017,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                             sqlText = "  ";
                             sqlText += @" INSERT INTO EmployeeStructureGroup( EmployeeId,IsGross,EmployeeGroupId,LeaveStructureId,SalaryStructureId,PFStructureId
                             ,TaxStructureId,BonusStructureId,Remarks,IsActive,IsArchive
-                            ) 
+                            )
                             VALUES ( @EmployeeId,1,'1_1','1_1','1_1','1_1','1_1','1_1',@Remarks,@IsActive,@IsArchive
                             ) ";
 
@@ -9095,8 +9163,8 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                         //int foundId = (int)objfoundId;
 
                         sqlText = "  ";
-                        sqlText += @" INSERT INTO Department(Id,BranchId,Code,Name,Remarks,IsActive,IsArchive) 
-                                VALUES (@Id,@BranchId,@Code,@Name,@Remarks,@IsActive,@IsArchive) 
+                        sqlText += @" INSERT INTO Department(Id,BranchId,Code,Name,Remarks,IsActive,IsArchive)
+                                VALUES (@Id,@BranchId,@Code,@Name,@Remarks,@IsActive,@IsArchive)
                                         ";
                         SqlCommand cmdInsert = new SqlCommand(sqlText, currConn);
                         cmdInsert.Transaction = transaction;
@@ -9264,8 +9332,8 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                         //int foundId = (int)objfoundId;
 
                         sqlText = "  ";
-                        sqlText += @" INSERT INTO Designation(Id,BranchId,DesignationGroupId,Code,Name,Remarks,IsActive,IsArchive) 
-                                VALUES (@Id,@BranchId,@DesignationGroupId,@Code,@Name,@Remarks,@IsActive,@IsArchive) 
+                        sqlText += @" INSERT INTO Designation(Id,BranchId,DesignationGroupId,Code,Name,Remarks,IsActive,IsArchive)
+                                VALUES (@Id,@BranchId,@DesignationGroupId,@Code,@Name,@Remarks,@IsActive,@IsArchive)
                                         ";
                         SqlCommand cmdInsert = new SqlCommand(sqlText, currConn);
                         cmdInsert.Transaction = transaction;
@@ -9435,8 +9503,8 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                         //int foundId = (int)objfoundId;
 
                         sqlText = "  ";
-                        sqlText += @" INSERT INTO Bank(Id,BranchId,Code,Name,Remarks,IsActive,IsArchive) 
-                                VALUES (@Id,@BranchId,@Code,@Name,@Remarks,@IsActive,@IsArchive) 
+                        sqlText += @" INSERT INTO Bank(Id,BranchId,Code,Name,Remarks,IsActive,IsArchive)
+                                VALUES (@Id,@BranchId,@Code,@Name,@Remarks,@IsActive,@IsArchive)
                                         ";
                         SqlCommand cmdInsert = new SqlCommand(sqlText, currConn);
                         cmdInsert.Transaction = transaction;
@@ -9607,8 +9675,8 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                         var SL = _cDal.NextId("DesignationGroup", currConn, transaction);
 
                         sqlText = "  ";
-                        sqlText += @" INSERT INTO DesignationGroup(Id,Serial,BranchId,Code,Name,Remarks,IsActive,IsArchive) 
-                                VALUES (@Id,@Serial,@BranchId,@Code,@Name,@Remarks,@IsActive,@IsArchive) 
+                        sqlText += @" INSERT INTO DesignationGroup(Id,Serial,BranchId,Code,Name,Remarks,IsActive,IsArchive)
+                                VALUES (@Id,@Serial,@BranchId,@Code,@Name,@Remarks,@IsActive,@IsArchive)
                                         ";
                         SqlCommand cmdInsert = new SqlCommand(sqlText, currConn);
                         cmdInsert.Transaction = transaction;
@@ -9751,7 +9819,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                             ,Remarks
                             ,TransType
                             ,IsYearClosing
-                            ) 
+                            )
                             VALUES (
                             @GLJournalId
                             ,@COAName
@@ -9930,22 +9998,22 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                     transaction = Vtransaction;
                 }
 
-                sqlText = @"SELECT 
+                sqlText = @"SELECT
                         [GLJournalId] [Id]
-                        ,'JV-001/' [Code]    
-                        ,[TransactionDate]                     
-                        ,SUM([DrAmount]) [TransactionValue]   
-                        ,[Remarks] 
+                        ,'JV-001/' [Code]
+                        ,[TransactionDate]
+                        ,SUM([DrAmount]) [TransactionValue]
+                        ,[Remarks]
                         FROM [EGCB_PF_Test].[dbo].[tempGLJournalDetails]
                         where DrAmount>1
-                        Group by 
-                        [GLJournalId]	
+                        Group by
+                        [GLJournalId]
                         ,[TransactionDate]
                         ,[JournalType]
                         ,[TransactionType]
-                        ,[IsDr],[Remarks]  
+                        ,[IsDr],[Remarks]
                         ";
-                SqlCommand cmd = new SqlCommand(sqlText, currConn, transaction);               
+                SqlCommand cmd = new SqlCommand(sqlText, currConn, transaction);
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(dt);
 
@@ -10035,11 +10103,11 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                           ,[IsArchive]
                           ,[CreatedBy]
                           ,[CreatedAt]
-                          ,[CreatedFrom]                         
+                          ,[CreatedFrom]
                           ,[Post]
                           ,[TransType]
                           ,[IsYearClosing]
-                            ) 
+                            )
                             VALUES (
                            @Code
                           ,@TransactionDate
@@ -10051,7 +10119,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                           ,@IsArchive
                           ,@CreatedBy
                           ,@CreatedAt
-                          ,@CreatedFrom                        
+                          ,@CreatedFrom
                           ,@Post
                           ,@TransType
                           ,@IsYearClosing)";
@@ -10067,11 +10135,11 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                 cmdInsert.Parameters.AddWithValue("@IsArchive", vm.IsArchive);
                 cmdInsert.Parameters.AddWithValue("@CreatedBy", vm.CreatedBy);
                 cmdInsert.Parameters.AddWithValue("@CreatedAt", vm.CreatedAt);
-                cmdInsert.Parameters.AddWithValue("@CreatedFrom", vm.CreatedFrom);               
+                cmdInsert.Parameters.AddWithValue("@CreatedFrom", vm.CreatedFrom);
                 cmdInsert.Parameters.AddWithValue("@Post", vm.Post);
                 cmdInsert.Parameters.AddWithValue("@TransType",vm.TransType);
-                cmdInsert.Parameters.AddWithValue("@IsYearClosing",vm.IsYearClosing);              
-              
+                cmdInsert.Parameters.AddWithValue("@IsYearClosing",vm.IsYearClosing);
+
                 cmdInsert.ExecuteNonQuery();
 
                 #endregion Save
@@ -10161,10 +10229,10 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                     transaction = Vtransaction;
                 }
 
-                sqlText = @"SELECT 
+                sqlText = @"SELECT
                         *
                         FROM tempGLJournalDetails
-                         where GLJournalId=@GLJournalId                      
+                         where GLJournalId=@GLJournalId
                         ";
                 SqlCommand cmd = new SqlCommand(sqlText, currConn, transaction);
                 cmd.Parameters.AddWithValue("@GLJournalId", GLJournalId);
@@ -10174,7 +10242,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                 if (Vtransaction == null && transaction != null)
                 {
                     transaction.Commit();
-                }               
+                }
             }
             catch (Exception ex)
             {
@@ -10242,7 +10310,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                 }
                 #endregion open connection and transaction
                 #region Save
-                              
+
                 vm.Id = _cDal.NextId("GLJournals", currConn, transaction);
 
                 sqlText = "  ";
@@ -10283,7 +10351,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                 cmdInsert.Parameters.AddWithValue("@JournalType", vm.JournalType);
                 cmdInsert.Parameters.AddWithValue("@Remarks", vm.Remarks);
                 cmdInsert.Parameters.AddWithValue("@TransType", vm.TransType);
-                cmdInsert.Parameters.AddWithValue("@IsYearClosing", vm.IsYearClosing);              
+                cmdInsert.Parameters.AddWithValue("@IsYearClosing", vm.IsYearClosing);
 
                 cmdInsert.ExecuteNonQuery();
 
@@ -10529,7 +10597,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                 #endregion open connection and transaction
                 #region sql statement
                 #region sqlText
-                sqlText = @" SELECT 
+                sqlText = @" SELECT
 	                         CompanyId,
 	                         Code,
 	                         Name,
@@ -10597,7 +10665,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                 #endregion open connection and transaction
                 #region sql statement
                 #region sqlText
-                sqlText = @"SELECT 
+                sqlText = @"SELECT
 	                       BranchId
                           ,Code
                           ,Name
@@ -10636,7 +10704,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
             return dt;
         }
 
-        
+
         public DataTable SelectGradeInfo(ExportImportVM VM)
         {
             #region Variables
@@ -10656,7 +10724,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                 #endregion open connection and transaction
                 #region sql statement
                 #region sqlText
-                sqlText = @"SELECT 
+                sqlText = @"SELECT
 	                       SL
                           ,BranchId
                           ,Code
@@ -10697,7 +10765,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
             return dt;
         }
 
-     
+
         public DataTable SelectLeaveTypeInfo(ExportImportVM VM)
         {
             #region Variables
@@ -10717,8 +10785,8 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                 #endregion open connection and transaction
                 #region sql statement
                 #region sqlText
-                sqlText = @"SELECT 
-	                       Name                         
+                sqlText = @"SELECT
+	                       Name
                           ,IsWithoutPay
                           ,LType
                           ,Remarks
@@ -10774,7 +10842,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                 #endregion open connection and transaction
                 #region sql statement
                 #region sqlText
-                sqlText = @"SELECT 
+                sqlText = @"SELECT
 	                           BranchId
                               ,Code
                               ,Name
@@ -10831,7 +10899,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                 #endregion open connection and transaction
                 #region sql statement
                 #region sqlText
-                sqlText = @"SELECT 
+                sqlText = @"SELECT
 	                              BranchId
                                   ,Code
                                   ,Name
@@ -10902,7 +10970,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
                 #endregion open connection and transaction
                 #region sql statement
                 #region sqlText
-                sqlText = @"SELECT 
+                sqlText = @"SELECT
 	                              BranchId
                                   ,Code
                                   ,Name
@@ -10938,7 +11006,7 @@ VALUES (@Id,@EmployeeId,@PFStructureId,@PFValue,@IsFixed,
             }
             #endregion
             return dt;
-        }      
+        }
     }
 
 }

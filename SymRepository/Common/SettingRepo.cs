@@ -1,4 +1,4 @@
-﻿using SymServices.Common;
+using SymServices.Common;
 using SymViewModel.Common;
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,20 @@ namespace SymRepository.Common
 {
     public class SettingRepo
     {
+        public string settingValueByName(string settingName)
+        {
+            string retResults = "0";
+            try
+            {
+                retResults = _settingDAL.settingValueByName(settingName);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return retResults;
+        }
+
         SettingDAL _settingDAL= new SettingDAL();
         public DataSet SearchSettings()
         {

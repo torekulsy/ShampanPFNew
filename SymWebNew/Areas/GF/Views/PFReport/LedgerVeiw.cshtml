@@ -1,0 +1,78 @@
+@model SymViewModel.PF.PFReportVM
+@using UIHelper.MVC
+@{
+
+    ViewBag.Title = "Create";
+    ViewBag.Location = "Create";
+}
+
+
+
+@using (Html.BeginForm("LedgerReport", "PFReport", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmFR", @target = "_blank" }))
+{
+    @Html.ValidationSummary(true)
+    string PF_COAUrl = "/Config/DropDown/PF_COA?TransType=" + @ViewBag.TransType;
+    
+    <div class="thinbox">
+        <div class="th_thinbox">
+            <p><i class="fa fa-file-text-o"></i> Ledger Report</p>
+        </div>
+        <div class="EnumEEHead" style="padding: 20px 24px;">
+            <div class="ep-form-grid" style="grid-template-columns: 1fr 1fr auto; gap: 14px 18px; align-items: flex-end;">
+                <div class="ep-form-group" style="grid-column: 1 / -1;">
+                    <label class="ep-field-label">Account Head</label>
+                    <div class="editor-field">
+                        @Html.SimpleDropDownFor(model => model.Id, PF_COAUrl, new { @class = "form-control selectDropdown" })
+                    </div>
+                </div>
+                <div class="ep-form-group">
+                    <label class="ep-field-label">@Html.LabelFor(model => model.DateFrom)</label>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.DateFrom, new { @placeholder = "Date From", @class = "customDatePicker form-control" })
+                        @Html.ValidationMessageFor(model => model.DateFrom)
+                    </div>
+                </div>
+                <div class="ep-form-group">
+                    <label class="ep-field-label">@Html.LabelFor(model => model.DateTo)</label>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(model => model.DateTo, new { @placeholder = "Date To", @class = "customDatePicker form-control" })
+                        @Html.ValidationMessageFor(model => model.DateTo)
+                    </div>
+                </div>
+                <div class="ep-form-group" style="margin-bottom: 0;">
+                    <label class="ep-field-label">&nbsp;</label>
+                    <div class="ep-checkbox-card" style="margin: 0; height: 28px; padding: 0 10px; display: flex; align-items: center;">
+                        <span class="ep-addon-box">
+                            @Html.CheckBoxFor(model => model.OptionA, new { @class = "form-control" })
+                        </span>
+                        <span class="ep-addon-text" style="white-space: nowrap;">With Zero</span>
+                    </div>
+                    @Html.ValidationMessageFor(model => model.OptionA)
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 15px; padding-top: 10px; border-top: 1px solid #f1f5f9;">
+                <button type="button" title="Click for Report" data-url="/@ViewBag.TransType/PFReport/LedgerReport" onclick="reportData(this);" id="" class="sym-btn-report btn-erp-preview">&nbsp;Preview</button>
+                <button type="button" title="Clear the Entries" id="Clear" class="sym-btn-clear btn-erp-clear">&nbsp;Clear</button>
+            </div>
+        </div>
+    </div>
+}
+<script>
+    $(function () {
+        InitDropDowns();
+        InitDateTimePickers();
+        $("#Clear").on('click', function () {
+            //$("#Code").val("");
+            $("#Id").val("");
+            $("#PFHeaderId").val("");
+            $("#DateFrom").val("");
+            $("#DateTo").val("");
+
+        });
+    });
+
+    function reportData(sender) {
+        $("#frmFR").submit();
+    }
+
+</script>

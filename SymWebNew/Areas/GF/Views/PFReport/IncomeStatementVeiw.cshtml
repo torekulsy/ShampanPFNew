@@ -1,0 +1,57 @@
+@model SymViewModel.PF.PFReportVM
+@using UIHelper.MVC
+@{
+
+    ViewBag.Title = "Create";
+    ViewBag.Location = "Create";
+}
+
+
+
+@using (Html.BeginForm("IncomeStatementReport", "PFReport", FormMethod.Post, new { enctype = "multipart/form-data", @Id = "frmFR", @target = "_blank" }))
+{
+    @Html.ValidationSummary(true)
+    <div class="thinbox">
+        <div class="th_thinbox">
+            <p><i class="fa fa-file-text-o"></i> Income Statement Report</p>
+        </div>
+        <div class="EnumEEHead" style="padding: 20px 24px;">
+            <div class="ep-form-grid">
+                <div class="ep-form-group col-span-6">
+                    <label class="ep-field-label">@Html.LabelFor(model => model.DateFrom)</label>
+                    @Html.TextBoxFor(model => model.DateFrom, new { @placeholder = "Date From", @class = "customDatePicker form-control" })
+                    @Html.ValidationMessageFor(model => model.DateFrom)
+                </div>
+                <div class="ep-form-group col-span-6">
+                    <label class="ep-field-label">@Html.LabelFor(model => model.DateTo)</label>
+                    @Html.TextBoxFor(model => model.DateTo, new { @placeholder = "Date To", @class = "customDatePicker form-control" })
+                    @Html.ValidationMessageFor(model => model.DateTo)
+                </div>
+            </div>
+            <div class="ep-report-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+                <button type="button" title="Click for Report" data-url="/@ViewBag.TransType/PFReport/IncomeStatementReport" onclick="reportData(this);" id="" class="sym-btn-Excel-Export btn-erp-print">&nbsp;Preview</button>
+                <button type="button" title="Clear the Entries" id="Clear" class="sym-btn-clear btn-erp-cancel">&nbsp;Clear</button>
+                <button type="button" title="Cancel Data" class="btncancel sym-btn-cancel btn-erp-cancel">&nbsp;Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+<script>
+    $(function () {
+        InitDropDowns();
+        InitDateTimePickers();
+        $("#Clear").on('click', function () {
+            //$("#Code").val("");
+            $("#Id").val("");
+            $("#PFHeaderId").val("");
+            $("#DateFrom").val("");
+            $("#DateTo").val("");
+
+        });
+    });
+
+    function reportData(sender) {
+        $("#frmFR").submit();
+    }
+
+</script>

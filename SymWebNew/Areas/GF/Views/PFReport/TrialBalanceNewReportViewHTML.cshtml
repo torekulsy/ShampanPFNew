@@ -1,0 +1,243 @@
+@using System.Data
+@model DataTable
+@{
+    Layout = null;
+    var dt = Model ?? new DataTable();
+    string companyName    = ViewBag.CompanyName    as string ?? "Symphony Softtech Limited";
+    string companyAddress = ViewBag.CompanyAddress as string ?? "";
+    string companyLogo    = ViewBag.CompanyLogo    as string ?? "/Images/COMPANYLOGOhtml.png";
+    string reportHead     = ViewBag.ReportHead     as string ?? "Trial Balance";
+    int recordCount = dt.Rows.Count;
+
+    string dateFromStr = ViewBag.DateFrom as string ?? "";
+    string dateToStr   = ViewBag.DateTo   as string ?? "";
+    string fiscalYear  = ViewBag.FiscalYear as string ?? "";
+    DateTime pFrom, pTo;
+    if (DateTime.TryParse(dateFromStr, out pFrom))
+    {
+        dateFromStr = pFrom.ToString("dd-MMM-yyyy");
+    }
+    if (DateTime.TryParse(dateToStr,   out pTo))
+    {
+        dateToStr   = pTo.ToString("dd-MMM-yyyy");
+    }
+    string printDateStr = DateTime.Now.ToString("dd-MMM-yy");
+    string asOfDate = !string.IsNullOrEmpty(dateToStr) ? dateToStr : (!string.IsNullOrEmpty(fiscalYear) ? fiscalYear : "");
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Trial Balance</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #000; background-color: #525659; }
+        .toolbar { position: sticky; top: 0; z-index: 1000; background: #323639; color: #fff; padding: 8px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .toolbar-title { font-size: 13px; font-weight: bold; }
+        .toolbar-actions { display: flex; gap: 8px; }
+        .btn { padding: 5px 12px; font-size: 12px; font-weight: bold; border: none; border-radius: 3px; cursor: pointer; }
+        .btn-print { background: #0078d4; color: #fff; }
+        .btn-excel { background: #107c41; color: #fff; }
+        .btn-close  { background: #555; color: #fff; }
+        .report-container { display: flex; justify-content: center; padding: 20px 0 40px 0; }
+        .report-page { width: 280mm; min-height: 200mm; background: #fff; padding: 10mm 12mm; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1.5px solid #000 !important box-sizing: border-box; }
+
+        /* â”€â”€ Header â”€â”€ */
+        .header-section { position: relative; text-align: center; margin-bottom: 10px; min-height: 56px; }
+        .company-logo   { position: absolute; left: 0; top: 0; max-height: 55px; max-width: 150px; object-fit: contain; }
+        .print-date     { position: absolute; right: 0; top: 0; font-size: 10px; color: #000; font-weight: normal; }
+        .company-name   { font-size: 16px; font-weight: bold; color: #000; text-transform: uppercase; }
+        .company-address{ font-size: 10px; color: #444; margin-top: 1px; }
+        .report-main-title { font-size: 13px; font-weight: bold; color: #000; margin-top: 4px; margin-bottom: 2px; }
+        .report-asof-line  { font-size: 11px; font-weight: bold; color: #000; margin-top: 2px; }
+
+        /* â”€â”€ Section Banner â”€â”€ */
+        .section-banner { background-color: #a6a6a6; border: 1px solid #333; text-align: center; font-size: 12.5px; font-weight: bold; padding: 3px 0; color: #000; margin-bottom: 0; }
+
+        /* â”€â”€ Table â”€â”€ */
+        .tb-table { width: 100%; border-collapse: collapse; font-size: 10px; color: #000; table-layout: fixed; }
+        .tb-table th { border: 1px solid #333; background-color: #fff; padding: 3px 4px; font-weight: bold; text-align: center; font-size: 10.5px; }
+        .tb-table td { border-left: 1px solid #333; border-right: 1px solid #333; padding: 2.5px 4px; vertical-align: top; border-bottom: 1px dotted #888; }
+
+        .totals-row td { border-top: 1px solid #000 !important; border-bottom: 3px double #000 !important; font-weight: bold; padding: 4px; }
+        .grand-total-row td { border-top: 1px solid #000 !important; border-bottom: 3px double #000 !important; font-weight: bold; padding: 4px; color: #0000ff; }
+
+        .text-left   { text-align: left; }
+        .text-center { text-align: center; }
+        .text-right  { text-align: right; }
+        .font-bold   { font-weight: bold; }
+
+        .page-footer-info { display: flex; justify-content: flex-end; margin-top: 25px; font-size: 10px; color: #000; }
+
+        @@media print {
+            @@page { size: landscape; margin: 8mm; }
+            body { background: #fff; color: #000; }
+            .toolbar { display: none !important; }
+            .report-container { padding: 0; }
+            .report-page { width: 100% !important; min-height: 185mm !important; box-shadow: none !important; padding: 6mm 8mm !important; border: 1.5px solid #000 !important box-sizing: border-box; }
+            .section-banner { background-color: #a6a6a6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            tr { page-break-inside: avoid; }
+        }
+    </style>
+<link href="@Url.Content("~/assets/stylesheets/pf-module-views.css")" rel="stylesheet" media="screen" />
+</head>
+<body class="pf-module-theme pf-module-report">
+    <div class="toolbar">
+        <div class="toolbar-title">Trial Balance (@recordCount Records)</div>
+        <div class="toolbar-actions">
+            <button type="button" class="btn btn-print" onclick="window.print()">Print</button>
+            <button type="button" class="btn btn-excel" onclick="exportExcel()">Excel</button>
+            <button type="button" class="btn btn-close"  onclick="window.close()">Close</button>
+        </div>
+    </div>
+
+    <div class="report-container">
+        <div class="report-page">
+
+            <!-- â”€â”€ Header â”€â”€ -->
+            <div class="header-section">
+                <img src="@companyLogo" class="company-logo" onerror="this.style.display='none'" />
+                <div class="print-date">Print Date: @printDateStr</div>
+                @if (!string.IsNullOrEmpty(companyName))
+                {
+                    <div class="company-name">@companyName</div>
+                }
+                @if (!string.IsNullOrEmpty(companyAddress))
+                {
+                    <div class="company-address">@companyAddress</div>
+                }
+                <div class="report-main-title">@reportHead</div>
+                @if (!string.IsNullOrEmpty(asOfDate))
+                {
+                    <div class="report-asof-line">AS of - @asOfDate</div>
+                }
+            </div>
+
+            <div class="section-banner">Trial Balance</div>
+
+            @if (recordCount == 0)
+            {
+                <div style="text-align:center; padding: 40px; font-size: 13px; color: #666;">
+                    There are no data to Preview for Trial Balance
+                </div>
+            }
+            else
+            {
+                <table class="tb-table" id="reportTable">
+                    <colgroup>
+                        <col style="width:35px;" />
+                        <col style="width:80px;" />
+                        <col />
+                        <col style="width:100px;" />
+                        <col style="width:90px;" />
+                        <col style="width:90px;" />
+                        <col style="width:100px;" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>SL</th>
+                            <th class="text-left">Acc Code</th>
+                            <th class="text-left">Account Name</th>
+                            <th class="text-right">Opening Balance</th>
+                            <th class="text-right">Debit</th>
+                            <th class="text-right">Credit</th>
+                            <th class="text-right">Closing Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int sl        = 1;
+                            decimal totOpen    = 0;
+                            decimal totDr      = 0;
+                            decimal totCr      = 0;
+                            decimal totClosing = 0;
+                        }
+                        @foreach (DataRow row in dt.Rows)
+                        {
+                            string acCode = dt.Columns.Contains("COACode") && row["COACode"] != DBNull.Value
+                                            ? row["COACode"].ToString()
+                                            : (dt.Columns.Contains("Code") && row["Code"] != DBNull.Value ? row["Code"].ToString() : "");
+
+                            string acName = dt.Columns.Contains("COAName") && row["COAName"] != DBNull.Value
+                                            ? row["COAName"].ToString()
+                                            : (dt.Columns.Contains("AccountName") && row["AccountName"] != DBNull.Value
+                                               ? row["AccountName"].ToString()
+                                               : (dt.Columns.Contains("Account Description") && row["Account Description"] != DBNull.Value
+                                                  ? row["Account Description"].ToString() : ""));
+
+                            decimal openAmt = 0;
+                            if (dt.Columns.Contains("OpeningAmount") && row["OpeningAmount"] != DBNull.Value)
+                            {
+                                openAmt = Convert.ToDecimal(row["OpeningAmount"]);
+                            }
+                            else if (dt.Columns.Contains("OpenDr") && dt.Columns.Contains("OpenCr"))
+                            {
+                                openAmt = (row["OpenDr"] != DBNull.Value ? Convert.ToDecimal(row["OpenDr"]) : 0)
+                                        - (row["OpenCr"] != DBNull.Value ? Convert.ToDecimal(row["OpenCr"]) : 0);
+                            }
+
+                            decimal dr = dt.Columns.Contains("Dr") && row["Dr"] != DBNull.Value
+                                         ? Convert.ToDecimal(row["Dr"])
+                                         : (dt.Columns.Contains("Debits") && row["Debits"] != DBNull.Value ? Convert.ToDecimal(row["Debits"]) : 0);
+
+                            decimal cr = dt.Columns.Contains("Cr") && row["Cr"] != DBNull.Value
+                                         ? Convert.ToDecimal(row["Cr"])
+                                         : (dt.Columns.Contains("Credits") && row["Credits"] != DBNull.Value ? Convert.ToDecimal(row["Credits"]) : 0);
+
+                            decimal closingAmt = dt.Columns.Contains("ClosingAmount") && row["ClosingAmount"] != DBNull.Value
+                                                 ? Convert.ToDecimal(row["ClosingAmount"])
+                                                 : openAmt + dr - cr;
+
+                            totOpen    += openAmt;
+                            totDr      += dr;
+                            totCr      += cr;
+                            totClosing += closingAmt;
+
+                            <tr>
+                                <td class="text-center">@(sl++)</td>
+                                <td class="text-left font-bold">@acCode</td>
+                                <td class="text-left">@acName</td>
+                                <td class="text-right">@(openAmt == 0 ? "" : openAmt.ToString("N2"))</td>
+                                <td class="text-right">@(dr == 0 ? "" : dr.ToString("N2"))</td>
+                                <td class="text-right">@(cr == 0 ? "" : cr.ToString("N2"))</td>
+                                <td class="text-right">@(closingAmt == 0 ? "" : closingAmt.ToString("N2"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-right font-bold" style="border-top:1px solid #000;border-bottom:3px double #000;">Total</td>
+                            <td class="text-right totals-row">@totOpen.ToString("N2")</td>
+                            <td class="text-right totals-row">@totDr.ToString("N2")</td>
+                            <td class="text-right totals-row">@totCr.ToString("N2")</td>
+                            <td class="text-right totals-row">@totClosing.ToString("N2")</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-right font-bold" style="padding-top:10px;border-bottom:3px double #000;color:#0000ff;">Grand Total</td>
+                            <td class="text-right grand-total-row" style="padding-top:10px;">@totOpen.ToString("N2")</td>
+                            <td class="text-right grand-total-row" style="padding-top:10px;">@totDr.ToString("N2")</td>
+                            <td class="text-right grand-total-row" style="padding-top:10px;">@totCr.ToString("N2")</td>
+                            <td class="text-right grand-total-row" style="padding-top:10px;">@totClosing.ToString("N2")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            }
+
+            <div class="page-footer-info">Page 1 of 1</div>
+        </div>
+    </div>
+
+    <script>
+        function exportExcel() {
+            var table = document.getElementById('reportTable');
+            if (!table) return;
+            var html = table.outerHTML;
+            var url = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'TrialBalance2_' + new Date().toISOString().slice(0,10) + '.xls';
+            a.click();
+        }
+    </script>
+</body>
+</html>

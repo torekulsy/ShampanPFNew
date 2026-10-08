@@ -1,0 +1,675 @@
+@using System.Data
+@model DataTable
+@{
+    Layout = null;
+    var dt = Model ?? new DataTable();
+    string companyName = ViewBag.CompanyName as string ?? "Symphony Softtech Limited";
+    string companyAddress = ViewBag.CompanyAddress as string ?? "";
+    string companyPhone = ViewBag.CompanyPhone as string ?? "";
+    string companyEmail = ViewBag.CompanyEmail as string ?? "";
+    string companyLogo = ViewBag.CompanyLogo as string ?? "/Images/COMPANYLOGOhtml.png";
+    string reportHead = ViewBag.ReportHead as string ?? "Employees' Contributory Gratuity Fund";
+    int recordCount = dt.Rows.Count;
+
+    bool isSymphony = string.IsNullOrEmpty(companyName) || companyName.ToLower().Contains("symphony") || companyName.ToLower().Contains("softtech");
+    if (string.IsNullOrEmpty(companyAddress) && isSymphony)
+    {
+        companyAddress = "Tridhara Tower (2nd Floor), 67, West Panthapath, Lake Circus, Kalabagan, Dhaka-1205";
+    }
+    if (string.IsNullOrEmpty(companyPhone) && isSymphony)
+    {
+        companyPhone = "+88 02 58 157 384, +88 01872 650 660 - 69";
+    }
+    if (string.IsNullOrEmpty(companyEmail) && isSymphony)
+    {
+        companyEmail = "info@symphonysoftt.com, office@symphonysoftt.com";
+    }
+
+    string dateFromStr = ViewBag.DateFrom as string ?? "";
+    string dateToStr = ViewBag.DateTo as string ?? "";
+    DateTime parsedDateFrom, parsedDateTo;
+    if (DateTime.TryParse(dateFromStr, out parsedDateFrom))
+    {
+        dateFromStr = parsedDateFrom.ToString("dd-MMM-yyyy");
+    }
+    if (DateTime.TryParse(dateToStr, out parsedDateTo))
+    {
+        dateToStr = parsedDateTo.ToString("dd-MMM-yyyy");
+    }
+    string printDateStr = DateTime.Now.ToString("dd-MMM-yy");
+
+    decimal grandTotalDebit = 0;
+    decimal grandTotalCredit = 0;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@reportHead - Ledger</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10px;
+            color: #000;
+            background-color: #525659;
+        }
+
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #323639;
+            color: #fff;
+            padding: 8px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            font-family: Arial, sans-serif;
+        }
+
+        .toolbar-title {
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .btn-print {
+            background: #0078d4;
+            color: #fff;
+        }
+        .btn-print:hover {
+            background: #005a9e;
+        }
+
+        .btn-excel {
+            background: #107c41;
+            color: #fff;
+        }
+        .btn-excel:hover {
+            background: #0b5a2f;
+        }
+
+        .btn-close {
+            background: #555;
+            color: #fff;
+        }
+        .btn-close:hover {
+            background: #444;
+        }
+
+        .report-container {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0 40px 0;
+        }
+
+        .report-page {
+            width: 280mm;
+            min-height: 200mm;
+            background: #fff;
+            padding: 8mm 12mm 12mm 12mm;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        /* Company Header matching Crystal Report */
+        .company-header {
+            position: relative;
+            text-align: center;
+            padding-bottom: 6px;
+            border-bottom: 1.5px solid #000;
+            margin-bottom: 8px;
+        }
+
+        .company-logo {
+            position: absolute;
+            left: 0;
+            top: 2px;
+            max-height: 52px;
+            max-width: 140px;
+            object-fit: contain;
+        }
+
+        .company-name {
+            font-size: 15px;
+            font-weight: bold;
+            color: #000;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .company-address, .company-contact, .company-web {
+            font-size: 9.5px;
+            color: #000;
+            margin-top: 1px;
+            line-height: 1.25;
+        }
+
+        /* Sub Header matching Crystal Report */
+        .report-sub-header {
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .report-title-text {
+            font-size: 12.5px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .report-meta-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            margin-top: 3px;
+            padding: 0 2px;
+        }
+
+        .report-date-range {
+            font-size: 10px;
+            font-weight: normal;
+            color: #000;
+            margin: 0 auto;
+            padding-left: 90px;
+        }
+
+        .print-date {
+            font-size: 9.5px;
+            color: #000;
+            white-space: nowrap;
+        }
+
+        /* Grey Ledger Banner Bar matching Crystal Report */
+        .section-banner {
+            background-color: #c0c0c0;
+            border: 1px solid #000;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 3px 0;
+            color: #000;
+            margin-top: 4px;
+            margin-bottom: 0;
+        }
+
+        /* Ledger Table matching Crystal Report */
+        .ledger-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9.5px;
+            color: #000;
+            table-layout: fixed;
+            border: 1px solid #000;
+        }
+
+        .ledger-table th, .ledger-table td {
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            padding: 2.5px 4px;
+            vertical-align: middle;
+            line-height: 1.25;
+        }
+
+        .ledger-table thead th {
+            border: 1px solid #000;
+            background-color: #fff;
+            padding: 3.5px 4px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        /* Account Header Row (Group) */
+        .account-header-row td {
+            border-top: 1px solid #000 !important;
+            border-bottom: 1px solid #000 !important;
+            font-weight: bold;
+            font-size: 9.5px;
+            background-color: #fff;
+        }
+
+        /* Detail Rows with dashed horizontal dividers */
+        .detail-row td {
+            border-bottom: 1px dashed #777;
+        }
+
+        /* Account Group Total Row */
+        .account-total-row td {
+            border-bottom: none;
+            padding-top: 3px;
+            padding-bottom: 3px;
+        }
+
+        .total-number-cell {
+            border-top: 1.5px solid #000 !important;
+            border-bottom: 1.5px solid #000 !important;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        /* Grand Total Row */
+        .grand-total-row td {
+            border-bottom: none;
+            padding-top: 10px;
+            padding-bottom: 4px;
+        }
+
+        .grand-total-number-cell {
+            border-top: 1.5px solid #000 !important;
+            border-bottom: 3px double #000 !important;
+            font-weight: bold;
+            text-align: right;
+            color: #0000ff;
+        }
+
+        .tc { text-align: center; }
+        .tl { text-align: left; }
+        .tr { text-align: right; }
+        .fb { font-weight: bold; }
+
+        .page-footer-info {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 35px;
+            font-size: 9.5px;
+            color: #000;
+        }
+
+        /* Print styles */
+        @@media print {
+            @@page {
+                size: landscape;
+                margin: 8mm 6mm 8mm 6mm;
+            }
+
+            body {
+                background: #fff;
+                color: #000;
+            }
+
+            .toolbar {
+                display: none !important;
+            }
+
+            .report-container {
+                padding: 0;
+                display: block;
+            }
+
+            .report-page {
+                width: 100% !important;
+                min-height: auto !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+
+            .section-banner {
+                background-color: #c0c0c0 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            thead {
+                display: table-header-group;
+            }
+
+            tr {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+<link href="@Url.Content("~/assets/stylesheets/pf-module-views.css")" rel="stylesheet" media="screen" />
+</head>
+<body class="pf-module-theme pf-module-report">
+    <div class="toolbar">
+        <div class="toolbar-title">@reportHead - Ledger (@recordCount Records)</div>
+        <div class="toolbar-actions">
+            <button type="button" class="btn btn-print" onclick="window.print()">Print</button>
+            <button type="button" class="btn btn-excel" onclick="exportExcel()">Excel</button>
+            <button type="button" class="btn btn-close" onclick="window.close()">Close</button>
+        </div>
+    </div>
+
+    <div class="report-container">
+        <div class="report-page">
+            <!-- Company Header matching Crystal Report -->
+            <div class="company-header">
+                <img src="@companyLogo" class="company-logo" onerror="this.onerror=null; this.src='/Images/COMPANYLOGO.png';" />
+                <div class="company-name">@companyName</div>
+                @if (!string.IsNullOrEmpty(companyAddress))
+                {
+                    <div class="company-address">@companyAddress</div>
+                }
+                @if (isSymphony)
+                {
+                    <div class="company-contact">@companyPhone</div>
+                    <div class="company-web">@companyEmail</div>
+                    <div class="company-web">www.symphonysofttech.com</div>
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(companyPhone) || !string.IsNullOrEmpty(companyEmail))
+                    {
+                        <div class="company-contact">@companyPhone @(!string.IsNullOrEmpty(companyPhone) && !string.IsNullOrEmpty(companyEmail) ? ", " : "") @companyEmail</div>
+                    }
+                }
+            </div>
+
+            <!-- Sub Header Title and Dates matching Crystal Report -->
+            <div class="report-sub-header">
+                <div class="report-title-text">@reportHead</div>
+                <div class="report-meta-line">
+                    <div></div>
+                    <div class="report-date-range">
+                        @if (!string.IsNullOrEmpty(dateFromStr) || !string.IsNullOrEmpty(dateToStr))
+                        {
+                            <span>Report From: @dateFromStr to @dateToStr</span>
+                        }
+                    </div>
+                    <div class="print-date">Print Date: @printDateStr</div>
+                </div>
+            </div>
+
+            <!-- Grey Shaded Ledger Banner -->
+            <div class="section-banner">Ledger</div>
+
+            @if (recordCount == 0)
+            {
+                <div style="text-align:center; padding: 50px 0; font-size: 13px; color: #555; border: 1px solid #000; border-top: none;">
+                    There are no data to Preview for Ledger
+                </div>
+            }
+            else
+            {
+                <table class="ledger-table" id="reportTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 32px;">SL.</th>
+                            <th style="width: 48px;">Source</th>
+                            <th style="width: 75px;">Date</th>
+                            <th style="width: 105px;" class="tl">Acc Code / Ref</th>
+                            <th class="tl">Account Name / Narration</th>
+                            <th style="width: 82px;" class="tr">Opening</th>
+                            <th style="width: 82px;" class="tr">Debit</th>
+                            <th style="width: 82px;" class="tr">Credit</th>
+                            <th style="width: 90px;" class="tr">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var hasAccountCode = dt.Columns.Contains("AccountCode");
+                            var hasAccountName = dt.Columns.Contains("AccountName");
+                            var hasCOAId = dt.Columns.Contains("COAId");
+
+                            var accountGroups = dt.AsEnumerable().GroupBy(r => new {
+                                AccountCode = hasAccountCode && r["AccountCode"] != DBNull.Value ? r["AccountCode"].ToString().Trim() : "",
+                                AccountName = hasAccountName && r["AccountName"] != DBNull.Value ? r["AccountName"].ToString().Trim() : (hasCOAId && r["COAId"] != DBNull.Value ? r["COAId"].ToString().Trim() : "")
+                            }).ToList();
+
+                            int accIndex = 1;
+                        }
+
+                        @foreach (var accGroup in accountGroups)
+                        {
+                            decimal accTotalDebit = 0;
+                            decimal accTotalCredit = 0;
+                            int detailSL = 1;
+                            decimal currentRunningBalance = 0;
+                            string groupNature = "";
+
+                            <!-- Account Group Header Row (SL, Acc Code, Account Name) -->
+                            <tr class="account-header-row">
+                                <td class="tc fb">@accIndex</td>
+                                <td></td>
+                                <td></td>
+                                <td class="tl fb">@accGroup.Key.AccountCode</td>
+                                <td class="tl fb">@accGroup.Key.AccountName</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                            <!-- Detail Rows within Group -->
+                            foreach (DataRow row in accGroup)
+                            {
+                                string journalType = dt.Columns.Contains("JournalType") && row["JournalType"] != DBNull.Value ? row["JournalType"].ToString().Trim() : "";
+                                string code = dt.Columns.Contains("Code") && row["Code"] != DBNull.Value ? row["Code"].ToString().Trim() : "";
+                                string remarks = dt.Columns.Contains("Remarks") && row["Remarks"] != DBNull.Value ? row["Remarks"].ToString().Trim() : "";
+                                string nature = dt.Columns.Contains("Nature") && row["Nature"] != DBNull.Value ? row["Nature"].ToString().Trim() : "";
+                                if (!string.IsNullOrEmpty(nature)) { groupNature = nature; }
+
+                                bool isOpening = journalType.Equals("Opening", StringComparison.OrdinalIgnoreCase) || code.Equals("OP", StringComparison.OrdinalIgnoreCase);
+
+                                if (isOpening)
+                                {
+                                    decimal opVal = 0;
+                                    if (dt.Columns.Contains("NetChange") && row["NetChange"] != DBNull.Value)
+                                    {
+                                        decimal.TryParse(row["NetChange"].ToString(), out opVal);
+                                    }
+                                    else if (dt.Columns.Contains("TransactionAmount") && row["TransactionAmount"] != DBNull.Value)
+                                    {
+                                        decimal.TryParse(row["TransactionAmount"].ToString(), out opVal);
+                                    }
+
+                                    decimal opDisplay = Math.Abs(opVal);
+                                    decimal opBalance = groupNature.Equals("Cr", StringComparison.OrdinalIgnoreCase) ? (opVal * -1) : opVal;
+                                    currentRunningBalance = opBalance;
+
+                                    <tr class="detail-row">
+                                        <td class="tc">@(detailSL++)</td>
+                                        <td class="tl">OP</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="tr">@(opDisplay != 0 ? opDisplay.ToString("#,##0.00") : "")</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="tr">@(opBalance != 0 ? opBalance.ToString("#,##0.00") : "")</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    string source = "";
+                                    if (journalType.Equals("Opening", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        source = "OP";
+                                    }
+                                    else if (journalType.Equals("JournalVoucher", StringComparison.OrdinalIgnoreCase) || journalType.Equals("JV", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        source = "JV";
+                                    }
+                                    else if (journalType.Equals("ReceiptVoucher", StringComparison.OrdinalIgnoreCase) || journalType.Equals("RV", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        source = "RV";
+                                    }
+                                    else if (journalType.Equals("PaymentVoucher", StringComparison.OrdinalIgnoreCase) || journalType.Equals("PV", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        source = "PV";
+                                    }
+                                    else if (!string.IsNullOrEmpty(code) && code.Contains("-") && !code.StartsWith("-"))
+                                    {
+                                        source = code.Split('-')[0];
+                                    }
+                                    else
+                                    {
+                                        source = journalType;
+                                    }
+
+                                    string dateDisplay = "";
+                                    if (dt.Columns.Contains("TransactionDate") && row["TransactionDate"] != DBNull.Value)
+                                    {
+                                        DateTime tDate;
+                                        if (DateTime.TryParse(row["TransactionDate"].ToString(), out tDate))
+                                        {
+                                            if (tDate.Year > 1900)
+                                            {
+                                                dateDisplay = tDate.ToString("dd-MMM-yyyy");
+                                            }
+                                        }
+                                    }
+
+                                    decimal dr = 0;
+                                    if (dt.Columns.Contains("DrAmount") && row["DrAmount"] != DBNull.Value)
+                                    {
+                                        decimal.TryParse(row["DrAmount"].ToString(), out dr);
+                                    }
+                                    else if (dt.Columns.Contains("Debit") && row["Debit"] != DBNull.Value)
+                                    {
+                                        decimal.TryParse(row["Debit"].ToString(), out dr);
+                                    }
+
+                                    decimal cr = 0;
+                                    if (dt.Columns.Contains("CrAmount") && row["CrAmount"] != DBNull.Value)
+                                    {
+                                        decimal.TryParse(row["CrAmount"].ToString(), out cr);
+                                    }
+                                    else if (dt.Columns.Contains("Credit") && row["Credit"] != DBNull.Value)
+                                    {
+                                        decimal.TryParse(row["Credit"].ToString(), out cr);
+                                    }
+
+                                    accTotalDebit += dr;
+                                    accTotalCredit += cr;
+
+                                    // Calculate row balance matching Crystal Report Balance formula:
+                                    // if({dtLedger.Nature}="Cr") then {dtLedger.NetChange}*-1 else {dtLedger.NetChange}
+                                    decimal rowBalance = 0;
+                                    bool hasNetChange = false;
+                                    if (dt.Columns.Contains("NetChange") && row["NetChange"] != DBNull.Value)
+                                    {
+                                        decimal nc = 0;
+                                        if (decimal.TryParse(row["NetChange"].ToString(), out nc))
+                                        {
+                                            rowBalance = groupNature.Equals("Cr", StringComparison.OrdinalIgnoreCase) ? (nc * -1) : nc;
+                                            hasNetChange = true;
+                                        }
+                                    }
+                                    if (!hasNetChange)
+                                    {
+                                        if (groupNature.Equals("Cr", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            currentRunningBalance = currentRunningBalance + cr - dr;
+                                        }
+                                        else
+                                        {
+                                            currentRunningBalance = currentRunningBalance + dr - cr;
+                                        }
+                                        rowBalance = currentRunningBalance;
+                                    }
+
+                                    <tr class="detail-row">
+                                        <td class="tc">@(detailSL++)</td>
+                                        <td class="tl">@source</td>
+                                        <td class="tc">@dateDisplay</td>
+                                        <td class="tl">@code</td>
+                                        <td class="tl">@remarks</td>
+                                        <td></td>
+                                        <td class="tr">@(dr > 0 ? dr.ToString("#,##0.00") : "")</td>
+                                        <td class="tr">@(cr > 0 ? cr.ToString("#,##0.00") : "")</td>
+                                        <td class="tr">@rowBalance.ToString("#,##0.00")</td>
+                                    </tr>
+                                }
+                            }
+
+                            grandTotalDebit += accTotalDebit;
+                            grandTotalCredit += accTotalCredit;
+
+                            <!-- Account Group Total Row -->
+                            <tr class="account-total-row">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="tr fb">Total</td>
+                                <td class="total-number-cell">
+                                    @(accTotalDebit > 0 ? accTotalDebit.ToString("#,##0.00") : "0.00")
+                                </td>
+                                <td class="total-number-cell">
+                                    @(accTotalCredit > 0 ? accTotalCredit.ToString("#,##0.00") : "0.00")
+                                </td>
+                                <td></td>
+                            </tr>
+
+                            accIndex++;
+                        }
+
+                        <!-- Grand Total Row -->
+                        <tr class="grand-total-row">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="tr fb" style="font-size: 10.5px;">Grand Total</td>
+                            <td class="grand-total-number-cell">
+                                @(grandTotalDebit > 0 ? grandTotalDebit.ToString("#,##0.00") : "0.00")
+                            </td>
+                            <td class="grand-total-number-cell">
+                                @(grandTotalCredit > 0 ? grandTotalCredit.ToString("#,##0.00") : "0.00")
+                            </td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            }
+
+            <div class="page-footer-info">
+                <div>Page 1 of 1</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function exportExcel() {
+            var table = document.getElementById('reportTable');
+            if (!table) return;
+
+            var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+            html += '<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>LedgerReport</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><link href="@Url.Content("~/assets/stylesheets/pf-module-views.css")" rel="stylesheet" media="screen" />
+</head><body class="pf-module-theme pf-module-report">';
+            html += '<div style="text-align:center; font-weight:bold; font-size:14pt;">' + '@(companyName)' + '</div>';
+            html += '<div style="text-align:center; font-size:10pt;">' + '@(companyAddress)' + '</div>';
+            html += '<div style="text-align:center; font-weight:bold; font-size:12pt; margin-top:5px;">' + '@(reportHead)' + '</div>';
+            html += '<div style="text-align:center; font-size:10pt;">Report From: @(dateFromStr) to @(dateToStr)</div><br/>';
+            html += table.outerHTML;
+            html += '</body></html>';
+
+            var blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'LedgerReport_' + new Date().toISOString().slice(0, 10) + '.xls';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>

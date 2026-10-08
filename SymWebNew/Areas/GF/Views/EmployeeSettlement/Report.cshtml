@@ -1,0 +1,66 @@
+<div class="thinbox">
+    <div class="th_thinbox">
+        <p><i class="fa fa-file-text-o"></i> Employee Settlement Report</p>
+    </div>
+    <div class="EnumEEHead" style="padding: 20px 24px;">
+        <div class="ep-form-grid" style="grid-template-columns: repeat(3, 1fr); gap: 14px 18px;">
+            <div class="ep-form-group col-span-1">
+                <div class="ep-field-label">
+                    <label>Left Employee Code</label>
+                </div>
+                <div class="editor-field">
+                    @Html.SimpleDropDown("CodeF", "/Config/DropDown/ExEmployeeCodeName", new { @class = "form-control selectDropdown" })
+                </div>
+            </div>
+
+            <div class="ep-form-group col-span-1">
+                <div class="ep-field-label">
+                    <label>Settlement Date From</label>
+                </div>
+                <div class="editor-field">
+                    @Html.TextBox("SettlementDateFrom", "", new { @placeholder = "Date From", @class = "stDateFrom customDatePicker form-control" })
+                </div>
+            </div>
+
+            <div class="ep-form-group col-span-1">
+                <div class="ep-field-label">
+                    <label>Settlement Date To</label>
+                </div>
+                <div class="editor-field">
+                    @Html.TextBox("SettlementDateTo", "", new { @placeholder = "Date To", @class = "stDateTo customDatePicker form-control" })
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 15px; padding-top: 10px; border-top: 1px solid #f1f5f9;">
+            <button type="button" title="Click for Report" name="Detail" data-url="/GF/EmployeeSettlement/ReportView" onclick="reportData(this);" class="sym-btn-report btn-erp-preview">&nbsp;Detail</button>
+            <button type="button" title="Click for Report" name="Summary" data-url="/GF/EmployeeSettlement/ReportView" onclick="reportData(this);" class="sym-btn-report btn-erp-preview">&nbsp;Summary</button>
+            <button type="button" title="Clear the Entries" id="Clear" class="sym-btn-clear btn-erp-clear"><i class="fa fa-eraser"></i> Clear</button>
+            <button type="button" title="Cancel Data" class="btncancel sym-btn-cancel btn-erp-cancel"><i class="fa fa-times"></i> Cancel</button>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        InitDropdownsCommon();
+    });
+
+    function reportData(sender) {
+        var url = $(sender).attr('data-url');
+        var reportType = $(sender).attr('name');
+        var empCodeFrom = $("#CodeF :selected").val();
+        var dtFrom = $(".stDateFrom").val();
+        var dtTo = $(".stDateTo").val();
+
+        rptObj = new Object();
+        rptObj.empCodeFrom = empCodeFrom;
+        rptObj.reportType = reportType;
+        rptObj.dtFrom = dtFrom;
+        rptObj.dtTo = dtTo;
+
+        var rptParam = $.param(rptObj);
+        url = url + "?" + rptParam;
+        var win = window.open(url, '_blank');
+    }
+</script>
+

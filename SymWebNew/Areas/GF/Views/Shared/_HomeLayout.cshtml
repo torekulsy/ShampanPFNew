@@ -1,0 +1,10 @@
+@{
+    Layout = "~/Areas/PF/Views/Shared/_HomeLayout.cshtml";
+}
+@Html.Partial("~/Areas/Common/Views/Shared/_PFModuleStyle.cshtml")
+<div class="pf-module-view" data-module="GF">
+    @RenderBody()
+</div>
+@section scripts {
+    @RenderSection("scripts", required: false)
+}

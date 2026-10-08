@@ -1,0 +1,53 @@
+@using UIHelper.MVC
+<div class="thinbox">
+    <div class="th_thinbox">
+        <p><i class="fa fa-file-text-o"></i> PF Bank Statement</p>
+    </div>
+    <div class="PFBankStatementReport" style="padding: 20px 24px;">
+        <div class="ep-form-grid">
+            <div class="ep-form-group col-span-4">
+                <label class="ep-field-label">Deposit Date From</label>
+                @Html.TextBox("DateFrom", "", new { @placeholder = "Date From", @class = " dtFrom customDatePicker form-control" })
+            </div>
+            <div class="ep-form-group col-span-4">
+                <label class="ep-field-label">Deposit Date To</label>
+                @Html.TextBox("DateTo", "", new { @placeholder = "Date To", @class = " dtTo customDatePicker form-control" })
+            </div>
+            <div class="ep-form-group col-span-4">
+                <label class="ep-field-label">Bank Branch Name</label>
+                @Html.SimpleDropDown("BankBranchId", "/Config/DropDown/PF_BankBranchName", new { @class = " required bankBranchId form-control" })
+            </div>
+        </div>
+        <div class="ep-report-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+            <button type="button" title="Click for Report" data-url="/@ViewBag.TransType/PFReport/PFBankStatementReportView" onclick="reportData(this);" id="" class="sym-btn-report btn-erp-print">&nbsp;Detail</button>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        InitDropdownsCommon();
+    });
+
+    function reportData(sender) {
+        var url = $(sender).attr('data-url');
+
+        var dtFrom = $(".dtFrom").val();
+        var dtTo = $(".dtTo").val();
+        var bankBranchId = $(".bankBranchId").val();
+
+
+        if (bankBranchId == "") {
+            ShowResult("Fail", "Please Select the Bank Branch First!");
+            return;
+        }
+        
+        rptObj = new Object();
+        rptObj.dtFrom = dtFrom;
+        rptObj.dtTo = dtTo;
+        rptObj.bankBranchId = bankBranchId;
+        
+        var rptParam = $.param(rptObj);
+        url = url + "?" + rptParam;
+        var win = window.open(url, '_blank');
+    }
+</script>
