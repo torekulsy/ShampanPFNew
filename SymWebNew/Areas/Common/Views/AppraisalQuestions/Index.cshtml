@@ -110,7 +110,7 @@
         }
         var letterName = $("#LetterName").val();
         if (letterName == "") {
-            ShowResult("Fail", "Select First to Letter Name!");
+            showRequiredFieldMessage("#LetterName");
             return;
         }
 
@@ -138,7 +138,7 @@
         }
         var letterName = $("#LetterName").val();
         if (letterName == "") {
-            ShowResult("Fail", "Select First to Letter Name!");
+            showRequiredFieldMessage("#LetterName");
             return;
         }
 

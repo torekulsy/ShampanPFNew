@@ -69,15 +69,15 @@
         var FiscalPeriodDetailId = $("#FiscalPeriodDetailId").val();
         var TotalProfit = $("#TotalProfit").val();
         if (FiscalPeriodDetailId == "") {
-            ShowResult("Fail", "Please Select the Fiscal Period");
+            showRequiredFieldMessage("#FiscalPeriodDetailId");
             return;
         }
         if (TotalProfit == "") {
-            ShowResult("Fail", "Please Enter Valid Total Profit");
+            showRequiredFieldMessage("#TotalProfit");
             return;
         }
         if (FiscalYear == "") {
-            ShowResult("Fail", "Please Select the Fiscal Year");
+            showRequiredFieldMessage("#FiscalYear");
             return;
         }
         var url = "/WWF/WWF/Create"

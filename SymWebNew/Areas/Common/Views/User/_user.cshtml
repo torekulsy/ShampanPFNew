@@ -185,7 +185,7 @@
             }
         }
         if ($("#EmployeeId").val() == "0") {
-            ShowResult("Fail", "Please select employee!");
+            showRequiredFieldMessage("#EmployeeId");
             return;
         }
     }

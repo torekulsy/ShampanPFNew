@@ -214,15 +214,15 @@
 
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Code!");
+            showRequiredFieldMessage("#Code");
             return;
         }
         if (PFOpeningValue == "" || PFOpeningValue == "0" || PFOpeningValue == "0.0" || PFOpeningValue == "0.00") {
-            ShowResult("Fail", "Please Enter WWF EmployeeContribution!");
+            showRequiredFieldMessage(".cPFOpeningValue");
             return;
         }
         if (OpeningDate == "") {
-            ShowResult("Fail", "Please Select Opening Date!");
+            showRequiredFieldMessage(".cOpeningDate");
             return;
         }
 
@@ -309,15 +309,15 @@
 
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Code!");
+            showRequiredFieldMessage("#Code");
             return;
         }
         if (PFOpeningValue == "" || PFOpeningValue == "0" || PFOpeningValue == "0.0" || PFOpeningValue == "0.00") {
-            ShowResult("Fail", "Please Enter WWF Opening Value!");
+            showRequiredFieldMessage(".cPFOpeningValue");
             return;
         }
         if (OpeningDate == "") {
-            ShowResult("Fail", "Please Select Opening Date!");
+            showRequiredFieldMessage(".cOpeningDate");
             return;
         }
 
@@ -338,7 +338,7 @@
 
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Code!");
+            showRequiredFieldMessage("#Code");
             return;
         }
         

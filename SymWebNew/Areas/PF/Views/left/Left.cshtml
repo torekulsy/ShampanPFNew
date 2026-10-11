@@ -180,7 +180,7 @@
             }
         }
         if ($("#leftInformation_EmployeeId").val() == "0") {
-            ShowResult("Fail", "Please select employee!");
+            showRequiredFieldMessage("#leftInformation_EmployeeId");
             return;
         }
     }

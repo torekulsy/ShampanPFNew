@@ -2,7 +2,7 @@
     Layout = "~/Areas/PF/Views/Shared/_HomeLayout.cshtml";
 }
 @Html.Partial("~/Areas/Common/Views/Shared/_PFModuleStyle.cshtml")
-<div class="pf-module-view" data-module="GF">
+<div class="pf-module-view" data-module="GF" data-controller="@(ViewContext.RouteData.Values["controller"])" data-action="@(ViewContext.RouteData.Values["action"])">
     @RenderBody()
 </div>
 @section scripts {

@@ -39,7 +39,7 @@
         var url = $(sender).attr('data-url');
         var FiscalPeriodDetailId = $("#FiscalPeriodDetailId").val();
         if (FiscalPeriodDetailId == "") {
-            ShowResult("Fail", "Please Select the Fiscal Period");
+            showRequiredFieldMessage("#FiscalPeriodDetailId");
             return;
         }
 

@@ -79,7 +79,7 @@
             var ImportType = $("#Type :selected").val();
 
             if (ImportType == "" || ImportType == null) {
-                ShowResult("Fail", "You are requested to Select Type  before Import!");
+                showRequiredFieldMessage("#Type");
                 return;
                 
             }

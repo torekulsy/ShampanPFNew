@@ -1,4 +1,9 @@
-﻿<div class="headrow">
+﻿@{
+    var identity = System.Threading.Thread.CurrentPrincipal.Identity as SymOrdinary.ShampanIdentity;
+    bool isAdmin = identity != null && identity.IsAdmin;
+}
+
+<div class="headrow">
     <button type="button" title="Add Fund (Return On Investment)" data-url="/@ViewBag.TransType/PreDistributionFund/Create" onclick="GoTo(this)" id="" class=" sym-btn-add ">&nbsp;New</button>
 
     <label class="pull-right">Pre Distribution Fund </label>
@@ -60,7 +65,7 @@
                         + '<a title="Journal" class="sym-btn-bank-row" href="/@ViewBag.TransType/PreDistributionFund/JournalEntry/?Code=' + Code + '&Id=' + oObj.aData[0] + '"></a>';
 
                     // Now check if admin and the post condition
-                    if ('@identity.IsAdmin'.toLowerCase() == "true") {
+                    if ('@isAdmin'.toLowerCase() == "true") {
                         if (oObj.aData[5] == "Posted") {
                             // If posted, show post button with disabled style
                             result += '&nbsp; <a title="Click on for Post" data-url="/@ViewBag.TransType/PreDistributionFund/Post" onclick=btnPostNoSplit(this); data-Post="' + oObj.aData[4] + '" data-Id="' + oObj.aData[0] + '" class="sym-btn-post-row" style="opacity:0.45;pointer-events:none;cursor:default;"></a>';

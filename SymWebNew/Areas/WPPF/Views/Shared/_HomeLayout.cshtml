@@ -51,6 +51,7 @@
     }
 
     @Styles.Render("~/Content/css")
+    @Html.Partial("~/Areas/Common/Views/Shared/_PFModuleStyle.cshtml")
     @*   @Scripts.Render("~/bundles/modernizr")*@
     @*    @{
             try
@@ -1078,7 +1079,9 @@
 
             <!-- Content Area -->
             <main class="content-area contentBody">
-                @RenderBody()
+                <div class="pf-module-view" data-module="WPPF" data-controller="@(ViewContext.RouteData.Values["controller"])" data-action="@(ViewContext.RouteData.Values["action"])">
+                    @RenderBody()
+                </div>
                 @Scripts.Render("~/bundles/jquery")
                 @RenderSection("scripts", required: false)
 

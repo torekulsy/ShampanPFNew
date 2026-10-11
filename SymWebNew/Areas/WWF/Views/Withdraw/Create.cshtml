@@ -99,7 +99,7 @@
                         @Html.LabelFor(model => model.WithdrawAmount)
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(model => model.WithdrawAmount, new { @placeholder = "Withdraw Amount", @class = " cWithdrawAmount right NumberCheck required  form-control" })
+                        @Html.TextBoxFor(model => model.WithdrawAmount, new { @placeholder = "Withdraw Amount", @class = " cWithdrawAmount right NumberCheck required required-positive form-control" })
                         @Html.ValidationMessageFor(model => model.WithdrawAmount)
                     </div>
                 </div>

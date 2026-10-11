@@ -74,11 +74,11 @@
         var ProjectId = $("#ProjectId").val();
         var chkAll = $("#chkAll").prop("checked") ? true : false;
         if (FiscalPeriodDetailId == "") {
-            ShowResult("Fail", "Please Select the Fiscal Period");
+            showRequiredFieldMessage("#FiscalPeriodDetailId");
             return;
         }
         if (!chkAll && ProjectId=="") {
-            ShowResult("Fail", "Please Select the Project");
+            showRequiredFieldMessage("#ProjectId");
             return;
         }
         var url = "/@ViewBag.TransType/PFDetail/PFProcess?fydid=" + FiscalPeriodDetailId + "&ProjectId=" + ProjectId + "&chkAll=" + chkAll;

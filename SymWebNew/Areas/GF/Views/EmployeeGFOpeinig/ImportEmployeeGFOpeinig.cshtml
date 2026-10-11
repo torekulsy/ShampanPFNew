@@ -116,7 +116,7 @@
         var Orderby = $("#Orderby").val();
 
         if (Orderby == "") {
-            ShowResult('Fail', "Please Select Order By ");
+            showRequiredFieldMessage("#Orderby");
             return false;
         }
 
@@ -139,7 +139,7 @@
         var Orderby = $("#Orderby").val();
 
         if (Orderby == "") {
-            ShowResult('Fail', "Please Select Order By ");
+            showRequiredFieldMessage("#Orderby");
             return false;
         }
 

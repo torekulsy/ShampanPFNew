@@ -48,7 +48,7 @@
         Ask("Do you want to Process the year end?", function () {
             var FiscalPeriodDetailId = $("#YearTo").val();
             if (FiscalPeriodDetailId == "" || FiscalPeriodDetailId == null || FiscalPeriodDetailId == "0") {
-                ShowResult("Fail", "Please Select the Fiscal Period / Year");
+                showRequiredFieldMessage("#YearTo");
                 return;
             }
 

@@ -257,7 +257,7 @@
                 if (btn === 'next') btn = 'first';
                 else if (btn === 'previous') btn = 'last';
                 else if (btn === 'current') {
-                    ShowResult("Fail", "Please Select Employee Code!");
+                    showRequiredFieldMessage(".empId");
                     return;
                 }
             }

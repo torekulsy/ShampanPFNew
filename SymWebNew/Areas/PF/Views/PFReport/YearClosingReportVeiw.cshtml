@@ -73,7 +73,7 @@
 
             var FiscalPeriodDetailId = $("#YearTo").val();
             if (FiscalPeriodDetailId == "") {
-                ShowResult("Fail", "Please Select the Fiscal Period");
+                showRequiredFieldMessage("#YearTo");
                 return;
             }
 

@@ -2609,6 +2609,31 @@ label.error {
     color: red;
 }
 
+/* Inline errors must occupy their own line below text, Select2 and grouped inputs. */
+.RequiredField,
+.field-validation-error,
+label.error,
+span.error,
+.field-validation-error > * {
+    clear: both;
+    float: none !important;
+    max-width: 100%;
+    margin: 4px 0 0;
+    padding: 0;
+    color: #e80c4d !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1.4;
+    height: auto !important;
+    white-space: normal !important;
+    overflow-wrap: break-word;
+}
+.field-validation-error,
+label.error { display: block; }
+.input-group > .RequiredField,
+.input-group > .field-validation-error,
+.input-group > label.error { flex: 0 0 100%; width: 100%; }
+
 select.readonly, input.readonly {
     background: rgb(233,233,233);
 }
@@ -2737,6 +2762,10 @@ select.readonly, input.readonly {
 
 
 .required {
+    border-bottom: 2px solid #f20 !important;
+}
+
+input[required], select[required], textarea[required] {
     border-bottom: 2px solid #f20 !important;
 }
 
@@ -4683,4 +4712,11 @@ span.round-tab:hover {
     .left-panel {
         display: none;
     }
+}
+
+/* Hide a displayed zero amount without changing values used by calculations or submission. */
+input.amount-zero-value {
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    caret-color: #495057;
 }

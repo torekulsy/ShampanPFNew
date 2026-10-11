@@ -226,7 +226,7 @@
         var ExportType = $("#ExportType :selected").val();
 
         if (ExportType == "" || ExportType == null) {
-            ShowResult("Fail", "You are requested to Select Type  before Export!");
+            showRequiredFieldMessage("#ExportType");
             return;
         }
 

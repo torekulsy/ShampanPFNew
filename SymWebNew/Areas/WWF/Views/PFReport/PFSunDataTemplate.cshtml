@@ -82,11 +82,11 @@
             var fpDetailsCom = $("#fpDetailsCom").val();
              
             if (fiscalyearCom == "") {
-                ShowResult("Fail", "Please select the Year From");
+                showRequiredFieldMessage("#fiscalyearCom");
                 return true;
             }
             else if (fpDetailsCom == "") {
-                ShowResult("Fail", "Please select the Date To");
+                showRequiredFieldMessage("#fpDetailsCom");
                 return true;
             }
 

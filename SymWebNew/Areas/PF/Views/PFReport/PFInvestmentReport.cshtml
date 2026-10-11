@@ -53,7 +53,7 @@
             debugger;
             var ToDate = $('#YearTo').val();
             if (ToDate == "") {
-                ShowResult("Fail", "Please select To Year !");
+                showRequiredFieldMessage("#YearTo");
                 return;
             }
             //alert(empId);
@@ -65,7 +65,7 @@
                         
             var ToDate = $('#YearTo').val();
             if (ToDate == "") {
-                ShowResult("Fail", "Please select To Year !");
+                showRequiredFieldMessage("#YearTo");
                 return;
             }
             var url = "/@ViewBag.TransType/PFReport/PFInvestmentRepor?ToDate=" + ToDate + "&Type=" + "SynP";

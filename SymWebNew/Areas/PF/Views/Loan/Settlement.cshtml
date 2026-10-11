@@ -694,7 +694,7 @@
         var PFPrincipalAmount = $('#PrincipalAmount').val();
         if (PFPrincipalAmount == 0) {
 
-            ShowResult("Fail", "Principal Amount is Required ");
+            showRequiredFieldMessage("#PrincipalAmount");
             return;
         }
         if (PFPrincipalAmount != 0) {

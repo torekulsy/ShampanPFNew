@@ -150,13 +150,13 @@
             var DateTo = $("#DateTo").val();
 
             if (DateFrom === "" ) {
-                ShowResult("Fail","Date From Required");
+                showRequiredFieldMessage("#DateFrom");
                 $("#DateFrom").focus();
                 return false;
             }
 
             if (DateTo === "") {
-                ShowResult("Fail", "Date To Required");
+                showRequiredFieldMessage("#DateTo");
                 $("#DateTo").focus();
                 return false;
             }

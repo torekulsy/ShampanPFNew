@@ -756,3 +756,10 @@ tr.pager td {
 .mr-15 {
     margin-right: 15px;
 }
+
+/* Use the same colour and weight for custom and MVC inline validation messages. */
+.RequiredField, .field-validation-error, .field-validation-error > *, label.error, span.error {
+    color: #e80c4d !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+}

@@ -89,7 +89,7 @@
         var PaymentDate = $('#PaymentDate').val();
 
         if (PaymentDate == "") {
-            ShowResult('Fail', "Please Select Payment Date");
+            showRequiredFieldMessage("#PaymentDate");
             return;
         }
 

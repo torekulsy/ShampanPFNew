@@ -280,7 +280,7 @@
         var MonthTo = $("#MonthTo").val();
 
         if (MonthTo == "") {
-            ShowResult("Fail", "Please select the Period To");
+            showRequiredFieldMessage("#MonthTo");
             return true;
         }
 

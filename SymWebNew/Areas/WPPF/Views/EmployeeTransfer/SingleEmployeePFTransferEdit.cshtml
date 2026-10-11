@@ -65,7 +65,7 @@
         $('#current').click(function () {
             var empId = $('#empId').val();
             if (empId == "") {
-                ShowResult("Fail", "Please Input Code!");
+                showRequiredFieldMessage("#empId");
                 return;
             }
             var btn = 'current';

@@ -35,7 +35,20 @@ namespace SymWebUI.Areas.WWF.Controllers
         //
         // GET: /HRM/Loan/
 				SymUserRoleRepo _reposur = new SymUserRoleRepo();
-				ShampanIdentity identity = (ShampanIdentity)Thread.CurrentPrincipal.Identity;
+        private ShampanIdentity identity
+        {
+            get { return Thread.CurrentPrincipal.Identity as ShampanIdentity; }
+        }
+
+        protected override void OnAuthorization(AuthorizationContext filterContext)
+        {
+            base.OnAuthorization(filterContext);
+            if (identity == null && filterContext.Result == null)
+            {
+                filterContext.Result = new HttpUnauthorizedResult();
+            }
+        }
+
         public ActionResult Index(string id)
         {
                var permission= _reposur.SymRoleSession(identity.UserId, "1_51", "index").ToString();

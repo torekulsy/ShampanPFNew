@@ -156,11 +156,11 @@
         var OpeningDate = $('.cOpeningDate').val();
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Code!");
+            showRequiredFieldMessage("#Code");
             return;
         }
         if (OpeningDate == "") {
-            ShowResult("Fail", "Please Select Opening Date!");
+            showRequiredFieldMessage(".cOpeningDate");
             return;
         }
         var myData = $('#afrmEmployeeEdit').serialize();
@@ -191,11 +191,11 @@
         var Post = $('.cPost').val();
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Code!");
+            showRequiredFieldMessage("#Code");
             return;
         }
         if (OpeningDate == "") {
-            ShowResult("Fail", "Please Select Opening Date!");
+            showRequiredFieldMessage(".cOpeningDate");
             return;
         }
         if (Post.toLowerCase() == "true") {
@@ -212,7 +212,7 @@
         var Post = $('.cPost').val();
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Code!");
+            showRequiredFieldMessage("#Code");
             return;
         }
         

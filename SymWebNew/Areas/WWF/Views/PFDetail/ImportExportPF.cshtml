@@ -211,11 +211,11 @@
         var Orderby = $("#Orderby").val();
 
         if (fid == "") {
-            ShowResult('Fail', "Please Select Fiscal year");
+            showRequiredFieldMessage("#FiscalPeriodDetailId");
             return;
         }
         if (ProjectId == "") {
-            ShowResult('Fail', "Please Select Project Id");
+            showRequiredFieldMessage("#ProjectId");
             return;
         }
         //if (ETId == "") {
@@ -224,7 +224,7 @@
         //}
 
         if (Orderby == "") {
-            ShowResult('Fail', "Please Select Order By ");
+            showRequiredFieldMessage("#Orderby");
             return false;
         }
 
@@ -248,11 +248,11 @@
         var ProjectId = $('#ProjectId').val();
 
         if (FiscalYearDetailId == "") {
-            ShowResult('Fail', "Please Select Fiscal year");
+            showRequiredFieldMessage("#FiscalPeriodDetailId");
             return;
         }
         if (ProjectId == "") {
-            ShowResult('Fail', "Please Select Project Id");
+            showRequiredFieldMessage("#ProjectId");
             return;
         }
         $('#FYDId').val(FiscalYearDetailId);

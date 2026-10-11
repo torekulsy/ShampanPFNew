@@ -609,7 +609,7 @@
         var PFPrincipalAmount = $('#PrincipalAmount').val();
 
         if (PFPrincipalAmount == "" || parseFloat(PFPrincipalAmount) <= 0) {
-            ShowResult("Fail", "Principal Amount is Required");
+            showRequiredFieldMessage("#PrincipalAmount");
             $('#PrincipalAmount').focus();
             return false;
         }

@@ -220,7 +220,7 @@
             var eeHeadId = $('.eeHead  :selected').val();
 
             if (eeHeadId == "") {
-                ShowResult("Fail", "Please select the Item!");
+                showRequiredFieldMessage(".eeHead");
                 return;
             }
 
@@ -237,7 +237,7 @@
                 return;
             }
             else if (oParam.STotal == "") {
-                ShowResult("Fail", "Please Enter Sub Total!");
+                showRequiredFieldMessage(".STotal");
                 return;
             }
             $.ajax({

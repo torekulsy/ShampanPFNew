@@ -123,12 +123,12 @@
         FiscalYearDetailIdTo = $("#iFiscalYearDetailIdTo").val();
 
         if (FiscalYearDetailId == null || FiscalYearDetailId == "" || FiscalYearDetailId == "0") {
-            ShowResult("Fail", "Please Select the Fiscal Period From!");
+            showRequiredFieldMessage("#iFiscalYearDetailId");
             return true;
         }
 
         if (FiscalYearDetailIdTo == null || FiscalYearDetailIdTo == "" || FiscalYearDetailIdTo == "0") {
-            ShowResult("Fail", "Please Select the Fiscal Period To!");
+            showRequiredFieldMessage("#iFiscalYearDetailIdTo");
             return true;
         }
 

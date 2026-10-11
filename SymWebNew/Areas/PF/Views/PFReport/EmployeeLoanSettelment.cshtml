@@ -62,11 +62,11 @@
             var FromDate = $('.dtFrom').val();
           
             if (FromDate == "") {
-                ShowResult("Fail", "Please select From Date !");
+                showRequiredFieldMessage(".dtFrom");
                 return;
             }
             if (ToDate == "") {
-                ShowResult("Fail", "Please select To Date !");
+                showRequiredFieldMessage(".dtTo");
                 return;
             }
             //alert(empId);

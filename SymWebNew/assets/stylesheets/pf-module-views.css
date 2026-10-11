@@ -1,4 +1,4 @@
-/* Adapt the older GF/WWF view markup to the existing PF common.css theme. */
+/* Adapt the older GF/WWF/WPPF view markup to the existing PF common.css theme. */
 @media screen {
     .pf-module-view { min-width: 0; }
     .pf-module-theme .erp-page-wrapper { padding: 0; max-width: none; }
@@ -97,5 +97,86 @@
         .pf-module-theme .ep-form-grid > [class*="col-span-"] { grid-column: 1 / -1; }
         .pf-module-theme .ep-side-form-grid { grid-template-columns: minmax(0, 1fr); gap: 5px; }
         .pf-module-theme .erp-card-body { padding: 12px !important; }
+    }
+}
+
+@media screen {
+    /* Keep legacy WWF/WPPF grid gutters and toolbars inside their cards. */
+    .pf-module-alignment .pf-module-view,
+    .pf-module-alignment .pf-module-view form { min-width: 0; max-width: 100%; }
+    .pf-module-alignment .thinbox { padding: 0 !important; }
+    .pf-module-alignment .thinbox > .th_thinbox {
+        margin: 0 !important; padding: 10px 12px !important;
+    }
+    .pf-module-alignment .headrow,
+    .pf-module-alignment .erp-action-bar {
+        justify-content: flex-start; gap: 8px; padding: 12px;
+    }
+    .pf-module-alignment .headrow > button,
+    .pf-module-alignment .headrow > a[class*="sym-btn"] {
+        float: none !important; margin: 0 !important; flex: 0 0 auto;
+    }
+    .pf-module-alignment .headrow > .pf-module-page-label { display: none; }
+    .pf-module-alignment .pf-module-table-row {
+        display: block; margin: 0 !important; padding: 0 !important;
+    }
+    .pf-module-alignment .pf-module-table-container {
+        width: 100%; max-width: 100%; min-width: 0; margin: 0; padding: 0;
+    }
+    .pf-module-alignment .dataTables_wrapper {
+        width: 100%; max-width: 100%; min-width: 0; overflow: visible !important;
+    }
+    .pf-module-alignment .pf-module-table-top {
+        padding: 10px 12px; margin: 0; width: 100%; box-sizing: border-box;
+    }
+    .pf-module-alignment .pf-module-actions { min-width: 0; gap: 8px; }
+    .pf-module-alignment .pf-module-actions > button,
+    .pf-module-alignment .pf-module-actions > a { margin: 0 !important; float: none !important; }
+    .pf-module-alignment .pf-module-search { flex: 0 1 auto; min-width: 0; max-width: 100%; }
+    .pf-module-alignment .pf-module-search .dataTables_filter { width: auto; }
+    .pf-module-alignment .pf-module-search .dataTables_filter label {
+        display: flex; align-items: center; gap: 8px; margin: 0; white-space: nowrap;
+    }
+    .pf-module-alignment .pf-module-search input {
+        width: 200px; max-width: 100%; box-sizing: border-box; margin: 0 !important;
+    }
+    .pf-module-alignment .pf-module-table-scroll {
+        max-width: 100%; min-width: 0; overflow-x: auto;
+    }
+    .pf-module-alignment .pf-module-table-footer {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+        padding: 8px 12px; margin: 0;
+    }
+    .pf-module-alignment .pf-module-table-footer > div { min-width: 0; }
+    .pf-module-alignment .pf-module-table-footer .dataTables_length,
+    .pf-module-alignment .pf-module-table-footer .dataTables_info,
+    .pf-module-alignment .pf-module-table-footer .dataTables_paginate {
+        width: auto !important; float: none !important; margin: 0; padding: 0;
+    }
+    .pf-module-alignment .pf-module-pagination { justify-self: end; }
+    .pf-module-alignment .pf-module-form-content { padding: 12px 8px; }
+    .pf-module-alignment .thinbox .row { margin-left: 0 !important; margin-right: 0 !important; }
+    .pf-module-alignment .thinbox .row > [class*="col-"] {
+        min-width: 0; padding-left: 8px; padding-right: 8px; margin-bottom: 12px;
+    }
+    .pf-module-alignment .thinbox .editor-label label { margin: 0 0 5px; white-space: normal; }
+    .pf-module-alignment .thinbox .editor-field,
+    .pf-module-alignment .thinbox .form-control { max-width: 100%; }
+    .pf-module-alignment .thinbox .select2-container { width: 100% !important; max-width: 100%; }
+    .pf-module-alignment .thinbox textarea.form-control { height: auto; min-height: 54px; }
+    .pf-module-alignment .pf-module-action-row {
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 8px;
+    }
+    .pf-module-alignment .pf-module-action-row > button { margin: 0 !important; }
+    .pf-module-alignment .th_thinbox_top { gap: 12px; flex-wrap: wrap; }
+    .pf-module-alignment .breadcrumb { flex-wrap: wrap; justify-content: flex-start; }
+    @media (max-width: 767px) {
+        .pf-module-alignment .pf-module-table-footer { display: flex; flex-wrap: wrap; justify-content: space-between; }
+        .pf-module-alignment .pf-module-info { flex: 1 0 100%; order: -1; }
+        .pf-module-alignment .pf-module-search { flex: 1 0 100%; margin-left: 0; }
+        .pf-module-alignment .pf-module-search .dataTables_filter { width: 100%; }
+        .pf-module-alignment .pf-module-search input { flex: 1; width: auto; min-width: 0; }
+        .pf-module-alignment .breadcrumb-container { width: 100%; }
+        .pf-module-alignment .breadcrumb { justify-content: flex-start !important; }
     }
 }

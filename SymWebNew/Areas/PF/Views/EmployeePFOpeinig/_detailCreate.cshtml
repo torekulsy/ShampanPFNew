@@ -201,7 +201,7 @@
 
     function validateOpeningDate() {
         var isValid = validateRequiredFields("#afrmEmployeeEdit", ".cOpeningDate.required");
-        $('.cOpeningDate').parent().find('.RequiredField').text('This field is required');
+        $('.cOpeningDate').parent().find('.RequiredField').text('This Field is Required');
         return isValid;
     }
 
@@ -210,11 +210,11 @@
         var PFOpeningValue = $('.cPFOpeningValue').val();
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Employee Code!");
+            showRequiredFieldMessage("#Code");
             return;
         }
         if (PFOpeningValue == "" || PFOpeningValue == "0" || PFOpeningValue == "0.0" || PFOpeningValue == "0.00") {
-            ShowResult("Fail", "Please Enter PF Opening Value!");
+            showRequiredFieldMessage(".cPFOpeningValue");
             return;
         }
         if (!validateOpeningDate()) {
@@ -255,11 +255,11 @@
 
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Employee Code!");
+            showRequiredFieldMessage("#Code");
             return;
         }
         if (PFOpeningValue == "" || PFOpeningValue == "0" || PFOpeningValue == "0.0" || PFOpeningValue == "0.00") {
-            ShowResult("Fail", "Please Enter PF Opening Value!");
+            showRequiredFieldMessage(".cPFOpeningValue");
             return;
         }
         if (!validateOpeningDate()) {
@@ -283,7 +283,7 @@
 
         var Code = $('#Code').val();
         if (Code == "") {
-            ShowResult("Fail", "Please Select Employee Code!");
+            showRequiredFieldMessage("#Code");
             return;
         }
         

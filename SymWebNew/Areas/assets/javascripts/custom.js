@@ -269,32 +269,270 @@ function ParseDate(input) {
 //}
 function validateRequiredFields(container, fieldSelector) {
     var $container = typeof container === "string" ? $(container) : container;
-    var selector = fieldSelector || ".required";
+    var selector = fieldSelector || requiredFieldSelector;
     var isValid = true;
-
     $container.find(selector).each(function () {
-        var $field = $(this);
-        var value = $field.val();
-        var isEmpty = value === null || $.trim(String(value)) === "";
-        var $parent = $field.parent();
-        var $message = $parent.children(".RequiredField").first();
-
-        if ($message.length === 0) {
-            $parent.append('<p class="RequiredField" style="color:red; font-size: 13px">This Field is Required</p>');
-            $message = $parent.children(".RequiredField").last();
-        }
-
-        if (isEmpty) {
-            $message.show();
-            isValid = false;
-        }
-        else {
-            $message.hide();
-        }
+        if (!validateRequiredField($(this))) isValid = false;
     });
-
     return isValid;
 }
+
+var requiredFieldSelector = 'input.required, select.required, textarea.required, input[required], select[required], textarea[required]';
+var requiredMessageId = 0;
+var requiredValidationMessage = 'This Field is Required';
+
+function isPositiveRequiredAmount(value) {
+    var amount = Number($.trim(String(value == null ? '' : value)).replace(/,/g, ''));
+    return isFinite(amount) && amount > 0;
+}
+
+function isPickerField($field) {
+    return $field.is('.customDatePicker, .customDatePickerChangeable, .datepickerRange, .DatePicker, .cDatePickerEdit, .hasDatepicker, .customTimePicker, input[type="date"], input[type="datetime-local"], input[type="time"]');
+}
+
+function skipRequiredField($field) {
+    return $field.is(':disabled, input[type="hidden"]')
+        || ($field.is('[readonly]') && !isPickerField($field));
+}
+
+function showRequiredFieldMessage(selector) {
+    $(selector).filter('input, select, textarea').each(function () {
+        validateRequiredField($(this), true);
+    });
+}
+
+function validateRequiredField($field, forceRequiredError) {
+    if (forceRequiredError) $field.attr('data-required-action', 'true');
+    if ($field.is(':disabled, input[type="hidden"]')
+        || (!forceRequiredError && $field.attr('data-required-action') !== 'true' && skipRequiredField($field))) return true;
+    var value = $field.val();
+    var isEmpty = value === null || (Array.isArray(value) ? value.length === 0 : $.trim(String(value)) === '');
+    if ($field.hasClass('amount-zero-value')) isEmpty = true;
+    if ($field.hasClass('required-positive')) isEmpty = !isPositiveRequiredAmount(value);
+    var $form = $field.closest('form');
+    var fieldName = $field.attr('name');
+    if ($field.is(':checkbox, :radio')) {
+        var $group = fieldName && $form.length ? $form.find('input').filter(function () {
+            return this.name === fieldName && this.type === $field[0].type && !this.disabled;
+        }) : $field;
+        isEmpty = !$group.is(':checked');
+    }
+    if (forceRequiredError) isEmpty = true;
+    var key = $field.attr('data-required-key');
+    if (!key) {
+        key = 'required-field-' + (++requiredMessageId);
+        $field.attr('data-required-key', key);
+    }
+    var $parent = $field.parent();
+    var $inputGroup = $field.closest('.input-group');
+    var $scope = $form.length ? $form : ($inputGroup.length ? $inputGroup.parent() : $parent);
+    var $message = $scope.find('.RequiredField').filter(function () {
+        return $(this).attr('data-required-for') === key;
+    }).first();
+    var $mvcMessages = $scope.find('[data-valmsg-for]').filter(function () {
+        return fieldName && $(this).attr('data-valmsg-for') === fieldName;
+    });
+    var requiredText = requiredValidationMessage;
+    // Use the MVC placeholder even before its validator has rendered an error.
+    // Custom and MVC validation then update the same node, regardless of event order.
+    if ($mvcMessages.length) {
+        var $mvcMessage = $mvcMessages.first();
+        $message.remove();
+        if ($parent.find('input:not([type="hidden"]), select, textarea').length === 1) {
+            $parent.children('.RequiredField').filter(function () {
+                return !$(this).attr('data-required-for');
+            }).remove();
+        }
+        var ownsMessage = $mvcMessage.attr('data-required-owner') === key
+            && !$mvcMessage.children().length
+            && $mvcMessage.text() === $mvcMessage.attr('data-required-text');
+        if (isEmpty) {
+            if ($mvcMessage.children().length) {
+                // Keep the validator's error element so its success/reset logic still works.
+                $mvcMessage.children().first().text(requiredText);
+            } else {
+                $mvcMessage.text(requiredText)
+                    .attr({ 'data-required-owner': key, 'data-required-text': requiredText });
+            }
+            $mvcMessage.removeClass('field-validation-valid').addClass('field-validation-error').css('display', '');
+        } else if (!isEmpty && ownsMessage) {
+            $mvcMessage.empty().removeAttr('data-required-owner data-required-text')
+                .removeClass('field-validation-error').addClass('field-validation-valid')
+                .css('display', '');
+        }
+        $field.attr('data-required-checked', 'true');
+        return !isEmpty;
+    }
+    // Keep MVC required/range/server messages intact and avoid displaying two errors.
+    var hasMvcError = $mvcMessages.filter('.field-validation-error').filter(function () {
+        return $.trim($(this).text()) !== '';
+    }).length > 0;
+    hasMvcError = hasMvcError || $scope.find('label.error, span.error, span.input-validation-error').filter(function () {
+        var target = $(this).attr('for');
+        return (target === $field.attr('id') || target === fieldName)
+            && $(this).css('display') !== 'none' && $.trim($(this).text()) !== '';
+    }).length > 0;
+    if (isEmpty && !$message.length && !hasMvcError) {
+        var $legacy = $parent.children('.RequiredField').filter(function () {
+            return !$(this).attr('data-required-for');
+        });
+        if ($parent.find('input:not([type="hidden"]), select, textarea').length === 1) $message = $legacy.first();
+        if (!$message.length) {
+            $message = $('<p/>', { 'class': 'RequiredField', text: requiredValidationMessage });
+        }
+        $message.attr({ 'data-required-for': key, id: key + '-message', role: 'alert' });
+        var $groupContainer = $field.closest('.input-group');
+        var $select2 = $field.prev('.select2-container').add($field.next('.select2-container'));
+        var $anchor = $groupContainer.length ? $groupContainer : ($select2.length ? $select2.last() : $field);
+        $message.insertAfter($anchor);
+        var describedBy = ($field.attr('aria-describedby') || '').split(/\s+/).filter(Boolean);
+        if ($.inArray(key + '-message', describedBy) < 0) describedBy.push(key + '-message');
+        $field.attr('aria-describedby', describedBy.join(' '));
+    }
+    if ($message.length) {
+        if (isEmpty) $message.text(requiredValidationMessage);
+        $message.toggle(isEmpty && !hasMvcError);
+    }
+    $field.attr('data-required-checked', 'true');
+    return !isEmpty;
+}
+
+function bindRequiredFieldValidation() {
+    if (!document.inlineRequiredActionGuard) {
+        document.inlineRequiredActionGuard = function (event) {
+            var action = event.target.closest && event.target.closest('.sym-btn-save, .sym-btn-update, #SaveJSON, #UpdateJSON');
+            if (!action) return;
+            var container = action.closest('form') || action.closest('.pf-module-view, .contentBody, .main-content');
+            if (container && !validateRequiredFields($(container))) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+            }
+        };
+        // Run before inline onclick and page-specific AJAX handlers/toasts.
+        document.addEventListener('click', document.inlineRequiredActionGuard, true);
+    }
+    $('[data-val-required]').attr('data-val-required', requiredValidationMessage);
+    $('.field-validation-error[data-valmsg-for]').each(function () {
+        var $error = $(this);
+        var name = $error.attr('data-valmsg-for');
+        var $field = $error.closest('form').find(requiredFieldSelector).filter(function () {
+            return this.name === name;
+        }).first();
+        if ($field.length) validateRequiredField($field);
+    });
+    if ($.validator) {
+        // The view's required marker is authoritative; implicit non-nullable model
+        // metadata must not introduce required errors on optional/read-only fields.
+        if (!$.validator.normalizeRules.explicitRequiredOnly) {
+            var originalNormalizeRules = $.validator.normalizeRules;
+            var normalizeExplicitRules = function (rules, element) {
+                var result = originalNormalizeRules.apply(this, arguments);
+                var $element = $(element);
+                if (!$element.is(requiredFieldSelector) || skipRequiredField($element)) {
+                    delete result.required;
+                    delete result.requiredPositive;
+                }
+                return result;
+            };
+            normalizeExplicitRules.explicitRequiredOnly = true;
+            $.validator.normalizeRules = normalizeExplicitRules;
+        }
+        if (!$.validator.methods.required.zeroNumericRequired) {
+            var originalRequired = $.validator.methods.required;
+            var requiredWithBlankZero = function (value, element, parameter) {
+                if ($(element).hasClass('amount-zero-value')) return false;
+                return originalRequired.apply(this, arguments);
+            };
+            requiredWithBlankZero.zeroNumericRequired = true;
+            $.validator.methods.required = requiredWithBlankZero;
+        }
+        $.validator.messages.required = requiredValidationMessage;
+        $.validator.addMethod('requiredPositive', function (value) {
+            return isPositiveRequiredAmount(value);
+        }, requiredValidationMessage);
+        $.validator.addClassRules('required-positive', { requiredPositive: true });
+        if (!$.validator.prototype.defaultMessage.uniformRequiredMessage) {
+            var originalDefaultMessage = $.validator.prototype.defaultMessage;
+            var uniformDefaultMessage = function (element, rule) {
+                var method = typeof rule === 'string' ? rule : rule.method;
+                return method === 'required' || method === 'requiredPositive'
+                    ? requiredValidationMessage : originalDefaultMessage.apply(this, arguments);
+            };
+            uniformDefaultMessage.uniformRequiredMessage = true;
+            $.validator.prototype.defaultMessage = uniformDefaultMessage;
+        }
+    }
+    if ($.validator && !$.validator.prototype.showErrors.requiredMessageSync) {
+        var originalShowErrors = $.validator.prototype.showErrors;
+        var syncedShowErrors = function () {
+            var result = originalShowErrors.apply(this, arguments);
+            $(this.currentForm).find('[data-required-checked="true"]').each(function () {
+                validateRequiredField($(this));
+            });
+            return result;
+        };
+        syncedShowErrors.requiredMessageSync = true;
+        $.validator.prototype.showErrors = syncedShowErrors;
+    }
+    $(document).off('input.requiredFields change.requiredFields', 'input, select, textarea')
+        .on('input.requiredFields change.requiredFields', 'input, select, textarea', function () {
+            var $field = $(this);
+            if ($field.attr('data-required-checked') === 'true') validateRequiredField($field);
+        });
+    $(document).off('submit.requiredFields', 'form').on('submit.requiredFields', 'form', function (event) {
+        if (!validateRequiredFields($(this))) event.preventDefault();
+    });
+}
+
+function updateZeroAmountDisplay(field) {
+    if (!field || field.tagName !== 'INPUT' || !/^(text|number)$/i.test(field.type)) return;
+    var description = [field.name, field.id, field.getAttribute('placeholder') || ''].join(' ');
+    var numericClass = /(?:^|\s)(?:NumberCheck|NumberCheckAddDetail|isPositiveNumeric|TwoDecimal|NoDecimal)(?:\s|$)/.test(field.className);
+    var numericMetadata = field.getAttribute('data-val-number') !== null;
+    if (!numericClass && !numericMetadata && field.type !== 'number' && !/(amount|value|rate)/i.test(description)) return;
+    var value = $.trim(String(field.value || '')).replace(/,/g, '');
+    var isZero = value !== '' && isFinite(Number(value)) && Number(value) === 0;
+    if (field.classList.contains('amount-zero-value') !== isZero) {
+        field.classList.toggle('amount-zero-value', isZero);
+    }
+}
+
+function bindZeroAmountFields() {
+    $('input').each(function () { updateZeroAmountDisplay(this); });
+    $(document).off('input.zeroAmount change.zeroAmount', 'input')
+        .on('input.zeroAmount change.zeroAmount', 'input', function () { updateZeroAmountDisplay(this); });
+    // Calculated amounts often change through .val() without a change event.
+    if (!$.fn.val.zeroAmountDisplay) {
+        var originalVal = $.fn.val;
+        var amountVal = function () {
+            var result = originalVal.apply(this, arguments);
+            if (arguments.length) this.each(function () {
+                updateZeroAmountDisplay(this);
+                var $field = $(this);
+                if ($field.attr('data-required-checked') === 'true') {
+                    validateRequiredField($field);
+                }
+            });
+            return result;
+        };
+        amountVal.zeroAmountDisplay = true;
+        $.fn.val = amountVal;
+    }
+    if (!document.zeroAmountObserver && typeof MutationObserver !== 'undefined') {
+        document.zeroAmountObserver = new MutationObserver(function (changes) {
+            changes.forEach(function (change) {
+                Array.prototype.forEach.call(change.addedNodes, function (node) {
+                    if (node.nodeType !== 1) return;
+                    updateZeroAmountDisplay(node);
+                    Array.prototype.forEach.call(node.querySelectorAll('input'), updateZeroAmountDisplay);
+                });
+            });
+        });
+        document.zeroAmountObserver.observe(document.body, { childList: true, subtree: true });
+    }
+}
+
+$(function () { bindZeroAmountFields(); bindRequiredFieldValidation(); });
 
 function valiDation(sender) {
     //$("textarea").attr('maxlength', '200');
@@ -304,26 +542,7 @@ function valiDation(sender) {
     // Inline messages are created only after the first failed action.
 
 
-    $(".required").change(function () {
-        //var t = $(".required :selected").text();
-
-        if ($(this).val() == "") {
-
-            $(this).parent().find('.RequiredField').show();
-        }
-        else if ($(sender).attr('data-val-number')) {
-            if (!parseInt($(this).val())) {
-                $(this).parent().find('.RequiredField').show();
-            }
-            else {
-                $(this).parent().find('.RequiredField').hide('slow');
-            }
-        }
-        else {
-
-            $(this).parent().find('.RequiredField').hide('slow');
-        }
-    });
+    bindRequiredFieldValidation();
     $(".NumberCheck").change(function () {
         var val = $(this).val().replace(/\./g, '');
         val = val.replace(/\,/g, '');
@@ -444,12 +663,9 @@ $(".TimeFormat").change(function () {
 
 function pageSubmitJSON(sender) {
     var a = 0;
-    for (var i = 0; i < $('#' + sender + ' .required').length; i++) {
-        if ($($('#' + sender + ' .required')[i]).val() == "") {
-            $($('#' + sender + ' .required')[i]).parent().find('.RequiredField').show();
-            a++;
-        }
-    }
+    $('#' + sender).find(requiredFieldSelector).each(function () {
+        if (!validateRequiredField($(this))) a++;
+    });
     return a;
 }
 function NumberFormatCheck() {

@@ -55,7 +55,7 @@
 
             var empId = $('.EmpId').val();         
             if (empId=="") {
-                ShowResult("Fail", "Please select Employee !");
+                showRequiredFieldMessage(".EmpId");
                 return;
             }          
           

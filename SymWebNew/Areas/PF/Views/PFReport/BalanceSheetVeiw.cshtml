@@ -78,11 +78,11 @@
         var DateTo = $("#DateTo").val();
 
         if (DateFrom == "") {
-            ShowResult("Fail", "Please select the Date From");
+            showRequiredFieldMessage("#DateFrom");
             return true;
         }
         else if (DateTo == "") {
-            ShowResult("Fail", "Please select the Date To");
+            showRequiredFieldMessage("#DateTo");
             return true;
         }
         $("#frmFR").submit();

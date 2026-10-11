@@ -66,15 +66,15 @@
             var ToDate = $('.dtTo').val();
             var FromDate = $('.dtFrom').val();
             if (empId=="") {
-                ShowResult("Fail", "Please select Employee !");
+                showRequiredFieldMessage(".EmpId");
                 return;
             }
             if (FromDate == "") {
-                ShowResult("Fail", "Please select From Date !");
+                showRequiredFieldMessage(".dtFrom");
                 return;
             }
             if (ToDate == "") {
-                ShowResult("Fail", "Please select To Date !");
+                showRequiredFieldMessage(".dtTo");
                 return;
             }
             //alert(empId);
@@ -88,15 +88,15 @@
             var ToDate = $('.dtTo').val();
             var FromDate = $('.dtFrom').val();
             if (empId == "") {
-                ShowResult("Fail", "Please select Employee !");
+                showRequiredFieldMessage(".EmpId");
                 return;
             }
             if (FromDate == "") {
-                ShowResult("Fail", "Please select From Date !");
+                showRequiredFieldMessage(".dtFrom");
                 return;
             }
             if (ToDate == "") {
-                ShowResult("Fail", "Please select To Date !");
+                showRequiredFieldMessage(".dtTo");
                 return;
             }
             var url = "/@ViewBag.TransType/PFReport/EmployeePFStatements?rType=" + "Detail" + '&EmployeeId=' + empId + '&ToDate=' + ToDate+'&FromDate='+FromDate;

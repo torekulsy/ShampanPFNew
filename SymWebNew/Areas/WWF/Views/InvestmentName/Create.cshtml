@@ -376,7 +376,7 @@ BankAccountNo
 
 
         if (InterestRate == "") {
-            ShowResult("Fail", "Please select the Item!");
+            showRequiredFieldMessage(".crInterestRate");
             return;
         }
 
@@ -390,7 +390,7 @@ BankAccountNo
 
 
         if (InterestRate == "" ) {
-            ShowResult("Fail", "Please Enter Interest Rate!");
+            showRequiredFieldMessage(".crInterestRate");
             return;
         }
         if ( InterestRate < 1) {

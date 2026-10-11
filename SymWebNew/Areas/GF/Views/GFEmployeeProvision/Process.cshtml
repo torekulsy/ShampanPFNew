@@ -63,11 +63,11 @@
         var fYear = $("#fYear").val();
 
         if (FiscalPeriodDetailId == "") {
-            ShowResult("Fail", "Please Select the Fiscal Period");
+            showRequiredFieldMessage("#FiscalPeriodDetailId");
             return;
         }
         if (!chkAll && ProjectId == "") {
-            ShowResult("Fail", "Please Select the Project");
+            showRequiredFieldMessage("#ProjectId");
             return;
         }
 

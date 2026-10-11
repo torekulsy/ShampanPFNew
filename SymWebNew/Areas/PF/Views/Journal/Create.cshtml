@@ -389,7 +389,7 @@ else
 
 
         if (accountId == "") {
-            ShowResult("Fail", "Please select the Item!");
+            showRequiredFieldMessage(".COAId");
             return;
         }
 
@@ -406,7 +406,7 @@ else
 
 
         if (debitAmount == "" && creditAmount == "") {
-            ShowResult("Fail", "Please Enter Either Debit or Credit Amount!");
+            showRequiredFieldMessage(".drAmount");
             return;
         }
 

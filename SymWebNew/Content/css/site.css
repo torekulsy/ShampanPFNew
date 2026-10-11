@@ -358,3 +358,9 @@ div.dt-buttons {
         filter: brightness(0.8);
     }
 
+/* Use the same colour and weight for custom and MVC inline validation messages. */
+.RequiredField, .field-validation-error, .field-validation-error > *, label.error, span.error {
+    color: #e80c4d !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+}

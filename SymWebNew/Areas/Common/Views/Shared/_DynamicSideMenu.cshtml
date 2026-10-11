@@ -163,7 +163,7 @@
     }
     var iconInfo = GetMenuIconInfo(item.Title);
     <li class="nav-item">
-        <a class="@linkClass" href="@item.Url" data-menu-id="@parentKey-@item.Title">
+        <a class="@linkClass" href="@item.Url" data-menu-id="@parentKey-@item.Title" data-current-menu="@item.IsCurrent.ToString().ToLowerInvariant()">
             <i class="nav-icon @iconInfo.IconClass" style="color: @iconInfo.Color !important;"></i>
             <p>@item.Title</p>
         </a>
@@ -182,7 +182,7 @@
             linkClass += " linkReport";
         }
         <li class="nav-item">
-            <a class="@linkClass" href="@node.Url" data-menu-id="@parentKey-@node.CssClass">
+            <a class="@linkClass" href="@node.Url" data-menu-id="@parentKey-@node.CssClass" data-current-menu="@node.IsCurrent.ToString().ToLowerInvariant()">
                 <i class="nav-icon @iconInfo.IconClass" style="color: @iconInfo.Color !important;"></i>
                 <p>@node.Title</p>
             </a>

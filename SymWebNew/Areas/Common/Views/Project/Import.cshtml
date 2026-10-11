@@ -47,7 +47,7 @@
 
         // check empty
         if (fileInput.val() === "" || fileInput.val() === null) {
-            ShowResult("Fail", "Please choose a file");
+            showRequiredFieldMessage("#FileUpload");
             return false;
         }
 
